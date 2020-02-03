@@ -1,0 +1,6 @@
+[submodule "components/frozen/frozen"]
+	path = components/frozen/frozen
+	url = https://github.com/serge-sans-paille/frozen
+[submodule "components/rapidxml/rapidxml"]
+	path = components/rapidxml/rapidxml
+	url = https://github.com/dwd/rapidxml
