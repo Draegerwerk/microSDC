@@ -1,0 +1,4 @@
+config BUILD_DOCUMENTATION
+    bool "Build doxygen"
+    help
+        Generate Doxygen documentation for this project in the build process.

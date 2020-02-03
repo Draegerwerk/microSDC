@@ -1,0 +1,129 @@
+#include "DeviceCharacteristics.hpp"
+#include "NetworkHandler.hpp"
+#include "MicroSDC.hpp"
+#include "esp_eth.h"
+#include "esp_log.h"
+#include "esp_system.h"
+#include "nvs_flash.h"
+#include <chrono>
+#include "esp_pthread.h"
+#include <iostream>
+#include <sstream>
+#include <thread>
+
+static constexpr const char* TAG = "main_component";
+
+static void ip_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id,
+                             void* event_data)
+{
+  switch (event_id)
+  {
+    case IP_EVENT_ETH_GOT_IP:
+      [[fallthrough]];
+    case IP_EVENT_STA_GOT_IP: {
+      auto sdc = reinterpret_cast<MicroSDC*>(arg);
+      sdc->start();
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id,
+                               void* event_data)
+{
+  switch (event_id)
+  {
+    case WIFI_EVENT_WIFI_READY:
+      ESP_LOGI(TAG, "WiFi ready");
+      break;
+    case WIFI_EVENT_SCAN_DONE:
+      ESP_LOGI(TAG, "WiFi scan done");
+      break;
+    case WIFI_EVENT_STA_START:
+      ESP_LOGI(TAG, "WiFi start");
+      break;
+    case WIFI_EVENT_STA_STOP:
+      ESP_LOGI(TAG, "WiFi stop");
+      break;
+    case WIFI_EVENT_STA_CONNECTED:
+      ESP_LOGI(TAG, "WiFi connected");
+      break;
+    case WIFI_EVENT_STA_DISCONNECTED: {
+      ESP_LOGI(TAG, "WiFi disconnected");
+      auto sdc = reinterpret_cast<MicroSDC*>(arg);
+      sdc->stop();
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+static void eth_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id,
+                              void* event_data)
+{
+  uint8_t macAddress[6] = {0};
+  // we can get the ethernet driver handle from event data
+  esp_eth_handle_t eth_handle = *static_cast<esp_eth_handle_t*>(event_data);
+
+  switch (event_id)
+  {
+    case ETHERNET_EVENT_CONNECTED: {
+      esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, macAddress);
+      ESP_LOGI(TAG, "Ethernet Link Up");
+      ESP_LOGI(TAG, "Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x", macAddress[0], macAddress[1],
+               macAddress[2], macAddress[3], macAddress[4], macAddress[5]);
+      break;
+    }
+    case ETHERNET_EVENT_DISCONNECTED: {
+      ESP_LOGI(TAG, "Ethernet Link Down");
+      auto sdc = reinterpret_cast<MicroSDC*>(arg);
+      sdc->stop();
+      break;
+    }
+    case ETHERNET_EVENT_START:
+      ESP_LOGI(TAG, "Ethernet Started");
+      break;
+    case ETHERNET_EVENT_STOP:
+      ESP_LOGI(TAG, "Ethernet Stopped");
+      break;
+    default:
+      break;
+  }
+}
+
+// force c linkage for app_main()
+extern "C" void app_main()
+{
+  ESP_LOGI(TAG, "Starting up....");
+
+  ESP_LOGI(TAG, "NVS Flash init...");
+  ESP_ERROR_CHECK(nvs_flash_init());
+  ESP_LOGI(TAG, "TCP adapter init...");
+  tcpip_adapter_init();
+  ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+  auto sdc = new MicroSDC();
+  sdc->setEndpointReference("urn:uuid:MicroSDC-provider-on-esp32");
+  sdc->setUseTLS(true);
+
+  DeviceCharacteristics deviceCharacteristics;
+  deviceCharacteristics.setFriendlyName("MicroSDC on ESP32");
+  deviceCharacteristics.setManufacturer("Draeger");
+  deviceCharacteristics.setModelName("MicroSDC_Device01");
+  sdc->setDeviceCharacteristics(deviceCharacteristics);
+
+  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, sdc));
+
+  ESP_ERROR_CHECK(
+      esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, sdc));
+  ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &eth_event_handler, sdc));
+
+
+  ESP_LOGI(TAG, "Connecting...");
+  ESP_ERROR_CHECK(NetworkHandler::getInstance().connect());
+
+  vTaskDelete(nullptr);
+}

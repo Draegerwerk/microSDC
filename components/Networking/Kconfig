@@ -1,0 +1,40 @@
+menu "Networking"
+    choice CONNECT_INTERFACE
+        prompt "Connect using"
+        default CONNECT_WIFI
+        help
+            Protocol examples can use Wi-Fi or Ethernet to connect to the network.
+            Choose which interface to use.
+
+        config CONNECT_WIFI
+            bool "Wi-Fi"
+
+        config CONNECT_ETHERNET
+            bool "Ethernet"
+
+    endchoice
+
+    if CONNECT_WIFI
+        config WIFI_SSID
+            string "WiFi SSID"
+            default "myssid"
+            help
+                SSID (network name) for the example to connect to.
+
+        config WIFI_PASSWORD
+            string "WiFi Password"
+            default "mypassword"
+            help
+                WiFi password (WPA or WPA2) for the example to use.
+                Can be left blank if the network has no security set.
+    endif
+
+    if CONNECT_ETHERNET
+        config ETHERNET_DHCP
+            bool "Enable DHCP"
+            default y
+            help
+                Whether to start the DHCP client when connected to Ethernet.
+    endif
+
+endmenu
