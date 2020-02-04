@@ -24,6 +24,7 @@ esp_err_t Ethernet::connect()
   esp_eth_config_t config = ETH_DEFAULT_CONFIG(mac, phy);
   esp_eth_handle_t ethHandle = nullptr;
   ESP_ERROR_CHECK(esp_eth_driver_install(&config, &ethHandle));
+  ESP_ERROR_CHECK(esp_eth_start(ethHandle));
 
   return ESP_OK;
 }
