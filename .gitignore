@@ -3,6 +3,9 @@ compile_commands.json
 # clangd index
 .clangd
 
+# vim configuration
+.vim/
+
 # ccls cache directory
 .ccls-cache
 
