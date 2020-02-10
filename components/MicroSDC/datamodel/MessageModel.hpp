@@ -144,7 +144,7 @@ namespace MESSAGEMODEL
 
     // GetMdibResponse
     //
-    using GetMdibResponseType = std::string;
+    using GetMdibResponseType = BICEPS::PM::Mdib;
     using GetMdibResponseOptional = std::optional<GetMdibResponseType>;
     const GetMdibResponseOptional& GetMdibResponse() const;
     GetMdibResponseOptional& GetMdibResponse();

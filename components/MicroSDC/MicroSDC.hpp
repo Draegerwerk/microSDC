@@ -21,6 +21,8 @@ public:
    * @brief stops all components when disconnected
    */
   void stop();
+  const BICEPS::PM::Mdib& getMdib() const;
+  void setMdDescription(const BICEPS::PM::MdDescription& mdDescription);
   /**
    * @brief sets the device characteristics of this SDC service
    * @param devChar characteristics to be set
@@ -65,7 +67,10 @@ private:
   std::unique_ptr<DPWSHost> dpws_{nullptr};
   /// pointer to the WebServer
   std::unique_ptr<WebServer> webserver_{nullptr};
-  bool useTLS{true};
+  /// pointer to the mdib representation
+  std::unique_ptr<BICEPS::PM::Mdib> mdib_{nullptr};
+  /// whether the communication uses TLS
+  bool useTLS_{true};
   /// whether SDC is started and connected
   bool running_{false};
   mutable std::mutex runningMutex_;

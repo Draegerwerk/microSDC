@@ -42,26 +42,24 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const WS::DPWS::HostServiceType& host);
   void serialize(rapidxml::xml_node<>* parent, const WS::DPWS::HostedServiceType& hosted);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::GetMdibResponse& getMdibResponse);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Mdib& mdib);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdDescription& mdDescription);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdsDescriptor& mdsDescriptor);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Metadata& metadata);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::SystemContextDescriptor& systemContext);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::PatientContextDescriptor& patientContext);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::VmdDescriptor& vmd);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ChannelDescriptor& channel);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::AbstractMetricDescriptor& abstractMetric);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& mdState);
 
+  static std::string toString(BICEPS::PM::SafetyClassification);
   static std::string toString(const WS::DISCOVERY::UriListType& uriList);
   static std::string toString(const WS::DISCOVERY::QNameListType& qNameList);
-  //void serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::QNameListType& qNameList);
+
 private:
-  /*
-  static constexpr frozen::unordered_map<frozen::string, frozen::string, 10> nsMap__ = {
-      {MDPWS::WS_NS_SOAP_ENVELOPE, "soap"},
-      {MDPWS::WS_NS_DISCOVERY, "wsd"},
-      {MDPWS::WS_NS_ADDRESSING, "wsa"},
-      {MDPWS::WS_NS_DPWS, "dpws"},
-      {MDPWS::NS_MDPWS, "mdpws"},
-      {MDPWS::WS_NS_METADATA_EXCHANGE, "mex"},
-      {SDC::NS_GLUE, "glue"},
-      {SDC::NS_BICEPS_MESSAGE_MODEL, "mm"},
-      {SDC::NS_BICEPS_PARTICIPANT_MODEL, "pm"},
-      {SDC::NS_BICEPS_EXTENSION, "ext"}};
-      */
-
   std::unique_ptr<rapidxml::xml_document<>> xmlDocument_;
-
-  // std::string outString_;
 };

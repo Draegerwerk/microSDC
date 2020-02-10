@@ -1,12 +1,12 @@
 #include "DeviceCharacteristics.hpp"
-#include "NetworkHandler.hpp"
 #include "MicroSDC.hpp"
+#include "NetworkHandler.hpp"
 #include "esp_eth.h"
 #include "esp_log.h"
+#include "esp_pthread.h"
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include <chrono>
-#include "esp_pthread.h"
 #include <iostream>
 #include <sstream>
 #include <thread>
@@ -114,6 +114,28 @@ extern "C" void app_main()
   deviceCharacteristics.setManufacturer("Draeger");
   deviceCharacteristics.setModelName("MicroSDC_Device01");
   sdc->setDeviceCharacteristics(deviceCharacteristics);
+
+  BICEPS::PM::Metadata metadata;
+  metadata.Manufacturer().emplace_back("Draeger");
+  metadata.ModelName().emplace_back("MicroSDC_Device01");
+  metadata.ModelNumber().emplace("1");
+  metadata.SerialNumber().emplace_back("1234-5678");
+
+  BICEPS::PM::SystemContextDescriptor systemContext("system_context");
+  systemContext.PatientContext() = BICEPS::PM::PatientContextDescriptor("patient_context");
+
+  BICEPS::PM::ChannelDescriptor deviceChannel("device_channel");
+  deviceChannel.SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
+  BICEPS::PM::VmdDescriptor deviceModule("device_vmd");
+
+  BICEPS::PM::MdsDescriptor deviceDescriptor("MedicalDevices");
+  deviceDescriptor.MetaData() = metadata;
+  deviceDescriptor.SystemContext() = systemContext;
+  deviceDescriptor.Vmd().emplace_back(deviceModule);
+
+  BICEPS::PM::MdDescription mdDescription;
+  mdDescription.Mds().emplace_back(deviceDescriptor);
+  sdc->setMdDescription(mdDescription);
 
   ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, sdc));
 

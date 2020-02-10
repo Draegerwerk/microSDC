@@ -56,6 +56,7 @@ namespace BICEPS::PM
     const SafetyClassificationOptional& SafetyClassification() const;
     SafetyClassificationOptional& SafetyClassification();
 
+  protected:
     // Constructors.
     //
     AbstractDescriptor(const HandleType&);
@@ -68,9 +69,13 @@ namespace BICEPS::PM
   };
   class AbstractDeviceComponentDescriptor : public AbstractDescriptor
   {
+  protected:
+    AbstractDeviceComponentDescriptor(const HandleType&);
   };
   class AbstractComplexDeviceComponentDescriptor : public AbstractDeviceComponentDescriptor
   {
+  protected:
+    AbstractComplexDeviceComponentDescriptor(const HandleType&);
   };
   class Metadata
   {
@@ -109,8 +114,34 @@ namespace BICEPS::PM
     ModelNumberOptional ModelNumber_;
     SerialNumberSequence SerialNumber_;
   };
-  class SystemContextDescriptor
+  class AbstractContextDescriptor : public AbstractDescriptor
   {
+  protected:
+    AbstractContextDescriptor(const HandleType&);
+  };
+  class PatientContextDescriptor : public AbstractContextDescriptor
+  {
+  public:
+    // Constructors
+    //
+    PatientContextDescriptor(const HandleType&);
+  };
+  class SystemContextDescriptor : public AbstractContextDescriptor
+  {
+  public:
+    // PatientContext
+    //
+    using PatientContextType = PatientContextDescriptor;
+    using PatientContextOptional = std::optional<PatientContextType>;
+    const PatientContextOptional& PatientContext() const;
+    PatientContextOptional& PatientContext();
+
+    // Constructors
+    //
+    SystemContextDescriptor(const HandleType&);
+
+  protected:
+    PatientContextOptional PatientContext_;
   };
   class ClockDescriptor
   {
@@ -153,6 +184,7 @@ namespace BICEPS::PM
     const MetricAvailabilityType& MetricAvailability() const;
     MetricAvailabilityType& MetricAvailability();
 
+  protected:
     // Constructors.
     //
     AbstractMetricDescriptor(const HandleType&, const UnitType&, const MetricCategoryType&,
@@ -172,6 +204,9 @@ namespace BICEPS::PM
     using MetricSequence = std::vector<MetricType>;
     const MetricSequence& Metric() const;
     MetricSequence& Metric();
+    // Constructors
+    //
+    ChannelDescriptor(const HandleType&);
 
   protected:
     MetricSequence Metric_;
@@ -259,7 +294,7 @@ namespace BICEPS::PM
 
     // Constructors.
     //
-    MdDescription();
+    MdDescription() = default;
 
   protected:
     MdsSequence Mds_;
@@ -281,6 +316,7 @@ namespace BICEPS::PM
     const DescriptorHandleType& DescriptorHandle() const;
     DescriptorHandleType& DescriptorHandle();
 
+  protected:
     // Constructors.
     //
     AbstractState(const DescriptorHandleType&);
@@ -312,6 +348,7 @@ namespace BICEPS::PM
   };
   class Mdib
   {
+  public:
     // MdDescription
     //
     using MdDescriptionType = ::BICEPS::PM::MdDescription;

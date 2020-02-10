@@ -1,4 +1,6 @@
 set(COMPONENT_SOURCES
+        "datamodel/BICEPS_MessageModel.cpp"
+        "datamodel/BICEPS_ParticipantModel.cpp"
         "datamodel/ExpectedElement.cpp"
         "datamodel/MessageModel.cpp"
         "datamodel/MessageSerializer.cpp"
@@ -15,6 +17,8 @@ set(COMPONENT_SOURCES
         "MicroSDC.cpp"
         "SoapService.cpp"
         "StaticService.cpp"
+        "MDIB/Mdib.hpp"
+        "MDIB/Mdib.cpp"
     )
 
 idf_component_register(

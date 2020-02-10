@@ -8,8 +8,9 @@
 
 static constexpr const char* TAG = "GetService";
 
-GetService::GetService(const MetadataProvider& metadata)
-  : metadata_(metadata)
+GetService::GetService(const MicroSDC& microSDC, const MetadataProvider& metadata)
+  : microSDC_(microSDC)
+  , metadata_(metadata)
 {
 }
 
@@ -40,15 +41,12 @@ void GetService::handleRequest(httpd_req* req, char* message)
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
     responseEnvelope.Header().Action() = WS::ADDRESSING::URIType(SDC::ACTION_GET_MDIB_RESPONSE);
-    randomValue = esp_random();
     responseEnvelope.Body().GetMdibResponse() =
-        std::make_optional<MESSAGEMODEL::Body::GetMdibResponseType>(
-            SampleMdib_l + std::to_string(randomValue) + SampleMdib_r);
+        std::make_optional<MESSAGEMODEL::Body::GetMdibResponseType>(microSDC_.getMdib());
     MessageSerializer serializer;
     serializer.serialize(responseEnvelope);
     const auto& message = serializer.str();
-    ESP_LOGI(TAG, "Sending GetMdibResponse");
-    ESP_LOGD(TAG, "Sending GetMdibResponse: \n %s", message.c_str());
+    ESP_LOGI(TAG, "Sending GetMdibResponse: \n %s", message.c_str());
     httpd_resp_send(req, message.c_str(), message.length());
   }
   else

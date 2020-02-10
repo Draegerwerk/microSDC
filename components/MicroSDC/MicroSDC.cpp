@@ -13,7 +13,10 @@
 
 static constexpr const char* TAG = "MicroSDC";
 
-MicroSDC::MicroSDC() = default;
+MicroSDC::MicroSDC()
+  : mdib_(std::make_unique<BICEPS::PM::Mdib>(std::string("0")))
+{
+}
 
 void MicroSDC::start()
 {
@@ -33,13 +36,13 @@ void MicroSDC::startup()
   } // free lock of running bool
   ESP_LOGI(TAG, "Initialize...");
 
-  MetadataProvider metadata(getDeviceCharacteristics(), useTLS);
+  MetadataProvider metadata(getDeviceCharacteristics(), useTLS_);
 
   // construct xAddresses containing reference to the service
   WS::DISCOVERY::UriListType xAddresses;
-  std::string protocol = useTLS ? "https" : "http";
+  std::string protocol = useTLS_ ? "https" : "http";
   std::string xaddress = protocol + "://" + NetworkHandler::getInstance().address() +
-                         (useTLS ? ":443" : ":80") + metadata.getDeviceServicePath();
+                         (useTLS_ ? ":443" : ":80") + metadata.getDeviceServicePath();
   xAddresses.emplace_back(xaddress);
 
   // fill discovery types
@@ -60,11 +63,11 @@ void MicroSDC::startup()
 
   // construct web services
   auto deviceService = std::make_shared<DeviceService>(metadata);
-  auto getService = std::make_shared<GetService>(metadata);
+  auto getService = std::make_shared<GetService>(*this, metadata);
   auto getWSDLService =
       std::make_shared<StaticService>(getService->getURI() + "/?wsdl", WSDL::getServiceWSDL);
 
-  webserver_ = std::make_unique<WebServer>(useTLS);
+  webserver_ = std::make_unique<WebServer>(useTLS_);
 
   // register webservices
   webserver_->addService(deviceService);
@@ -86,6 +89,16 @@ void MicroSDC::stop()
     sdcThread_.join();
     ESP_LOGI(TAG, "stopped");
   }
+}
+
+const BICEPS::PM::Mdib& MicroSDC::getMdib() const
+{
+  return *mdib_;
+}
+
+void MicroSDC::setMdDescription(const BICEPS::PM::MdDescription& mdDescription)
+{
+  mdib_->MdDescription() = mdDescription;
 }
 
 void MicroSDC::setDeviceCharacteristics(DeviceCharacteristics devChar)
@@ -115,13 +128,13 @@ std::string MicroSDC::getEndpointReference() const
 
 void MicroSDC::setUseTLS(const bool useTLS)
 {
-  this->useTLS = useTLS;
+  this->useTLS_ = useTLS;
 }
 
 std::string MicroSDC::calculateUUID()
 {
-  auto UUID = UUIDGenerator().create();
-  return UUID.toString();
+  auto uuid = UUIDGenerator().create();
+  return uuid.toString();
 }
 
 std::string MicroSDC::calculateMessageID()

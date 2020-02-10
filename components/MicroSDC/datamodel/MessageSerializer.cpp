@@ -110,7 +110,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   }
   else if (body.GetMdibResponse().has_value())
   {
-    bodyNode->value(body.GetMdibResponse()->c_str());
+    serialize(bodyNode, body.GetMdibResponse().value());
   }
   parent->append_node(bodyNode);
 }
@@ -119,7 +119,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::ADDRESSING::RelatesToType& relatesTo)
 {
   auto relatesToNode = xmlDocument_->allocate_node(rapidxml::node_element, "mdpws:RelatesTo");
-  relatesToNode->value(relatesTo.uri().c_str(), relatesTo.uri().size());
+  relatesToNode->value(relatesTo.uri().c_str());
   parent->append_node(relatesToNode);
 }
 
@@ -133,21 +133,6 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   parent->append_node(eprNode);
 }
 
-/*
-void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::DISCOVERY::QNameListType& qNameList)
-{
-  for (auto qname = qNameList.begin(); qname != qNameList.end(); qname++)
-  {
-    if (qname != qNameList.begin())
-    {
-      sstream_ += " ";
-    }
-    sstream_ += std::string(nsMap__.at(qname->ns()).data()) + ":" + qname->name();
-  }
-}
-*/
-
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::AppSequenceType& appSequence)
 {
@@ -158,8 +143,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   appSequenceNode->append_attribute(instanceIdAttr);
   if (appSequence.SequenceId().has_value())
   {
-    auto sequenceId = xmlDocument_->allocate_string(appSequence.SequenceId()->uri().c_str(),
-                                                    appSequence.SequenceId()->uri().size());
+    auto sequenceId = xmlDocument_->allocate_string(appSequence.SequenceId()->uri().c_str());
     auto sequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", sequenceId);
     appSequenceNode->append_attribute(sequenceIdAttr);
   }
@@ -169,6 +153,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   appSequenceNode->append_attribute(messageNumberAttr);
   parent->append_node(appSequenceNode);
 }
+
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::ScopesType& scopes)
 {
@@ -428,6 +413,173 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::MM::GetMdibResponse& getMdibResponse)
 {
+  auto getMdibResponseNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "mm:GetMdibResponse");
+  auto sequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", "0");
+  getMdibResponseNode->append_attribute(sequenceIdAttr);
+  serialize(getMdibResponseNode, getMdibResponse.Mdib());
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Mdib& mdib)
+{
+  auto mdibNode = xmlDocument_->allocate_node(rapidxml::node_element, "mm:Mdib");
+  auto sequenceId = xmlDocument_->allocate_string(mdib.SequenceId().uri().c_str());
+  auto sequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", sequenceId);
+  mdibNode->append_attribute(sequenceIdAttr);
+  auto mdibVersion =
+      xmlDocument_->allocate_string(std::to_string(mdib.MdibVersion().value_or(0)).c_str());
+  auto mdibVersionAttr = xmlDocument_->allocate_attribute(mdibVersion);
+  mdibNode->append_attribute(mdibVersionAttr);
+  if (mdib.MdDescription().has_value())
+  {
+    serialize(mdibNode, mdib.MdDescription().value());
+  }
+  if (mdib.MdState().has_value())
+  {
+    serialize(mdibNode, mdib.MdState().value());
+  }
+  parent->append_node(mdibNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::MdDescription& mdDescription)
+{
+  auto mdDescriptionNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MdDescription");
+  for (const auto& md : mdDescription.Mds())
+  {
+    serialize(mdDescriptionNode, md);
+  }
+  parent->append_node(mdDescriptionNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::MdsDescriptor& mdsDescriptor)
+{
+  auto mdsDescriptorNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Mds");
+  auto handleAttr = xmlDocument_->allocate_attribute("Handle", mdsDescriptor.Handle().c_str());
+  mdsDescriptorNode->append_attribute(handleAttr);
+  if (mdsDescriptor.MetaData().has_value())
+  {
+    serialize(mdsDescriptorNode, mdsDescriptor.MetaData().value());
+  }
+  if (mdsDescriptor.SystemContext().has_value())
+  {
+    serialize(mdsDescriptorNode, mdsDescriptor.SystemContext().value());
+  }
+  for (const auto& vmd : mdsDescriptor.Vmd())
+  {
+    serialize(mdsDescriptorNode, vmd);
+  }
+  parent->append_node(mdsDescriptorNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::Metadata& metadata)
+{
+  auto metaDataNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MetaData");
+
+  for (const auto& modelName : metadata.ModelName())
+  {
+    auto modelNameNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:ModelName");
+    auto refAttr = xmlDocument_->allocate_attribute("Ref", modelName.c_str());
+    modelNameNode->append_attribute(refAttr);
+    metaDataNode->append_node(modelNameNode);
+  }
+  if (metadata.ModelNumber().has_value())
+  {
+    auto modelNumberNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:ModelNumber");
+    modelNumberNode->value(metadata.ModelNumber().value().c_str());
+    metaDataNode->append_node(modelNumberNode);
+  }
+  for (const auto& serialNumber : metadata.SerialNumber())
+  {
+    auto serialNumberNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:SerialNumber");
+    serialNumberNode->value(serialNumber.c_str());
+    metaDataNode->append_node(serialNumberNode);
+  }
+  for (const auto& manufacturer : metadata.Manufacturer())
+  {
+    auto manufacturerNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Manufacturer");
+    auto refAttr = xmlDocument_->allocate_attribute("Ref", manufacturer.c_str());
+    manufacturerNode->append_attribute(refAttr);
+    metaDataNode->append_node(manufacturerNode);
+  }
+  parent->append_node(metaDataNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::SystemContextDescriptor& systemContext)
+{
+  auto systemContextNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:SystemContext");
+  auto handleAttr = xmlDocument_->allocate_attribute("Handle", systemContext.Handle().c_str());
+  systemContextNode->append_attribute(handleAttr);
+  if (systemContext.PatientContext().has_value())
+  {
+    serialize(systemContextNode, systemContext.PatientContext().value());
+  }
+  parent->append_node(systemContextNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::PatientContextDescriptor& patientContext)
+{
+  auto patientContextNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "pm:PatientContext");
+  auto handleAttr = xmlDocument_->allocate_attribute("Handle", patientContext.Handle().c_str());
+  patientContextNode->append_attribute(handleAttr);
+  if (patientContext.SafetyClassification().has_value())
+  {
+    auto safetyClassification = xmlDocument_->allocate_string(
+        toString(patientContext.SafetyClassification().value()).c_str());
+    auto handleAttr =
+        xmlDocument_->allocate_attribute("SafetyClassification", safetyClassification);
+    patientContextNode->append_attribute(handleAttr);
+  }
+  parent->append_node(patientContextNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::VmdDescriptor& vmd)
+{
+  auto vmdNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Vmd");
+  auto handleAttr = xmlDocument_->allocate_attribute("Handle", vmd.Handle().c_str());
+  vmdNode->append_attribute(handleAttr);
+  for (const auto& channel : vmd.Channel())
+  {
+    serialize(vmdNode, channel);
+  }
+  parent->append_node(vmdNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::ChannelDescriptor& channel)
+{
+  auto channelNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Channel");
+  auto handleAttr = xmlDocument_->allocate_attribute("Handle", channel.Handle().c_str());
+  channelNode->append_attribute(handleAttr);
+  parent->append_node(channelNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& mdState)
+{
+}
+
+/*static*/ std::string
+MessageSerializer::toString(BICEPS::PM::SafetyClassification safetyClassification)
+{
+  switch (safetyClassification)
+  {
+    case BICEPS::PM::SafetyClassification::Inf:
+      return "Inf";
+    case BICEPS::PM::SafetyClassification::MedA:
+      return "MedA";
+    case BICEPS::PM::SafetyClassification::MedB:
+      return "MedB";
+    case BICEPS::PM::SafetyClassification::MedC:
+      return "MedC";
+  }
+  assert(false && "Uncatched value in SafetyClassification");
+  return "";
 }
 
 std::string MessageSerializer::toString(const WS::DISCOVERY::UriListType& uriList)
