@@ -28,7 +28,7 @@ struct Color
   std::uint8_t blue = 0;
 };
 
-template <unsigned int LED_COUNT, RGBOrder RGB_ORDER>
+template <std::size_t LED_COUNT, RGBOrder RGB_ORDER>
 class WS2812
 {
 public:
@@ -50,12 +50,16 @@ public:
 
 private:
   rmt_channel_t rmtChannel_;
-  static const uint16_t bitsPerLedCmd_ = 24;
-  // These values are determined by measuring pulse timing with logic analyzer and adjusting to
-  // match datasheet.
-  static const uint16_t highTime0_ = 14;  // 0 bit high time
-  static const uint16_t highTime1_ = 52;  // 1 bit high time
-  static const uint16_t lowTimeAny_ = 52; // low time for either bit
+  static const std::uint8_t bitsPerLedCmd_ = 24;
+  static const unsigned int rmtBufferSize_ = LED_COUNT * bitsPerLedCmd_;
+  /// These values are determined by measuring pulse timing with logic analyzer and adjusting to
+  /// match datasheet.
+  /// 0 bit high time
+  static const std::uint8_t highTime0_ = 14;
+  /// 1 bit high time
+  static const std::uint8_t highTime1_ = 52;
+  // low time for either bit
+  static const std::uint8_t lowTimeAny_ = 52;
 
   /**
    * @brief Sets up the RMT data buffer
@@ -63,12 +67,13 @@ private:
    * @param rmtDataBuffer The RMT data buffer to write to
    * @param ledState The array holding RGB colors corresponding to the connected LEDs
    */
-  void setupRmtDataBuffer(rmt_item32_t* rmtDataBuffer, std::array<Color, LED_COUNT> ledState);
+  void setupRmtDataBuffer(std::array<rmt_item32_t, rmtBufferSize_>& rmtDataBuffer,
+                          std::array<Color, LED_COUNT> ledState);
   std::array<uint32_t, LED_COUNT>
   composeRgbValues(const std::array<Color, LED_COUNT>& ledState) const;
 };
 
-template <unsigned int LED_COUNT, RGBOrder RGB_ORDER>
+template <std::size_t LED_COUNT, RGBOrder RGB_ORDER>
 WS2812<LED_COUNT, RGB_ORDER>::WS2812(gpio_num_t gpioPin, rmt_channel_t rmtChannel)
 {
   rmtChannel_ = rmtChannel;
@@ -86,26 +91,26 @@ WS2812<LED_COUNT, RGB_ORDER>::WS2812(gpio_num_t gpioPin, rmt_channel_t rmtChanne
   ESP_ERROR_CHECK(rmt_driver_install(rmtChannel_, 0, 0));
 }
 
-template <unsigned int LED_COUNT, RGBOrder RGB_ORDER>
+template <std::size_t LED_COUNT, RGBOrder RGB_ORDER>
 void WS2812<LED_COUNT, RGB_ORDER>::writeLeds(const std::array<Color, LED_COUNT>& ledState)
 {
-  rmt_item32_t rmtDataBuffer[LED_COUNT * bitsPerLedCmd_] = {};
+  std::array<rmt_item32_t, rmtBufferSize_> rmtDataBuffer;
+  rmtDataBuffer.fill((rmt_item32_t){{{0, 0, 0, 0}}});
   setupRmtDataBuffer(rmtDataBuffer, ledState);
-  ESP_ERROR_CHECK(rmt_write_items(rmtChannel_, rmtDataBuffer, LED_COUNT * bitsPerLedCmd_, false));
+  ESP_ERROR_CHECK(rmt_write_items(rmtChannel_, rmtDataBuffer.data(), rmtBufferSize_, false));
   ESP_ERROR_CHECK(rmt_wait_tx_done(rmtChannel_, portMAX_DELAY));
 }
 
-template <unsigned int LED_COUNT, RGBOrder RGB_ORDER>
-void WS2812<LED_COUNT, RGB_ORDER>::setupRmtDataBuffer(rmt_item32_t* rmtDataBuffer,
-                                                      std::array<Color, LED_COUNT> ledState)
+template <std::size_t LED_COUNT, RGBOrder RGB_ORDER>
+void WS2812<LED_COUNT, RGB_ORDER>::setupRmtDataBuffer(
+    std::array<rmt_item32_t, rmtBufferSize_>& rmtDataBuffer, std::array<Color, LED_COUNT> ledState)
 {
   std::array<uint32_t, LED_COUNT> rgbValues = composeRgbValues(ledState);
-  for (uint32_t ledIndex = 0; ledIndex < LED_COUNT; ledIndex++)
+  for (std::size_t ledIndex = 0; ledIndex < LED_COUNT; ++ledIndex)
   {
-    uint32_t bitsToSend = rgbValues.at(ledIndex);
-    const char* intStr = std::to_string(bitsToSend).c_str();
+    uint32_t bitsToSend = rgbValues[ledIndex];
     uint32_t mask = 1 << (bitsPerLedCmd_ - 1);
-    for (uint32_t bitIndex = 0; bitIndex < bitsPerLedCmd_; bitIndex++)
+    for (std::size_t bitIndex = 0; bitIndex < bitsPerLedCmd_; ++bitIndex)
     {
       uint32_t isBitSet = bitsToSend & mask;
       rmtDataBuffer[ledIndex * bitsPerLedCmd_ + bitIndex] =
@@ -116,38 +121,40 @@ void WS2812<LED_COUNT, RGB_ORDER>::setupRmtDataBuffer(rmt_item32_t* rmtDataBuffe
   }
 }
 
-template <unsigned int LED_COUNT, RGBOrder RGB_ORDER>
+template <std::size_t LED_COUNT, RGBOrder RGB_ORDER>
 std::array<uint32_t, LED_COUNT>
 WS2812<LED_COUNT, RGB_ORDER>::composeRgbValues(const std::array<Color, LED_COUNT>& ledState) const
 {
-  std::array<uint32_t, LED_COUNT> rgbValues = {};
-  for (unsigned int i = 0; i < ledState.size(); ++i)
+  std::array<uint32_t, LED_COUNT> rgbValues;
+  rgbValues.fill(0);
+  for (std::size_t i = 0; i < ledState.size(); ++i)
   {
-    uint32_t redByte = ledState.at(i).red << 16;
-    uint32_t greenByte = ledState.at(i).green << 8;
-    uint32_t blueByte = ledState.at(i).blue;
-    switch (RGB_ORDER)
+    uint32_t redByte = ledState[i].red;
+    uint32_t greenByte = ledState[i].green;
+    uint32_t blueByte = ledState[i].blue;
+    if constexpr (RGB_ORDER == RGBOrder::RGB)
     {
-      case RGBOrder::RGB:
-        rgbValues.at(i) = redByte | greenByte | blueByte;
-        break;
-      case RGBOrder::RBG:
-        rgbValues.at(i) = redByte | (greenByte >> 8) | (blueByte << 8);
-        break;
-      case RGBOrder::GRB:
-        rgbValues.at(i) = (redByte >> 8) | (greenByte << 8) | (blueByte);
-        break;
-      case RGBOrder::GBR:
-        rgbValues.at(i) = (redByte >> 16) | (greenByte << 8) | (blueByte << 8);
-        break;
-      case RGBOrder::BRG:
-        rgbValues.at(i) = (redByte >> 8) | (greenByte >> 8) | (blueByte << 16);
-        break;
-      case RGBOrder::BGR:
-        rgbValues.at(i) = (redByte >> 16) | greenByte | (blueByte << 16);
-        break;
-      default:
-        break;
+      rgbValues[i] = redByte << 16u | greenByte << 8u | blueByte;
+    }
+    else if constexpr (RGB_ORDER == RGBOrder::RBG)
+    {
+      rgbValues[i] = redByte << 16u | greenByte | (blueByte << 8);
+    }
+    else if constexpr (RGB_ORDER == RGBOrder::GRB)
+    {
+      rgbValues[i] = (redByte << 8u) | (greenByte << 16u) | blueByte;
+    }
+    else if constexpr (RGB_ORDER == RGBOrder::GBR)
+    {
+      rgbValues[i] = redByte | (greenByte << 16u) | (blueByte << 8u);
+    }
+    else if constexpr (RGB_ORDER == RGBOrder::BRG)
+    {
+      rgbValues[i] = (redByte << 8u) | greenByte | (blueByte << 16u);
+    }
+    else if constexpr (RGB_ORDER == RGBOrder::BGR)
+    {
+      rgbValues[i] = redByte | (greenByte << 8u) | (blueByte << 16u);
     }
   }
   return rgbValues;
