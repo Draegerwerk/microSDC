@@ -1,2 +1,2 @@
-idf_component_register(SRCS "WS2812.cpp"
+idf_component_register(SRCS
                        INCLUDE_DIRS ".")
