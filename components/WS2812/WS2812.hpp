@@ -38,7 +38,7 @@ public:
    * @param gpioPin The GPIO pin which is connect to a WS2812 LED strip
    * @param rmtChannel The RMT channel to use
    */
-  WS2812(gpio_num_t gpioPin, rmt_channel_t rmtChannel = RMT_CHANNEL_0);
+  explicit WS2812(gpio_num_t gpioPin, rmt_channel_t rmtChannel = RMT_CHANNEL_0);
 
   /**
    * @brief Lights the LED strip up corresponding to the provided array of Colors
@@ -50,16 +50,16 @@ public:
 
 private:
   rmt_channel_t rmtChannel_;
-  static const std::uint8_t bitsPerLedCmd_ = 24;
-  static const unsigned int rmtBufferSize_ = LED_COUNT * bitsPerLedCmd_;
+  static const std::uint8_t bitsPerLedCmd__ = 24;
+  static const unsigned int rmtBufferSize__ = LED_COUNT * bitsPerLedCmd__;
   /// These values are determined by measuring pulse timing with logic analyzer and adjusting to
   /// match datasheet.
   /// 0 bit high time
-  static const std::uint8_t highTime0_ = 14;
+  static const std::uint8_t highTime0__ = 14;
   /// 1 bit high time
-  static const std::uint8_t highTime1_ = 52;
+  static const std::uint8_t highTime1__ = 52;
   // low time for either bit
-  static const std::uint8_t lowTimeAny_ = 52;
+  static const std::uint8_t lowTimeAny__ = 52;
 
   /**
    * @brief Sets up the RMT data buffer
@@ -67,7 +67,7 @@ private:
    * @param rmtDataBuffer The RMT data buffer to write to
    * @param ledState The array holding RGB colors corresponding to the connected LEDs
    */
-  void setupRmtDataBuffer(std::array<rmt_item32_t, rmtBufferSize_>& rmtDataBuffer,
+  void setupRmtDataBuffer(std::array<rmt_item32_t, rmtBufferSize__>& rmtDataBuffer,
                           std::array<Color, LED_COUNT> ledState);
   std::array<uint32_t, LED_COUNT>
   composeRgbValues(const std::array<Color, LED_COUNT>& ledState) const;
@@ -94,29 +94,29 @@ WS2812<LED_COUNT, RGB_ORDER>::WS2812(gpio_num_t gpioPin, rmt_channel_t rmtChanne
 template <std::size_t LED_COUNT, RGBOrder RGB_ORDER>
 void WS2812<LED_COUNT, RGB_ORDER>::writeLeds(const std::array<Color, LED_COUNT>& ledState)
 {
-  std::array<rmt_item32_t, rmtBufferSize_> rmtDataBuffer;
+  std::array<rmt_item32_t, rmtBufferSize__> rmtDataBuffer;
   rmtDataBuffer.fill((rmt_item32_t){{{0, 0, 0, 0}}});
   setupRmtDataBuffer(rmtDataBuffer, ledState);
-  ESP_ERROR_CHECK(rmt_write_items(rmtChannel_, rmtDataBuffer.data(), rmtBufferSize_, false));
+  ESP_ERROR_CHECK(rmt_write_items(rmtChannel_, rmtDataBuffer.data(), rmtBufferSize__, false));
   ESP_ERROR_CHECK(rmt_wait_tx_done(rmtChannel_, portMAX_DELAY));
 }
 
 template <std::size_t LED_COUNT, RGBOrder RGB_ORDER>
 void WS2812<LED_COUNT, RGB_ORDER>::setupRmtDataBuffer(
-    std::array<rmt_item32_t, rmtBufferSize_>& rmtDataBuffer, std::array<Color, LED_COUNT> ledState)
+    std::array<rmt_item32_t, rmtBufferSize__>& rmtDataBuffer, std::array<Color, LED_COUNT> ledState)
 {
   std::array<uint32_t, LED_COUNT> rgbValues = composeRgbValues(ledState);
   for (std::size_t ledIndex = 0; ledIndex < LED_COUNT; ++ledIndex)
   {
     uint32_t bitsToSend = rgbValues[ledIndex];
-    uint32_t mask = 1 << (bitsPerLedCmd_ - 1);
-    for (std::size_t bitIndex = 0; bitIndex < bitsPerLedCmd_; ++bitIndex)
+    uint32_t mask = 1u << (bitsPerLedCmd__ - 1u);
+    for (std::size_t bitIndex = 0; bitIndex < bitsPerLedCmd__; ++bitIndex)
     {
       uint32_t isBitSet = bitsToSend & mask;
-      rmtDataBuffer[ledIndex * bitsPerLedCmd_ + bitIndex] =
-          isBitSet ? (rmt_item32_t){{{highTime1_, 1, lowTimeAny_, 0}}}
-                   : (rmt_item32_t){{{highTime0_, 1, lowTimeAny_, 0}}};
-      mask >>= 1;
+      rmtDataBuffer[ledIndex * bitsPerLedCmd__ + bitIndex] =
+          isBitSet != 0u ? (rmt_item32_t){{{highTime1__, 1, lowTimeAny__, 0}}}
+                   : (rmt_item32_t){{{highTime0__, 1, lowTimeAny__, 0}}};
+      mask >>= 1u;
     }
   }
 }
@@ -138,7 +138,7 @@ WS2812<LED_COUNT, RGB_ORDER>::composeRgbValues(const std::array<Color, LED_COUNT
     }
     else if constexpr (RGB_ORDER == RGBOrder::RBG)
     {
-      rgbValues[i] = redByte << 16u | greenByte | (blueByte << 8);
+      rgbValues[i] = redByte << 16u | greenByte | (blueByte << 8u);
     }
     else if constexpr (RGB_ORDER == RGBOrder::GRB)
     {
