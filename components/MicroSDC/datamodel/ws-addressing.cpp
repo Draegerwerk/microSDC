@@ -39,10 +39,10 @@ namespace WS::ADDRESSING
   }
   void EndpointReferenceType::parse(const rapidxml::xml_node<>& node)
   {
-    auto addressNode = node.first_node("Address", MDPWS::WS_NS_ADDRESSING.data());
+    auto addressNode = node.first_node("Address", MDPWS::WS_NS_ADDRESSING);
     if (addressNode == nullptr)
     {
-      throw ExpectedElement("Address", MDPWS::WS_NS_ADDRESSING.data());
+      throw ExpectedElement("Address", MDPWS::WS_NS_ADDRESSING);
     }
     Address_ = URIType({addressNode->value(), addressNode->value_size()});
   }

@@ -17,14 +17,14 @@ namespace WS::MEX
          entry = entry->next_sibling())
     {
       if (strncmp(entry->name(), "Dialect", entry->name_size()) == 0 &&
-          strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE.data(), entry->xmlns_size()) ==
+          strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE, entry->xmlns_size()) ==
               0)
       {
         Dialect_ =
             std::make_optional<DialectType>(std::string(entry->value(), entry->value_size()));
       }
       else if (strncmp(entry->name(), "Identifier", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE.data(),
+               strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE,
                        entry->xmlns_size()) == 0)
       {
         Identifier_ =

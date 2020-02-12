@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ws-addressing.hpp"
-#include "frozen/string.h"
 #include <memory>
 #include <vector>
 
@@ -10,16 +9,16 @@ namespace WS::DISCOVERY
   class QName
   {
   public:
-    QName(const frozen::string& ns, const std::string& name);
+    using NameSpaceString = const char*;
+    QName(NameSpaceString ns, const std::string& name);
 
-    const frozen::string& ns() const;
-    frozen::string& ns();
+    NameSpaceString ns() const;
 
     const std::string& name() const;
     std::string& name();
 
   protected:
-    frozen::string ns_;
+    NameSpaceString ns_;
     std::string name_;
   };
 
@@ -313,7 +312,6 @@ namespace WS::DISCOVERY
     ScopesOptional Scopes_;
     XAddrsOptional XAddrs_;
     MetadataVersionType MetadataVersion_;
-
   };
   class ResolveMatchesType
   {

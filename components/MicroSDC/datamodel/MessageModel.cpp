@@ -108,10 +108,10 @@ namespace MESSAGEMODEL
   void Header::parse(const rapidxml::xml_node<>& node)
   {
     // Find mandatory action node
-    auto actionNode = node.first_node("Action", MDPWS::WS_NS_ADDRESSING.data());
+    auto actionNode = node.first_node("Action", MDPWS::WS_NS_ADDRESSING);
     if (actionNode == nullptr)
     {
-      throw ExpectedElement("Action", MDPWS::WS_NS_ADDRESSING.data());
+      throw ExpectedElement("Action", MDPWS::WS_NS_ADDRESSING);
     }
     Action_ = ActionType(*actionNode);
 
@@ -119,47 +119,47 @@ namespace MESSAGEMODEL
          entry = entry->next_sibling())
     {
       if (strncmp(entry->name(), "AppSequence", entry->name_size()) == 0 &&
-          strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING.data(), entry->xmlns_size()) == 0)
+          strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
         // AppSequence
       }
       else if (strncmp(entry->name(), "FaultTo", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING.data(), entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
         // FaultTo
       }
       else if (strncmp(entry->name(), "From", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING.data(), entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
         // From
       }
       else if (strncmp(entry->name(), "MessageID", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING.data(), entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
         MessageID_ = std::make_optional<MessageIDType>(*entry);
       }
       else if (strncmp(entry->name(), "ReferenceParameters", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING.data(), entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
         // ReferenceParameters
       }
       else if (strncmp(entry->name(), "RelatesTo", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING.data(), entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
         // RelatesTo
       }
       else if (strncmp(entry->name(), "ReplyTo", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING.data(), entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
         ReplyTo_ = std::make_optional<ReplyToType>(*entry);
       }
       else if (strncmp(entry->name(), "To", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING.data(), entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
         To_ = std::make_optional<ToType>(*entry);
       }
       else if (strncmp(entry->name(), "Identifier", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING.data(), entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
         // Identifier
       }
@@ -289,19 +289,19 @@ namespace MESSAGEMODEL
       return;
     }
     if (strncmp(bodyContent->name(), "Probe", bodyContent->name_size()) == 0 &&
-        strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY.data(), bodyContent->xmlns_size()) ==
+        strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY, bodyContent->xmlns_size()) ==
             0)
     {
       Probe_ = std::make_optional<ProbeType>(*bodyContent);
     }
     else if (strncmp(bodyContent->name(), "Resolve", bodyContent->name_size()) == 0 &&
-             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY.data(),
+             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY,
                      bodyContent->xmlns_size()) == 0)
     {
       Resolve_ = std::make_optional<ResolveType>(*bodyContent);
     }
     else if (strncmp(bodyContent->name(), "GetMetadata", bodyContent->name_size()) == 0 &&
-             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_METADATA_EXCHANGE.data(),
+             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_METADATA_EXCHANGE,
                      bodyContent->xmlns_size()) == 0)
     {
       GetMetadata_ = std::make_optional<GetMetadataType>(*bodyContent);
@@ -338,17 +338,17 @@ namespace MESSAGEMODEL
 
   void Envelope::parse(const rapidxml::xml_node<>& node)
   {
-    auto headerNode = node.first_node("Header", MDPWS::WS_NS_SOAP_ENVELOPE.data());
+    auto headerNode = node.first_node("Header", MDPWS::WS_NS_SOAP_ENVELOPE);
     if (headerNode == nullptr)
     {
-      throw ExpectedElement("Header", MDPWS::WS_NS_SOAP_ENVELOPE.data());
+      throw ExpectedElement("Header", MDPWS::WS_NS_SOAP_ENVELOPE);
     }
     Header_ = HeaderType(*headerNode);
 
-    auto bodyNode = node.first_node("Body", MDPWS::WS_NS_SOAP_ENVELOPE.data());
+    auto bodyNode = node.first_node("Body", MDPWS::WS_NS_SOAP_ENVELOPE);
     if (bodyNode == nullptr)
     {
-      throw ExpectedElement("Body", MDPWS::WS_NS_SOAP_ENVELOPE.data());
+      throw ExpectedElement("Body", MDPWS::WS_NS_SOAP_ENVELOPE);
     }
     Body_ = BodyType(*bodyNode);
   }

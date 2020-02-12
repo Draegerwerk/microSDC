@@ -20,5 +20,5 @@ set(COMPONENT_SOURCES
 idf_component_register(
     SRCS ${COMPONENT_SOURCES}
     INCLUDE_DIRS "."
-    REQUIRES "WebServer" "UUID" "Networking" "rapidxml" "frozen" "asio" "pthread"
+    REQUIRES "WebServer" "UUID" "Networking" "rapidxml" "asio" "pthread"
     )

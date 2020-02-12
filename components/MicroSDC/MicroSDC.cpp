@@ -44,8 +44,8 @@ void MicroSDC::startup()
 
   // fill discovery types
   WS::DISCOVERY::QNameListType types;
-  types.emplace_back(MDPWS::WS_NS_DPWS, "Device");
-  types.emplace_back(MDPWS::NS_MDPWS, "MedicalDevice");
+  types.emplace_back(MDPWS::WS_NS_DPWS_PREFIX, "Device");
+  types.emplace_back(MDPWS::NS_MDPWS_PREFIX, "MedicalDevice");
 
   try
   {

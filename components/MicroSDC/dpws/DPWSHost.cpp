@@ -103,7 +103,7 @@ void DPWSHost::handleUDPMessage(std::size_t bytesRecvd)
     ESP_LOGE(TAG, "ParseError at %c (%d): %s", *e.where<char>(),
              e.where<char>() - receiveBuffer_->data(), e.what());
   }
-  auto envelopeNode = doc.first_node("Envelope", MDPWS::WS_NS_SOAP_ENVELOPE.data());
+  auto envelopeNode = doc.first_node("Envelope", MDPWS::WS_NS_SOAP_ENVELOPE);
   if (envelopeNode == nullptr)
   {
     ESP_LOGE(TAG, "Cannot find soap envelope node in received message!");

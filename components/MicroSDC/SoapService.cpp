@@ -12,7 +12,7 @@ MESSAGEMODEL::Envelope SoapService::parse(char* message)
   rapidxml::xml_document<> doc;
   doc.parse<rapidxml::parse_fastest>(message);
 
-  auto envelopeNode = doc.first_node("Envelope", MDPWS::WS_NS_SOAP_ENVELOPE.data());
+  auto envelopeNode = doc.first_node("Envelope", MDPWS::WS_NS_SOAP_ENVELOPE);
   if (envelopeNode == nullptr)
   {
     ESP_LOGE(TAG, "Cannot find soap envelope node in received message!");
