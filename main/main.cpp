@@ -14,10 +14,10 @@
 
 static constexpr const char* TAG = "main_component";
 
-static void ip_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id,
-                             void* event_data)
+static void ipEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_t eventId,
+                             void*  /*event_data*/)
 {
-  switch (event_id)
+  switch (eventId)
   {
     case IP_EVENT_ETH_GOT_IP:
       [[fallthrough]];
@@ -31,10 +31,10 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base, int32_t eve
   }
 }
 
-static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id,
-                               void* event_data)
+static void wifiEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_t eventId,
+                               void*  /*event_data*/)
 {
-  switch (event_id)
+  switch (eventId)
   {
     case WIFI_EVENT_WIFI_READY:
       ESP_LOGI(TAG, "WiFi ready");
@@ -62,17 +62,17 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t e
   }
 }
 
-static void eth_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id,
-                              void* event_data)
+static void ethEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_t eventId,
+                              void* eventData)
 {
   uint8_t macAddress[6] = {0};
   // we can get the ethernet driver handle from event data
-  esp_eth_handle_t eth_handle = *static_cast<esp_eth_handle_t*>(event_data);
+  esp_eth_handle_t ethHandle = *static_cast<esp_eth_handle_t*>(eventData);
 
-  switch (event_id)
+  switch (eventId)
   {
     case ETHERNET_EVENT_CONNECTED: {
-      esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, macAddress);
+      esp_eth_ioctl(ethHandle, ETH_CMD_G_MAC_ADDR, macAddress);
       ESP_LOGI(TAG, "Ethernet Link Up");
       ESP_LOGI(TAG, "Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x", macAddress[0], macAddress[1],
                macAddress[2], macAddress[3], macAddress[4], macAddress[5]);
@@ -98,8 +98,8 @@ static void eth_event_handler(void* arg, esp_event_base_t event_base, int32_t ev
 class NumericStateHandler : public MdStateHandler<BICEPS::PM::NumericMetricState>
 {
 public:
-  explicit NumericStateHandler(std::string descriptorHandle)
-    : MdStateHandler(std::move(descriptorHandle))
+  explicit NumericStateHandler(const std::string& descriptorHandle)
+    : MdStateHandler(descriptorHandle)
   {
   }
 
@@ -178,11 +178,11 @@ extern "C" void app_main()
   auto numericStateHandler = std::make_shared<NumericStateHandler>("numericState_handle");
   sdc->addMdState(numericStateHandler);
 
-  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, sdc));
+  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ipEventHandler, sdc));
 
   ESP_ERROR_CHECK(
-      esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, sdc));
-  ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &eth_event_handler, sdc));
+      esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, sdc));
+  ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &ethEventHandler, sdc));
 
 
   ESP_LOGI(TAG, "Connecting...");

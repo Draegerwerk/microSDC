@@ -1,5 +1,4 @@
 #include "MessageSerializer.hpp"
-#include "NamespaceMap.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "rapidxml_print.hpp"
 
@@ -31,30 +30,30 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto envelope = xmlDocument_->allocate_node(rapidxml::node_element, "soap:Envelope");
 
-  auto xmlns_soap = xmlDocument_->allocate_attribute("xmlns:soap", MDPWS::WS_NS_SOAP_ENVELOPE);
-  auto xmlns_wsd = xmlDocument_->allocate_attribute("xmlns:wsd", MDPWS::WS_NS_DISCOVERY);
-  auto xmlns_wsa = xmlDocument_->allocate_attribute("xmlns:wsa", MDPWS::WS_NS_ADDRESSING);
-  auto xmlns_dpws = xmlDocument_->allocate_attribute("xmlns:dpws", MDPWS::WS_NS_DPWS);
-  auto xmlns_mdpws = xmlDocument_->allocate_attribute("xmlns:mdpws", MDPWS::NS_MDPWS);
-  auto xmlns_mex = xmlDocument_->allocate_attribute("xmlns:mex", MDPWS::WS_NS_METADATA_EXCHANGE);
-  auto xmlns_glue = xmlDocument_->allocate_attribute("xmlns:glue", SDC::NS_GLUE);
-  auto xmlns_mm = xmlDocument_->allocate_attribute("xmlns:mm", SDC::NS_BICEPS_MESSAGE_MODEL);
-  auto xmlns_pm = xmlDocument_->allocate_attribute("xmlns:pm", SDC::NS_BICEPS_PARTICIPANT_MODEL);
-  auto xmlns_ext = xmlDocument_->allocate_attribute("xmlns:ext", SDC::NS_BICEPS_EXTENSION);
-  auto xmlns_xsi =
+  auto xmlnsSoap = xmlDocument_->allocate_attribute("xmlns:soap", MDPWS::WS_NS_SOAP_ENVELOPE);
+  auto xmlnsWsd = xmlDocument_->allocate_attribute("xmlns:wsd", MDPWS::WS_NS_DISCOVERY);
+  auto xmlnsWsa = xmlDocument_->allocate_attribute("xmlns:wsa", MDPWS::WS_NS_ADDRESSING);
+  auto xmlnsDpws = xmlDocument_->allocate_attribute("xmlns:dpws", MDPWS::WS_NS_DPWS);
+  auto xmlnsMdpws = xmlDocument_->allocate_attribute("xmlns:mdpws", MDPWS::NS_MDPWS);
+  auto xmlnsMex = xmlDocument_->allocate_attribute("xmlns:mex", MDPWS::WS_NS_METADATA_EXCHANGE);
+  auto xmlnsGlue = xmlDocument_->allocate_attribute("xmlns:glue", SDC::NS_GLUE);
+  auto xmlnsMm = xmlDocument_->allocate_attribute("xmlns:mm", SDC::NS_BICEPS_MESSAGE_MODEL);
+  auto xmlnsPm = xmlDocument_->allocate_attribute("xmlns:pm", SDC::NS_BICEPS_PARTICIPANT_MODEL);
+  auto xmlnsExt = xmlDocument_->allocate_attribute("xmlns:ext", SDC::NS_BICEPS_EXTENSION);
+  auto xmlnsXsi =
       xmlDocument_->allocate_attribute("xmlns:xsi", MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE);
 
-  envelope->append_attribute(xmlns_soap);
-  envelope->append_attribute(xmlns_wsd);
-  envelope->append_attribute(xmlns_wsa);
-  envelope->append_attribute(xmlns_dpws);
-  envelope->append_attribute(xmlns_mdpws);
-  envelope->append_attribute(xmlns_mex);
-  envelope->append_attribute(xmlns_glue);
-  envelope->append_attribute(xmlns_mm);
-  envelope->append_attribute(xmlns_pm);
-  envelope->append_attribute(xmlns_ext);
-  envelope->append_attribute(xmlns_xsi);
+  envelope->append_attribute(xmlnsSoap);
+  envelope->append_attribute(xmlnsWsd);
+  envelope->append_attribute(xmlnsWsa);
+  envelope->append_attribute(xmlnsDpws);
+  envelope->append_attribute(xmlnsMdpws);
+  envelope->append_attribute(xmlnsMex);
+  envelope->append_attribute(xmlnsGlue);
+  envelope->append_attribute(xmlnsMm);
+  envelope->append_attribute(xmlnsPm);
+  envelope->append_attribute(xmlnsExt);
+  envelope->append_attribute(xmlnsXsi);
 
   serialize(envelope, message.Header());
   serialize(envelope, message.Body());

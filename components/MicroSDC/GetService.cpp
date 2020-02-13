@@ -1,5 +1,4 @@
 #include "GetService.hpp"
-#include "SampleMdib.hpp"
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
@@ -8,9 +7,9 @@
 
 static constexpr const char* TAG = "GetService";
 
-GetService::GetService(const MicroSDC& microSDC, const MetadataProvider& metadata)
+GetService::GetService(const MicroSDC& microSDC, MetadataProvider metadata)
   : microSDC_(microSDC)
-  , metadata_(metadata)
+  , metadata_(std::move(metadata))
 {
 }
 

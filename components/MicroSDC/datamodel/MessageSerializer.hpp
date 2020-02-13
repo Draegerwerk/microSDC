@@ -2,7 +2,6 @@
 
 #include "MDPWSConstants.hpp"
 #include "MessageModel.hpp"
-#include "NamespaceMap.hpp"
 #include "SDCConstants.hpp"
 #include <sstream>
 #include <string>

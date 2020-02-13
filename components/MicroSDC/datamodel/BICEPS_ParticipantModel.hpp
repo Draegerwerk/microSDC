@@ -7,6 +7,63 @@
 
 namespace BICEPS::PM
 {
+  enum class SafetyClassification
+  {
+    Inf,
+    MedA,
+    MedB,
+    MedC
+  };
+  enum class MetricCategory
+  {
+    Unspec,
+    Msrmt,
+    Clc,
+    Set,
+    Preset,
+    Rcmm
+  };
+  enum class MetricAvailability
+  {
+    Intr,
+    Cont
+  };
+  enum class MetricType
+  {
+    NUMERIC,
+  };
+  enum class StateType
+  {
+    NUMERIC_METRIC_STATE,
+  };
+  enum class MeasurementValidity
+  {
+    Vld,
+    Vldated,
+    Ong,
+    Qst,
+    Calib,
+    Inv,
+    Oflw,
+    Uflw,
+    NA
+  };
+  enum class GenerationMode
+  {
+    Real,
+    Test,
+    Demo
+  };
+  enum class ComponentActivation
+  {
+    On,
+    NotRdy,
+    StndBy,
+    Off,
+    Shtdn,
+    Fail
+  };
+
   class CodedValue
   {
   public:
@@ -18,13 +75,6 @@ namespace BICEPS::PM
 
   private:
     CodeType Code_;
-  };
-  enum class SafetyClassification
-  {
-    Inf,
-    MedA,
-    MedB,
-    MedC
   };
   class AbstractDescriptor
   {
@@ -149,20 +199,6 @@ namespace BICEPS::PM
   class BatteryDescriptor
   {
   };
-  enum class MetricCategory
-  {
-    Unspec,
-    Msrmt,
-    Clc,
-    Set,
-    Preset,
-    Rcmm
-  };
-  enum class MetricAvailability
-  {
-    Intr,
-    Cont
-  };
   class Range
   {
   public:
@@ -198,10 +234,6 @@ namespace BICEPS::PM
     RelativeAccuracyOptional RelativeAccuracy_;
     AbsoluteAccuracyOptional AbsoluteAccuracy_;
   };
-  enum class MetricType
-  {
-    NUMERIC,
-  };
   class AbstractMetricDescriptor : public AbstractDescriptor
   {
   public:
@@ -223,7 +255,7 @@ namespace BICEPS::PM
     const MetricAvailabilityType& MetricAvailability() const;
     MetricAvailabilityType& MetricAvailability();
 
-    [[nodiscard]] virtual MetricType getMetricType() const = 0;
+    virtual MetricType getMetricType() const = 0;
 
   protected:
     // Constructors.
@@ -254,7 +286,7 @@ namespace BICEPS::PM
     const AveragingPeriodOptional& AveragingPeriod() const;
     AveragingPeriodOptional& AveragingPeriod();
 
-    [[nodiscard]] MetricType getMetricType() const override;
+    MetricType getMetricType() const override;
 
     // Constructors
     //
@@ -371,10 +403,6 @@ namespace BICEPS::PM
     MdsSequence Mds_;
     DescriptionVersionOptional DescriptionVersion_;
   };
-  enum class StateType
-  {
-    NUMERIC_METRIC_STATE,
-  };
   class AbstractState
   {
   public:
@@ -401,24 +429,6 @@ namespace BICEPS::PM
   protected:
     StateVersionOptional StateVersion_;
     DescriptorHandleType DescriptorHandle_;
-  };
-  enum class MeasurementValidity
-  {
-    Vld,
-    Vldated,
-    Ong,
-    Qst,
-    Calib,
-    Inv,
-    Oflw,
-    Uflw,
-    NA
-  };
-  enum class GenerationMode
-  {
-    Real,
-    Test,
-    Demo
   };
   class MetricQuality
   {
@@ -468,7 +478,7 @@ namespace BICEPS::PM
     using DeterminationTimeType = Timestamp;
     using DeterminationTimeOptional = std::optional<DeterminationTimeType>;
 
-    [[nodiscard]] virtual MetricType getMetricType() const = 0;
+    virtual MetricType getMetricType() const = 0;
 
   protected:
     MetricQualityType MetricQuality_;
@@ -485,19 +495,10 @@ namespace BICEPS::PM
     const ValueOptional& Value() const;
     ValueOptional& Value();
 
-    [[nodiscard]] MetricType getMetricType() const override;
+    MetricType getMetricType() const override;
 
   protected:
     ValueOptional Value_;
-  };
-  enum class ComponentActivation
-  {
-    On,
-    NotRdy,
-    StndBy,
-    Off,
-    Shtdn,
-    Fail
   };
   class AbstractMetricState : public AbstractState
   {
@@ -512,12 +513,6 @@ namespace BICEPS::PM
 
   protected:
     ActivationStateOptional ActivationState_;
-    /* TODO
-  BodySiteSequence BodySite_;
-  PhysicalConnectorOptional PhysicalConnector_;
-  ActiveDeterminationPeriodOptional ActiveDeterminationPeriod_;
-  LifeTimePeriodOptional LifeTimePeriod_;
-  */
   };
   class NumericMetricState : public AbstractMetricState
   {

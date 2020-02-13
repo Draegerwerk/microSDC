@@ -1,12 +1,12 @@
 #include "MicroSDC.hpp"
-
 #include "DeviceService.hpp"
 #include "GetService.hpp"
 #include "NetworkHandler.hpp"
 #include "SDCConstants.hpp"
+#include "StateHandler.hpp"
 #include "StaticService.hpp"
 #include "UUIDGenerator.hpp"
-#include "WebServer.hpp"
+#include "asio/system_error.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "dpws/MetadataProvider.hpp"
 #include "esp_log.h"
@@ -103,6 +103,7 @@ void MicroSDC::initializeMdStates()
     {
       auto& numericHandler =
           static_cast<const MdStateHandler<BICEPS::PM::NumericMetricState>&>(*handler);
+      std::lock_guard<std::mutex> lock(mdibMutex_);
       mdib_->MdState()->State().emplace_back(numericHandler.getInitialState());
     }
   }
@@ -110,12 +111,14 @@ void MicroSDC::initializeMdStates()
 
 const BICEPS::PM::Mdib& MicroSDC::getMdib() const
 {
+  std::lock_guard<std::mutex> lock(mdibMutex_);
   return *mdib_;
 }
 
-void MicroSDC::setMdDescription(BICEPS::PM::MdDescription& mdDescription)
+void MicroSDC::setMdDescription(const BICEPS::PM::MdDescription& mdDescription)
 {
-  mdib_->MdDescription() = std::move(mdDescription);
+  std::lock_guard<std::mutex> lock(mdibMutex_);
+  mdib_->MdDescription() = mdDescription;
 }
 
 void MicroSDC::setDeviceCharacteristics(DeviceCharacteristics devChar)
@@ -174,6 +177,7 @@ template <class T>
 void MicroSDC::updateMdib(std::shared_ptr<T> newState)
 {
   incrementMdibVersion();
+  std::lock_guard<std::mutex> lock(mdibMutex_);
   for (auto& state : mdib_->MdState()->State())
   {
     if (newState->DescriptorHandle() == state->DescriptorHandle())
@@ -185,5 +189,6 @@ void MicroSDC::updateMdib(std::shared_ptr<T> newState)
 
 void MicroSDC::incrementMdibVersion()
 {
+  std::lock_guard<std::mutex> lock(mdibMutex_);
   mdib_->MdibVersion() = mdib_->MdibVersion().value_or(0) + 1;
 }

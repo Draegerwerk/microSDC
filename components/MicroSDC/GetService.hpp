@@ -7,7 +7,7 @@
 class GetService : public SoapService
 {
 public:
-  GetService(const MicroSDC& microSDC, const MetadataProvider& metadata);
+  GetService(const MicroSDC& microSDC, MetadataProvider metadata);
   std::string getURI() const override;
   void handleRequest(httpd_req* req, char* message) override;
 

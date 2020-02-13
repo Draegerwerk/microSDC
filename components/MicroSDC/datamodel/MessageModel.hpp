@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BICEPS_MessageModel.hpp"
-#include "NamespaceMap.hpp"
 #include "ws-MetadataExchange.hpp"
 #include "ws-addressing.hpp"
 #include "ws-discovery.hpp"

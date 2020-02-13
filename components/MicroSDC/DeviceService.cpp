@@ -8,8 +8,8 @@
 
 static constexpr const char* TAG = "DeviceService";
 
-DeviceService::DeviceService(const MetadataProvider& metadata)
-  : metadata_(metadata)
+DeviceService::DeviceService(MetadataProvider metadata)
+  : metadata_(std::move(metadata))
 {
 }
 
