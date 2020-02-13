@@ -1,4 +1,5 @@
 #include "MicroSDC.hpp"
+
 #include "DeviceService.hpp"
 #include "GetService.hpp"
 #include "NetworkHandler.hpp"
@@ -16,6 +17,7 @@ static constexpr const char* TAG = "MicroSDC";
 MicroSDC::MicroSDC()
   : mdib_(std::make_unique<BICEPS::PM::Mdib>(std::string("0")))
 {
+  mdib_->MdState() = BICEPS::PM::MdState();
 }
 
 void MicroSDC::start()
