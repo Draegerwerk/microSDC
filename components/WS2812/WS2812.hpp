@@ -39,6 +39,7 @@ public:
    * @param rmtChannel The RMT channel to use
    */
   explicit WS2812(gpio_num_t gpioPin, rmt_channel_t rmtChannel = RMT_CHANNEL_0);
+  ~WS2812();
 
   /**
    * @brief Lights the LED strip up corresponding to the provided array of Colors
@@ -92,6 +93,12 @@ WS2812<LED_COUNT, RGB_ORDER>::WS2812(gpio_num_t gpioPin, rmt_channel_t rmtChanne
 }
 
 template <std::size_t LED_COUNT, RGBOrder RGB_ORDER>
+~WS2812<LED_COUNT, RGB_ORDER>::WS2812(gpio_num_t gpioPin, rmt_channel_t rmtChannel)
+{
+  ESP_ERROR_CHECK(rmt_driver_uninstall(rmtChannel_));
+}
+
+template <std::size_t LED_COUNT, RGBOrder RGB_ORDER>
 void WS2812<LED_COUNT, RGB_ORDER>::writeLeds(const std::array<Color, LED_COUNT>& ledState)
 {
   std::array<rmt_item32_t, rmtBufferSize__> rmtDataBuffer;
@@ -115,7 +122,7 @@ void WS2812<LED_COUNT, RGB_ORDER>::setupRmtDataBuffer(
       uint32_t isBitSet = bitsToSend & mask;
       rmtDataBuffer[ledIndex * bitsPerLedCmd__ + bitIndex] =
           isBitSet != 0u ? (rmt_item32_t){{{highTime1__, 1, lowTimeAny__, 0}}}
-                   : (rmt_item32_t){{{highTime0__, 1, lowTimeAny__, 0}}};
+                         : (rmt_item32_t){{{highTime0__, 1, lowTimeAny__, 0}}};
       mask >>= 1u;
     }
   }
