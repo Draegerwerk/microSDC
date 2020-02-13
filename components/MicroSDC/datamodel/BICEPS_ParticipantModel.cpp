@@ -150,6 +150,13 @@ namespace BICEPS::PM
   {
   }
 
+  // LocationContext
+  //
+  LocationContextDescriptor::LocationContextDescriptor(const HandleType& handle)
+    : AbstractContextDescriptor(handle)
+  {
+  }
+
   // SystemContext
   //
   SystemContextDescriptor::SystemContextDescriptor(const HandleType& handle)
@@ -164,6 +171,15 @@ namespace BICEPS::PM
   SystemContextDescriptor::PatientContextOptional& SystemContextDescriptor::PatientContext()
   {
     return PatientContext_;
+  }
+  const SystemContextDescriptor::LocationContextOptional&
+  SystemContextDescriptor::LocationContext() const
+  {
+    return LocationContext_;
+  }
+  SystemContextDescriptor::LocationContextOptional& SystemContextDescriptor::LocationContext()
+  {
+    return LocationContext_;
   }
 
   // AbstractDeviceComponentDescriptor

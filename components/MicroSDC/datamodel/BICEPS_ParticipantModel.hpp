@@ -176,6 +176,13 @@ namespace BICEPS::PM
     //
     PatientContextDescriptor(const HandleType&);
   };
+  class LocationContextDescriptor : public AbstractContextDescriptor
+  {
+  public:
+    // Constructors
+    //
+    LocationContextDescriptor(const HandleType&);
+  };
   class SystemContextDescriptor : public AbstractContextDescriptor
   {
   public:
@@ -186,12 +193,20 @@ namespace BICEPS::PM
     const PatientContextOptional& PatientContext() const;
     PatientContextOptional& PatientContext();
 
+    // LocationContext
+    //
+    using LocationContextType = LocationContextDescriptor;
+    using LocationContextOptional = std::optional<LocationContextType>;
+    const LocationContextOptional& LocationContext() const;
+    LocationContextOptional& LocationContext();
+
     // Constructors
     //
     SystemContextDescriptor(const HandleType&);
 
   protected:
     PatientContextOptional PatientContext_;
+    LocationContextOptional LocationContext_;
   };
   class ClockDescriptor
   {

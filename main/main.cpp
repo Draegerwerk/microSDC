@@ -154,6 +154,7 @@ extern "C" void app_main()
 
   BICEPS::PM::SystemContextDescriptor systemContext("system_context");
   systemContext.PatientContext() = BICEPS::PM::PatientContextDescriptor("patient_context");
+  systemContext.LocationContext() = BICEPS::PM::LocationContextDescriptor("location_context");
 
   auto numericState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "numericState_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Msrmt,

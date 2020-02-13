@@ -49,6 +49,8 @@ public:
                  const BICEPS::PM::SystemContextDescriptor& systemContext);
   void serialize(rapidxml::xml_node<>* parent,
                  const BICEPS::PM::PatientContextDescriptor& patientContext);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::LocationContextDescriptor& locationContext);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::VmdDescriptor& vmd);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ChannelDescriptor& channel);
   void serialize(rapidxml::xml_node<>* parent,

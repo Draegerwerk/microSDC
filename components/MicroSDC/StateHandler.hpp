@@ -29,7 +29,7 @@ public:
   virtual BICEPS::PM::MetricType getMetricType() const = 0;
   /**
    * @brief sets the MicroSDC instantation, which handles this state
-   * @param MicroSDC the pointer MicroSDC object
+   * @param microSDC the pointer MicroSDC object
    */
   void setMicroSDC(MicroSDC* microSDC);
   /**

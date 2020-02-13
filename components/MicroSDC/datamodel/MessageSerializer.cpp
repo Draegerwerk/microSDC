@@ -521,6 +521,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   {
     serialize(systemContextNode, systemContext.PatientContext().value());
   }
+  if (systemContext.LocationContext().has_value())
+  {
+    serialize(systemContextNode, systemContext.LocationContext().value());
+  }
   parent->append_node(systemContextNode);
 }
 
@@ -535,6 +539,24 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   {
     auto safetyClassification = xmlDocument_->allocate_string(
         toString(patientContext.SafetyClassification().value()).c_str());
+    auto safetyClassificationAttr =
+        xmlDocument_->allocate_attribute("SafetyClassification", safetyClassification);
+    patientContextNode->append_attribute(safetyClassificationAttr);
+  }
+  parent->append_node(patientContextNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::LocationContextDescriptor& locationContext)
+{
+  auto patientContextNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "pm:LocationContext");
+  auto handleAttr = xmlDocument_->allocate_attribute("Handle", locationContext.Handle().c_str());
+  patientContextNode->append_attribute(handleAttr);
+  if (locationContext.SafetyClassification().has_value())
+  {
+    auto safetyClassification = xmlDocument_->allocate_string(
+        toString(locationContext.SafetyClassification().value()).c_str());
     auto safetyClassificationAttr =
         xmlDocument_->allocate_attribute("SafetyClassification", safetyClassification);
     patientContextNode->append_attribute(safetyClassificationAttr);
