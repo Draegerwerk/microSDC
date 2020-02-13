@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DeviceCharacteristics.hpp"
+#include "StateHandler.hpp"
 #include "WebServer.hpp"
 #include "dpws/DPWSHost.hpp"
 #include <mutex>
@@ -21,8 +22,9 @@ public:
    * @brief stops all components when disconnected
    */
   void stop();
+  void initializeMdStates();
   const BICEPS::PM::Mdib& getMdib() const;
-  void setMdDescription(const BICEPS::PM::MdDescription& mdDescription);
+  void setMdDescription(BICEPS::PM::MdDescription& mdDescription);
   /**
    * @brief sets the device characteristics of this SDC service
    * @param devChar characteristics to be set
@@ -60,6 +62,10 @@ public:
    */
   static std::string calculateUUID();
 
+  void addMdState(std::shared_ptr<StateHandler> stateHandler);
+
+  void updateState(std::shared_ptr<BICEPS::PM::NumericMetricState> state);
+
 private:
   /// the SDC thread
   std::thread sdcThread_;
@@ -69,6 +75,8 @@ private:
   std::unique_ptr<WebServer> webserver_{nullptr};
   /// pointer to the mdib representation
   std::unique_ptr<BICEPS::PM::Mdib> mdib_{nullptr};
+  /// all states
+  std::map<std::string, std::shared_ptr<StateHandler>> stateHandlers_;
   /// whether the communication uses TLS
   bool useTLS_{true};
   /// whether SDC is started and connected
@@ -86,4 +94,9 @@ private:
    * @brief Starts and initializes all SDC components and services
    */
   void startup();
+
+  template <class T>
+  void updateMdib(std::shared_ptr<T> state);
+
+  void incrementMdibVersion();
 };

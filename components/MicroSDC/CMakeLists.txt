@@ -17,8 +17,7 @@ set(COMPONENT_SOURCES
         "MicroSDC.cpp"
         "SoapService.cpp"
         "StaticService.cpp"
-        "MDIB/Mdib.hpp"
-        "MDIB/Mdib.cpp"
+        "StateHandler.cpp"
     )
 
 idf_component_register(

@@ -3,6 +3,64 @@
 namespace BICEPS::PM
 {
 
+  // Range
+  //
+  const Range::LowerOptional& Range::Lower() const
+  {
+    return Lower_;
+  }
+  Range::LowerOptional& Range::Lower()
+  {
+    return Lower_;
+  }
+  const Range::UpperOptional& Range::Upper() const
+  {
+    return Upper_;
+  }
+  Range::UpperOptional& Range::Upper()
+  {
+    return Upper_;
+  }
+  const Range::StepWidthOptional& Range::StepWidth() const
+  {
+    return StepWidth_;
+  }
+  Range::StepWidthOptional& Range::StepWidth()
+  {
+    return StepWidth_;
+  }
+  const Range::RelativeAccuracyOptional& Range::RelativeAccuracy() const
+  {
+    return RelativeAccuracy_;
+  }
+  Range::RelativeAccuracyOptional& Range::RelativeAccuracy()
+  {
+    return RelativeAccuracy_;
+  }
+  const Range::AbsoluteAccuracyOptional& Range::AbsoluteAccuracy() const
+  {
+    return AbsoluteAccuracy_;
+  }
+  Range::AbsoluteAccuracyOptional& Range::AbsoluteAccuracy()
+  {
+    return AbsoluteAccuracy_;
+  }
+
+  // CodedValue
+  //
+  CodedValue::CodedValue(const CodeType& code)
+    : Code_(code)
+  {
+  }
+  const CodedValue::CodeType& CodedValue::Code() const
+  {
+    return Code_;
+  }
+  CodedValue::CodeType& CodedValue::Code()
+  {
+    return Code_;
+  }
+
   // Metadata
   //
   const Metadata::ManufacturerSequence& Metadata::Manufacturer() const
@@ -44,6 +102,14 @@ namespace BICEPS::PM
     : Handle_(handle)
   {
   }
+  const AbstractDescriptor::TypeOptional& AbstractDescriptor::Type() const
+  {
+    return Type_;
+  }
+  AbstractDescriptor::TypeOptional& AbstractDescriptor::Type()
+  {
+    return Type_;
+  }
   const AbstractDescriptor::HandleType& AbstractDescriptor::Handle() const
   {
     return Handle_;
@@ -51,6 +117,14 @@ namespace BICEPS::PM
   AbstractDescriptor::HandleType& AbstractDescriptor::Handle()
   {
     return Handle_;
+  }
+  const AbstractDescriptor::DescriptorVersionOptional& AbstractDescriptor::DescriptorVersion() const
+  {
+    return DescriptorVersion_;
+  }
+  AbstractDescriptor::DescriptorVersionOptional& AbstractDescriptor::DescriptorVersion()
+  {
+    return DescriptorVersion_;
   }
   const AbstractDescriptor::SafetyClassificationOptional&
   AbstractDescriptor::SafetyClassification() const
@@ -99,11 +173,101 @@ namespace BICEPS::PM
   {
   }
 
+  // AbstractMetricDescriptor
+  //
+  AbstractMetricDescriptor::AbstractMetricDescriptor(
+      const HandleType& handle, const UnitType& unit, const MetricCategoryType& metricCategory,
+      const MetricAvailabilityType& metricAvailability)
+    : AbstractDescriptor(handle)
+    , Unit_(unit)
+    , MetricCategory_(metricCategory)
+    , MetricAvailability_(metricAvailability)
+  {
+  }
+  const AbstractMetricDescriptor::UnitType& AbstractMetricDescriptor::Unit() const
+  {
+    return Unit_;
+  }
+  AbstractMetricDescriptor::UnitType& AbstractMetricDescriptor::Unit()
+  {
+    return Unit_;
+  }
+  const AbstractMetricDescriptor::MetricCategoryType&
+  AbstractMetricDescriptor::MetricCategory() const
+  {
+    return MetricCategory_;
+  }
+  AbstractMetricDescriptor::MetricCategoryType& AbstractMetricDescriptor::MetricCategory()
+  {
+    return MetricCategory_;
+  }
+  const AbstractMetricDescriptor::MetricAvailabilityType&
+  AbstractMetricDescriptor::MetricAvailability() const
+  {
+    return MetricAvailability_;
+  }
+  AbstractMetricDescriptor::MetricAvailabilityType& AbstractMetricDescriptor::MetricAvailability()
+  {
+    return MetricAvailability_;
+  }
+
+
+  // NumericMetricDescriptor
+  //
+  NumericMetricDescriptor::NumericMetricDescriptor(const HandleType& handle, const UnitType& unit,
+                                                   const MetricCategoryType& metricCategory,
+                                                   const MetricAvailabilityType& metricAvailability,
+                                                   const ResolutionType& resolution)
+    : AbstractMetricDescriptor(handle, unit, metricCategory, metricAvailability)
+    , Resolution_(resolution)
+  {
+  }
+
+  MetricType NumericMetricDescriptor::getMetricType() const
+  {
+    return MetricType::NUMERIC;
+  }
+
+  const NumericMetricDescriptor::TechnicalRangeSequence&
+  NumericMetricDescriptor::TechnicalRange() const
+  {
+    return TechnicalRange_;
+  }
+  NumericMetricDescriptor::TechnicalRangeSequence& NumericMetricDescriptor::TechnicalRange()
+  {
+    return TechnicalRange_;
+  }
+  const NumericMetricDescriptor::ResolutionType& NumericMetricDescriptor::Resolution() const
+  {
+    return Resolution_;
+  }
+  NumericMetricDescriptor::ResolutionType& NumericMetricDescriptor::Resolution()
+  {
+    return Resolution_;
+  }
+  const NumericMetricDescriptor::AveragingPeriodOptional&
+  NumericMetricDescriptor::AveragingPeriod() const
+  {
+    return AveragingPeriod_;
+  }
+  NumericMetricDescriptor::AveragingPeriodOptional& NumericMetricDescriptor::AveragingPeriod()
+  {
+    return AveragingPeriod_;
+  }
+
   // ChannelDescriptor
   //
   ChannelDescriptor::ChannelDescriptor(const HandleType& handle)
     : AbstractDeviceComponentDescriptor(handle)
   {
+  }
+  const ChannelDescriptor::MetricSequence& ChannelDescriptor::Metric() const
+  {
+    return Metric_;
+  }
+  ChannelDescriptor::MetricSequence& ChannelDescriptor::Metric()
+  {
+    return Metric_;
   }
 
   // AbstractComplexDeviceComponentDescriptor
@@ -169,6 +333,95 @@ namespace BICEPS::PM
   MdDescription::MdsSequence& MdDescription::Mds()
   {
     return Mds_;
+  }
+
+  // MetricQuality
+  //
+  const MetricQuality::ValidityType& MetricQuality::Validity() const
+  {
+    return Validity_;
+  }
+  MetricQuality::ValidityType& MetricQuality::Validity()
+  {
+    return Validity_;
+  }
+
+  // AbstractMetricValue
+  //
+  const AbstractMetricValue::MetricQualityType& AbstractMetricValue::Quality() const
+  {
+    return MetricQuality_;
+  }
+  AbstractMetricValue::MetricQualityType& AbstractMetricValue::Quality()
+  {
+    return MetricQuality_;
+  }
+
+  // NumericMetricValue
+  //
+  const NumericMetricValue::ValueOptional& NumericMetricValue::Value() const
+  {
+    return Value_;
+  }
+  NumericMetricValue::ValueOptional& NumericMetricValue::Value()
+  {
+    return Value_;
+  }
+  MetricType NumericMetricValue::getMetricType() const
+  {
+    return MetricType::NUMERIC;
+  }
+
+  // AbstractState
+  //
+  AbstractState::AbstractState(DescriptorHandleType handle)
+    : DescriptorHandle_(std::move(handle))
+  {
+  }
+  const AbstractState::DescriptorHandleType& AbstractState::DescriptorHandle() const
+  {
+    return DescriptorHandle_;
+  }
+  AbstractState::DescriptorHandleType& AbstractState::DescriptorHandle()
+  {
+    return DescriptorHandle_;
+  }
+
+  // AbstractMetricState
+  //
+  AbstractMetricState::AbstractMetricState(DescriptorHandleType handle)
+    : AbstractState(std::move(handle))
+  {
+  }
+
+  // NumericMetricState
+  //
+  NumericMetricState::NumericMetricState(DescriptorHandleType handle)
+    : AbstractMetricState(std::move(handle))
+  {
+  }
+  StateType NumericMetricState::getStateType() const
+  {
+    return StateType::NUMERIC_METRIC_STATE;
+  }
+  const NumericMetricState::MetricValueOptional& NumericMetricState::MetricValue() const
+  {
+    return MetricValue_;
+  }
+  NumericMetricState::MetricValueOptional& NumericMetricState::MetricValue()
+  {
+    return MetricValue_;
+  }
+
+  // MdState
+  //
+  const MdState::StateSequence& MdState::State() const
+  {
+    return State_;
+  }
+  MdState::StateSequence& MdState::State()
+  {
+    return State_;
   }
 
   // Mdib

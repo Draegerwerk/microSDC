@@ -53,12 +53,19 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::VmdDescriptor& vmd);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ChannelDescriptor& channel);
   void serialize(rapidxml::xml_node<>* parent,
-                 const BICEPS::PM::AbstractMetricDescriptor& abstractMetric);
+                 const BICEPS::PM::AbstractMetricDescriptor& abstractMetricDescriptor);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Range& range);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& mdState);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractMetricValue& metricValue);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MetricQuality& quality);
 
   static std::string toString(BICEPS::PM::SafetyClassification);
   static std::string toString(const WS::DISCOVERY::UriListType& uriList);
   static std::string toString(const WS::DISCOVERY::QNameListType& qNameList);
+  static std::string toString(BICEPS::PM::MetricCategory);
+  static std::string toString(BICEPS::PM::MetricAvailability);
+  static std::string toString(BICEPS::PM::MeasurementValidity);
 
 private:
   std::unique_ptr<rapidxml::xml_document<>> xmlDocument_;

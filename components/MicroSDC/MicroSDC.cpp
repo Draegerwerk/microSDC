@@ -52,6 +52,8 @@ void MicroSDC::startup()
   types.emplace_back(MDPWS::WS_NS_DPWS_PREFIX, "Device");
   types.emplace_back(MDPWS::NS_MDPWS_PREFIX, "MedicalDevice");
 
+  initializeMdStates();
+
   try
   {
     dpws_ = std::make_unique<DPWSHost>(
@@ -93,14 +95,27 @@ void MicroSDC::stop()
   }
 }
 
+void MicroSDC::initializeMdStates()
+{
+  for (const auto& [descriptorHandle, handler] : stateHandlers_)
+  {
+    if (handler->getMetricType() == BICEPS::PM::MetricType::NUMERIC)
+    {
+      auto& numericHandler =
+          static_cast<const MdStateHandler<BICEPS::PM::NumericMetricState>&>(*handler);
+      mdib_->MdState()->State().emplace_back(numericHandler.getInitialState());
+    }
+  }
+}
+
 const BICEPS::PM::Mdib& MicroSDC::getMdib() const
 {
   return *mdib_;
 }
 
-void MicroSDC::setMdDescription(const BICEPS::PM::MdDescription& mdDescription)
+void MicroSDC::setMdDescription(BICEPS::PM::MdDescription& mdDescription)
 {
-  mdib_->MdDescription() = mdDescription;
+  mdib_->MdDescription() = std::move(mdDescription);
 }
 
 void MicroSDC::setDeviceCharacteristics(DeviceCharacteristics devChar)
@@ -142,4 +157,33 @@ std::string MicroSDC::calculateUUID()
 std::string MicroSDC::calculateMessageID()
 {
   return std::string(SDC::UUID_SDC_PREFIX + MicroSDC::calculateUUID());
+}
+
+void MicroSDC::addMdState(std::shared_ptr<StateHandler> stateHandler)
+{
+  stateHandler->setMicroSDC(this);
+  stateHandlers_[stateHandler->getDescriptorHandle()] = std::move(stateHandler);
+}
+
+void MicroSDC::updateState(std::shared_ptr<BICEPS::PM::NumericMetricState> state)
+{
+  updateMdib(std::move(state));
+}
+
+template <class T>
+void MicroSDC::updateMdib(std::shared_ptr<T> newState)
+{
+  incrementMdibVersion();
+  for (auto& state : mdib_->MdState()->State())
+  {
+    if (newState->DescriptorHandle() == state->DescriptorHandle())
+    {
+      state = newState;
+    }
+  }
+}
+
+void MicroSDC::incrementMdibVersion()
+{
+  mdib_->MdibVersion() = mdib_->MdibVersion().value_or(0) + 1;
 }

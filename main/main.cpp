@@ -1,6 +1,7 @@
 #include "DeviceCharacteristics.hpp"
 #include "MicroSDC.hpp"
 #include "NetworkHandler.hpp"
+#include "StateHandler.hpp"
 #include "esp_eth.h"
 #include "esp_log.h"
 #include "esp_pthread.h"
@@ -94,6 +95,36 @@ static void eth_event_handler(void* arg, esp_event_base_t event_base, int32_t ev
   }
 }
 
+class NumericStateHandler : public MdStateHandler<BICEPS::PM::NumericMetricState>
+{
+public:
+  explicit NumericStateHandler(std::string descriptorHandle)
+    : MdStateHandler(std::move(descriptorHandle))
+  {
+  }
+
+  BICEPS::PM::MetricType getMetricType() const override
+  {
+    return BICEPS::PM::MetricType::NUMERIC;
+  }
+
+  std::shared_ptr<BICEPS::PM::NumericMetricState> getInitialState() const override
+  {
+    auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
+    BICEPS::PM::NumericMetricValue value;
+    value.Value() = 0;
+    state->MetricValue() = value;
+    return state;
+  }
+
+  void setValue(int value)
+  {
+    auto state = getInitialState();
+    state->MetricValue()->Value() = value;
+    updateState(state);
+  }
+};
+
 // force c linkage for app_main()
 extern "C" void app_main()
 {
@@ -124,9 +155,16 @@ extern "C" void app_main()
   BICEPS::PM::SystemContextDescriptor systemContext("system_context");
   systemContext.PatientContext() = BICEPS::PM::PatientContextDescriptor("patient_context");
 
+  auto numericState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "numericState_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Msrmt,
+      BICEPS::PM::MetricAvailability::Cont, 1);
+  numericState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
+
   BICEPS::PM::ChannelDescriptor deviceChannel("device_channel");
+  deviceChannel.Metric().emplace_back(numericState);
   deviceChannel.SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
   BICEPS::PM::VmdDescriptor deviceModule("device_vmd");
+  deviceModule.Channel().emplace_back(deviceChannel);
 
   BICEPS::PM::MdsDescriptor deviceDescriptor("MedicalDevices");
   deviceDescriptor.MetaData() = metadata;
@@ -136,6 +174,9 @@ extern "C" void app_main()
   BICEPS::PM::MdDescription mdDescription;
   mdDescription.Mds().emplace_back(deviceDescriptor);
   sdc->setMdDescription(mdDescription);
+
+  auto numericStateHandler = std::make_shared<NumericStateHandler>("numericState_handle");
+  sdc->addMdState(numericStateHandler);
 
   ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, sdc));
 

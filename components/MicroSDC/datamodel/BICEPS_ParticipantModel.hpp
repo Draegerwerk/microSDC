@@ -163,6 +163,45 @@ namespace BICEPS::PM
     Intr,
     Cont
   };
+  class Range
+  {
+  public:
+    using LowerType = int;
+    using LowerOptional = std::optional<LowerType>;
+    const LowerOptional& Lower() const;
+    LowerOptional& Lower();
+
+    using UpperType = int;
+    using UpperOptional = std::optional<UpperType>;
+    const UpperOptional& Upper() const;
+    UpperOptional& Upper();
+
+    using StepWidthType = int;
+    using StepWidthOptional = std::optional<StepWidthType>;
+    const StepWidthOptional& StepWidth() const;
+    StepWidthOptional& StepWidth();
+
+    using RelativeAccuracyType = int;
+    using RelativeAccuracyOptional = std::optional<RelativeAccuracyType>;
+    const RelativeAccuracyOptional& RelativeAccuracy() const;
+    RelativeAccuracyOptional& RelativeAccuracy();
+
+    using AbsoluteAccuracyType = int;
+    using AbsoluteAccuracyOptional = std::optional<AbsoluteAccuracyType>;
+    const AbsoluteAccuracyOptional& AbsoluteAccuracy() const;
+    AbsoluteAccuracyOptional& AbsoluteAccuracy();
+
+  protected:
+    LowerOptional Lower_;
+    UpperOptional Upper_;
+    StepWidthOptional StepWidth_;
+    RelativeAccuracyOptional RelativeAccuracy_;
+    AbsoluteAccuracyOptional AbsoluteAccuracy_;
+  };
+  enum class MetricType
+  {
+    NUMERIC,
+  };
   class AbstractMetricDescriptor : public AbstractDescriptor
   {
   public:
@@ -184,23 +223,55 @@ namespace BICEPS::PM
     const MetricAvailabilityType& MetricAvailability() const;
     MetricAvailabilityType& MetricAvailability();
 
+    [[nodiscard]] virtual MetricType getMetricType() const = 0;
+
   protected:
     // Constructors.
     //
     AbstractMetricDescriptor(const HandleType&, const UnitType&, const MetricCategoryType&,
                              const MetricAvailabilityType&);
+    virtual ~AbstractMetricDescriptor() = default;
 
   protected:
     UnitType Unit_;
     MetricCategoryType MetricCategory_;
     MetricAvailabilityType MetricAvailability_;
   };
+  class NumericMetricDescriptor : public AbstractMetricDescriptor
+  {
+  public:
+    using TechnicalRangeType = Range;
+    using TechnicalRangeSequence = std::vector<TechnicalRangeType>;
+    const TechnicalRangeSequence& TechnicalRange() const;
+    TechnicalRangeSequence& TechnicalRange();
+
+    using ResolutionType = int;
+    const ResolutionType& Resolution() const;
+    ResolutionType& Resolution();
+
+    using AveragingPeriodType = std::string;
+    using AveragingPeriodOptional = std::optional<AveragingPeriodType>;
+    const AveragingPeriodOptional& AveragingPeriod() const;
+    AveragingPeriodOptional& AveragingPeriod();
+
+    [[nodiscard]] MetricType getMetricType() const override;
+
+    // Constructors
+    //
+    NumericMetricDescriptor(const HandleType&, const UnitType&, const MetricCategoryType&,
+                            const MetricAvailabilityType&, const ResolutionType&);
+
+  protected:
+    TechnicalRangeSequence TechnicalRange_;
+    ResolutionType Resolution_;
+    AveragingPeriodOptional AveragingPeriod_;
+  };
   class ChannelDescriptor : public AbstractDeviceComponentDescriptor
   {
   public:
     // Metric
     //
-    using MetricType = AbstractMetricDescriptor;
+    using MetricType = std::shared_ptr<AbstractMetricDescriptor>;
     using MetricSequence = std::vector<MetricType>;
     const MetricSequence& Metric() const;
     MetricSequence& Metric();
@@ -300,6 +371,10 @@ namespace BICEPS::PM
     MdsSequence Mds_;
     DescriptionVersionOptional DescriptionVersion_;
   };
+  enum class StateType
+  {
+    NUMERIC_METRIC_STATE,
+  };
   class AbstractState
   {
   public:
@@ -316,21 +391,165 @@ namespace BICEPS::PM
     const DescriptorHandleType& DescriptorHandle() const;
     DescriptorHandleType& DescriptorHandle();
 
+    virtual StateType getStateType() const = 0;
+
   protected:
     // Constructors.
     //
-    AbstractState(const DescriptorHandleType&);
+    AbstractState(DescriptorHandleType);
 
   protected:
     StateVersionOptional StateVersion_;
     DescriptorHandleType DescriptorHandle_;
+  };
+  enum class MeasurementValidity
+  {
+    Vld,
+    Vldated,
+    Ong,
+    Qst,
+    Calib,
+    Inv,
+    Oflw,
+    Uflw,
+    NA
+  };
+  enum class GenerationMode
+  {
+    Real,
+    Test,
+    Demo
+  };
+  class MetricQuality
+  {
+  public:
+    using ValidityType = MeasurementValidity;
+    const ValidityType& Validity() const;
+    ValidityType& Validity();
+
+    using ModeType = GenerationMode;
+    using ModeOptional = std::optional<ModeType>;
+
+    using QiType = int;
+    using QiOptional = std::optional<QiType>;
+
+  protected:
+    ValidityType Validity_;
+    ModeOptional Mode_;
+    QiOptional Qi_;
+  };
+  class Annotation
+  {
+  public:
+    using TypeType = CodedValue;
+
+  protected:
+    TypeType Type_;
+  };
+
+  using Timestamp = unsigned int;
+
+  class AbstractMetricValue
+  {
+  public:
+    using MetricQualityType = MetricQuality;
+    const MetricQualityType& Quality() const;
+    MetricQualityType& Quality();
+
+    using AnnotationType = Annotation;
+    using AnnotationSequence = std::vector<AnnotationType>;
+
+    using StartTimeType = Timestamp;
+    using StartTimeOptional = std::optional<StartTimeType>;
+
+    using StopTimeType = Timestamp;
+    using StopTimeOptional = std::optional<StopTimeType>;
+
+    using DeterminationTimeType = Timestamp;
+    using DeterminationTimeOptional = std::optional<DeterminationTimeType>;
+
+    [[nodiscard]] virtual MetricType getMetricType() const = 0;
+
+  protected:
+    MetricQualityType MetricQuality_;
+    AnnotationSequence Annotation_;
+    StartTimeOptional StartTime_;
+    StopTimeOptional StopTime_;
+    DeterminationTimeOptional DeterminationTime_;
+  };
+  class NumericMetricValue : public AbstractMetricValue
+  {
+  public:
+    using ValueType = int;
+    using ValueOptional = std::optional<ValueType>;
+    const ValueOptional& Value() const;
+    ValueOptional& Value();
+
+    [[nodiscard]] MetricType getMetricType() const override;
+
+  protected:
+    ValueOptional Value_;
+  };
+  enum class ComponentActivation
+  {
+    On,
+    NotRdy,
+    StndBy,
+    Off,
+    Shtdn,
+    Fail
+  };
+  class AbstractMetricState : public AbstractState
+  {
+  public:
+    using ActivationStateType = ComponentActivation;
+    using ActivationStateOptional = std::optional<ActivationStateType>;
+
+  protected:
+    // Constructors
+    //
+    AbstractMetricState(DescriptorHandleType handle);
+
+  protected:
+    ActivationStateOptional ActivationState_;
+    /* TODO
+  BodySiteSequence BodySite_;
+  PhysicalConnectorOptional PhysicalConnector_;
+  ActiveDeterminationPeriodOptional ActiveDeterminationPeriod_;
+  LifeTimePeriodOptional LifeTimePeriod_;
+  */
+  };
+  class NumericMetricState : public AbstractMetricState
+  {
+  public:
+    using MetricValueType = NumericMetricValue;
+    using MetricValueOptional = std::optional<MetricValueType>;
+    const MetricValueOptional& MetricValue() const;
+    MetricValueOptional& MetricValue();
+
+    using PhysiologicalRangeType = Range;
+    using PhysiologicalRangeSequence = std::vector<PhysiologicalRangeType>;
+
+    using ActiveAveragingPeriodType = std::string;
+    using ActiveAveragingPeriodOptional = std::optional<ActiveAveragingPeriodType>;
+
+    StateType getStateType() const override;
+
+    // Constructors
+    //
+    NumericMetricState(DescriptorHandleType handle);
+
+  protected:
+    MetricValueOptional MetricValue_;
+    PhysiologicalRangeSequence PhysiologicalRange_;
+    ActiveAveragingPeriodOptional ActiveAveragingPeriod_;
   };
   class MdState
   {
   public:
     // State
     //
-    using StateType = AbstractState;
+    using StateType = std::shared_ptr<AbstractState>;
     using StateSequence = std::vector<StateType>;
     const StateSequence& State() const;
     StateSequence& State();

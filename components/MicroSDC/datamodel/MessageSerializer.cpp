@@ -1,5 +1,6 @@
 #include "MessageSerializer.hpp"
 #include "NamespaceMap.hpp"
+#include "datamodel/MDPWSConstants.hpp"
 #include "rapidxml_print.hpp"
 
 MessageSerializer::MessageSerializer()
@@ -40,6 +41,8 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto xmlns_mm = xmlDocument_->allocate_attribute("xmlns:mm", SDC::NS_BICEPS_MESSAGE_MODEL);
   auto xmlns_pm = xmlDocument_->allocate_attribute("xmlns:pm", SDC::NS_BICEPS_PARTICIPANT_MODEL);
   auto xmlns_ext = xmlDocument_->allocate_attribute("xmlns:ext", SDC::NS_BICEPS_EXTENSION);
+  auto xmlns_xsi =
+      xmlDocument_->allocate_attribute("xmlns:xsi", MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE);
 
   envelope->append_attribute(xmlns_soap);
   envelope->append_attribute(xmlns_wsd);
@@ -51,6 +54,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   envelope->append_attribute(xmlns_mm);
   envelope->append_attribute(xmlns_pm);
   envelope->append_attribute(xmlns_ext);
+  envelope->append_attribute(xmlns_xsi);
 
   serialize(envelope, message.Header());
   serialize(envelope, message.Body());
@@ -418,6 +422,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto sequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", "0");
   getMdibResponseNode->append_attribute(sequenceIdAttr);
   serialize(getMdibResponseNode, getMdibResponse.Mdib());
+  parent->append_node(getMdibResponseNode);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Mdib& mdib)
@@ -531,9 +536,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   {
     auto safetyClassification = xmlDocument_->allocate_string(
         toString(patientContext.SafetyClassification().value()).c_str());
-    auto handleAttr =
+    auto safetyClassificationAttr =
         xmlDocument_->allocate_attribute("SafetyClassification", safetyClassification);
-    patientContextNode->append_attribute(handleAttr);
+    patientContextNode->append_attribute(safetyClassificationAttr);
   }
   parent->append_node(patientContextNode);
 }
@@ -557,11 +562,206 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto channelNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Channel");
   auto handleAttr = xmlDocument_->allocate_attribute("Handle", channel.Handle().c_str());
   channelNode->append_attribute(handleAttr);
+  if (channel.DescriptorVersion().has_value())
+  {
+    auto descriptorVersion =
+        xmlDocument_->allocate_string(std::to_string(channel.DescriptorVersion().value()).c_str());
+    auto descriptorVersionAttr =
+        xmlDocument_->allocate_attribute("DescriptorVersion", descriptorVersion);
+    channelNode->append_attribute(descriptorVersionAttr);
+  }
+  if (channel.SafetyClassification().has_value())
+  {
+    auto safetyClassification =
+        xmlDocument_->allocate_string(toString(channel.SafetyClassification().value()).c_str());
+    auto safetyClassificationAttr =
+        xmlDocument_->allocate_attribute("SafetyClassification", safetyClassification);
+    channelNode->append_attribute(safetyClassificationAttr);
+  }
+  if (channel.Type().has_value())
+  {
+    auto typeNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Type");
+    auto codeAttr = xmlDocument_->allocate_attribute("Code", channel.Type().value().Code().c_str());
+    typeNode->append_attribute(codeAttr);
+    channelNode->append_node(typeNode);
+  }
+  for (const auto& metric : channel.Metric())
+  {
+    serialize(channelNode, *metric);
+  }
   parent->append_node(channelNode);
+}
+
+void MessageSerializer::serialize(
+    rapidxml::xml_node<>* parent,
+    const BICEPS::PM::AbstractMetricDescriptor& abstractMetricDescriptor)
+{
+  auto metricNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Metric");
+  auto handleAttr =
+      xmlDocument_->allocate_attribute("Handle", abstractMetricDescriptor.Handle().c_str());
+  metricNode->append_attribute(handleAttr);
+
+  auto descriptorVersion = xmlDocument_->allocate_string(
+      std::to_string(abstractMetricDescriptor.DescriptorVersion().value_or(0)).c_str());
+  auto descriptorVersionAttr =
+      xmlDocument_->allocate_attribute("DescriptorVersion", descriptorVersion);
+  metricNode->append_attribute(descriptorVersionAttr);
+
+  if (abstractMetricDescriptor.SafetyClassification().has_value())
+  {
+    auto safetyClassification = xmlDocument_->allocate_string(
+        toString(abstractMetricDescriptor.SafetyClassification().value()).c_str());
+    auto safetyClassificationAttr =
+        xmlDocument_->allocate_attribute("SafetyClassification", safetyClassification);
+    metricNode->append_attribute(safetyClassificationAttr);
+  }
+
+  auto unitNode = xmlDocument_->allocate_node(rapidxml::node_element, "Unit");
+  auto unitCodeAttr =
+      xmlDocument_->allocate_attribute("Code", abstractMetricDescriptor.Unit().Code().c_str());
+  unitNode->append_attribute(unitCodeAttr);
+  metricNode->append_node(unitNode);
+
+  auto metricCategory =
+      xmlDocument_->allocate_string(toString(abstractMetricDescriptor.MetricCategory()).c_str());
+  auto metricCategoryAttr = xmlDocument_->allocate_attribute("MetricCategory", metricCategory);
+  metricNode->append_attribute(metricCategoryAttr);
+
+  auto metricAvailability = xmlDocument_->allocate_string(
+      toString(abstractMetricDescriptor.MetricAvailability()).c_str());
+  auto metricAvailabilityAttr =
+      xmlDocument_->allocate_attribute("MetricAvailability", metricAvailability);
+  metricNode->append_attribute(metricAvailabilityAttr);
+
+  if (abstractMetricDescriptor.getMetricType() == BICEPS::PM::MetricType::NUMERIC)
+  {
+    const auto& numericDescriptor =
+        static_cast<const BICEPS::PM::NumericMetricDescriptor&>(abstractMetricDescriptor);
+    auto typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:NumericMetricDescriptor");
+    metricNode->append_attribute(typeAttr);
+
+    for (const auto& range : numericDescriptor.TechnicalRange())
+    {
+      auto technicalRangeNode =
+          xmlDocument_->allocate_node(rapidxml::node_element, "TechnicalRange");
+      serialize(technicalRangeNode, range);
+      metricNode->append_node(technicalRangeNode);
+    }
+
+    auto resolution =
+        xmlDocument_->allocate_string(std::to_string(numericDescriptor.Resolution()).c_str());
+    auto resolutionAttr = xmlDocument_->allocate_attribute("Resolution", resolution);
+    metricNode->append_attribute(resolutionAttr);
+
+    if (numericDescriptor.AveragingPeriod().has_value())
+    {
+      auto averagingPeriodAttr = xmlDocument_->allocate_attribute(
+          "AveragingPeriod", numericDescriptor.AveragingPeriod()->c_str());
+      metricNode->append_attribute(averagingPeriodAttr);
+    }
+  }
+
+  parent->append_node(metricNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Range& range)
+{
+  if (range.Lower().has_value())
+  {
+    auto lower = xmlDocument_->allocate_string(std::to_string(range.Lower().value()).c_str());
+    auto lowerAttr = xmlDocument_->allocate_attribute("Lower", lower);
+    parent->append_attribute(lowerAttr);
+  }
+  if (range.Upper().has_value())
+  {
+    auto upper = xmlDocument_->allocate_string(std::to_string(range.Upper().value()).c_str());
+    auto upperAttr = xmlDocument_->allocate_attribute("Upper", upper);
+    parent->append_attribute(upperAttr);
+  }
+  if (range.StepWidth().has_value())
+  {
+    auto stepWidth =
+        xmlDocument_->allocate_string(std::to_string(range.StepWidth().value()).c_str());
+    auto stepWidthAttr = xmlDocument_->allocate_attribute("StepWidth", stepWidth);
+    parent->append_attribute(stepWidthAttr);
+  }
+  if (range.RelativeAccuracy().has_value())
+  {
+    auto relativeAccuracy =
+        xmlDocument_->allocate_string(std::to_string(range.RelativeAccuracy().value()).c_str());
+    auto relativeAccuracyAttr =
+        xmlDocument_->allocate_attribute("RelativeAccuracy", relativeAccuracy);
+    parent->append_attribute(relativeAccuracyAttr);
+  }
+  if (range.AbsoluteAccuracy().has_value())
+  {
+    auto absoluteAccuracy =
+        xmlDocument_->allocate_string(std::to_string(range.AbsoluteAccuracy().value()).c_str());
+    auto absoluteAccuracyAttr =
+        xmlDocument_->allocate_attribute("AbsoluteAccuracy", absoluteAccuracy);
+    parent->append_attribute(absoluteAccuracyAttr);
+  }
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& mdState)
 {
+  auto mdStateNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MdState");
+  for (const auto& state : mdState.State())
+  {
+    serialize(mdStateNode, *state);
+  }
+  parent->append_node(mdStateNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::AbstractState& state)
+{
+  auto stateNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:State");
+  auto descriptorHandleAttr =
+      xmlDocument_->allocate_attribute("DescriptorHandle", state.DescriptorHandle().c_str());
+  stateNode->append_attribute(descriptorHandleAttr);
+  if (state.getStateType() == BICEPS::PM::StateType::NUMERIC_METRIC_STATE)
+  {
+    const auto& numericMetricState = static_cast<const BICEPS::PM::NumericMetricState&>(state);
+    if (numericMetricState.MetricValue().has_value())
+    {
+      serialize(stateNode, numericMetricState.MetricValue().value());
+    }
+    auto typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:NumericMetricState");
+    stateNode->append_attribute(typeAttr);
+  }
+  parent->append_node(stateNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::AbstractMetricValue& value)
+{
+  auto valueNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MetricValue");
+  serialize(valueNode, value.Quality());
+
+  if (value.getMetricType() == BICEPS::PM::MetricType::NUMERIC)
+  {
+    const auto& numericValue = static_cast<const BICEPS::PM::NumericMetricValue&>(value);
+    if (numericValue.Value().has_value())
+    {
+      auto num =
+          xmlDocument_->allocate_string(std::to_string(numericValue.Value().value()).c_str());
+      auto valueAttr = xmlDocument_->allocate_attribute("Value", num);
+      valueNode->append_attribute(valueAttr);
+    }
+  }
+
+  parent->append_node(valueNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::MetricQuality& quality)
+{
+  auto metricQualityNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MetricQuality");
+  auto validity = xmlDocument_->allocate_string(toString(quality.Validity()).c_str());
+  auto validityAttr = xmlDocument_->allocate_attribute("Validity", validity);
+  metricQualityNode->append_attribute(validityAttr);
+  parent->append_node(metricQualityNode);
 }
 
 /*static*/ std::string
@@ -608,4 +808,65 @@ std::string MessageSerializer::toString(const WS::DISCOVERY::QNameListType& qNam
     out += std::string(std::string(qname->ns()) + ":" + qname->name());
   }
   return out;
+}
+
+std::string MessageSerializer::toString(BICEPS::PM::MetricCategory category)
+{
+  switch (category)
+  {
+    case BICEPS::PM::MetricCategory::Unspec:
+      return "Unspec";
+    case BICEPS::PM::MetricCategory::Msrmt:
+      return "Msrmt";
+    case BICEPS::PM::MetricCategory::Clc:
+      return "Clc";
+    case BICEPS::PM::MetricCategory::Set:
+      return "Set";
+    case BICEPS::PM::MetricCategory::Preset:
+      return "Preset";
+    case BICEPS::PM::MetricCategory::Rcmm:
+      return "Rcmm";
+  }
+  assert(false && "Uncatched value in MetricCategory");
+  return "";
+}
+
+std::string MessageSerializer::toString(BICEPS::PM::MetricAvailability availability)
+{
+  switch (availability)
+  {
+    case BICEPS::PM::MetricAvailability::Intr:
+      return "Intr";
+    case BICEPS::PM::MetricAvailability::Cont:
+      return "Cont";
+  }
+  assert(false && "Uncatched value in MetricAvailability");
+  return "";
+}
+
+std::string MessageSerializer::toString(BICEPS::PM::MeasurementValidity validity)
+{
+  switch (validity)
+  {
+    case BICEPS::PM::MeasurementValidity::Calib:
+      return "Calib";
+    case BICEPS::PM::MeasurementValidity::Inv:
+      return "Inv";
+    case BICEPS::PM::MeasurementValidity::NA:
+      return "NA";
+    case BICEPS::PM::MeasurementValidity::Oflw:
+      return "Oflw";
+    case BICEPS::PM::MeasurementValidity::Ong:
+      return "Ong";
+    case BICEPS::PM::MeasurementValidity::Qst:
+      return "Qst";
+    case BICEPS::PM::MeasurementValidity::Uflw:
+      return "Uflw";
+    case BICEPS::PM::MeasurementValidity::Vld:
+      return "Vld";
+    case BICEPS::PM::MeasurementValidity::Vldated:
+      return "Vldated";
+  }
+  assert(false && "Uncatched value in MeasurementValidity");
+  return "";
 }
