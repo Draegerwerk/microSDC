@@ -8,7 +8,7 @@
 class DeviceService : public SoapService
 {
 public:
-  DeviceService(const MetadataProvider& metadata);
+  explicit DeviceService(MetadataProvider metadata);
   void handleRequest(httpd_req_t* req, char* message) override;
   std::string getURI() const override;
 

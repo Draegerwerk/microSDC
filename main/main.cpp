@@ -1,22 +1,23 @@
 #include "DeviceCharacteristics.hpp"
-#include "NetworkHandler.hpp"
 #include "MicroSDC.hpp"
+#include "NetworkHandler.hpp"
+#include "StateHandler.hpp"
 #include "esp_eth.h"
 #include "esp_log.h"
+#include "esp_pthread.h"
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include <chrono>
-#include "esp_pthread.h"
 #include <iostream>
 #include <sstream>
 #include <thread>
 
 static constexpr const char* TAG = "main_component";
 
-static void ip_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id,
-                             void* event_data)
+static void ipEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_t eventId,
+                             void*  /*event_data*/)
 {
-  switch (event_id)
+  switch (eventId)
   {
     case IP_EVENT_ETH_GOT_IP:
       [[fallthrough]];
@@ -30,10 +31,10 @@ static void ip_event_handler(void* arg, esp_event_base_t event_base, int32_t eve
   }
 }
 
-static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id,
-                               void* event_data)
+static void wifiEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_t eventId,
+                               void*  /*event_data*/)
 {
-  switch (event_id)
+  switch (eventId)
   {
     case WIFI_EVENT_WIFI_READY:
       ESP_LOGI(TAG, "WiFi ready");
@@ -61,17 +62,17 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t e
   }
 }
 
-static void eth_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id,
-                              void* event_data)
+static void ethEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_t eventId,
+                              void* eventData)
 {
   uint8_t macAddress[6] = {0};
   // we can get the ethernet driver handle from event data
-  esp_eth_handle_t eth_handle = *static_cast<esp_eth_handle_t*>(event_data);
+  esp_eth_handle_t ethHandle = *static_cast<esp_eth_handle_t*>(eventData);
 
-  switch (event_id)
+  switch (eventId)
   {
     case ETHERNET_EVENT_CONNECTED: {
-      esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, macAddress);
+      esp_eth_ioctl(ethHandle, ETH_CMD_G_MAC_ADDR, macAddress);
       ESP_LOGI(TAG, "Ethernet Link Up");
       ESP_LOGI(TAG, "Ethernet HW Addr %02x:%02x:%02x:%02x:%02x:%02x", macAddress[0], macAddress[1],
                macAddress[2], macAddress[3], macAddress[4], macAddress[5]);
@@ -94,6 +95,36 @@ static void eth_event_handler(void* arg, esp_event_base_t event_base, int32_t ev
   }
 }
 
+class NumericStateHandler : public MdStateHandler<BICEPS::PM::NumericMetricState>
+{
+public:
+  explicit NumericStateHandler(const std::string& descriptorHandle)
+    : MdStateHandler(descriptorHandle)
+  {
+  }
+
+  BICEPS::PM::MetricType getMetricType() const override
+  {
+    return BICEPS::PM::MetricType::NUMERIC;
+  }
+
+  std::shared_ptr<BICEPS::PM::NumericMetricState> getInitialState() const override
+  {
+    auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
+    BICEPS::PM::NumericMetricValue value;
+    value.Value() = 0;
+    state->MetricValue() = value;
+    return state;
+  }
+
+  void setValue(int value)
+  {
+    auto state = getInitialState();
+    state->MetricValue()->Value() = value;
+    updateState(state);
+  }
+};
+
 // force c linkage for app_main()
 extern "C" void app_main()
 {
@@ -115,11 +146,43 @@ extern "C" void app_main()
   deviceCharacteristics.setModelName("MicroSDC_Device01");
   sdc->setDeviceCharacteristics(deviceCharacteristics);
 
-  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, sdc));
+  BICEPS::PM::Metadata metadata;
+  metadata.Manufacturer().emplace_back("Draeger");
+  metadata.ModelName().emplace_back("MicroSDC_Device01");
+  metadata.ModelNumber().emplace("1");
+  metadata.SerialNumber().emplace_back("1234-5678");
+
+  BICEPS::PM::SystemContextDescriptor systemContext("system_context");
+  systemContext.PatientContext() = BICEPS::PM::PatientContextDescriptor("patient_context");
+
+  auto numericState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "numericState_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Msrmt,
+      BICEPS::PM::MetricAvailability::Cont, 1);
+  numericState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
+
+  BICEPS::PM::ChannelDescriptor deviceChannel("device_channel");
+  deviceChannel.Metric().emplace_back(numericState);
+  deviceChannel.SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
+  BICEPS::PM::VmdDescriptor deviceModule("device_vmd");
+  deviceModule.Channel().emplace_back(deviceChannel);
+
+  BICEPS::PM::MdsDescriptor deviceDescriptor("MedicalDevices");
+  deviceDescriptor.MetaData() = metadata;
+  deviceDescriptor.SystemContext() = systemContext;
+  deviceDescriptor.Vmd().emplace_back(deviceModule);
+
+  BICEPS::PM::MdDescription mdDescription;
+  mdDescription.Mds().emplace_back(deviceDescriptor);
+  sdc->setMdDescription(mdDescription);
+
+  auto numericStateHandler = std::make_shared<NumericStateHandler>("numericState_handle");
+  sdc->addMdState(numericStateHandler);
+
+  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ipEventHandler, sdc));
 
   ESP_ERROR_CHECK(
-      esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, sdc));
-  ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &eth_event_handler, sdc));
+      esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, sdc));
+  ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &ethEventHandler, sdc));
 
 
   ESP_LOGI(TAG, "Connecting...");

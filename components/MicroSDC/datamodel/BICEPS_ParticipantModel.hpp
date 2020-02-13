@@ -7,6 +7,63 @@
 
 namespace BICEPS::PM
 {
+  enum class SafetyClassification
+  {
+    Inf,
+    MedA,
+    MedB,
+    MedC
+  };
+  enum class MetricCategory
+  {
+    Unspec,
+    Msrmt,
+    Clc,
+    Set,
+    Preset,
+    Rcmm
+  };
+  enum class MetricAvailability
+  {
+    Intr,
+    Cont
+  };
+  enum class MetricType
+  {
+    NUMERIC,
+  };
+  enum class StateType
+  {
+    NUMERIC_METRIC_STATE,
+  };
+  enum class MeasurementValidity
+  {
+    Vld,
+    Vldated,
+    Ong,
+    Qst,
+    Calib,
+    Inv,
+    Oflw,
+    Uflw,
+    NA
+  };
+  enum class GenerationMode
+  {
+    Real,
+    Test,
+    Demo
+  };
+  enum class ComponentActivation
+  {
+    On,
+    NotRdy,
+    StndBy,
+    Off,
+    Shtdn,
+    Fail
+  };
+
   class CodedValue
   {
   public:
@@ -18,13 +75,6 @@ namespace BICEPS::PM
 
   private:
     CodeType Code_;
-  };
-  enum class SafetyClassification
-  {
-    Inf,
-    MedA,
-    MedB,
-    MedC
   };
   class AbstractDescriptor
   {
@@ -56,6 +106,7 @@ namespace BICEPS::PM
     const SafetyClassificationOptional& SafetyClassification() const;
     SafetyClassificationOptional& SafetyClassification();
 
+  protected:
     // Constructors.
     //
     AbstractDescriptor(const HandleType&);
@@ -68,9 +119,13 @@ namespace BICEPS::PM
   };
   class AbstractDeviceComponentDescriptor : public AbstractDescriptor
   {
+  protected:
+    AbstractDeviceComponentDescriptor(const HandleType&);
   };
   class AbstractComplexDeviceComponentDescriptor : public AbstractDeviceComponentDescriptor
   {
+  protected:
+    AbstractComplexDeviceComponentDescriptor(const HandleType&);
   };
   class Metadata
   {
@@ -109,8 +164,34 @@ namespace BICEPS::PM
     ModelNumberOptional ModelNumber_;
     SerialNumberSequence SerialNumber_;
   };
-  class SystemContextDescriptor
+  class AbstractContextDescriptor : public AbstractDescriptor
   {
+  protected:
+    AbstractContextDescriptor(const HandleType&);
+  };
+  class PatientContextDescriptor : public AbstractContextDescriptor
+  {
+  public:
+    // Constructors
+    //
+    PatientContextDescriptor(const HandleType&);
+  };
+  class SystemContextDescriptor : public AbstractContextDescriptor
+  {
+  public:
+    // PatientContext
+    //
+    using PatientContextType = PatientContextDescriptor;
+    using PatientContextOptional = std::optional<PatientContextType>;
+    const PatientContextOptional& PatientContext() const;
+    PatientContextOptional& PatientContext();
+
+    // Constructors
+    //
+    SystemContextDescriptor(const HandleType&);
+
+  protected:
+    PatientContextOptional PatientContext_;
   };
   class ClockDescriptor
   {
@@ -118,19 +199,40 @@ namespace BICEPS::PM
   class BatteryDescriptor
   {
   };
-  enum class MetricCategory
+  class Range
   {
-    Unspec,
-    Msrmt,
-    Clc,
-    Set,
-    Preset,
-    Rcmm
-  };
-  enum class MetricAvailability
-  {
-    Intr,
-    Cont
+  public:
+    using LowerType = int;
+    using LowerOptional = std::optional<LowerType>;
+    const LowerOptional& Lower() const;
+    LowerOptional& Lower();
+
+    using UpperType = int;
+    using UpperOptional = std::optional<UpperType>;
+    const UpperOptional& Upper() const;
+    UpperOptional& Upper();
+
+    using StepWidthType = int;
+    using StepWidthOptional = std::optional<StepWidthType>;
+    const StepWidthOptional& StepWidth() const;
+    StepWidthOptional& StepWidth();
+
+    using RelativeAccuracyType = int;
+    using RelativeAccuracyOptional = std::optional<RelativeAccuracyType>;
+    const RelativeAccuracyOptional& RelativeAccuracy() const;
+    RelativeAccuracyOptional& RelativeAccuracy();
+
+    using AbsoluteAccuracyType = int;
+    using AbsoluteAccuracyOptional = std::optional<AbsoluteAccuracyType>;
+    const AbsoluteAccuracyOptional& AbsoluteAccuracy() const;
+    AbsoluteAccuracyOptional& AbsoluteAccuracy();
+
+  protected:
+    LowerOptional Lower_;
+    UpperOptional Upper_;
+    StepWidthOptional StepWidth_;
+    RelativeAccuracyOptional RelativeAccuracy_;
+    AbsoluteAccuracyOptional AbsoluteAccuracy_;
   };
   class AbstractMetricDescriptor : public AbstractDescriptor
   {
@@ -153,25 +255,61 @@ namespace BICEPS::PM
     const MetricAvailabilityType& MetricAvailability() const;
     MetricAvailabilityType& MetricAvailability();
 
+    virtual MetricType getMetricType() const = 0;
+
+  protected:
     // Constructors.
     //
     AbstractMetricDescriptor(const HandleType&, const UnitType&, const MetricCategoryType&,
                              const MetricAvailabilityType&);
+    virtual ~AbstractMetricDescriptor() = default;
 
   protected:
     UnitType Unit_;
     MetricCategoryType MetricCategory_;
     MetricAvailabilityType MetricAvailability_;
   };
+  class NumericMetricDescriptor : public AbstractMetricDescriptor
+  {
+  public:
+    using TechnicalRangeType = Range;
+    using TechnicalRangeSequence = std::vector<TechnicalRangeType>;
+    const TechnicalRangeSequence& TechnicalRange() const;
+    TechnicalRangeSequence& TechnicalRange();
+
+    using ResolutionType = int;
+    const ResolutionType& Resolution() const;
+    ResolutionType& Resolution();
+
+    using AveragingPeriodType = std::string;
+    using AveragingPeriodOptional = std::optional<AveragingPeriodType>;
+    const AveragingPeriodOptional& AveragingPeriod() const;
+    AveragingPeriodOptional& AveragingPeriod();
+
+    MetricType getMetricType() const override;
+
+    // Constructors
+    //
+    NumericMetricDescriptor(const HandleType&, const UnitType&, const MetricCategoryType&,
+                            const MetricAvailabilityType&, const ResolutionType&);
+
+  protected:
+    TechnicalRangeSequence TechnicalRange_;
+    ResolutionType Resolution_;
+    AveragingPeriodOptional AveragingPeriod_;
+  };
   class ChannelDescriptor : public AbstractDeviceComponentDescriptor
   {
   public:
     // Metric
     //
-    using MetricType = AbstractMetricDescriptor;
+    using MetricType = std::shared_ptr<AbstractMetricDescriptor>;
     using MetricSequence = std::vector<MetricType>;
     const MetricSequence& Metric() const;
     MetricSequence& Metric();
+    // Constructors
+    //
+    ChannelDescriptor(const HandleType&);
 
   protected:
     MetricSequence Metric_;
@@ -259,7 +397,7 @@ namespace BICEPS::PM
 
     // Constructors.
     //
-    MdDescription();
+    MdDescription() = default;
 
   protected:
     MdsSequence Mds_;
@@ -281,20 +419,132 @@ namespace BICEPS::PM
     const DescriptorHandleType& DescriptorHandle() const;
     DescriptorHandleType& DescriptorHandle();
 
+    virtual StateType getStateType() const = 0;
+
+  protected:
     // Constructors.
     //
-    AbstractState(const DescriptorHandleType&);
+    AbstractState(DescriptorHandleType);
 
   protected:
     StateVersionOptional StateVersion_;
     DescriptorHandleType DescriptorHandle_;
+  };
+  class MetricQuality
+  {
+  public:
+    using ValidityType = MeasurementValidity;
+    const ValidityType& Validity() const;
+    ValidityType& Validity();
+
+    using ModeType = GenerationMode;
+    using ModeOptional = std::optional<ModeType>;
+
+    using QiType = int;
+    using QiOptional = std::optional<QiType>;
+
+  protected:
+    ValidityType Validity_;
+    ModeOptional Mode_;
+    QiOptional Qi_;
+  };
+  class Annotation
+  {
+  public:
+    using TypeType = CodedValue;
+
+  protected:
+    TypeType Type_;
+  };
+
+  using Timestamp = unsigned int;
+
+  class AbstractMetricValue
+  {
+  public:
+    using MetricQualityType = MetricQuality;
+    const MetricQualityType& Quality() const;
+    MetricQualityType& Quality();
+
+    using AnnotationType = Annotation;
+    using AnnotationSequence = std::vector<AnnotationType>;
+
+    using StartTimeType = Timestamp;
+    using StartTimeOptional = std::optional<StartTimeType>;
+
+    using StopTimeType = Timestamp;
+    using StopTimeOptional = std::optional<StopTimeType>;
+
+    using DeterminationTimeType = Timestamp;
+    using DeterminationTimeOptional = std::optional<DeterminationTimeType>;
+
+    virtual MetricType getMetricType() const = 0;
+
+  protected:
+    MetricQualityType MetricQuality_;
+    AnnotationSequence Annotation_;
+    StartTimeOptional StartTime_;
+    StopTimeOptional StopTime_;
+    DeterminationTimeOptional DeterminationTime_;
+  };
+  class NumericMetricValue : public AbstractMetricValue
+  {
+  public:
+    using ValueType = int;
+    using ValueOptional = std::optional<ValueType>;
+    const ValueOptional& Value() const;
+    ValueOptional& Value();
+
+    MetricType getMetricType() const override;
+
+  protected:
+    ValueOptional Value_;
+  };
+  class AbstractMetricState : public AbstractState
+  {
+  public:
+    using ActivationStateType = ComponentActivation;
+    using ActivationStateOptional = std::optional<ActivationStateType>;
+
+  protected:
+    // Constructors
+    //
+    AbstractMetricState(DescriptorHandleType handle);
+
+  protected:
+    ActivationStateOptional ActivationState_;
+  };
+  class NumericMetricState : public AbstractMetricState
+  {
+  public:
+    using MetricValueType = NumericMetricValue;
+    using MetricValueOptional = std::optional<MetricValueType>;
+    const MetricValueOptional& MetricValue() const;
+    MetricValueOptional& MetricValue();
+
+    using PhysiologicalRangeType = Range;
+    using PhysiologicalRangeSequence = std::vector<PhysiologicalRangeType>;
+
+    using ActiveAveragingPeriodType = std::string;
+    using ActiveAveragingPeriodOptional = std::optional<ActiveAveragingPeriodType>;
+
+    StateType getStateType() const override;
+
+    // Constructors
+    //
+    NumericMetricState(DescriptorHandleType handle);
+
+  protected:
+    MetricValueOptional MetricValue_;
+    PhysiologicalRangeSequence PhysiologicalRange_;
+    ActiveAveragingPeriodOptional ActiveAveragingPeriod_;
   };
   class MdState
   {
   public:
     // State
     //
-    using StateType = AbstractState;
+    using StateType = std::shared_ptr<AbstractState>;
     using StateSequence = std::vector<StateType>;
     const StateSequence& State() const;
     StateSequence& State();
@@ -312,6 +562,7 @@ namespace BICEPS::PM
   };
   class Mdib
   {
+  public:
     // MdDescription
     //
     using MdDescriptionType = ::BICEPS::PM::MdDescription;

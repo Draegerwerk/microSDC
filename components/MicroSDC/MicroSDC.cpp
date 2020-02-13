@@ -3,9 +3,10 @@
 #include "GetService.hpp"
 #include "NetworkHandler.hpp"
 #include "SDCConstants.hpp"
+#include "StateHandler.hpp"
 #include "StaticService.hpp"
 #include "UUIDGenerator.hpp"
-#include "WebServer.hpp"
+#include "asio/system_error.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "dpws/MetadataProvider.hpp"
 #include "esp_log.h"
@@ -13,7 +14,11 @@
 
 static constexpr const char* TAG = "MicroSDC";
 
-MicroSDC::MicroSDC() = default;
+MicroSDC::MicroSDC()
+  : mdib_(std::make_unique<BICEPS::PM::Mdib>(std::string("0")))
+{
+  mdib_->MdState() = BICEPS::PM::MdState();
+}
 
 void MicroSDC::start()
 {
@@ -33,19 +38,21 @@ void MicroSDC::startup()
   } // free lock of running bool
   ESP_LOGI(TAG, "Initialize...");
 
-  MetadataProvider metadata(getDeviceCharacteristics(), useTLS);
+  MetadataProvider metadata(getDeviceCharacteristics(), useTLS_);
 
   // construct xAddresses containing reference to the service
   WS::DISCOVERY::UriListType xAddresses;
-  std::string protocol = useTLS ? "https" : "http";
+  std::string protocol = useTLS_ ? "https" : "http";
   std::string xaddress = protocol + "://" + NetworkHandler::getInstance().address() +
-                         (useTLS ? ":443" : ":80") + metadata.getDeviceServicePath();
+                         (useTLS_ ? ":443" : ":80") + metadata.getDeviceServicePath();
   xAddresses.emplace_back(xaddress);
 
   // fill discovery types
   WS::DISCOVERY::QNameListType types;
-  types.emplace_back(MDPWS::WS_NS_DPWS, "Device");
-  types.emplace_back(MDPWS::NS_MDPWS, "MedicalDevice");
+  types.emplace_back(MDPWS::WS_NS_DPWS_PREFIX, "Device");
+  types.emplace_back(MDPWS::NS_MDPWS_PREFIX, "MedicalDevice");
+
+  initializeMdStates();
 
   try
   {
@@ -60,11 +67,11 @@ void MicroSDC::startup()
 
   // construct web services
   auto deviceService = std::make_shared<DeviceService>(metadata);
-  auto getService = std::make_shared<GetService>(metadata);
+  auto getService = std::make_shared<GetService>(*this, metadata);
   auto getWSDLService =
       std::make_shared<StaticService>(getService->getURI() + "/?wsdl", WSDL::getServiceWSDL);
 
-  webserver_ = std::make_unique<WebServer>(useTLS);
+  webserver_ = std::make_unique<WebServer>(useTLS_);
 
   // register webservices
   webserver_->addService(deviceService);
@@ -86,6 +93,32 @@ void MicroSDC::stop()
     sdcThread_.join();
     ESP_LOGI(TAG, "stopped");
   }
+}
+
+void MicroSDC::initializeMdStates()
+{
+  for (const auto& [descriptorHandle, handler] : stateHandlers_)
+  {
+    if (handler->getMetricType() == BICEPS::PM::MetricType::NUMERIC)
+    {
+      auto& numericHandler =
+          static_cast<const MdStateHandler<BICEPS::PM::NumericMetricState>&>(*handler);
+      std::lock_guard<std::mutex> lock(mdibMutex_);
+      mdib_->MdState()->State().emplace_back(numericHandler.getInitialState());
+    }
+  }
+}
+
+const BICEPS::PM::Mdib& MicroSDC::getMdib() const
+{
+  std::lock_guard<std::mutex> lock(mdibMutex_);
+  return *mdib_;
+}
+
+void MicroSDC::setMdDescription(const BICEPS::PM::MdDescription& mdDescription)
+{
+  std::lock_guard<std::mutex> lock(mdibMutex_);
+  mdib_->MdDescription() = mdDescription;
 }
 
 void MicroSDC::setDeviceCharacteristics(DeviceCharacteristics devChar)
@@ -115,16 +148,47 @@ std::string MicroSDC::getEndpointReference() const
 
 void MicroSDC::setUseTLS(const bool useTLS)
 {
-  this->useTLS = useTLS;
+  this->useTLS_ = useTLS;
 }
 
 std::string MicroSDC::calculateUUID()
 {
-  auto UUID = UUIDGenerator().create();
-  return UUID.toString();
+  auto uuid = UUIDGenerator().create();
+  return uuid.toString();
 }
 
 std::string MicroSDC::calculateMessageID()
 {
   return std::string(SDC::UUID_SDC_PREFIX + MicroSDC::calculateUUID());
+}
+
+void MicroSDC::addMdState(std::shared_ptr<StateHandler> stateHandler)
+{
+  stateHandler->setMicroSDC(this);
+  stateHandlers_[stateHandler->getDescriptorHandle()] = std::move(stateHandler);
+}
+
+void MicroSDC::updateState(std::shared_ptr<BICEPS::PM::NumericMetricState> state)
+{
+  updateMdib(std::move(state));
+}
+
+template <class T>
+void MicroSDC::updateMdib(std::shared_ptr<T> newState)
+{
+  incrementMdibVersion();
+  std::lock_guard<std::mutex> lock(mdibMutex_);
+  for (auto& state : mdib_->MdState()->State())
+  {
+    if (newState->DescriptorHandle() == state->DescriptorHandle())
+    {
+      state = newState;
+    }
+  }
+}
+
+void MicroSDC::incrementMdibVersion()
+{
+  std::lock_guard<std::mutex> lock(mdibMutex_);
+  mdib_->MdibVersion() = mdib_->MdibVersion().value_or(0) + 1;
 }

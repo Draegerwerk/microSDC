@@ -1,8 +1,6 @@
 #pragma once
 
-#include "frozen/string.h"
-
-#define NameSpaceConstant static constexpr frozen::string
+#define NameSpaceConstant static constexpr const char*
 #define MDPWSConstant static constexpr const char*
 
 namespace MDPWS
@@ -43,7 +41,9 @@ namespace MDPWS
 
 
   NameSpaceConstant WS_NS_DPWS = "http://docs.oasis-open.org/ws-dd/ns/dpws/2009/01";
+  NameSpaceConstant WS_NS_DPWS_PREFIX = "dpws";
   NameSpaceConstant NS_MDPWS = "http://standards.ieee.org/downloads/11073/11073-20702-2016";
+  NameSpaceConstant NS_MDPWS_PREFIX = "mdpws";
   NameSpaceConstant WS_NS_SOAP_ENVELOPE = "http://www.w3.org/2003/05/soap-envelope";
   NameSpaceConstant WS_NS_WSDL_SOAP = "http://schemas.xmlsoap.org/wsdl/";
   NameSpaceConstant WS_NS_WSDL_W3_SOAP = "http://www.w3.org/ns/wsdl/soap";

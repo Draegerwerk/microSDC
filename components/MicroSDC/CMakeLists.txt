@@ -1,4 +1,6 @@
 set(COMPONENT_SOURCES
+        "datamodel/BICEPS_MessageModel.cpp"
+        "datamodel/BICEPS_ParticipantModel.cpp"
         "datamodel/ExpectedElement.cpp"
         "datamodel/MessageModel.cpp"
         "datamodel/MessageSerializer.cpp"
@@ -15,10 +17,11 @@ set(COMPONENT_SOURCES
         "MicroSDC.cpp"
         "SoapService.cpp"
         "StaticService.cpp"
+        "StateHandler.cpp"
     )
 
 idf_component_register(
     SRCS ${COMPONENT_SOURCES}
     INCLUDE_DIRS "."
-    REQUIRES "WebServer" "UUID" "Networking" "rapidxml" "frozen" "asio" "pthread"
+    REQUIRES "WebServer" "UUID" "Networking" "rapidxml" "asio" "pthread"
     )

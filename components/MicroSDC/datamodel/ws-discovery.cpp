@@ -7,17 +7,13 @@
 
 namespace WS::DISCOVERY
 {
-  QName::QName(const frozen::string& ns, const std::string& name)
+  QName::QName(NameSpaceString ns, const std::string& name)
     : ns_(ns)
     , name_(name)
   {
   }
 
-  const frozen::string& QName::ns() const
-  {
-    return ns_;
-  }
-  frozen::string& QName::ns()
+  QName::NameSpaceString QName::ns() const
   {
     return ns_;
   }
@@ -318,10 +314,10 @@ namespace WS::DISCOVERY
 
   void ResolveType::parse(const rapidxml::xml_node<>& node)
   {
-    auto eprNode = node.first_node("EndpointReference", MDPWS::WS_NS_ADDRESSING.data());
+    auto eprNode = node.first_node("EndpointReference", MDPWS::WS_NS_ADDRESSING);
     if (eprNode == nullptr)
     {
-      throw ExpectedElement("EndpointReference", MDPWS::WS_NS_ADDRESSING.data());
+      throw ExpectedElement("EndpointReference", MDPWS::WS_NS_ADDRESSING);
     }
     EndpointReference_ = EndpointReferenceType(*eprNode);
   }

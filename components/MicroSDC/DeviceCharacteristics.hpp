@@ -5,9 +5,6 @@
 class DeviceCharacteristics
 {
 public:
-  DeviceCharacteristics() = default;
-  DeviceCharacteristics(const DeviceCharacteristics& devChar) = default;
-
   void setManufacturer(const std::string& name);
   void setManufacturerUrl(const std::string& url);
   void setModelName(const std::string& name);

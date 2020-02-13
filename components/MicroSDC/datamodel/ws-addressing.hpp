@@ -1,6 +1,5 @@
 #pragma once
 
-#include "NamespaceMap.hpp"
 #include "ws-eventing.hpp"
 #include <memory>
 #include <optional>

@@ -86,7 +86,7 @@ MetadataProvider::Hosted MetadataProvider::createHostedGetService() const
   endpointReference.emplace_back(Hosted::EndpointReferenceType::AddressType(xaddress));
   // Types
   Hosted::TypesType types;
-  types.emplace_back(SDC::NS_GLUE, SDC::QNAME_GETSERVICE);
+  types.emplace_back(SDC::NS_GLUE_PREFIX, SDC::QNAME_GETSERVICE);
   // Service Id
   Hosted::ServiceIdType serviceId("GetService");
   return Hosted(endpointReference, types, serviceId);

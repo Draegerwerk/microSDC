@@ -2,9 +2,13 @@
 
 #include "DeviceCharacteristics.hpp"
 #include "WebServer.hpp"
+#include "datamodel/BICEPS_ParticipantModel.hpp"
 #include "dpws/DPWSHost.hpp"
+#include <map>
 #include <mutex>
 #include <thread>
+
+class StateHandler;
 
 class MicroSDC
 {
@@ -21,6 +25,16 @@ public:
    * @brief stops all components when disconnected
    */
   void stop();
+  /**
+   * @brief gets the mdib representation of this MicroSDC instance
+   * @return constant reference to the mdib
+   */
+  const BICEPS::PM::Mdib& getMdib() const;
+  /**
+   * @brief updates the MdDescription part of the mdib
+   * @param mdDescription the new mdDescription
+   */
+  void setMdDescription(const BICEPS::PM::MdDescription& mdDescription);
   /**
    * @brief sets the device characteristics of this SDC service
    * @param devChar characteristics to be set
@@ -57,6 +71,16 @@ public:
    * @return string containing a UUID
    */
   static std::string calculateUUID();
+  /**
+   * @brief Adds an state and its handle
+   * @param stateHandler the pointer the stateHandler to add
+   */
+  void addMdState(std::shared_ptr<StateHandler> stateHandler);
+  /**
+   * @brief updates a given state in the mdib representation
+   * @param state the state to update
+   */
+  void updateState(std::shared_ptr<BICEPS::PM::NumericMetricState> state);
 
 private:
   /// the SDC thread
@@ -65,20 +89,45 @@ private:
   std::unique_ptr<DPWSHost> dpws_{nullptr};
   /// pointer to the WebServer
   std::unique_ptr<WebServer> webserver_{nullptr};
-  bool useTLS{true};
+  /// pointer to the mdib representation
+  std::unique_ptr<BICEPS::PM::Mdib> mdib_{nullptr};
+  /// mutex protecting changes in the mdib
+  mutable std::mutex mdibMutex_;
+  /// all states
+  std::map<std::string, std::shared_ptr<StateHandler>> stateHandlers_;
+  /// whether the communication uses TLS
+  bool useTLS_{true};
   /// whether SDC is started and connected
   bool running_{false};
+  /// mutex protecting running_ member
   mutable std::mutex runningMutex_;
   /// endpoint reference of this MicroSDC instance
   std::string endpointReference_;
+  /// mutex protecting the endpointReference
   mutable std::mutex eprMutex_;
 
   /// Device Characteristics of this instance
   DeviceCharacteristics deviceCharacteristics_;
+  /// mutex protecting the deviceCharacteristics
   mutable std::mutex deviceCharacteristicsMutex_;
 
   /**
    * @brief Starts and initializes all SDC components and services
    */
   void startup();
+  /**
+   * @brief updates the internal mdib representation with a given state
+   * @tparam infered state type of the state to update
+   * @param state the new state to update in the mdib
+   */
+  template <class T>
+  void updateMdib(std::shared_ptr<T> state);
+  /**
+   * @brief update the version attribute of the mdib. Will be called everytime the mdib changes
+   */
+  void incrementMdibVersion();
+  /**
+   * @brief initializes all registered states by calling there initial state function
+   */
+  void initializeMdStates();
 };
