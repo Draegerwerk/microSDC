@@ -19,13 +19,18 @@ std::string MetadataProvider::getGetServicePath() const
   return std::string("/MicroSDC/GetService");
 }
 
+std::string MetadataProvider::getSetServicePath() const
+{
+  return std::string("/MicroSDC/SetService");
+}
+
 void MetadataProvider::fillDeviceMetadata(MESSAGEMODEL::Envelope& envelope) const
 {
   auto& metadata = envelope.Body().Metadata() = WS::MEX::Metadata();
   metadata->MetadataSection().emplace_back(createMetadataSectionThisModel());
   metadata->MetadataSection().emplace_back(createMetadataSectionThisDevice());
-  metadata->MetadataSection().emplace_back(
-      createMetadataSectionRelationship(createHostMetadata(), {createHostedGetService()}));
+  metadata->MetadataSection().emplace_back(createMetadataSectionRelationship(
+      createHostMetadata(), {createHostedGetService(), createHostedSetService()}));
 }
 
 void MetadataProvider::fillGetServiceMetadata(MESSAGEMODEL::Envelope& envelope) const
@@ -36,10 +41,17 @@ void MetadataProvider::fillGetServiceMetadata(MESSAGEMODEL::Envelope& envelope) 
       createMetadataSectionRelationship(createHostMetadata(), {createHostedGetService()}));
 }
 
+void MetadataProvider::fillSetServiceMetadata(MESSAGEMODEL::Envelope& envelope) const
+{
+  auto& metadata = envelope.Body().Metadata() = WS::MEX::Metadata();
+  metadata->MetadataSection().emplace_back(createMetadataSectionWSDLSetService());
+  metadata->MetadataSection().emplace_back(
+      createMetadataSectionRelationship(createHostMetadata(), {createHostedSetService()}));
+}
+
 MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionThisModel() const
 {
-  MetadataSection metadata =
-      MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_MODEL));
+  MetadataSection metadata = MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_MODEL));
   auto& thisModel = metadata.ThisModel() = WS::DPWS::ThisModelType();
   WS::DPWS::ThisModelType::ManufacturerType manufacturer(deviceCharacteristics_.getManufacturer());
   thisModel->Manufacturer().emplace_back(manufacturer);
@@ -49,8 +61,7 @@ MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionThisMod
 
 MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionThisDevice() const
 {
-  MetadataSection metadata =
-      MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_DEVICE));
+  MetadataSection metadata = MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_DEVICE));
   auto& thisDevice = metadata.ThisDevice() = WS::DPWS::ThisDeviceType();
   auto friendlyName = deviceCharacteristics_.getFriendlyName();
   thisDevice->FriendlyName().emplace_back(friendlyName);
@@ -70,8 +81,7 @@ MetadataProvider::MetadataSection
 MetadataProvider::createMetadataSectionRelationship(const Host& host,
                                                     const HostedSequence& hosted) const
 {
-  MetadataSection metadata =
-      MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_REL));
+  MetadataSection metadata = MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_REL));
   metadata.Relationship() = WS::DPWS::Relationship(host, hosted, MDPWS::WS_MEX_REL_HOST);
   return metadata;
 }
@@ -100,5 +110,32 @@ MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionWSDLGet
   wsdlSection.Location() =
       MetadataSection::LocationType(protocol + "://" + NetworkHandler::getInstance().address() +
                                     (useTLS ? ":443" : ":80") + getGetServicePath() + "/?wsdl");
+  return wsdlSection;
+}
+
+MetadataProvider::Hosted MetadataProvider::createHostedSetService() const
+{
+  // Endpoint Reference
+  const std::string protocol = useTLS ? "https" : "http";
+  const std::string xaddress = protocol + "://" + NetworkHandler::getInstance().address() +
+                               (useTLS ? ":443" : ":80") + getSetServicePath();
+  Hosted::EndpointReferenceSequence endpointReference;
+  endpointReference.emplace_back(Hosted::EndpointReferenceType::AddressType(xaddress));
+  // Types
+  Hosted::TypesType types;
+  types.emplace_back(SDC::NS_GLUE_PREFIX, SDC::QNAME_SETSERVICE);
+  // Service Id
+  Hosted::ServiceIdType serviceId("SetService");
+  return Hosted(endpointReference, types, serviceId);
+}
+
+MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionWSDLSetService() const
+{
+  MetadataSection wsdlSection =
+      MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_WSDL));
+  const std::string protocol = useTLS ? "https" : "http";
+  wsdlSection.Location() =
+      MetadataSection::LocationType(protocol + "://" + NetworkHandler::getInstance().address() +
+                                    (useTLS ? ":443" : ":80") + getSetServicePath() + "/?wsdl");
   return wsdlSection;
 }

@@ -16,6 +16,7 @@ namespace SDC
       "http://standards.ieee.org/downloads/11073/11073-10207-2017/extension";
 
   SDCConstant QNAME_GETSERVICE = "GetService";
+  SDCConstant QNAME_SETSERVICE = "SetService";
   SDCConstant ACTION_GET_MDIB_REQUEST =
       "http://standards.ieee.org/downloads/11073/11073-20701-2018/GetService/GetMdib";
   SDCConstant ACTION_GET_MDIB_RESPONSE =

@@ -3,6 +3,7 @@
 #include "GetService.hpp"
 #include "NetworkHandler.hpp"
 #include "SDCConstants.hpp"
+#include "SetService.hpp"
 #include "StateHandler.hpp"
 #include "StaticService.hpp"
 #include "UUIDGenerator.hpp"
@@ -11,6 +12,7 @@
 #include "dpws/MetadataProvider.hpp"
 #include "esp_log.h"
 #include "wsdl/GetServiceWSDL.hpp"
+#include "wsdl/SetServiceWSDL.hpp"
 
 static constexpr const char* TAG = "MicroSDC";
 
@@ -69,7 +71,10 @@ void MicroSDC::startup()
   auto deviceService = std::make_shared<DeviceService>(metadata);
   auto getService = std::make_shared<GetService>(*this, metadata);
   auto getWSDLService =
-      std::make_shared<StaticService>(getService->getURI() + "/?wsdl", WSDL::getServiceWSDL);
+      std::make_shared<StaticService>(getService->getURI() + "/?wsdl", WSDL::GET_SERVICE_WSDL);
+  auto setService = std::make_shared<SetService>(*this, metadata);
+  auto setWSDLService =
+      std::make_shared<StaticService>(setService->getURI() + "/?wsdl", WSDL::SET_SERVICE_WSDL);
 
   webserver_ = std::make_unique<WebServer>(useTLS_);
 
@@ -77,6 +82,8 @@ void MicroSDC::startup()
   webserver_->addService(deviceService);
   webserver_->addService(getService);
   webserver_->addService(getWSDLService);
+  webserver_->addService(setService);
+  webserver_->addService(setWSDLService);
 
   webserver_->start();
   dpws_->start();

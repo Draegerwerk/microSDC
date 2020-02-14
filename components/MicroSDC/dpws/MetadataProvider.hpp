@@ -30,6 +30,11 @@ public:
    */
   std::string getGetServicePath() const;
   /**
+   * @brief get the URI of the SetService
+   * @return string containing the URI
+   */
+  std::string getSetServicePath() const;
+  /**
    * @brief fill SOAP Envelope with Device Metadata for GetMetadataResponse
    * @param envelope reference to the response envelope to fill
    */
@@ -39,6 +44,11 @@ public:
    * @param envelope reference to the response envelope to fill
    */
   void fillGetServiceMetadata(MESSAGEMODEL::Envelope& envelope) const;
+  /**
+   * @brief fill SOAP Envelope with SetService Metadata for GetMetadataResponse
+   * @param envelope reference to the response envelope to fill
+   */
+  void fillSetServiceMetadata(MESSAGEMODEL::Envelope& envelope) const;
   /**
    * @brief compile host part of MetadataSection Relationship
    * @return Host section
@@ -68,10 +78,20 @@ public:
    */
   MetadataSection createMetadataSectionWSDLGetService() const;
   /**
+   * @brief compile information about WSDL for SetService
+   * @return constructed MetadataSection
+   */
+  MetadataSection createMetadataSectionWSDLSetService() const;
+  /**
    * @brief construct Hosted section for GetService
    * @brief Hosted element
    */
   Hosted createHostedGetService() const;
+  /**
+   * @brief construct Hosted section for SetService
+   * @brief Hosted element
+   */
+  Hosted createHostedSetService() const;
 
 private:
   /// device characteristics to provide

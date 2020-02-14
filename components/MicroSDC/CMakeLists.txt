@@ -18,6 +18,7 @@ set(COMPONENT_SOURCES
         "SoapService.cpp"
         "StaticService.cpp"
         "StateHandler.cpp"
+        "SetService.cpp"
     )
 
 idf_component_register(

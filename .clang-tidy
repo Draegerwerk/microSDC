@@ -1,4 +1,4 @@
-Checks: '-*,readability-identifier-naming,readability-braces-around-statements,readability-inconsistent-declaration-parameter-name,performance-for-range-copy,performance-implicit-conversion-in-loop,performance-inefficient-vector-operation'
+Checks: '*, -modernize-use-nodiscard, -modernize-use-trailing-return-type, -fuchsia-default-arguments-calls, -hicpp-uppercase-literal-suffix, -readibility-uppercase-literal-suffix'
 CheckOptions:
   - { key: readability-identifier-naming.NamespaceCase,         value: CamelCase  }
   - { key: readability-identifier-naming.ClassCase,             value: CamelCase  }
