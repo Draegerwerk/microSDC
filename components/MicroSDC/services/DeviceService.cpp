@@ -1,4 +1,4 @@
-#include "DeviceService.hpp"
+#include "services/DeviceService.hpp"
 #include "MicroSDC.hpp"
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
