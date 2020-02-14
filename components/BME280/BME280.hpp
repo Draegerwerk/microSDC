@@ -17,7 +17,7 @@ public:
    * @param sclPin The GPIO pin of the I2C clock line
    */
   BME280(i2c_port_t i2cPort, std::uint8_t deviceAddress, gpio_num_t sdaPin, gpio_num_t sclPin);
-  BME280(const BME280& other) = default;
+  BME280(const BME280& other) = delete;
   BME280(BME280&& other) noexcept = default;
   BME280& operator=(const BME280& other) = delete;
   BME280& operator=(BME280&& other) noexcept = delete;

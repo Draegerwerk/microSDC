@@ -1,3 +1,4 @@
+#include "BME280.hpp"
 #include "DeviceCharacteristics.hpp"
 #include "MicroSDC.hpp"
 #include "NetworkHandler.hpp"
@@ -14,8 +15,8 @@
 
 static constexpr const char* TAG = "main_component";
 
-static void ipEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_t eventId,
-                             void*  /*event_data*/)
+static void ipEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t eventId,
+                           void* /*event_data*/)
 {
   switch (eventId)
   {
@@ -31,8 +32,8 @@ static void ipEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_t 
   }
 }
 
-static void wifiEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_t eventId,
-                               void*  /*event_data*/)
+static void wifiEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t eventId,
+                             void* /*event_data*/)
 {
   switch (eventId)
   {
@@ -62,8 +63,8 @@ static void wifiEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_
   }
 }
 
-static void ethEventHandler(void* arg, esp_event_base_t  /*event_base*/, int32_t eventId,
-                              void* eventData)
+static void ethEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t eventId,
+                            void* eventData)
 {
   uint8_t macAddress[6] = {0};
   // we can get the ethernet driver handle from event data
@@ -156,13 +157,26 @@ extern "C" void app_main()
   systemContext.PatientContext() = BICEPS::PM::PatientContextDescriptor("patient_context");
   systemContext.LocationContext() = BICEPS::PM::LocationContextDescriptor("location_context");
 
-  auto numericState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "numericState_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Msrmt,
+  auto pressureState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "pressureState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  numericState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
+  pressureState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
+
+    auto temperatureState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "temperatureState_handle", BICEPS::PM::CodedValue("6048"), BICEPS::PM::MetricCategory::Msrmt,
+      BICEPS::PM::MetricAvailability::Cont, 1);
+  temperatureState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
+
+    auto humidityState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "humidityState_handle", BICEPS::PM::CodedValue("262688"), BICEPS::PM::MetricCategory::Msrmt,
+      BICEPS::PM::MetricAvailability::Cont, 1);
+  humidityState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
 
   BICEPS::PM::ChannelDescriptor deviceChannel("device_channel");
-  deviceChannel.Metric().emplace_back(numericState);
+  deviceChannel.Metric().emplace_back(pressureState);
+  deviceChannel.Metric().emplace_back(temperatureState);
+  deviceChannel.Metric().emplace_back(humidityState);
+  
   deviceChannel.SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
   BICEPS::PM::VmdDescriptor deviceModule("device_vmd");
   deviceModule.Channel().emplace_back(deviceChannel);
@@ -176,18 +190,31 @@ extern "C" void app_main()
   mdDescription.Mds().emplace_back(deviceDescriptor);
   sdc->setMdDescription(mdDescription);
 
-  auto numericStateHandler = std::make_shared<NumericStateHandler>("numericState_handle");
-  sdc->addMdState(numericStateHandler);
+  auto pressureStateHandler = std::make_shared<NumericStateHandler>("pressureState_handle");
+  auto temperatureStateHandler = std::make_shared<NumericStateHandler>("temperatureState_handle");
+  auto humidityStateHandler = std::make_shared<NumericStateHandler>("humidityState_handle");
+  sdc->addMdState(pressureStateHandler);
+  sdc->addMdState(temperatureStateHandler);
+  sdc->addMdState(humidityStateHandler);
 
   ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ipEventHandler, sdc));
-
-  ESP_ERROR_CHECK(
-      esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, sdc));
+  ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, sdc));
   ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &ethEventHandler, sdc));
-
 
   ESP_LOGI(TAG, "Connecting...");
   ESP_ERROR_CHECK(NetworkHandler::getInstance().connect());
 
+  BME280 bme280(i2c_port_t::I2C_NUM_0, 0x76u, static_cast<gpio_num_t>(13),
+                static_cast<gpio_num_t>(16));
+  while (1)
+  {
+    const auto sensorData = bme280.getSensorData();
+    ESP_LOGI(TAG, "pressure: %0.2f, temp: %0.2f, humidity: %0.2f", sensorData.pressure,
+             sensorData.temperature, sensorData.humidity);
+             pressureStateHandler->setValue(static_cast<int>(sensorData.pressure));
+             temperatureStateHandler->setValue(static_cast<int>(sensorData.temperature));
+             humidityStateHandler->setValue(static_cast<int>(sensorData.humidity));
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
+  }
   vTaskDelete(nullptr);
 }
