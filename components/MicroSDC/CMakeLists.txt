@@ -7,6 +7,7 @@ set(COMPONENT_SOURCES
         "datamodel/ws-addressing.cpp"
         "datamodel/ws-discovery.cpp"
         "datamodel/ws-dpws.cpp"
+        "datamodel/ws-eventing.cpp"
         "datamodel/ws-MetadataExchange.cpp"
         "dpws/DPWSHost.cpp"
         "dpws/MessagingContext.cpp"
