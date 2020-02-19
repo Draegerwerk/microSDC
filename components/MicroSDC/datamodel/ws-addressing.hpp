@@ -1,9 +1,21 @@
 #pragma once
 
-#include "ws-eventing.hpp"
 #include <memory>
 #include <optional>
 #include <rapidxml.hpp>
+
+namespace WS::EVENTING
+{
+  class Identifier : public std::string
+  {
+  public:
+    using IsReferenceParameterType = bool;
+    using IsReferenceParameterOptional = std::optional<IsReferenceParameterType>;
+
+  protected:
+    IsReferenceParameterOptional IsReferenceParameter_;
+  };
+} // namespace WS::EVENTING
 
 namespace WS::ADDRESSING
 {

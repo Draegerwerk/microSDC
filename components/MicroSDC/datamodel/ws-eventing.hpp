@@ -1,24 +1,13 @@
 #pragma once
 
-//#include "datamodel/ws-addressing.hpp"
+#include "ws-addressing.hpp"
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
 namespace WS::EVENTING
-{
-  class Identifier : public std::string
-  {
-  public:
-    using IsReferenceParameterType = bool;
-    using IsReferenceParameterOptional = std::optional<IsReferenceParameterType>;
-
-  protected:
-    IsReferenceParameterOptional IsReferenceParameter_;
-  };
-
-  /*
+{  
   class DeliveryType
   {
   public:
@@ -67,16 +56,16 @@ namespace WS::EVENTING
     const EndToOptional& EndTo() const;
     EndToOptional& EndTo();
 
-    using DeliveryType = DeliveryType;
+    using DeliveryType = WS::EVENTING::DeliveryType;
     const DeliveryType& Delivery() const;
     DeliveryType& Delivery();
 
-    using ExpirationType = ExpirationType;
+    using ExpirationType = WS::EVENTING::ExpirationType;
     using ExpiresOptional = std::optional<ExpirationType>;
     const ExpiresOptional& Expires() const;
     ExpiresOptional& Expires();
 
-    using FilterType = FilterType;
+    using FilterType = WS::EVENTING::FilterType;
     using FilterOptional = std::optional<FilterType>;
     const FilterOptional& Filter() const;
     FilterOptional& Filter();
@@ -108,5 +97,5 @@ namespace WS::EVENTING
     SubscriptionManagerType SubscriptionManager_;
     ExpiresType Expires_;
   };
-  */
+  
 } // namespace WS::EVENTING
