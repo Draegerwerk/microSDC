@@ -3,6 +3,8 @@
 #include "MicroSDC.hpp"
 #include "SoapService.hpp"
 #include "dpws/MetadataProvider.hpp"
+#include "SubscriptionManager.hpp"
+#include <memory>
 
 class SetService : public SoapService
 {
@@ -14,4 +16,5 @@ public:
 private:
   const MicroSDC& microSDC_;
   const MetadataProvider metadata_;
+  std::vector<std::shared_ptr<SubscriptionManager>> subscriptionManagers_;
 };

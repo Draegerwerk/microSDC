@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace WS::EVENTING
-{  
+{
   class DeliveryType
   {
   public:
@@ -21,10 +21,14 @@ namespace WS::EVENTING
     ModeOptional& Mode();
 
     explicit DeliveryType(const NotifyToType& notifyTo);
+    DeliveryType(const rapidxml::xml_node<>& node);
+    DeliveryType() = default;
 
   protected:
     NotifyToType NotifyTo_;
     ModeOptional Mode_;
+
+    void parse(const rapidxml::xml_node<>& node);
   };
 
   class ExpirationType : public std::string
@@ -43,9 +47,12 @@ namespace WS::EVENTING
     DialectType& Dialect();
 
     explicit FilterType(const DialectType& dialect);
+    FilterType(const rapidxml::xml_node<>& node);
 
   protected:
     DialectType Dialect_;
+
+    void parse(const rapidxml::xml_node<>& node);
   };
 
   class Subscribe
@@ -71,12 +78,16 @@ namespace WS::EVENTING
     FilterOptional& Filter();
 
     explicit Subscribe(const DeliveryType& delivery);
+    Subscribe(const rapidxml::xml_node<>& node);
+    Subscribe() = default;
 
   protected:
     EndToOptional EndTo_;
     DeliveryType Delivery_;
     ExpiresOptional Expires_;
     FilterOptional Filter_;
+
+    void parse(const rapidxml::xml_node<>& node);
   };
 
   class SubscribeResponse
@@ -97,5 +108,5 @@ namespace WS::EVENTING
     SubscriptionManagerType SubscriptionManager_;
     ExpiresType Expires_;
   };
-  
+
 } // namespace WS::EVENTING

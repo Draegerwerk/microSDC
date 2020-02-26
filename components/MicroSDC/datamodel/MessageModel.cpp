@@ -1,6 +1,7 @@
 #include "MessageModel.hpp"
 #include "ExpectedElement.hpp"
 #include "MDPWSConstants.hpp"
+#include "ws-eventing.hpp"
 #include <cstring>
 #include <memory>
 #include <optional>
@@ -280,6 +281,24 @@ namespace MESSAGEMODEL
     return GetMdibResponse_;
   }
 
+  const Body::SubscribeOptional& Body::Subscribe() const
+  {
+    return Subscribe_;
+  }
+  Body::SubscribeOptional& Body::Subscribe()
+  {
+    return Subscribe_;
+  }
+
+  const Body::SubscribeResponseOptional& Body::SubscribeResponse() const
+  {
+    return SubscribeResponse_;
+  }
+  Body::SubscribeResponseOptional& Body::SubscribeResponse()
+  {
+    return SubscribeResponse_;
+  }
+
   void Body::parse(const rapidxml::xml_node<>& node)
   {
     rapidxml::xml_node<>* bodyContent = node.first_node();
@@ -289,14 +308,12 @@ namespace MESSAGEMODEL
       return;
     }
     if (strncmp(bodyContent->name(), "Probe", bodyContent->name_size()) == 0 &&
-        strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY, bodyContent->xmlns_size()) ==
-            0)
+        strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY, bodyContent->xmlns_size()) == 0)
     {
       Probe_ = std::make_optional<ProbeType>(*bodyContent);
     }
     else if (strncmp(bodyContent->name(), "Resolve", bodyContent->name_size()) == 0 &&
-             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY,
-                     bodyContent->xmlns_size()) == 0)
+             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY, bodyContent->xmlns_size()) == 0)
     {
       Resolve_ = std::make_optional<ResolveType>(*bodyContent);
     }
@@ -305,6 +322,11 @@ namespace MESSAGEMODEL
                      bodyContent->xmlns_size()) == 0)
     {
       GetMetadata_ = std::make_optional<GetMetadataType>(*bodyContent);
+    }
+    else if (strncmp(bodyContent->name(), "Subscribe", bodyContent->name_size()) == 0 &&
+             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
+    {
+      // Subscribe_ = std::make_optional<SubscribeType>(*bodyContent);
     }
   }
 

@@ -74,6 +74,7 @@ namespace WS::ADDRESSING
     EndpointReferenceType(const EndpointReferenceType& epr);
     EndpointReferenceType(const AddressType& address);
     EndpointReferenceType(const rapidxml::xml_node<>& node);
+    EndpointReferenceType() = default;
 
   protected:
     AddressType Address_;

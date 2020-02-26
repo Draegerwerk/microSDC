@@ -148,6 +148,20 @@ namespace MESSAGEMODEL
     const GetMdibResponseOptional& GetMdibResponse() const;
     GetMdibResponseOptional& GetMdibResponse();
 
+    // Subscribe
+    //
+    using SubscribeType = WS::EVENTING::Subscribe;
+    using SubscribeOptional = std::optional<SubscribeType>;
+    const SubscribeOptional& Subscribe() const;
+    SubscribeOptional& Subscribe();
+
+    // SubscribeResponse
+    //
+    using SubscribeResponseType = WS::EVENTING::Subscribe;
+    using SubscribeResponseOptional = std::optional<SubscribeResponseType>;
+    const SubscribeResponseOptional& SubscribeResponse() const;
+    SubscribeResponseOptional& SubscribeResponse();
+   
   protected:
     ByeOptional Bye_;
     HelloOptional Hello_;
@@ -159,7 +173,8 @@ namespace MESSAGEMODEL
     MetadataOptional Metadata_;
     GetMdibOptional GetMdib_;
     GetMdibResponseOptional GetMdibResponse_;
-
+    SubscribeOptional Subscribe_;
+    SubscribeResponseOptional SubscribeResponse_;
     void parse(const rapidxml::xml_node<>& node);
   };
 

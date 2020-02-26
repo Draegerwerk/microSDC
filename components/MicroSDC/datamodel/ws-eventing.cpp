@@ -9,6 +9,14 @@ namespace WS::EVENTING
     : NotifyTo_(notifyTo)
   {
   }
+  DeliveryType::DeliveryType(const rapidxml::xml_node<>& node)
+  {
+    this->parse(node);
+  }
+  void DeliveryType::parse(const rapidxml::xml_node<>& node)
+  {
+    // TODO:: parse
+  }
   const DeliveryType::NotifyToType& DeliveryType::NotifyTo() const
   {
     return NotifyTo_;
@@ -32,6 +40,14 @@ namespace WS::EVENTING
     : Dialect_(dialect)
   {
   }
+  FilterType::FilterType(const rapidxml::xml_node<>& node)
+  {
+    this->parse(node);
+  }
+  void FilterType::parse(const rapidxml::xml_node<>& node)
+  {
+    // TODO:: parse 
+  }
   const FilterType::DialectType& FilterType::Dialect() const
   {
     return Dialect_;
@@ -47,7 +63,14 @@ namespace WS::EVENTING
     : Delivery_(delivery)
   {
   }
-
+  Subscribe::Subscribe(const rapidxml::xml_node<>& node)
+  {
+    this->parse(node);
+  }
+  void Subscribe::parse(const rapidxml::xml_node<>& node)
+  {
+    // TODO: parse
+  }
   const Subscribe::EndToOptional& Subscribe::EndTo() const
   {
     return EndTo_;
