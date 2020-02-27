@@ -39,11 +39,10 @@ void SetService::handleRequest(httpd_req* req, char* message)
   {
     ESP_LOGI(TAG, "Got Subscribe: \n %s", message);
     // TODO: Implement SubscriptionManager
-    // auto subscriptionManager = std::make_shared<SubscriptionManager>();
+    // auto subscriptionManager = std::make_shared<SubscriptionManager>(...);
     // subscriptionManagers_.emplace_back(subscriptionManager);
 
-    // TODO: parse subscribe
-    // requestEnvelope.Body().Subscribe();
+    auto subscribe = requestEnvelope.Body().Subscribe();
   }
   else
   {

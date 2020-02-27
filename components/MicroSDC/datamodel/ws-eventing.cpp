@@ -1,4 +1,8 @@
 #include "ws-eventing.hpp"
+#include "ExpectedElement.hpp"
+#include "MDPWSConstants.hpp"
+#include <cstring>
+#include <sstream>
 
 namespace WS::EVENTING
 {
@@ -15,7 +19,21 @@ namespace WS::EVENTING
   }
   void DeliveryType::parse(const rapidxml::xml_node<>& node)
   {
-    // TODO:: parse
+    auto nodeAttr = node.first_attribute("Mode", 0);
+    if (nodeAttr == nullptr || strncmp(nodeAttr->value(), ::MDPWS::WS_EVENTING_DELIVERYMODE_PUSH,
+                                       nodeAttr->value_size()) == 0)
+    {
+      Mode_ = ::MDPWS::WS_EVENTING_DELIVERYMODE_PUSH;
+    }
+    for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
+         entry = entry->next_sibling())
+    {
+      if (strncmp(entry->name(), "NotifyTo", entry->name_size()) == 0 &&
+          strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
+      {
+        NotifyTo_ = NotifyToType(*entry);
+      }
+    }
   }
   const DeliveryType::NotifyToType& DeliveryType::NotifyTo() const
   {
@@ -34,6 +52,13 @@ namespace WS::EVENTING
     return Mode_;
   }
 
+  // DeliveryType
+  //
+  ExpirationType::ExpirationType(std::string expiration)
+    : std::string(expiration)
+  {
+  }
+
   // FilterType
   //
   FilterType::FilterType(const DialectType& dialect)
@@ -46,7 +71,30 @@ namespace WS::EVENTING
   }
   void FilterType::parse(const rapidxml::xml_node<>& node)
   {
-    // TODO:: parse 
+    auto dialectAttr = node.first_attribute("Dialect", 0);
+    if (dialectAttr == nullptr || strncmp(dialectAttr->value(), ::MDPWS::WS_EVENTING_FILTER_ACTION,
+                                          dialectAttr->value_size()) != 0)
+    {
+      throw ExpectedElement("Dialect", ::MDPWS::WS_EVENTING_FILTER_ACTION);
+    }
+    Dialect_ = ::MDPWS::WS_EVENTING_FILTER_ACTION;
+    if (node.value() != nullptr)
+    {
+      // extract white space delimited filters
+      std::string filters(node.value(), node.value_size()); 
+      std::istringstream stringStream(filters);
+      do
+      {
+        std::string subString;
+        stringStream >> subString;
+        this->emplace_back(subString);
+      } while (stringStream);
+    }
+    for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
+         entry = entry->next_sibling())
+    {
+      this->emplace_back(std::string(entry->value(), entry->value_size()));
+    }
   }
   const FilterType::DialectType& FilterType::Dialect() const
   {
@@ -69,7 +117,31 @@ namespace WS::EVENTING
   }
   void Subscribe::parse(const rapidxml::xml_node<>& node)
   {
-    // TODO: parse
+    for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
+         entry = entry->next_sibling())
+    {
+      if (strncmp(entry->name(), "EndTo", entry->name_size()) == 0 &&
+          strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
+      {
+        EndTo_ = std::make_optional<EndToType>(*entry);
+      }
+      else if (strncmp(entry->name(), "Delivery", entry->name_size()) == 0 &&
+               strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
+      {
+        Delivery_ = DeliveryType(*entry);
+      }
+      else if (strncmp(entry->name(), "Expires", entry->name_size()) == 0 &&
+               strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
+      {
+        Expires_ =
+            std::make_optional<ExpirationType>(std::string(entry->value(), entry->value_size()));
+      }
+      else if (strncmp(entry->name(), "Filter", entry->name_size()) == 0 &&
+               strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
+      {
+        Filter_ = std::make_optional<FilterType>(*entry);
+      }
+    }
   }
   const Subscribe::EndToOptional& Subscribe::EndTo() const
   {

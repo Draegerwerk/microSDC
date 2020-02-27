@@ -33,6 +33,8 @@ namespace WS::EVENTING
 
   class ExpirationType : public std::string
   {
+  public:
+    ExpirationType(std::string expiration);
   };
 
   class ActionList : public std::vector<std::string>

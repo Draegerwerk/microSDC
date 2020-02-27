@@ -326,7 +326,7 @@ namespace MESSAGEMODEL
     else if (strncmp(bodyContent->name(), "Subscribe", bodyContent->name_size()) == 0 &&
              strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
     {
-      // Subscribe_ = std::make_optional<SubscribeType>(*bodyContent);
+      Subscribe_ = std::make_optional<SubscribeType>(*bodyContent);
     }
   }
 
