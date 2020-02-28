@@ -12,6 +12,8 @@ namespace WS::EVENTING
     using IsReferenceParameterType = bool;
     using IsReferenceParameterOptional = std::optional<IsReferenceParameterType>;
 
+    Identifier(std::string identifier);
+
   protected:
     IsReferenceParameterOptional IsReferenceParameter_;
   };
@@ -61,6 +63,8 @@ namespace WS::ADDRESSING
     const IdentifierOptional& Identifier() const;
     IdentifierOptional& Identifier();
 
+    ReferenceParametersType(const IdentifierType& identifier);
+
   protected:
     IdentifierOptional Identifier_;
   };
@@ -70,14 +74,24 @@ namespace WS::ADDRESSING
   public:
     using AddressType = ::WS::ADDRESSING::URIType;
     const AddressType& Address() const;
+    AddressType& Address();
 
+    using ReferenceParametersType = WS::ADDRESSING::ReferenceParametersType;
+    using ReferenceParametersOptional = std::optional<ReferenceParametersType>;
+    const ReferenceParametersOptional& ReferenceParameters() const;
+    ReferenceParametersOptional& ReferenceParameters();
+
+    /* is this allowed?
     EndpointReferenceType(const EndpointReferenceType& epr);
+    */
+
     EndpointReferenceType(const AddressType& address);
     EndpointReferenceType(const rapidxml::xml_node<>& node);
     EndpointReferenceType() = default;
 
   protected:
     AddressType Address_;
+    ReferenceParametersOptional ReferenceParameters_;
 
     void parse(const rapidxml::xml_node<>& node);
   };

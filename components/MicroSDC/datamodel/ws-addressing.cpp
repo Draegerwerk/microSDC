@@ -2,8 +2,20 @@
 #include "ExpectedElement.hpp"
 #include "MDPWSConstants.hpp"
 
+namespace WS::EVENTING
+{
+  // Identifier
+  //
+  Identifier::Identifier(std::string identifier)
+    : std::string(identifier)
+  {
+  }
+} // namespace WS::EVENTING
+
 namespace WS::ADDRESSING
 {
+  // URIType
+  //
   URIType::URIType(const rapidxml::xml_node<>& node)
   {
     this->parse(node);
@@ -21,10 +33,14 @@ namespace WS::ADDRESSING
     uri_ = {node.value(), node.value_size()};
   }
 
+  // EndpointReferenceType
+  //
+  /*
   EndpointReferenceType::EndpointReferenceType(const EndpointReferenceType& epr)
     : Address_(epr.Address_)
   {
   }
+  */
   EndpointReferenceType::EndpointReferenceType(const AddressType& address)
     : Address_(address)
   {
@@ -45,8 +61,19 @@ namespace WS::ADDRESSING
       throw ExpectedElement("Address", MDPWS::WS_NS_ADDRESSING);
     }
     Address_ = URIType({addressNode->value(), addressNode->value_size()});
+    auto referenceParameters =
+        addressNode->next_sibling("ReferenceParameters", MDPWS::WS_NS_ADDRESSING);
+    if (referenceParameters != nullptr &&
+        referenceParameters->first_node("Identifier", MDPWS::WS_NS_EVENTING) != nullptr)
+    {
+      ReferenceParameters_ = std::make_optional<ReferenceParametersType>(
+          std::string(referenceParameters->first_node()->value(),
+                      referenceParameters->first_node()->value_size()));
+    }
   }
 
+  // RelatesToType
+  //
   RelatesToType::RelatesToType(const URIType& x)
     : URIType(x)
   {
@@ -55,6 +82,14 @@ namespace WS::ADDRESSING
     : URIType(x)
   {
     RelationshipType_ = x.RelationshipType_;
+  }
+
+  // ReferenceParametersType
+  //
+
+  ReferenceParametersType::ReferenceParametersType(const IdentifierType& identifier)
+    : Identifier_(identifier)
+  {
   }
 
   const ReferenceParametersType::IdentifierOptional& ReferenceParametersType::Identifier() const

@@ -38,11 +38,10 @@ void SetService::handleRequest(httpd_req* req, char* message)
   else if (soapAction.uri() == MDPWS::WS_ACTION_SUBSCRIBE)
   {
     ESP_LOGI(TAG, "Got Subscribe: \n %s", message);
-    // TODO: Implement SubscriptionManager
-    // auto subscriptionManager = std::make_shared<SubscriptionManager>(...);
+    auto subscribeRequest = requestEnvelope.Body().Subscribe();
+    auto subscriptionManager = std::make_shared<SubscriptionManager>();
+    subscriptionManager->dispatch(subscribeRequest.value());
     // subscriptionManagers_.emplace_back(subscriptionManager);
-
-    auto subscribe = requestEnvelope.Body().Subscribe();
   }
   else
   {

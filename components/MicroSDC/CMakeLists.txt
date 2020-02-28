@@ -12,14 +12,15 @@ set(COMPONENT_SOURCES
         "dpws/DPWSHost.cpp"
         "dpws/MessagingContext.cpp"
         "dpws/MetadataProvider.cpp"
-        "services/SoapService.cpp"
         "services/DeviceService.cpp"
-        "services/StaticService.cpp"
         "services/GetService.cpp"
         "services/SetService.cpp"
+        "services/SoapService.cpp"
+        "services/StaticService.cpp"
         "DeviceCharacteristics.cpp"
         "MicroSDC.cpp"
         "StateHandler.cpp"
+        "SubscriptionManager.cpp"
     )
 
 idf_component_register(

@@ -81,7 +81,7 @@ namespace WS::EVENTING
     if (node.value() != nullptr)
     {
       // extract white space delimited filters
-      std::string filters(node.value(), node.value_size()); 
+      std::string filters(node.value(), node.value_size());
       std::istringstream stringStream(filters);
       do
       {
@@ -89,11 +89,6 @@ namespace WS::EVENTING
         stringStream >> subString;
         this->emplace_back(subString);
       } while (stringStream);
-    }
-    for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
-         entry = entry->next_sibling())
-    {
-      this->emplace_back(std::string(entry->value(), entry->value_size()));
     }
   }
   const FilterType::DialectType& FilterType::Dialect() const
