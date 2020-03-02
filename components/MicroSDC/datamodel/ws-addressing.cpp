@@ -35,12 +35,6 @@ namespace WS::ADDRESSING
 
   // EndpointReferenceType
   //
-  /*
-  EndpointReferenceType::EndpointReferenceType(const EndpointReferenceType& epr)
-    : Address_(epr.Address_)
-  {
-  }
-  */
   EndpointReferenceType::EndpointReferenceType(const AddressType& address)
     : Address_(address)
   {
@@ -52,6 +46,15 @@ namespace WS::ADDRESSING
   EndpointReferenceType::EndpointReferenceType(const rapidxml::xml_node<>& node)
   {
     this->parse(node);
+  }
+  const EndpointReferenceType::ReferenceParametersOptional&
+  EndpointReferenceType::ReferenceParameters() const
+  {
+    return ReferenceParameters_;
+  }
+  EndpointReferenceType::ReferenceParametersOptional& EndpointReferenceType::ReferenceParameters()
+  {
+    return ReferenceParameters_;
   }
   void EndpointReferenceType::parse(const rapidxml::xml_node<>& node)
   {
@@ -86,7 +89,6 @@ namespace WS::ADDRESSING
 
   // ReferenceParametersType
   //
-
   ReferenceParametersType::ReferenceParametersType(const IdentifierType& identifier)
     : Identifier_(identifier)
   {

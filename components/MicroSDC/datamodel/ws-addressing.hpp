@@ -81,13 +81,9 @@ namespace WS::ADDRESSING
     const ReferenceParametersOptional& ReferenceParameters() const;
     ReferenceParametersOptional& ReferenceParameters();
 
-    /* is this allowed?
-    EndpointReferenceType(const EndpointReferenceType& epr);
-    */
-
+    // TODO: This has to be explicit
     EndpointReferenceType(const AddressType& address);
-    EndpointReferenceType(const rapidxml::xml_node<>& node);
-    EndpointReferenceType() = default;
+    explicit EndpointReferenceType(const rapidxml::xml_node<>& node);
 
   protected:
     AddressType Address_;

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "datamodel/ws-eventing.hpp"
 #include "datamodel/ws-addressing.hpp"
+#include "datamodel/ws-eventing.hpp"
 #include <string>
 #include <vector>
 
 class SubscriptionManager
 {
-  
+
   /// End Point Reference of the Event Sink (where to send notifications)
   struct EventSinkEPR
   {
@@ -21,7 +21,7 @@ class SubscriptionManager
     EventSinkEPR eventSinkEPR;
     std::vector<std::string> filters;
     std::string expiry;
-  }; 
+  };
 
 public:
   SubscriptionManager();

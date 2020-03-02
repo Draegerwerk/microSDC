@@ -14,6 +14,7 @@ namespace WS::EVENTING
   {
   }
   DeliveryType::DeliveryType(const rapidxml::xml_node<>& node)
+    : NotifyTo_(WS::ADDRESSING::URIType(""))
   {
     this->parse(node);
   }
@@ -107,6 +108,7 @@ namespace WS::EVENTING
   {
   }
   Subscribe::Subscribe(const rapidxml::xml_node<>& node)
+    : Delivery_(WS::ADDRESSING::EndpointReferenceType(WS::ADDRESSING::URIType("")))
   {
     this->parse(node);
   }
@@ -169,6 +171,15 @@ namespace WS::EVENTING
   Subscribe::FilterOptional& Subscribe::Filter()
   {
     return Filter_;
+  }
+
+  // SubscribeResponse
+  //
+  SubscribeResponse::SubscribeResponse(const SubscriptionManagerType& subscriptionManager,
+                                       const ExpiresType& expires)
+    : SubscriptionManager_(subscriptionManager)
+    , Expires_(expires)
+  {
   }
 
 } // namespace WS::EVENTING

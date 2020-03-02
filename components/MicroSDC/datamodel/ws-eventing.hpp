@@ -22,7 +22,6 @@ namespace WS::EVENTING
 
     explicit DeliveryType(const NotifyToType& notifyTo);
     DeliveryType(const rapidxml::xml_node<>& node);
-    DeliveryType() = default;
 
   protected:
     NotifyToType NotifyTo_;
