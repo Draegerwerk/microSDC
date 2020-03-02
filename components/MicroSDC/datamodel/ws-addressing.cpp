@@ -43,6 +43,10 @@ namespace WS::ADDRESSING
   {
     return Address_;
   }
+  EndpointReferenceType::AddressType& EndpointReferenceType::Address()
+  {
+    return Address_;
+  }
   EndpointReferenceType::EndpointReferenceType(const rapidxml::xml_node<>& node)
   {
     this->parse(node);
@@ -64,6 +68,7 @@ namespace WS::ADDRESSING
       throw ExpectedElement("Address", MDPWS::WS_NS_ADDRESSING);
     }
     Address_ = URIType({addressNode->value(), addressNode->value_size()});
+    // TODO is this really necessary? The ReferenceParameters do not have to be parsed
     auto referenceParameters =
         addressNode->next_sibling("ReferenceParameters", MDPWS::WS_NS_ADDRESSING);
     if (referenceParameters != nullptr &&

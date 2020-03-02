@@ -189,7 +189,7 @@ void DPWSHost::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
   envelope.Header().To() = WS::ADDRESSING::URIType(MDPWS::WS_DISCOVERY_URN);
   envelope.Header().MessageID() = MicroSDC::calculateMessageID();
   auto& hello = envelope.Body().Hello() =
-      WS::DISCOVERY::HelloType(endpointReference_, metadataVersion_);
+      WS::DISCOVERY::HelloType(WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
   if (!scopes_.empty())
   {
     hello->Scopes(scopes_);

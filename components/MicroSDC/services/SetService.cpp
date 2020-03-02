@@ -1,15 +1,19 @@
 #include "SetService.hpp"
+
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
 #include "datamodel/MessageSerializer.hpp"
 #include "esp_log.h"
+#include <utility>
 
 static constexpr const char* TAG = "SetService";
 
-SetService::SetService(const MicroSDC& microSDC, MetadataProvider metadata)
+SetService::SetService(const MicroSDC& microSDC, MetadataProvider metadata,
+                       std::shared_ptr<SubscriptionManager> subscriptionManager)
   : microSDC_(microSDC)
   , metadata_(std::move(metadata))
+  , subscriptionManager_(std::move(subscriptionManager))
 {
 }
 
@@ -39,9 +43,23 @@ void SetService::handleRequest(httpd_req* req, char* message)
   {
     ESP_LOGI(TAG, "Got Subscribe: \n %s", message);
     auto subscribeRequest = requestEnvelope.Body().Subscribe();
-    auto subscriptionManager = std::make_shared<SubscriptionManager>();
-    subscriptionManager->dispatch(subscribeRequest.value());
-    // subscriptionManagers_.emplace_back(subscriptionManager);
+    auto response = subscriptionManager_->dispatch(subscribeRequest.value());
+    response.SubscriptionManager().Address() = metadata_.getSetServiceURI();
+
+    MESSAGEMODEL::Envelope responseEnvelope;
+    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
+    responseEnvelope.Header().Action() =
+        WS::ADDRESSING::URIType(MDPWS::WS_ACTION_SUBSCRIBE_RESPONSE);
+    responseEnvelope.Body().SubscribeResponse() = response;
+    MessageSerializer serializer;
+    serializer.serialize(responseEnvelope);
+    const auto message = serializer.str();
+    ESP_LOGI(TAG, "Sending SubscribeResponse: \n %s", message.c_str());
+    httpd_resp_send(req, message.c_str(), message.length());
+  }
+  else if (soapAction.uri() == MDPWS::WS_ACTION_RENEW)
+  {
+    ESP_LOGI(TAG, "Got Renew: \n %s", message);
   }
   else
   {

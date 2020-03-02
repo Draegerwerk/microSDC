@@ -35,6 +35,11 @@ public:
    */
   std::string getSetServicePath() const;
   /**
+   * @brief gets the endpoint URI of the SetService
+   * @return URI containing information regarding the set service
+   */
+  WS::ADDRESSING::URIType getSetServiceURI() const;
+  /**
    * @brief fill SOAP Envelope with Device Metadata for GetMetadataResponse
    * @param envelope reference to the response envelope to fill
    */

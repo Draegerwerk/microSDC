@@ -67,12 +67,15 @@ void MicroSDC::startup()
     return;
   }
 
+  // construct subscription manager
+  subscriptionManager_ = std::make_shared<SubscriptionManager>();
+
   // construct web services
   auto deviceService = std::make_shared<DeviceService>(metadata);
   auto getService = std::make_shared<GetService>(*this, metadata);
   auto getWSDLService =
       std::make_shared<StaticService>(getService->getURI() + "/?wsdl", WSDL::GET_SERVICE_WSDL);
-  auto setService = std::make_shared<SetService>(*this, metadata);
+  auto setService = std::make_shared<SetService>(*this, metadata, subscriptionManager_);
   auto setWSDLService =
       std::make_shared<StaticService>(setService->getURI() + "/?wsdl", WSDL::SET_SERVICE_WSDL);
 

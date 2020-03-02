@@ -61,6 +61,11 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractMetricValue& metricValue);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MetricQuality& quality);
 
+  void serialize(rapidxml::xml_node<>* parent,
+                 const WS::EVENTING::SubscribeResponse& subscribeResponse);
+  void serialize(rapidxml::xml_node<>* parent,
+                const WS::ADDRESSING::ReferenceParametersType& referenceParameters);
+
   static std::string toString(BICEPS::PM::SafetyClassification);
   static std::string toString(const WS::DISCOVERY::UriListType& uriList);
   static std::string toString(const WS::DISCOVERY::QNameListType& qNameList);

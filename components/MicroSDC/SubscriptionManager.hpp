@@ -1,34 +1,37 @@
 #pragma once
 
+#include "SDCConstants.hpp"
 #include "datamodel/ws-addressing.hpp"
 #include "datamodel/ws-eventing.hpp"
+#include <chrono>
+#include <map>
 #include <string>
 #include <vector>
 
 class SubscriptionManager
 {
-
-  /// End Point Reference of the Event Sink (where to send notifications)
-  struct EventSinkEPR
-  {
-    std::string address;
-    std::string reference;
-  };
-
   /// store stateful information about subscription
-  struct Subscription
+  struct SubscriptionInformation
   {
-    EventSinkEPR eventSinkEPR;
-    std::vector<std::string> filters;
-    std::string expiry;
+    SubscriptionInformation(WS::ADDRESSING::EndpointReferenceType notifyTo,
+                            WS::EVENTING::FilterType filter,
+                            std::chrono::system_clock::time_point expirationTime)
+      : notifyTo(std::move(notifyTo))
+      , filter(std::move(filter))
+      , expirationTime(expirationTime)
+    {
+    }
+
+    const WS::ADDRESSING::EndpointReferenceType notifyTo;
+    const WS::EVENTING::FilterType filter;
+    std::chrono::system_clock::time_point expirationTime;
   };
 
 public:
-  SubscriptionManager();
+  SubscriptionManager() = default;
   WS::EVENTING::SubscribeResponse dispatch(const WS::EVENTING::Subscribe& subscribeRequest);
 
 private:
-  Subscription subscription_;
-  /// The Identifier of this Subscription Manager
-  std::string id_;
+  std::map<WS::EVENTING::Identifier, SubscriptionInformation> subscriptions_;
+  std::vector<std::string> allowedSubscriptionEventActions_{SDC::ACTION_OPERATION_INVOKED_REPORT};
 };

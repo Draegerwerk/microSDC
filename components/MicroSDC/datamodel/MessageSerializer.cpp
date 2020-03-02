@@ -33,6 +33,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto xmlnsSoap = xmlDocument_->allocate_attribute("xmlns:soap", MDPWS::WS_NS_SOAP_ENVELOPE);
   auto xmlnsWsd = xmlDocument_->allocate_attribute("xmlns:wsd", MDPWS::WS_NS_DISCOVERY);
   auto xmlnsWsa = xmlDocument_->allocate_attribute("xmlns:wsa", MDPWS::WS_NS_ADDRESSING);
+  auto xmlnsWse = xmlDocument_->allocate_attribute("xmlns:wse", MDPWS::WS_NS_EVENTING);
   auto xmlnsDpws = xmlDocument_->allocate_attribute("xmlns:dpws", MDPWS::WS_NS_DPWS);
   auto xmlnsMdpws = xmlDocument_->allocate_attribute("xmlns:mdpws", MDPWS::NS_MDPWS);
   auto xmlnsMex = xmlDocument_->allocate_attribute("xmlns:mex", MDPWS::WS_NS_METADATA_EXCHANGE);
@@ -46,6 +47,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   envelope->append_attribute(xmlnsSoap);
   envelope->append_attribute(xmlnsWsd);
   envelope->append_attribute(xmlnsWsa);
+  envelope->append_attribute(xmlnsWse);
   envelope->append_attribute(xmlnsDpws);
   envelope->append_attribute(xmlnsMdpws);
   envelope->append_attribute(xmlnsMex);
@@ -114,6 +116,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   else if (body.GetMdibResponse().has_value())
   {
     serialize(bodyNode, body.GetMdibResponse().value());
+  }
+  else if (body.SubscribeResponse().has_value())
+  {
+    serialize(bodyNode, body.SubscribeResponse().value());
   }
   parent->append_node(bodyNode);
 }
@@ -783,6 +789,46 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto validityAttr = xmlDocument_->allocate_attribute("Validity", validity);
   metricQualityNode->append_attribute(validityAttr);
   parent->append_node(metricQualityNode);
+}
+
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const WS::EVENTING::SubscribeResponse& subscribeResponse)
+{
+  auto subscribeResponseNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "wse:SubscribeResponse");
+  auto subscriptionManagerNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "wse:SubscriptionManager");
+
+  auto addressNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Address");
+  addressNode->value(subscribeResponse.SubscriptionManager().Address().uri().c_str());
+  subscriptionManagerNode->append_node(addressNode);
+
+  serialize(subscriptionManagerNode,
+            subscribeResponse.SubscriptionManager().ReferenceParameters().value());
+
+  subscribeResponseNode->append_node(subscriptionManagerNode);
+
+  auto expiresNode = xmlDocument_->allocate_node(rapidxml::node_element, "wse:Expires");
+  expiresNode->value(subscribeResponse.Expires().c_str());
+  subscribeResponseNode->append_node(expiresNode);
+
+  parent->append_node(subscribeResponseNode);
+}
+
+void MessageSerializer::serialize(
+    rapidxml::xml_node<>* parent,
+    const WS::ADDRESSING::ReferenceParametersType& referenceParameters)
+{
+  auto referenceParametersNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "wsa:ReferenceParameters");
+  if (referenceParameters.Identifier().has_value())
+  {
+    auto identifierNode = xmlDocument_->allocate_node(rapidxml::node_element, "wse:Identifier");
+    identifierNode->value(referenceParameters.Identifier().value().c_str());
+    referenceParametersNode->append_node(identifierNode);
+  }
+  parent->append_node(referenceParametersNode);
 }
 
 /*static*/ std::string

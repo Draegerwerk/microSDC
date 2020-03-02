@@ -22,4 +22,8 @@ namespace SDC
   SDCConstant ACTION_GET_MDIB_RESPONSE =
       "http://standards.ieee.org/downloads/11073/11073-20701-2018/GetService/GetMdibResponse";
 
+  SDCConstant ACTION_OPERATION_INVOKED_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/SetService/"
+      "OperationInvokedReport";
+
 } // namespace SDC

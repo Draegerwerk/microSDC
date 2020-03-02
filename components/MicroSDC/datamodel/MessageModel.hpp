@@ -157,7 +157,7 @@ namespace MESSAGEMODEL
 
     // SubscribeResponse
     //
-    using SubscribeResponseType = WS::EVENTING::Subscribe;
+    using SubscribeResponseType = WS::EVENTING::SubscribeResponse;
     using SubscribeResponseOptional = std::optional<SubscribeResponseType>;
     const SubscribeResponseOptional& SubscribeResponse() const;
     SubscribeResponseOptional& SubscribeResponse();

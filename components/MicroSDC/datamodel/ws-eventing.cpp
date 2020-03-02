@@ -20,8 +20,8 @@ namespace WS::EVENTING
   }
   void DeliveryType::parse(const rapidxml::xml_node<>& node)
   {
-    auto nodeAttr = node.first_attribute("Mode", 0);
-    if (nodeAttr == nullptr || strncmp(nodeAttr->value(), ::MDPWS::WS_EVENTING_DELIVERYMODE_PUSH,
+    auto nodeAttr = node.first_attribute("Mode");
+    if (nodeAttr == nullptr || strncmp(nodeAttr->value(), MDPWS::WS_EVENTING_DELIVERYMODE_PUSH,
                                        nodeAttr->value_size()) == 0)
     {
       Mode_ = ::MDPWS::WS_EVENTING_DELIVERYMODE_PUSH;
@@ -72,24 +72,22 @@ namespace WS::EVENTING
   }
   void FilterType::parse(const rapidxml::xml_node<>& node)
   {
-    auto dialectAttr = node.first_attribute("Dialect", 0);
-    if (dialectAttr == nullptr || strncmp(dialectAttr->value(), ::MDPWS::WS_EVENTING_FILTER_ACTION,
+    auto dialectAttr = node.first_attribute("Dialect");
+    if (dialectAttr == nullptr || strncmp(dialectAttr->value(), MDPWS::WS_EVENTING_FILTER_ACTION,
                                           dialectAttr->value_size()) != 0)
     {
-      throw ExpectedElement("Dialect", ::MDPWS::WS_EVENTING_FILTER_ACTION);
+      throw ExpectedElement("Dialect", MDPWS::WS_EVENTING_FILTER_ACTION);
     }
-    Dialect_ = ::MDPWS::WS_EVENTING_FILTER_ACTION;
+    Dialect_ = MDPWS::WS_EVENTING_FILTER_ACTION;
     if (node.value() != nullptr)
     {
       // extract white space delimited filters
       std::string filters(node.value(), node.value_size());
-      std::istringstream stringStream(filters);
-      do
+      std::istringstream iss(filters);
+      for (std::string s; iss >> s;)
       {
-        std::string subString;
-        stringStream >> subString;
-        this->emplace_back(subString);
-      } while (stringStream);
+        this->emplace_back(s);
+      }
     }
   }
   const FilterType::DialectType& FilterType::Dialect() const
@@ -180,6 +178,22 @@ namespace WS::EVENTING
     : SubscriptionManager_(subscriptionManager)
     , Expires_(expires)
   {
+  }
+  const SubscribeResponse::SubscriptionManagerType& SubscribeResponse::SubscriptionManager() const
+  {
+    return SubscriptionManager_;
+  }
+  SubscribeResponse::SubscriptionManagerType& SubscribeResponse::SubscriptionManager()
+  {
+    return SubscriptionManager_;
+  }
+  const SubscribeResponse::ExpiresType& SubscribeResponse::Expires() const
+  {
+    return Expires_;
+  }
+  SubscribeResponse::ExpiresType& SubscribeResponse::Expires()
+  {
+    return Expires_;
   }
 
 } // namespace WS::EVENTING

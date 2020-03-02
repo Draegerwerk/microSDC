@@ -24,6 +24,15 @@ std::string MetadataProvider::getSetServicePath() const
   return std::string("/MicroSDC/SetService");
 }
 
+WS::ADDRESSING::URIType MetadataProvider::getSetServiceURI() const
+{
+  // Endpoint Reference
+  const std::string protocol = useTLS ? "https" : "http";
+  const std::string xaddress = protocol + "://" + NetworkHandler::getInstance().address() +
+                               (useTLS ? ":443" : ":80") + getSetServicePath();
+  return xaddress;
+}
+
 void MetadataProvider::fillDeviceMetadata(MESSAGEMODEL::Envelope& envelope) const
 {
   auto& metadata = envelope.Body().Metadata() = WS::MEX::Metadata();
@@ -116,11 +125,8 @@ MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionWSDLGet
 MetadataProvider::Hosted MetadataProvider::createHostedSetService() const
 {
   // Endpoint Reference
-  const std::string protocol = useTLS ? "https" : "http";
-  const std::string xaddress = protocol + "://" + NetworkHandler::getInstance().address() +
-                               (useTLS ? ":443" : ":80") + getSetServicePath();
   Hosted::EndpointReferenceSequence endpointReference;
-  endpointReference.emplace_back(Hosted::EndpointReferenceType::AddressType(xaddress));
+  endpointReference.emplace_back(Hosted::EndpointReferenceType::AddressType(getSetServiceURI()));
   // Types
   Hosted::TypesType types;
   types.emplace_back(SDC::NS_GLUE_PREFIX, SDC::QNAME_SETSERVICE);

@@ -9,6 +9,7 @@ set(COMPONENT_SOURCES
         "datamodel/ws-dpws.cpp"
         "datamodel/ws-eventing.cpp"
         "datamodel/ws-MetadataExchange.cpp"
+        "datamodel/xs_duration.cpp"
         "dpws/DPWSHost.cpp"
         "dpws/MessagingContext.cpp"
         "dpws/MetadataProvider.cpp"

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DeviceCharacteristics.hpp"
+#include "SubscriptionManager.hpp"
 #include "WebServer.hpp"
 #include "datamodel/BICEPS_ParticipantModel.hpp"
 #include "dpws/DPWSHost.hpp"
@@ -87,6 +88,8 @@ private:
   std::thread sdcThread_;
   /// pointer to the DPWS service
   std::unique_ptr<DPWSHost> dpws_{nullptr};
+  /// pointer to the subscription manager
+  std::shared_ptr<SubscriptionManager> subscriptionManager_{nullptr};
   /// pointer to the WebServer
   std::unique_ptr<WebServer> webserver_{nullptr};
   /// pointer to the mdib representation
