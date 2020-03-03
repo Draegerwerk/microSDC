@@ -110,4 +110,31 @@ namespace WS::EVENTING
     ExpiresType Expires_;
   };
 
+  class Renew
+  {
+  public:
+    Renew(const rapidxml::xml_node<>& node);
+    using ExpiresType = WS::EVENTING::ExpirationType;
+    using ExpiresOptional = std::optional<ExpiresType>;
+    const ExpiresOptional& Expires() const;
+    ExpiresOptional& Expires();
+
+  protected:
+    ExpiresOptional Expires_;
+  private:
+    void parse(const rapidxml::xml_node<>& node);
+  };
+
+  class RenewResponse
+  {
+  public:
+    using ExpiresType = WS::EVENTING::ExpirationType;
+    using ExpiresOptional = std::optional<ExpiresType>;
+    const ExpiresOptional& Expires() const;
+    ExpiresOptional& Expires();
+
+  protected:
+    ExpiresOptional Expires_;
+  };
+
 } // namespace WS::EVENTING

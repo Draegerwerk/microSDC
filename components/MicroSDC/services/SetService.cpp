@@ -60,6 +60,21 @@ void SetService::handleRequest(httpd_req* req, char* message)
   else if (soapAction.uri() == MDPWS::WS_ACTION_RENEW)
   {
     ESP_LOGI(TAG, "Got Renew: \n %s", message);
+    auto renewRequest = requestEnvelope.Body().Renew().value();
+    if (!requestEnvelope.Header().Identifier().has_value())
+    {
+      throw ExpectedElement("Identifier", MDPWS::WS_NS_EVENTING);
+    }
+    auto response =
+        subscriptionManager_->dispatch(renewRequest, requestEnvelope.Header().Identifier().value());
+    MESSAGEMODEL::Envelope responseEnvelope;
+    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
+    responseEnvelope.Body().RenewResponse() = response;
+    MessageSerializer serializer;
+    serializer.serialize(responseEnvelope);
+    const auto message = serializer.str();
+    ESP_LOGI(TAG, "Sending RenewResponse: \n %s", message.c_str());
+    httpd_resp_send(req, message.c_str(), message.length());
   }
   else
   {

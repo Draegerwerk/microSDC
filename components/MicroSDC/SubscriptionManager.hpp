@@ -30,8 +30,10 @@ class SubscriptionManager
 public:
   SubscriptionManager() = default;
   WS::EVENTING::SubscribeResponse dispatch(const WS::EVENTING::Subscribe& subscribeRequest);
+  WS::EVENTING::RenewResponse dispatch(const WS::EVENTING::Renew& renewRequest,
+                                       const WS::EVENTING::Identifier& identifier);
 
 private:
-  std::map<WS::EVENTING::Identifier, SubscriptionInformation> subscriptions_;
+  std::map<std::string, SubscriptionInformation> subscriptions_;
   std::vector<std::string> allowedSubscriptionEventActions_{SDC::ACTION_OPERATION_INVOKED_REPORT};
 };

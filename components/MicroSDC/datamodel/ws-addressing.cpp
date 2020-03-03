@@ -1,14 +1,39 @@
 #include "ws-addressing.hpp"
+
 #include "ExpectedElement.hpp"
 #include "MDPWSConstants.hpp"
+#include <cstring>
+#include <utility>
 
 namespace WS::EVENTING
 {
   // Identifier
   //
-  Identifier::Identifier(std::string identifier)
-    : std::string(identifier)
+  Identifier::Identifier(const rapidxml::xml_node<>& node)
   {
+    parse(node);
+  }
+  Identifier::Identifier(std::string identifier)
+    : std::string(std::move(identifier))
+  {
+  }
+  void Identifier::parse(const rapidxml::xml_node<>& node)
+  {
+    *this = std::string(node.value(), node.value_size());
+    const auto isReferenceParameterNode = node.first_attribute("IsReferenceParameter");
+    if (isReferenceParameterNode != nullptr)
+    {
+      if (strncmp(isReferenceParameterNode->value(), "true",
+                  isReferenceParameterNode->name_size()) == 0)
+      {
+        IsReferenceParameter_ = true;
+      }
+      else if (strncmp(isReferenceParameterNode->value(), "false",
+                       isReferenceParameterNode->name_size()) == 0)
+      {
+        IsReferenceParameter_ = false;
+      }
+    }
   }
 } // namespace WS::EVENTING
 

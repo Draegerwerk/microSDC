@@ -196,4 +196,39 @@ namespace WS::EVENTING
     return Expires_;
   }
 
+  // Renew
+  //
+  Renew::Renew(const rapidxml::xml_node<>& node)
+  {
+    this->parse(node);
+  }
+  const Renew::ExpiresOptional& Renew::Expires() const
+  {
+    return Expires_;
+  }
+  Renew::ExpiresOptional& Renew::Expires()
+  {
+    return Expires_;
+  }
+
+  void Renew::parse(const rapidxml::xml_node<>& node)
+  {
+    const auto expiresNode = node.first_node("Expires", MDPWS::WS_NS_EVENTING);
+    if (expiresNode != nullptr)
+    {
+      Expires_ = ExpiresType(std::string(expiresNode->value(), expiresNode->value_size()));
+    }
+  }
+
+  // RenewResponse
+  //
+  const RenewResponse::ExpiresOptional& RenewResponse::Expires() const
+  {
+    return Expires_;
+  }
+  RenewResponse::ExpiresOptional& RenewResponse::Expires()
+  {
+    return Expires_;
+  }
+
 } // namespace WS::EVENTING

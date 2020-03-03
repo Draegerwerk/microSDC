@@ -161,7 +161,21 @@ namespace MESSAGEMODEL
     using SubscribeResponseOptional = std::optional<SubscribeResponseType>;
     const SubscribeResponseOptional& SubscribeResponse() const;
     SubscribeResponseOptional& SubscribeResponse();
-   
+
+    // Renew
+    //
+    using RenewType = WS::EVENTING::Renew;
+    using RenewOptional = std::optional<RenewType>;
+    const RenewOptional& Renew() const;
+    RenewOptional& Renew();
+
+    // RenewResponse
+    //
+    using RenewResponseType = WS::EVENTING::RenewResponse;
+    using RenewResponseOptional = std::optional<RenewResponseType>;
+    const RenewResponseOptional& RenewResponse() const;
+    RenewResponseOptional& RenewResponse();
+
   protected:
     ByeOptional Bye_;
     HelloOptional Hello_;
@@ -175,6 +189,8 @@ namespace MESSAGEMODEL
     GetMdibResponseOptional GetMdibResponse_;
     SubscribeOptional Subscribe_;
     SubscribeResponseOptional SubscribeResponse_;
+    RenewOptional Renew_;
+    RenewResponseOptional RenewResponse_;
     void parse(const rapidxml::xml_node<>& node);
   };
 

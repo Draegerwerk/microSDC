@@ -12,10 +12,14 @@ namespace WS::EVENTING
     using IsReferenceParameterType = bool;
     using IsReferenceParameterOptional = std::optional<IsReferenceParameterType>;
 
+    Identifier(const rapidxml::xml_node<>& node);
     Identifier(std::string identifier);
 
   protected:
     IsReferenceParameterOptional IsReferenceParameter_;
+
+  private:
+    void parse(const rapidxml::xml_node<>& node);
   };
 } // namespace WS::EVENTING
 

@@ -3,8 +3,11 @@
 #include "UUIDGenerator.hpp"
 #include "datamodel/ws-addressing.hpp"
 #include "datamodel/xs_duration.hpp"
+#include "esp_log.h"
 #include <algorithm>
 #include <iostream>
+
+static constexpr const char* TAG = "SubscriptionManager";
 
 WS::EVENTING::SubscribeResponse
 SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
@@ -38,4 +41,21 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
   WS::EVENTING::SubscribeResponse subscribeResponse(subscriptionManager,
                                                     WS::EVENTING::ExpirationType(duration.str()));
   return subscribeResponse;
+}
+
+WS::EVENTING::RenewResponse
+SubscriptionManager::dispatch(const WS::EVENTING::Renew& renewRequest,
+                              const WS::EVENTING::Identifier& identifier)
+{
+  const Duration duration(renewRequest.Expires().value_or(WS::EVENTING::ExpirationType("PT1H")));
+  auto subscriptionInfo = subscriptions_.find(identifier);
+  if (subscriptionInfo == subscriptions_.end())
+  {
+    throw std::runtime_error("Could not find subscription corresponding to Renew Identifier " +
+                             identifier);
+  }
+  subscriptionInfo->second.expirationTime = duration.toExpirationTimePoint();
+  WS::EVENTING::RenewResponse renewResponse;
+  renewResponse.Expires() = WS::EVENTING::ExpirationType(duration.str());
+  return renewResponse;
 }

@@ -64,7 +64,8 @@ public:
   void serialize(rapidxml::xml_node<>* parent,
                  const WS::EVENTING::SubscribeResponse& subscribeResponse);
   void serialize(rapidxml::xml_node<>* parent,
-                const WS::ADDRESSING::ReferenceParametersType& referenceParameters);
+                 const WS::ADDRESSING::ReferenceParametersType& referenceParameters);
+  void serialize(rapidxml::xml_node<>* parent, const WS::EVENTING::RenewResponse& renewResponse);
 
   static std::string toString(BICEPS::PM::SafetyClassification);
   static std::string toString(const WS::DISCOVERY::UriListType& uriList);

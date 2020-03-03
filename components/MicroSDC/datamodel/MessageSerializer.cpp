@@ -121,6 +121,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   {
     serialize(bodyNode, body.SubscribeResponse().value());
   }
+  else if (body.RenewResponse().has_value())
+  {
+    serialize(bodyNode, body.RenewResponse().value());
+  }
   parent->append_node(bodyNode);
 }
 
@@ -829,6 +833,19 @@ void MessageSerializer::serialize(
     referenceParametersNode->append_node(identifierNode);
   }
   parent->append_node(referenceParametersNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const WS::EVENTING::RenewResponse& renewResponse)
+{
+  auto renewResponseNode = xmlDocument_->allocate_node(rapidxml::node_element, "wse:RenewResponse");
+  if (renewResponse.Expires().has_value())
+  {
+    auto expiresNode = xmlDocument_->allocate_node(rapidxml::node_element, "wse:Expires");
+    expiresNode->value(renewResponse.Expires().value().c_str());
+    renewResponseNode->append_node(expiresNode);
+  }
+  parent->append_node(renewResponseNode);
 }
 
 /*static*/ std::string

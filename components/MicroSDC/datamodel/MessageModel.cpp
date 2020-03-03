@@ -160,9 +160,9 @@ namespace MESSAGEMODEL
         To_ = std::make_optional<ToType>(*entry);
       }
       else if (strncmp(entry->name(), "Identifier", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        // Identifier
+        Identifier_ = std::make_optional<IdentifierType>(*entry);
       }
     }
   }
@@ -299,6 +299,24 @@ namespace MESSAGEMODEL
     return SubscribeResponse_;
   }
 
+  const Body::RenewOptional& Body::Renew() const
+  {
+    return Renew_;
+  }
+  Body::RenewOptional& Body::Renew()
+  {
+    return Renew_;
+  }
+
+  const Body::RenewResponseOptional& Body::RenewResponse() const
+  {
+    return RenewResponse_;
+  }
+  Body::RenewResponseOptional& Body::RenewResponse()
+  {
+    return RenewResponse_;
+  }
+
   void Body::parse(const rapidxml::xml_node<>& node)
   {
     rapidxml::xml_node<>* bodyContent = node.first_node();
@@ -327,6 +345,11 @@ namespace MESSAGEMODEL
              strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
     {
       Subscribe_ = std::make_optional<SubscribeType>(*bodyContent);
+    }
+    else if (strncmp(bodyContent->name(), "Renew", bodyContent->name_size()) == 0 &&
+             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
+    {
+      Renew_ = std::make_optional<RenewType>(*bodyContent);
     }
   }
 
