@@ -93,6 +93,11 @@ void SetService::handleRequest(httpd_req* req, char* message)
     ESP_LOGI(TAG, "Sending UnsubscribeResponse: \n %s", message.c_str());
     httpd_resp_send(req, message.c_str(), message.length());
   }
+  else if (soapAction.uri() == SDC::ACTION_SET_VALUE)
+  {
+        ESP_LOGI(TAG, "Got SetValue: \n %s", message);
+        auto SetValueRequest = requestEnvelope.Body().SetValue();
+  }
   else
   {
     ESP_LOGI(TAG, "Unknown soap action %s", soapAction.uri().c_str());

@@ -183,6 +183,20 @@ namespace MESSAGEMODEL
     const UnsubscribeOptional& Unsubscribe() const;
     UnsubscribeOptional& Unsubscribe();
 
+    // SetValue
+    //
+    using SetValueType = BICEPS::MM::SetValue;
+    using SetValueOptional = std::optional<SetValueType>;
+    const SetValueOptional& SetValue() const;
+    SetValueOptional& SetValue();
+
+    // SetValueResponse
+    //
+    using SetValueResponseType = BICEPS::MM::SetValueResponse;
+    using SetValueResponseOptional = std::optional<SetValueResponseType>;
+    const SetValueResponseOptional& SetValueResponse() const;
+    SetValueResponseOptional& SetValueResponse();
+
   protected:
     ByeOptional Bye_;
     HelloOptional Hello_;
@@ -199,6 +213,8 @@ namespace MESSAGEMODEL
     RenewOptional Renew_;
     RenewResponseOptional RenewResponse_;
     UnsubscribeOptional Unsubscribe_;
+    SetValueOptional SetValue_;
+    SetValueResponseOptional SetValueResponse_;
     void parse(const rapidxml::xml_node<>& node);
   };
 

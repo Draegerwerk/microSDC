@@ -1,6 +1,7 @@
 #include "MessageModel.hpp"
 #include "ExpectedElement.hpp"
 #include "MDPWSConstants.hpp"
+#include "SDCConstants.hpp"
 #include "ws-eventing.hpp"
 #include <cstring>
 #include <memory>
@@ -326,6 +327,24 @@ namespace MESSAGEMODEL
     return Unsubscribe_;
   }
 
+  const Body::SetValueOptional& Body::SetValue() const
+  {
+    return SetValue_;
+  }
+  Body::SetValueOptional& Body::SetValue()
+  {
+    return SetValue_;
+  }
+
+  const Body::SetValueResponseOptional& Body::SetValueResponse() const
+  {
+    return SetValueResponse_;
+  }
+  Body::SetValueResponseOptional& Body::SetValueResponse()
+  {
+    return SetValueResponse_;
+  }
+
   void Body::parse(const rapidxml::xml_node<>& node)
   {
     rapidxml::xml_node<>* bodyContent = node.first_node();
@@ -364,6 +383,12 @@ namespace MESSAGEMODEL
              strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
     {
       Unsubscribe_ = std::make_optional<UnsubscribeType>(*bodyContent);
+    }
+    else if (strncmp(bodyContent->name(), "SetValue", bodyContent->name_size()) == 0 &&
+             strncmp(bodyContent->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL,
+                     bodyContent->xmlns_size()) == 0)
+    {
+      SetValue_ = std::make_optional<SetValueType>(*bodyContent);
     }
   }
 

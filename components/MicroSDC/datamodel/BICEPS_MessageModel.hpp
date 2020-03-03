@@ -225,7 +225,7 @@ namespace BICEPS::MM
     InvocationInfoType InvocationInfo_;
   };
 
-  class SetValueReponse : public AbstractSetResponse
+  class SetValueResponse : public AbstractSetResponse
   {
   };
 
