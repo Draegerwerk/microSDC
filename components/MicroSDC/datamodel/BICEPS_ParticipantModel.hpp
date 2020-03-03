@@ -505,7 +505,7 @@ namespace BICEPS::PM
   class NumericMetricValue : public AbstractMetricValue
   {
   public:
-    using ValueType = int;
+    using ValueType = double;
     using ValueOptional = std::optional<ValueType>;
     const ValueOptional& Value() const;
     ValueOptional& Value();
