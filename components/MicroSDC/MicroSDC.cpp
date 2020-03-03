@@ -178,9 +178,10 @@ void MicroSDC::addMdState(std::shared_ptr<StateHandler> stateHandler)
   stateHandlers_[stateHandler->getDescriptorHandle()] = std::move(stateHandler);
 }
 
-void MicroSDC::updateState(std::shared_ptr<BICEPS::PM::NumericMetricState> state)
+void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state)
 {
-  updateMdib(std::move(state));
+  updateMdib(state);
+  notifyEpisodicMetricReport(state);
 }
 
 template <class T>
@@ -201,4 +202,20 @@ void MicroSDC::incrementMdibVersion()
 {
   std::lock_guard<std::mutex> lock(mdibMutex_);
   mdib_->MdibVersion() = mdib_->MdibVersion().value_or(0) + 1;
+}
+
+unsigned int MicroSDC::getMdibVersion() const
+{
+  std::lock_guard<std::mutex> lock(mdibMutex_);
+  return mdib_->MdibVersion().value_or(0);
+}
+
+void MicroSDC::notifyEpisodicMetricReport(
+    std::shared_ptr<const BICEPS::PM::NumericMetricState> state)
+{
+  BICEPS::MM::MetricReportPart reportPart;
+  reportPart.MetricState().emplace_back(std::move(state));
+  BICEPS::MM::EpisodicMetricReport report(WS::ADDRESSING::URIType("0"));
+  report.ReportPart().emplace_back(std::move(reportPart));
+  report.MdibVersion() = getMdibVersion();
 }

@@ -81,7 +81,7 @@ public:
    * @brief updates a given state in the mdib representation
    * @param state the state to update
    */
-  void updateState(std::shared_ptr<BICEPS::PM::NumericMetricState> state);
+  void updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state);
 
 private:
   /// the SDC thread
@@ -130,7 +130,13 @@ private:
    */
   void incrementMdibVersion();
   /**
+   * @brief returns the current mdib Version
+   * @return the mdib version
+   */
+  unsigned int getMdibVersion() const;
+  /**
    * @brief initializes all registered states by calling there initial state function
    */
   void initializeMdStates();
+  void notifyEpisodicMetricReport(std::shared_ptr<const BICEPS::PM::NumericMetricState> state);
 };
