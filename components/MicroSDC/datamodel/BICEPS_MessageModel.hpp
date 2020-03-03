@@ -158,7 +158,7 @@ namespace BICEPS::MM
   //
   class InvocationErrorMessage : public std::string
   {
-    public:
+  public:
     InvocationErrorMessage(std::string invocationErrorMessage);
   };
 
@@ -183,7 +183,8 @@ namespace BICEPS::MM
     const InvocationErrorMessageOptional& InvocationErrorMessage() const;
     InvocationErrorMessageOptional& InvocationErrorMessage();
 
-    InvocationInfo(const TransactionIdType& transactionId, const InvocationStateType& invocationState);
+    InvocationInfo(const TransactionIdType& transactionId,
+                   const InvocationStateType& invocationState);
     InvocationInfo() = default;
 
   protected:
@@ -216,7 +217,7 @@ namespace BICEPS::MM
 
     AbstractSetResponse(const SequenceIdType& sequenceId, const InvocationInfoType& invocationInfo);
     AbstractSetResponse() = default;
-    
+
   protected:
     MdibVersionOptional MdibVersion_;
     SequenceIdType SequenceId_;
@@ -226,6 +227,62 @@ namespace BICEPS::MM
 
   class SetValueReponse : public AbstractSetResponse
   {
+  };
+
+  // OperationInvokedReport
+  //
+  class OperationTarget : public std::string
+  {
+  };
+
+  class InvocationSource
+  {
+  };
+
+  class ReportPart
+  {
+  public:
+    using OperationHandleRefType = ::BICEPS::MM::OperationHandleRef;
+    const OperationHandleRefType& OperationHandleRef() const;
+    OperationHandleRefType& OperationHandleRef();
+
+    using OperationTargetType = ::BICEPS::MM::OperationTarget;
+    using OperationTargetOptional = std::optional<OperationTargetType>;
+    const OperationTargetOptional& OperationTarget() const;
+    OperationTargetOptional& OperationTarget();
+
+    using InvocationInfoType = ::BICEPS::MM::InvocationInfo;
+    const InvocationInfoType& InvocationInfo() const;
+    InvocationInfoType& InvocationInfo();
+
+    using InvocationSourceType = ::BICEPS::MM::InvocationSource;
+    const InvocationSourceType& InvocationSource() const;
+    InvocationSourceType& InvocationSource();
+
+    ReportPart(const OperationHandleRefType& operationHandleRef,
+               const InvocationInfoType& invocationInfo,
+               const InvocationSourceType& invocationSource);
+    ReportPart() = default;
+
+  protected:
+    OperationHandleRefType OperationHandleRef_;
+    OperationTargetOptional OperationTarget_;
+    InvocationInfoType InvocationInfo_;
+    InvocationSourceType InvocationSource_;
+  };
+
+  class OperationInvokedReport : public AbstractReport
+  {
+  public:
+    using ReportPartType = ::BICEPS::MM::ReportPart;
+    const ReportPartType& ReportPart() const;
+    ReportPartType& ReportPart();
+
+    OperationInvokedReport(const SequenceIdType& sequenceId, const ReportPartType& reportPart);
+    OperationInvokedReport() = default;
+
+  protected:
+    ReportPartType ReportPart_;
   };
 
 } // namespace BICEPS::MM

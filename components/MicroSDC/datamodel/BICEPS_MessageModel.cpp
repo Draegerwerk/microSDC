@@ -206,4 +206,63 @@ namespace BICEPS::MM
     return InvocationInfo_;
   }
 
+  // ReportPart
+  //
+  ReportPart::ReportPart(const OperationHandleRefType& operationHandleRef,
+                         const InvocationInfoType& invocationInfo,
+                         const InvocationSourceType& invocationSource)
+    : OperationHandleRef_(operationHandleRef)
+    , InvocationInfo_(invocationInfo)
+    , InvocationSource_(invocationSource)
+  {
+  }
+  const ReportPart::OperationHandleRefType& ReportPart::OperationHandleRef() const
+  {
+    return OperationHandleRef_;
+  }
+  ReportPart::OperationHandleRefType& ReportPart::OperationHandleRef()
+  {
+    return OperationHandleRef_;
+  }
+  const ReportPart::OperationTargetOptional& ReportPart::OperationTarget() const
+  {
+    return OperationTarget_;
+  }
+  ReportPart::OperationTargetOptional& ReportPart::OperationTarget()
+  {
+    return OperationTarget_;
+  }
+  const ReportPart::InvocationInfoType& ReportPart::InvocationInfo() const
+  {
+    return InvocationInfo_;
+  }
+  ReportPart::InvocationInfoType& ReportPart::InvocationInfo()
+  {
+    return InvocationInfo_;
+  }
+  const ReportPart::InvocationSourceType& ReportPart::InvocationSource() const
+  {
+    return InvocationSource_;
+  }
+  ReportPart::InvocationSourceType& ReportPart::InvocationSource()
+  {
+    return InvocationSource_;
+  }
+
+  // OperationInvokedReport
+  //
+  OperationInvokedReport::OperationInvokedReport(const SequenceIdType& sequenceId,
+                                                 const ReportPartType& reportPart)
+    : AbstractReport(sequenceId)
+    , ReportPart_(reportPart)
+  {
+  }
+  const OperationInvokedReport::ReportPartType& OperationInvokedReport::ReportPart() const
+  {
+    return ReportPart_;
+  }
+  OperationInvokedReport::ReportPartType& OperationInvokedReport::ReportPart()
+  {
+    return ReportPart_;
+  }
 } // namespace BICEPS::MM
