@@ -59,3 +59,15 @@ SubscriptionManager::dispatch(const WS::EVENTING::Renew& renewRequest,
   renewResponse.Expires() = WS::EVENTING::ExpirationType(duration.str());
   return renewResponse;
 }
+
+void SubscriptionManager::dispatch(const WS::EVENTING::Unsubscribe&  /*unsubscribeRequest*/,
+                                   const WS::EVENTING::Identifier& identifier)
+{
+  auto subscriptionInfo = subscriptions_.find(identifier);
+  if (subscriptionInfo == subscriptions_.end())
+  {
+    throw std::runtime_error("Could not find subscription corresponding to Renew Identifier " +
+                             identifier);
+  }
+  subscriptions_.erase(subscriptionInfo);
+}

@@ -32,6 +32,8 @@ public:
   WS::EVENTING::SubscribeResponse dispatch(const WS::EVENTING::Subscribe& subscribeRequest);
   WS::EVENTING::RenewResponse dispatch(const WS::EVENTING::Renew& renewRequest,
                                        const WS::EVENTING::Identifier& identifier);
+  void dispatch(const WS::EVENTING::Unsubscribe& unsubscribeRequest,
+                const WS::EVENTING::Identifier& identifier);
 
 private:
   std::map<std::string, SubscriptionInformation> subscriptions_;

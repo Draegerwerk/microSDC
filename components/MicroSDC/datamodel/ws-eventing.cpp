@@ -231,4 +231,8 @@ namespace WS::EVENTING
     return Expires_;
   }
 
+  // Unsubscribe
+  //
+  Unsubscribe::Unsubscribe(const rapidxml::xml_node<>& node) {}
+
 } // namespace WS::EVENTING

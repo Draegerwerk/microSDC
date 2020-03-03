@@ -121,6 +121,7 @@ namespace WS::EVENTING
 
   protected:
     ExpiresOptional Expires_;
+
   private:
     void parse(const rapidxml::xml_node<>& node);
   };
@@ -135,6 +136,12 @@ namespace WS::EVENTING
 
   protected:
     ExpiresOptional Expires_;
+  };
+
+  class Unsubscribe
+  {
+  public:
+    Unsubscribe(const rapidxml::xml_node<>& node);
   };
 
 } // namespace WS::EVENTING

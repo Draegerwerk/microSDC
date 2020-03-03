@@ -317,6 +317,15 @@ namespace MESSAGEMODEL
     return RenewResponse_;
   }
 
+  const Body::UnsubscribeOptional& Body::Unsubscribe() const
+  {
+    return Unsubscribe_;
+  }
+  Body::UnsubscribeOptional& Body::Unsubscribe()
+  {
+    return Unsubscribe_;
+  }
+
   void Body::parse(const rapidxml::xml_node<>& node)
   {
     rapidxml::xml_node<>* bodyContent = node.first_node();
@@ -350,6 +359,11 @@ namespace MESSAGEMODEL
              strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
     {
       Renew_ = std::make_optional<RenewType>(*bodyContent);
+    }
+    else if (strncmp(bodyContent->name(), "Unsubscribe", bodyContent->name_size()) == 0 &&
+             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
+    {
+      Unsubscribe_ = std::make_optional<UnsubscribeType>(*bodyContent);
     }
   }
 

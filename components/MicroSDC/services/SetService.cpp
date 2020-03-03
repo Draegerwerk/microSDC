@@ -69,11 +69,28 @@ void SetService::handleRequest(httpd_req* req, char* message)
         subscriptionManager_->dispatch(renewRequest, requestEnvelope.Header().Identifier().value());
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
+    responseEnvelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RENEW_RESPONSE);
     responseEnvelope.Body().RenewResponse() = response;
     MessageSerializer serializer;
     serializer.serialize(responseEnvelope);
     const auto message = serializer.str();
     ESP_LOGI(TAG, "Sending RenewResponse: \n %s", message.c_str());
+    httpd_resp_send(req, message.c_str(), message.length());
+  }
+  else if (soapAction.uri() == MDPWS::WS_ACTION_UNSUBSCRIBE)
+  {
+    ESP_LOGI(TAG, "Got Unsubscribe: \n %s", message);
+    auto unsubscribeRequest = requestEnvelope.Body().Unsubscribe().value();
+    subscriptionManager_->dispatch(unsubscribeRequest,
+                                   requestEnvelope.Header().Identifier().value());
+    MESSAGEMODEL::Envelope responseEnvelope;
+    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
+    responseEnvelope.Header().Action() =
+        WS::ADDRESSING::URIType(MDPWS::WS_ACTION_UNSUBSCRIBE_RESPONSE);
+    MessageSerializer serializer;
+    serializer.serialize(responseEnvelope);
+    const auto message = serializer.str();
+    ESP_LOGI(TAG, "Sending UnsubscribeResponse: \n %s", message.c_str());
     httpd_resp_send(req, message.c_str(), message.length());
   }
   else

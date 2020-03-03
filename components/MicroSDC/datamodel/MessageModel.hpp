@@ -176,6 +176,13 @@ namespace MESSAGEMODEL
     const RenewResponseOptional& RenewResponse() const;
     RenewResponseOptional& RenewResponse();
 
+    // Unsubscribe
+    //
+    using UnsubscribeType = WS::EVENTING::Unsubscribe;
+    using UnsubscribeOptional = std::optional<UnsubscribeType>;
+    const UnsubscribeOptional& Unsubscribe() const;
+    UnsubscribeOptional& Unsubscribe();
+
   protected:
     ByeOptional Bye_;
     HelloOptional Hello_;
@@ -191,6 +198,7 @@ namespace MESSAGEMODEL
     SubscribeResponseOptional SubscribeResponse_;
     RenewOptional Renew_;
     RenewResponseOptional RenewResponse_;
+    UnsubscribeOptional Unsubscribe_;
     void parse(const rapidxml::xml_node<>& node);
   };
 
