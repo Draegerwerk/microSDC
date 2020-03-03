@@ -17,6 +17,7 @@ namespace SDC
 
   SDCConstant QNAME_GETSERVICE = "GetService";
   SDCConstant QNAME_SETSERVICE = "SetService";
+  SDCConstant QNAME_STATEEVENTSERVICE = "StateEventService";
   SDCConstant ACTION_GET_MDIB_REQUEST =
       "http://standards.ieee.org/downloads/11073/11073-20701-2018/GetService/GetMdib";
   SDCConstant ACTION_GET_MDIB_RESPONSE =

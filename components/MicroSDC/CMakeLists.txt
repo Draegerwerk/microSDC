@@ -16,6 +16,7 @@ set(COMPONENT_SOURCES
         "services/DeviceService.cpp"
         "services/GetService.cpp"
         "services/SetService.cpp"
+        "services/StateEventService.cpp"
         "services/SoapService.cpp"
         "services/StaticService.cpp"
         "DeviceCharacteristics.cpp"

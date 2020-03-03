@@ -35,10 +35,20 @@ public:
    */
   std::string getSetServicePath() const;
   /**
+   * @brief get the URI of the StateEventService
+   * @return string containing the URI
+   */
+  std::string getStateEventServicePath() const;
+  /**
    * @brief gets the endpoint URI of the SetService
    * @return URI containing information regarding the set service
    */
   WS::ADDRESSING::URIType getSetServiceURI() const;
+  /**
+   * @brief gets the endpoint URI of the StateEventService
+   * @return URI containing information regarding the state event service
+   */
+  WS::ADDRESSING::URIType getStateEventServiceURI() const;
   /**
    * @brief fill SOAP Envelope with Device Metadata for GetMetadataResponse
    * @param envelope reference to the response envelope to fill
@@ -54,6 +64,11 @@ public:
    * @param envelope reference to the response envelope to fill
    */
   void fillSetServiceMetadata(MESSAGEMODEL::Envelope& envelope) const;
+  /**
+   * @brief fill SOAP Envelope with StateEventService Metadata for GetMetadataResponse
+   * @param envelope reference to the response envelope to fill
+   */
+  void fillStateEventServiceMetadata(MESSAGEMODEL::Envelope& envelope) const;
   /**
    * @brief compile host part of MetadataSection Relationship
    * @return Host section
@@ -88,6 +103,11 @@ public:
    */
   MetadataSection createMetadataSectionWSDLSetService() const;
   /**
+   * @brief compile information about WSDL for StateEventService
+   * @return constructed MetadataSection
+   */
+  MetadataSection createMetadataSectionWSDLStateEventService() const;
+  /**
    * @brief construct Hosted section for GetService
    * @brief Hosted element
    */
@@ -97,6 +117,11 @@ public:
    * @brief Hosted element
    */
   Hosted createHostedSetService() const;
+  /**
+   * @brief construct Hosted section for StateEventService
+   * @brief Hosted element
+   */
+  Hosted createHostedStateEventService() const;
 
 private:
   /// device characteristics to provide

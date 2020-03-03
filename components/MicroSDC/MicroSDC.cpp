@@ -10,9 +10,11 @@
 #include "services/DeviceService.hpp"
 #include "services/GetService.hpp"
 #include "services/SetService.hpp"
+#include "services/StateEventService.hpp"
 #include "services/StaticService.hpp"
 #include "wsdl/GetServiceWSDL.hpp"
 #include "wsdl/SetServiceWSDL.hpp"
+#include "wsdl/StateEventServiceWSDL.hpp"
 
 static constexpr const char* TAG = "MicroSDC";
 
@@ -78,6 +80,10 @@ void MicroSDC::startup()
   auto setService = std::make_shared<SetService>(*this, metadata, subscriptionManager_);
   auto setWSDLService =
       std::make_shared<StaticService>(setService->getURI() + "/?wsdl", WSDL::SET_SERVICE_WSDL);
+  auto stateEventService =
+      std::make_shared<StateEventService>(*this, metadata, subscriptionManager_);
+  auto stateEventWSDLService = std::make_shared<StaticService>(
+      stateEventService->getURI() + "/?wsdl", WSDL::STATE_EVENT_SERVICE_SERVICE_WSDL);
 
   webserver_ = std::make_unique<WebServer>(useTLS_);
 
@@ -87,6 +93,8 @@ void MicroSDC::startup()
   webserver_->addService(getWSDLService);
   webserver_->addService(setService);
   webserver_->addService(setWSDLService);
+  webserver_->addService(stateEventService);
+  webserver_->addService(stateEventWSDLService);
 
   webserver_->start();
   dpws_->start();
