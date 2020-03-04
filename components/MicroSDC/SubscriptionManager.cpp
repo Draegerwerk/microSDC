@@ -169,7 +169,6 @@ void SubscriptionManager::createClient(const std::string& notifyTo)
     ESP_LOGI(TAG, "Client session already exists");
     return;
   }
-  extern const char cacert_pem_start[] asm("_binary_cacert_pem_start");
   extern const char serverCert_pem_start[] asm("_binary_serverCert_pem_start");
   extern const char serverKey_pem_start[] asm("_binary_serverKey_pem_start");
   esp_http_client_config_t config;
@@ -181,7 +180,7 @@ void SubscriptionManager::createClient(const std::string& notifyTo)
   config.auth_type = HTTP_AUTH_TYPE_NONE;
   config.path = nullptr;
   config.query = nullptr;
-  config.cert_pem = cacert_pem_start;
+  config.cert_pem = nullptr;
   config.client_cert_pem = serverCert_pem_start;
   config.client_key_pem = serverKey_pem_start;
   config.method = HTTP_METHOD_POST;
