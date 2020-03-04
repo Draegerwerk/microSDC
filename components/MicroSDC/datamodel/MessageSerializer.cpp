@@ -848,6 +848,66 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   parent->append_node(renewResponseNode);
 }
 
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::MM::SetValueResponse& setValueResponse)
+{
+  auto setValueResponseNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "msg:SetValueResponse");
+  auto xmlnsBicepsMessage =
+      xmlDocument_->allocate_attribute("xmlns:msg", SDC::NS_BICEPS_MESSAGE_MODEL);
+  setValueResponseNode->append_attribute(xmlnsBicepsMessage);
+  if (setValueResponse.MdibVersion().has_value())
+  {
+    auto mdibVersionAttr = xmlDocument_->allocate_attribute(
+        "MdibVersion", std::to_string(setValueResponse.MdibVersion().value()).c_str());
+    setValueResponseNode->append_attribute(mdibVersionAttr);
+  }
+  auto SequenceIdAttr =
+      xmlDocument_->allocate_attribute("SequenceId", setValueResponse.SequenceId().uri().c_str());
+  setValueResponseNode->append_attribute(SequenceIdAttr);
+  if (setValueResponse.InstanceId().has_value())
+  {
+    auto instanceIdAttr = xmlDocument_->allocate_attribute(
+        "SequenceId", std::to_string(setValueResponse.InstanceId().value()).c_str());
+    setValueResponseNode->append_attribute(instanceIdAttr);
+  }
+  serialize(setValueResponseNode, setValueResponse.InvocationInfo());
+  parent->append_node(setValueResponseNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::MM::InvocationInfo& invocationInfo)
+{
+  auto invocationInfoNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationInfo");
+
+  auto transactionIdNode = xmlDocument_->allocate_node(rapidxml::node_element, "msg:TransactionId");
+  transactionIdNode->value(std::to_string(invocationInfo.TransactionId()).c_str());
+  invocationInfoNode->append_node(transactionIdNode);
+
+  auto invocationStateNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationState");
+  invocationStateNode->value(toString(invocationInfo.InvocationState()).c_str());
+  invocationInfoNode->append_node(invocationStateNode);
+
+  if (invocationInfo.InvocationError().has_value())
+  {
+    auto invocationErrorNode =
+        xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationError");
+    invocationErrorNode->value(toString(invocationInfo.InvocationError().value()).c_str());
+    invocationInfoNode->append_node(invocationErrorNode);
+  }
+
+  if (invocationInfo.InvocationErrorMessage().has_value())
+  {
+    auto invocationErrorMessageNode =
+        xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationErrorMessage");
+    invocationErrorMessageNode->value(invocationInfo.InvocationErrorMessage().value().c_str());
+    invocationInfoNode->append_node(invocationErrorMessageNode);
+  }
+  parent->append_node(invocationInfoNode);
+}
+
 /*static*/ std::string
 MessageSerializer::toString(BICEPS::PM::SafetyClassification safetyClassification)
 {
@@ -952,5 +1012,45 @@ std::string MessageSerializer::toString(BICEPS::PM::MeasurementValidity validity
       return "Vldated";
   }
   assert(false && "Uncatched value in MeasurementValidity");
+  return "";
+}
+
+std::string MessageSerializer::toString(BICEPS::MM::InvocationState invocationState)
+{
+  switch (invocationState)
+  {
+    case BICEPS::MM::InvocationState::Wait:
+      return "Wait";
+    case BICEPS::MM::InvocationState::Start:
+      return "Start";
+    case BICEPS::MM::InvocationState::Cnclld:
+      return "Cnclld";
+    case BICEPS::MM::InvocationState::CnclldMan:
+      return "CnclldMan";
+    case BICEPS::MM::InvocationState::Fin:
+      return "Fin";
+    case BICEPS::MM::InvocationState::FinMod:
+      return "FinMod";
+    case BICEPS::MM::InvocationState::Fail:
+      return "Fail";
+  }
+  assert(false && "Uncatched value in InvocationState");
+  return "";
+}
+
+std::string MessageSerializer::toString(BICEPS::MM::InvocationError invocationError)
+{
+  switch (invocationError)
+  {
+    case BICEPS::MM::InvocationError::Unspec:
+      return "Unspec";
+    case BICEPS::MM::InvocationError::Unkn:
+      return "Unkn";
+    case BICEPS::MM::InvocationError::Inv:
+      return "Inv";
+    case BICEPS::MM::InvocationError::Oth:
+      return "Oth";
+  }
+  assert(false && "Uncatched value in InvocationError");
   return "";
 }

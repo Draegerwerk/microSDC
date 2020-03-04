@@ -66,6 +66,8 @@ public:
   void serialize(rapidxml::xml_node<>* parent,
                  const WS::ADDRESSING::ReferenceParametersType& referenceParameters);
   void serialize(rapidxml::xml_node<>* parent, const WS::EVENTING::RenewResponse& renewResponse);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::SetValueResponse& setValueResponse);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::InvocationInfo& invocationInfo);
 
   static std::string toString(BICEPS::PM::SafetyClassification);
   static std::string toString(const WS::DISCOVERY::UriListType& uriList);
@@ -73,6 +75,8 @@ public:
   static std::string toString(BICEPS::PM::MetricCategory);
   static std::string toString(BICEPS::PM::MetricAvailability);
   static std::string toString(BICEPS::PM::MeasurementValidity);
+  static std::string toString(BICEPS::MM::InvocationState invocationState);
+  static std::string toString(BICEPS::MM::InvocationError invocationError);
 
 private:
   std::unique_ptr<rapidxml::xml_document<>> xmlDocument_;

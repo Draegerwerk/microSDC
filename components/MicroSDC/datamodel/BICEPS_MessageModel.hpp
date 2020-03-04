@@ -227,6 +227,8 @@ namespace BICEPS::MM
 
   class SetValueResponse : public AbstractSetResponse
   {
+    // use constructors of base class
+    using AbstractSetResponse::AbstractSetResponse;
   };
 
   // OperationInvokedReport

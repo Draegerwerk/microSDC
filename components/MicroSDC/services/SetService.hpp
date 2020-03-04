@@ -4,6 +4,7 @@
 #include "SoapService.hpp"
 #include "SubscriptionManager.hpp"
 #include "dpws/MetadataProvider.hpp"
+#include "datamodel/BICEPS_MessageModel.hpp"
 #include <memory>
 
 class SetService : public SoapService
@@ -18,4 +19,6 @@ private:
   const MicroSDC& microSDC_;
   const MetadataProvider metadata_;
   const std::shared_ptr<SubscriptionManager> subscriptionManager_;
+
+  BICEPS::MM::SetValueResponse dispatch(const BICEPS::MM::SetValue& setValueRequest);
 };

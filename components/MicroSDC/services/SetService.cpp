@@ -1,5 +1,5 @@
 #include "SetService.hpp"
-
+#include "UUIDGenerator.hpp"
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
@@ -95,12 +95,33 @@ void SetService::handleRequest(httpd_req* req, char* message)
   }
   else if (soapAction.uri() == SDC::ACTION_SET_VALUE)
   {
-        ESP_LOGI(TAG, "Got SetValue: \n %s", message);
-        auto SetValueRequest = requestEnvelope.Body().SetValue();
+    ESP_LOGI(TAG, "Got SetValue: \n %s", message);
+    auto setValueRequest = requestEnvelope.Body().SetValue().value();
+    auto setValueResponse = this->dispatch(setValueRequest);
+    MESSAGEMODEL::Envelope responseEnvelope;
+    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
+    responseEnvelope.Header().Action() = WS::ADDRESSING::URIType(SDC::ACTION_SET_VALUE_RESPONSE);
+    responseEnvelope.Body().SetValueResponse() = setValueResponse;
+    MessageSerializer serializer;
+    serializer.serialize(responseEnvelope);
+    const auto message = serializer.str();
+    ESP_LOGI(TAG, "Sending SetValueResponse: \n %s", message.c_str());
+    httpd_resp_send(req, message.c_str(), message.length());
   }
   else
   {
     ESP_LOGI(TAG, "Unknown soap action %s", soapAction.uri().c_str());
     httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "500 Internal Server Error");
   }
+}
+
+BICEPS::MM::SetValueResponse SetService::dispatch(const BICEPS::MM::SetValue& setValueRequest)
+{
+  // TODO: check if request is valid and update Mdib
+  WS::ADDRESSING::URIType sequenceId("uuid:" + UUIDGenerator().create().toString());
+  unsigned int transactionId = 0;
+  BICEPS::MM::InvocationInfo invocationInfo(transactionId, BICEPS::MM::InvocationState::Fin);
+  invocationInfo.InvocationErrorMessage().value() = std::string("MicroSDC rocks!");
+  BICEPS::MM::SetValueResponse setValueResponse(sequenceId, invocationInfo);
+  return setValueResponse;
 }
