@@ -70,6 +70,7 @@ void MicroSDC::startup()
     return;
   }
 
+  // initialize global ca store for client communication
   ESP_ERROR_CHECK(esp_tls_init_global_ca_store());
   extern const unsigned char cacert_pem_start[] asm("_binary_cacert_pem_start");
   extern const unsigned char cacert_pem_end[] asm("_binary_cacert_pem_end");
