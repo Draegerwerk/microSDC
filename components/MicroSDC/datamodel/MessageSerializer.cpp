@@ -125,6 +125,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   {
     serialize(bodyNode, body.RenewResponse().value());
   }
+  else if (body.EpisodicMetricReport().has_value())
+  {
+    serialize(bodyNode, body.EpisodicMetricReport().value());
+  }
   parent->append_node(bodyNode);
 }
 
@@ -906,6 +910,28 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     invocationInfoNode->append_node(invocationErrorMessageNode);
   }
   parent->append_node(invocationInfoNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::MM::EpisodicMetricReport& report)
+{
+  auto reportNode = xmlDocument_->allocate_node(rapidxml::node_element, "mm:EpisodicMetricReport");
+  for (const auto& part : report.ReportPart())
+  {
+    serialize(reportNode, part);
+  }
+  parent->append_node(reportNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::MM::MetricReportPart& part)
+{
+  auto reportPartNode = xmlDocument_->allocate_node(rapidxml::node_element, "mm:ReportPart");
+  for (const auto& state : part.MetricState())
+  {
+    serialize(reportPartNode, *state);
+  }
+  parent->append_node(reportPartNode);
 }
 
 /*static*/ std::string

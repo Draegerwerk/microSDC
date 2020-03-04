@@ -204,17 +204,20 @@ extern "C" void app_main()
   ESP_LOGI(TAG, "Connecting...");
   ESP_ERROR_CHECK(NetworkHandler::getInstance().connect());
 
-  BME280 bme280(i2c_port_t::I2C_NUM_0, 0x76u, static_cast<gpio_num_t>(13),
-                static_cast<gpio_num_t>(16));
-  while (true)
-  {
-    const auto sensorData = bme280.getSensorData();
-    ESP_LOGI(TAG, "pressure: %0.2f, temp: %0.2f, humidity: %0.2f", sensorData.pressure,
-             sensorData.temperature, sensorData.humidity);
-    pressureStateHandler->setValue(static_cast<int>(sensorData.pressure));
-    temperatureStateHandler->setValue(static_cast<int>(sensorData.temperature));
-    humidityStateHandler->setValue(static_cast<int>(sensorData.humidity));
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-  }
+  std::thread updateThread([=]() {
+    BME280 bme280(i2c_port_t::I2C_NUM_0, 0x76u, static_cast<gpio_num_t>(13),
+                  static_cast<gpio_num_t>(16));
+    while (true)
+    {
+      const auto sensorData = bme280.getSensorData();
+      ESP_LOGI(TAG, "pressure: %0.2f, temp: %0.2f, humidity: %0.2f", sensorData.pressure,
+               sensorData.temperature, sensorData.humidity);
+      pressureStateHandler->setValue(static_cast<int>(sensorData.pressure));
+      temperatureStateHandler->setValue(static_cast<int>(sensorData.temperature));
+      humidityStateHandler->setValue(static_cast<int>(sensorData.humidity));
+      vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+  });
+  updateThread.join();
   vTaskDelete(nullptr);
 }

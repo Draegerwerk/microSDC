@@ -197,6 +197,13 @@ namespace MESSAGEMODEL
     const SetValueResponseOptional& SetValueResponse() const;
     SetValueResponseOptional& SetValueResponse();
 
+    // EpisodicMetricReport
+    //
+    using EpisodicMetricReportType = BICEPS::MM::EpisodicMetricReport;
+    using EpisodicMetricReportOptional = std::optional<EpisodicMetricReportType>;
+    const EpisodicMetricReportOptional& EpisodicMetricReport() const;
+    EpisodicMetricReportOptional& EpisodicMetricReport();
+
   protected:
     ByeOptional Bye_;
     HelloOptional Hello_;
@@ -215,6 +222,8 @@ namespace MESSAGEMODEL
     UnsubscribeOptional Unsubscribe_;
     SetValueOptional SetValue_;
     SetValueResponseOptional SetValueResponse_;
+    EpisodicMetricReportOptional EpisodicMetricReport_;
+
     void parse(const rapidxml::xml_node<>& node);
   };
 

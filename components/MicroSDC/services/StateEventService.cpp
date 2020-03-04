@@ -36,12 +36,66 @@ void StateEventService::handleRequest(httpd_req* req, char* message)
     MessageSerializer serializer;
     serializer.serialize(responseEnvelope);
     const auto message = serializer.str();
-    ESP_LOGI(TAG, "Sending GetMetadataResponse: \n %s", message.c_str());
+    ESP_LOGD(TAG, "Sending GetMetadataResponse: \n %s", message.c_str());
+    httpd_resp_send(req, message.c_str(), message.length());
+  }
+  else if (soapAction.uri() == MDPWS::WS_ACTION_SUBSCRIBE)
+  {
+    ESP_LOGD(TAG, "Got Subscribe: \n %s", message);
+    auto subscribeRequest = requestEnvelope.Body().Subscribe();
+    auto response = subscriptionManager_->dispatch(subscribeRequest.value());
+    response.SubscriptionManager().Address() = metadata_.getStateEventServiceURI();
+
+    MESSAGEMODEL::Envelope responseEnvelope;
+    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
+    responseEnvelope.Header().Action() =
+        WS::ADDRESSING::URIType(MDPWS::WS_ACTION_SUBSCRIBE_RESPONSE);
+    responseEnvelope.Body().SubscribeResponse() = response;
+    MessageSerializer serializer;
+    serializer.serialize(responseEnvelope);
+    const auto message = serializer.str();
+    ESP_LOGD(TAG, "Sending SubscribeResponse: \n %s", message.c_str());
+    httpd_resp_send(req, message.c_str(), message.length());
+  }
+  else if (soapAction.uri() == MDPWS::WS_ACTION_RENEW)
+  {
+    ESP_LOGD(TAG, "Got Renew: \n %s", message);
+    auto renewRequest = requestEnvelope.Body().Renew().value();
+    if (!requestEnvelope.Header().Identifier().has_value())
+    {
+      throw ExpectedElement("Identifier", MDPWS::WS_NS_EVENTING);
+    }
+    auto response =
+        subscriptionManager_->dispatch(renewRequest, requestEnvelope.Header().Identifier().value());
+    MESSAGEMODEL::Envelope responseEnvelope;
+    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
+    responseEnvelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RENEW_RESPONSE);
+    responseEnvelope.Body().RenewResponse() = response;
+    MessageSerializer serializer;
+    serializer.serialize(responseEnvelope);
+    const auto message = serializer.str();
+    ESP_LOGD(TAG, "Sending RenewResponse: \n %s", message.c_str());
+    httpd_resp_send(req, message.c_str(), message.length());
+  }
+  else if (soapAction.uri() == MDPWS::WS_ACTION_UNSUBSCRIBE)
+  {
+    ESP_LOGD(TAG, "Got Unsubscribe: \n %s", message);
+    auto unsubscribeRequest = requestEnvelope.Body().Unsubscribe().value();
+    subscriptionManager_->dispatch(unsubscribeRequest,
+                                   requestEnvelope.Header().Identifier().value());
+    MESSAGEMODEL::Envelope responseEnvelope;
+    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
+    responseEnvelope.Header().Action() =
+        WS::ADDRESSING::URIType(MDPWS::WS_ACTION_UNSUBSCRIBE_RESPONSE);
+    MessageSerializer serializer;
+    serializer.serialize(responseEnvelope);
+    const auto message = serializer.str();
+    ESP_LOGD(TAG, "Sending UnsubscribeResponse: \n %s", message.c_str());
     httpd_resp_send(req, message.c_str(), message.length());
   }
   else
   {
-    ESP_LOGI(TAG, "Unknown soap action %s \n %s", soapAction.uri().c_str(), message);
+    ESP_LOGD(TAG, "Unknown soap action %s \n %s", soapAction.uri().c_str(), message);
     httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "500 Internal Server Error");
   }
 }

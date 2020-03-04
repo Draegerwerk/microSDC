@@ -16,6 +16,6 @@ std::string StaticService::getURI() const
 
 void StaticService::handleRequest(httpd_req_t* req, char*  /*message*/)
 {
-  ESP_LOGI(TAG, "Send response for GET request %s", uri_.c_str());
+  ESP_LOGD(TAG, "Send response for GET request %s", uri_.c_str());
   httpd_resp_send(req, content_.c_str(), content_.length());
 }

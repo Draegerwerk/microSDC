@@ -221,9 +221,14 @@ unsigned int MicroSDC::getMdibVersion() const
 void MicroSDC::notifyEpisodicMetricReport(
     std::shared_ptr<const BICEPS::PM::NumericMetricState> state)
 {
+  if (!running_)
+  {
+    return;
+  }
   BICEPS::MM::MetricReportPart reportPart;
   reportPart.MetricState().emplace_back(std::move(state));
   BICEPS::MM::EpisodicMetricReport report(WS::ADDRESSING::URIType("0"));
   report.ReportPart().emplace_back(std::move(reportPart));
   report.MdibVersion() = getMdibVersion();
+  subscriptionManager_->fireEvent(report);
 }

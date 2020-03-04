@@ -1,10 +1,13 @@
 #pragma once
 
 #include "SDCConstants.hpp"
+#include "datamodel/BICEPS_MessageModel.hpp"
 #include "datamodel/ws-addressing.hpp"
 #include "datamodel/ws-eventing.hpp"
+#include "esp_http_client.h"
 #include <chrono>
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -34,8 +37,22 @@ public:
                                        const WS::EVENTING::Identifier& identifier);
   void dispatch(const WS::EVENTING::Unsubscribe& unsubscribeRequest,
                 const WS::EVENTING::Identifier& identifier);
+  void fireEvent(const BICEPS::MM::EpisodicMetricReport& report);
 
 private:
+  void printSubscriptions() const;
+  void createClient(const std::string& notifyTo);
+  mutable std::mutex subscriptionMutex_;
   std::map<std::string, SubscriptionInformation> subscriptions_;
-  std::vector<std::string> allowedSubscriptionEventActions_{SDC::ACTION_OPERATION_INVOKED_REPORT};
+  std::map<std::string, esp_http_client_handle_t> clients_;
+  std::vector<std::string> allowedSubscriptionEventActions_{
+      SDC::ACTION_OPERATION_INVOKED_REPORT,
+      SDC::ACTION_PERIODIC_ALERT_REPORT,
+      SDC::ACTION_EPISODIC_ALERT_REPORT,
+      SDC::ACTION_EPISODIC_COMPONENT_REPORT,
+      SDC::ACTION_PERIODIC_COMPONENT_REPORT,
+      SDC::ACTION_EPISODIC_METRIC_REPORT,
+      SDC::ACTION_PERIODIC_METRIC_REPORT,
+      SDC::ACTION_EPISODIC_OPERATIONAL_STATE_REPORT,
+      SDC::ACTION_PERIODIC_OPERATIONAL_STATE_REPORT};
 };

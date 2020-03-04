@@ -345,6 +345,15 @@ namespace MESSAGEMODEL
     return SetValueResponse_;
   }
 
+  const Body::EpisodicMetricReportOptional& Body::EpisodicMetricReport() const
+  {
+    return EpisodicMetricReport_;
+  }
+  Body::EpisodicMetricReportOptional& Body::EpisodicMetricReport()
+  {
+    return EpisodicMetricReport_;
+  }
+
   void Body::parse(const rapidxml::xml_node<>& node)
   {
     rapidxml::xml_node<>* bodyContent = node.first_node();

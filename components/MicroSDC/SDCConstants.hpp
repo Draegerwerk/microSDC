@@ -31,5 +31,29 @@ namespace SDC
       "http://standards.ieee.org/downloads/11073/11073-20701-2018/SetService/SetValue";
   SDCConstant ACTION_SET_VALUE_RESPONSE =
       "http://standards.ieee.org/downloads/11073/11073-20701-2018/SetService/SetValueResponse";
+  SDCConstant ACTION_EPISODIC_ALERT_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "EpisodicAlertReport";
+  SDCConstant ACTION_PERIODIC_ALERT_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "PeriodicAlertReport";
+  SDCConstant ACTION_EPISODIC_COMPONENT_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "EpisodicComponentReport";
+  SDCConstant ACTION_PERIODIC_COMPONENT_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "PeriodicComponentReport";
+  SDCConstant ACTION_EPISODIC_METRIC_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "EpisodicMetricReport";
+  SDCConstant ACTION_PERIODIC_METRIC_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "PeriodicMetricReport";
+  SDCConstant ACTION_EPISODIC_OPERATIONAL_STATE_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "EpisodicOperationalStateReport";
+  SDCConstant ACTION_PERIODIC_OPERATIONAL_STATE_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "PeriodicOperationalStateReport";
 
 } // namespace SDC
