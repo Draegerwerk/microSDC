@@ -390,6 +390,14 @@ namespace BICEPS::PM
 
   // AbstractState
   //
+  const AbstractState::StateVersionOptional& AbstractState::StateVersion() const
+  {
+    return StateVersion_;
+  }
+  AbstractState::StateVersionOptional& AbstractState::StateVersion()
+  {
+    return StateVersion_;
+  }
   AbstractState::AbstractState(DescriptorHandleType handle)
     : DescriptorHandle_(std::move(handle))
   {

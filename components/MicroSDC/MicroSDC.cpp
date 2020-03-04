@@ -196,12 +196,16 @@ void MicroSDC::addMdState(std::shared_ptr<StateHandler> stateHandler)
 
 void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state)
 {
-  updateMdib(state);
-  notifyEpisodicMetricReport(state);
+  if (!running_)
+  {
+    return;
+  }
+  auto newState = updateMdib(state);
+  notifyEpisodicMetricReport(newState);
 }
 
 template <class T>
-void MicroSDC::updateMdib(std::shared_ptr<T> newState)
+std::shared_ptr<const T> MicroSDC::updateMdib(std::shared_ptr<T> newState)
 {
   incrementMdibVersion();
   std::lock_guard<std::mutex> lock(mdibMutex_);
@@ -209,9 +213,14 @@ void MicroSDC::updateMdib(std::shared_ptr<T> newState)
   {
     if (newState->DescriptorHandle() == state->DescriptorHandle())
     {
+      newState->StateVersion() = state->StateVersion().value_or(0) + 1;
       state = newState;
+      return newState;
     }
   }
+  throw std::runtime_error("Cannot find descriptor handle '" + newState->DescriptorHandle() +
+                           "'in mdib");
+  return nullptr;
 }
 
 void MicroSDC::incrementMdibVersion()

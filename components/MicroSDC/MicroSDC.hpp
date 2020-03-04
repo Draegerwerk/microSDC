@@ -124,7 +124,7 @@ private:
    * @param state the new state to update in the mdib
    */
   template <class T>
-  void updateMdib(std::shared_ptr<T> state);
+  std::shared_ptr<const T> updateMdib(std::shared_ptr<T> state);
   /**
    * @brief update the version attribute of the mdib. Will be called everytime the mdib changes
    */

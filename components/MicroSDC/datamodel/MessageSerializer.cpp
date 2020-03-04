@@ -755,6 +755,15 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto descriptorHandleAttr =
       xmlDocument_->allocate_attribute("DescriptorHandle", state.DescriptorHandle().c_str());
   stateNode->append_attribute(descriptorHandleAttr);
+
+  if (state.StateVersion().has_value())
+  {
+    auto version =
+        xmlDocument_->allocate_string(std::to_string(state.StateVersion().value()).c_str());
+    auto versionAttr = xmlDocument_->allocate_attribute("StateVersion", version);
+    stateNode->append_attribute(versionAttr);
+  }
+
   if (state.getStateType() == BICEPS::PM::StateType::NUMERIC_METRIC_STATE)
   {
     const auto& numericMetricState = static_cast<const BICEPS::PM::NumericMetricState&>(state);
@@ -916,6 +925,13 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::MM::EpisodicMetricReport& report)
 {
   auto reportNode = xmlDocument_->allocate_node(rapidxml::node_element, "mm:EpisodicMetricReport");
+  if (report.MdibVersion().has_value())
+  {
+    auto version =
+        xmlDocument_->allocate_string(std::to_string(report.MdibVersion().value()).c_str());
+    auto versionAttr = xmlDocument_->allocate_attribute("MdibVersion", version);
+    reportNode->append_attribute(versionAttr);
+  }
   for (const auto& part : report.ReportPart())
   {
     serialize(reportNode, part);
