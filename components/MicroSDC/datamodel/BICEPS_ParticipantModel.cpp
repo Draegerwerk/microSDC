@@ -136,6 +136,24 @@ namespace BICEPS::PM
     return SafetyClassification_;
   }
 
+  // AbstractOperationDescriptor
+  //
+  AbstractOperationDescriptor::AbstractOperationDescriptor(
+      const HandleType& handle, const OperationTargetType& operationTarget)
+    : AbstractDescriptor(handle)
+    , OperationTarget_(operationTarget)
+  {
+  }
+  const AbstractOperationDescriptor::OperationTargetType&
+  AbstractOperationDescriptor::OperationTarget() const
+  {
+    return OperationTarget_;
+  }
+  AbstractOperationDescriptor::OperationTargetType& AbstractOperationDescriptor::OperationTarget()
+  {
+    return OperationTarget_;
+  }
+
   // AbstractContextDescriptor
   //
   AbstractContextDescriptor::AbstractContextDescriptor(const HandleType& handle)
@@ -505,6 +523,22 @@ namespace BICEPS::PM
   StateType LocationContextState::getStateType() const
   {
     return StateType::LOCATION_CONTEXT;
+  }
+  // AbstractOperationState
+  //
+  AbstractOperationState::AbstractOperationState(const DescriptorHandleType& descriptorHandle,
+                                                 const OperatingModeType& operatingMode)
+    : AbstractState(descriptorHandle)
+    , OperatingMode_(operatingMode)
+  {
+  }
+  const AbstractOperationState::OperatingModeType& AbstractOperationState::OperatingMode() const
+  {
+    return OperatingMode_;
+  }
+  AbstractOperationState::OperatingModeType& AbstractOperationState::OperatingMode()
+  {
+    return OperatingMode_;
   }
 
   // AbstractMetricState

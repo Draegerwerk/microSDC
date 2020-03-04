@@ -64,6 +64,12 @@ namespace BICEPS::PM
     Shtdn,
     Fail
   };
+  enum class OperatingMode
+  {
+    Dis,
+    En,
+    NA
+  };
 
   class CodedValue
   {
@@ -117,6 +123,24 @@ namespace BICEPS::PM
     HandleType Handle_;
     DescriptorVersionOptional DescriptorVersion_;
     SafetyClassificationOptional SafetyClassification_;
+  };
+
+  class AbstractOperationDescriptor : public AbstractDescriptor
+  {
+  public:
+    using OperationTargetType = std::string;
+    const OperationTargetType& OperationTarget() const;
+    OperationTargetType& OperationTarget();
+
+  protected:
+    OperationTargetType OperationTarget_;
+    AbstractOperationDescriptor(const HandleType& handle,
+                                const OperationTargetType& operationTarget);
+  };
+
+  class SetValueOperationDescriptor : public AbstractOperationDescriptor
+  {
+    using AbstractOperationDescriptor::AbstractOperationDescriptor;
   };
   class AbstractDeviceComponentDescriptor : public AbstractDescriptor
   {
@@ -521,6 +545,23 @@ namespace BICEPS::PM
 
   protected:
     LocationDetailOptional LocationDetail_;
+  };
+  class AbstractOperationState : public AbstractState
+  {
+  public:
+    using OperatingModeType = ::BICEPS::PM::OperatingMode;
+    const OperatingModeType& OperatingMode() const;
+    OperatingModeType& OperatingMode();
+
+  protected:
+    OperatingModeType OperatingMode_;
+
+    AbstractOperationState(const DescriptorHandleType& descriptorHandle,
+                           const OperatingModeType& operatingMode);
+  };
+  class SetValueOperationState : public AbstractOperationState
+  {
+    using AbstractOperationState::AbstractOperationState;
   };
   class MetricQuality
   {
