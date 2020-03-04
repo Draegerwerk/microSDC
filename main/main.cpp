@@ -119,7 +119,7 @@ public:
     return state;
   }
 
-  void setValue(int value)
+  void setValue(double value)
   {
     auto state = getInitialState();
     state->MetricValue()->Value() = value;
@@ -216,9 +216,9 @@ extern "C" void app_main()
       const auto sensorData = bme280.getSensorData();
       ESP_LOGI(TAG, "pressure: %0.2f, temp: %0.2f, humidity: %0.2f", sensorData.pressure,
                sensorData.temperature, sensorData.humidity);
-      pressureStateHandler->setValue(static_cast<int>(sensorData.pressure));
-      temperatureStateHandler->setValue(static_cast<int>(sensorData.temperature));
-      humidityStateHandler->setValue(static_cast<int>(sensorData.humidity));
+      pressureStateHandler->setValue(sensorData.pressure);
+      temperatureStateHandler->setValue(sensorData.temperature);
+      humidityStateHandler->setValue(sensorData.humidity);
       vTaskDelay(500 / portTICK_PERIOD_MS);
     }
   });
