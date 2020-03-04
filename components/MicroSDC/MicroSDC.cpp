@@ -7,6 +7,7 @@
 #include "datamodel/MDPWSConstants.hpp"
 #include "dpws/MetadataProvider.hpp"
 #include "esp_log.h"
+#include "esp_tls.h"
 #include "services/DeviceService.hpp"
 #include "services/GetService.hpp"
 #include "services/SetService.hpp"
@@ -68,6 +69,12 @@ void MicroSDC::startup()
     ESP_LOGE(TAG, "asio system_error: %s", e.what());
     return;
   }
+
+  ESP_ERROR_CHECK(esp_tls_init_global_ca_store());
+  extern const unsigned char cacert_pem_start[] asm("_binary_cacert_pem_start");
+  extern const unsigned char cacert_pem_end[] asm("_binary_cacert_pem_end");
+  const std::size_t cacert_len = cacert_pem_end - cacert_pem_start;
+  ESP_ERROR_CHECK(esp_tls_set_global_ca_store(cacert_pem_start, cacert_len));
 
   // construct subscription manager
   subscriptionManager_ = std::make_shared<SubscriptionManager>();

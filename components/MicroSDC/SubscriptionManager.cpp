@@ -194,7 +194,7 @@ void SubscriptionManager::createClient(const std::string& notifyTo)
   config.buffer_size_tx = 0;
   config.user_data = nullptr;
   config.is_async = false;
-  config.use_global_ca_store = false;
+  config.use_global_ca_store = true;
   config.skip_cert_common_name_check = true;
   auto client = esp_http_client_init(&config);
   {
