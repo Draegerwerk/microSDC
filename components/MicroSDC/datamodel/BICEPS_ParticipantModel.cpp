@@ -136,6 +136,36 @@ namespace BICEPS::PM
     return SafetyClassification_;
   }
 
+  // AbstractOperationDescriptor
+  //
+  AbstractOperationDescriptor::AbstractOperationDescriptor(
+      const HandleType& handle, const OperationTargetType& operationTarget)
+    : AbstractDescriptor(handle)
+    , OperationTarget_(operationTarget)
+  {
+  }
+  const AbstractOperationDescriptor::OperationTargetType&
+  AbstractOperationDescriptor::OperationTarget() const
+  {
+    return OperationTarget_;
+  }
+  AbstractOperationDescriptor::OperationTargetType& AbstractOperationDescriptor::OperationTarget()
+  {
+    return OperationTarget_;
+  }
+
+  // SetValueOperationDescriptor
+  //
+  SetValueOperationDescriptor::SetValueOperationDescriptor(
+      const HandleType& handle, const OperationTargetType& operationTarget)
+    : AbstractOperationDescriptor(handle, operationTarget)
+  {
+  }
+  OperationType SetValueOperationDescriptor::getOperationType() const
+  {
+    return OperationType::SET_VALUE;
+  }
+
   // AbstractContextDescriptor
   //
   AbstractContextDescriptor::AbstractContextDescriptor(const HandleType& handle)
@@ -293,6 +323,16 @@ namespace BICEPS::PM
     : AbstractDeviceComponentDescriptor(handle)
   {
   }
+  // ScoDescriptor::
+  //
+  const ScoDescriptor::OperationSequence& ScoDescriptor::Operation() const
+  {
+    return Operation_;
+  }
+  ScoDescriptor::OperationSequence& ScoDescriptor::Operation()
+  {
+    return Operation_;
+  }
 
   // VmdDescriptor
   //
@@ -307,6 +347,14 @@ namespace BICEPS::PM
   VmdDescriptor::ChannelSequence& VmdDescriptor::Channel()
   {
     return Channel_;
+  }
+  const VmdDescriptor::ScoOptional& VmdDescriptor::Sco() const
+  {
+    return Sco_;
+  }
+  VmdDescriptor::ScoOptional& VmdDescriptor::Sco()
+  {
+    return Sco_;
   }
 
   // MdsDescriptor
@@ -390,6 +438,14 @@ namespace BICEPS::PM
 
   // AbstractState
   //
+  const AbstractState::StateVersionOptional& AbstractState::StateVersion() const
+  {
+    return StateVersion_;
+  }
+  AbstractState::StateVersionOptional& AbstractState::StateVersion()
+  {
+    return StateVersion_;
+  }
   AbstractState::AbstractState(DescriptorHandleType handle)
     : DescriptorHandle_(std::move(handle))
   {
@@ -401,6 +457,171 @@ namespace BICEPS::PM
   AbstractState::DescriptorHandleType& AbstractState::DescriptorHandle()
   {
     return DescriptorHandle_;
+  }
+
+  // AbstractMultiState
+  //
+  const AbstractMultiState::HandleType& AbstractMultiState::Handle() const
+  {
+    return Handle_;
+  }
+  AbstractMultiState::HandleType& AbstractMultiState::Handle()
+  {
+    return Handle_;
+  }
+  AbstractMultiState::AbstractMultiState(const DescriptorHandleType& descriptorHandle,
+                                         const HandleType& handle)
+    : AbstractState(descriptorHandle)
+    , Handle_(handle)
+  {
+  }
+
+  // InstanceIdentifier
+  //
+  const InstanceIdentifier::ExtensionOptional& InstanceIdentifier::Extension() const
+  {
+    return Extension_;
+  }
+  InstanceIdentifier::ExtensionOptional& InstanceIdentifier::Extension()
+  {
+    return Extension_;
+  }
+  const InstanceIdentifier::RootOptional& InstanceIdentifier::Root() const
+  {
+    return Root_;
+  }
+  InstanceIdentifier::RootOptional& InstanceIdentifier::Root()
+  {
+    return Root_;
+  }
+
+  // AbstractContextState
+  //
+  const AbstractContextState::BindingMdibVersionOptional&
+  AbstractContextState::BindingMdibVersion() const
+  {
+    return BindingMdibVersion_;
+  }
+  AbstractContextState::BindingMdibVersionOptional& AbstractContextState::BindingMdibVersion()
+  {
+    return BindingMdibVersion_;
+  }
+  const AbstractContextState::ContextAssociationOptional&
+  AbstractContextState::ContextAssociation() const
+  {
+    return ContextAssociation_;
+  }
+  AbstractContextState::ContextAssociationOptional& AbstractContextState::ContextAssociation()
+  {
+    return ContextAssociation_;
+  }
+  const AbstractContextState::ValidatorSequence& AbstractContextState::Validator() const
+  {
+    return Validator_;
+  }
+  AbstractContextState::ValidatorSequence& AbstractContextState::Validator()
+  {
+    return Validator_;
+  }
+  const AbstractContextState::IdentificationSequence& AbstractContextState::Identification() const
+  {
+    return Identification_;
+  }
+  AbstractContextState::IdentificationSequence& AbstractContextState::Identification()
+  {
+    return Identification_;
+  }
+  AbstractContextState::AbstractContextState(const DescriptorHandleType& descriptorHandle,
+                                             const HandleType& handle)
+    : AbstractMultiState(descriptorHandle, handle)
+  {
+  }
+
+  // LocationDetailType
+  //
+  const LocationDetailType::PoCOptional& LocationDetailType::PoC() const
+  {
+    return PoC_;
+  }
+  LocationDetailType::PoCOptional& LocationDetailType::PoC()
+  {
+    return PoC_;
+  }
+  const LocationDetailType::RoomOptional& LocationDetailType::Room() const
+  {
+    return Room_;
+  }
+  LocationDetailType::RoomOptional& LocationDetailType::Room()
+  {
+    return Room_;
+  }
+  const LocationDetailType::BedOptional& LocationDetailType::Bed() const
+  {
+    return Bed_;
+  }
+  LocationDetailType::BedOptional& LocationDetailType::Bed()
+  {
+    return Bed_;
+  }
+  const LocationDetailType::FacilityOptional& LocationDetailType::Facility() const
+  {
+    return Facility_;
+  }
+  LocationDetailType::FacilityOptional& LocationDetailType::Facility()
+  {
+    return Facility_;
+  }
+  const LocationDetailType::BuildingOptional& LocationDetailType::Building() const
+  {
+    return Building_;
+  }
+  LocationDetailType::BuildingOptional& LocationDetailType::Building()
+  {
+    return Building_;
+  }
+  const LocationDetailType::FloorOptional& LocationDetailType::Floor() const
+  {
+    return Floor_;
+  }
+  LocationDetailType::FloorOptional& LocationDetailType::Floor()
+  {
+    return Floor_;
+  }
+
+  // LocationContextState
+  //
+  const LocationContextState::LocationDetailOptional& LocationContextState::LocationDetail() const
+  {
+    return LocationDetail_;
+  }
+  LocationContextState::LocationDetailOptional& LocationContextState::LocationDetail()
+  {
+    return LocationDetail_;
+  }
+  LocationContextState::LocationContextState(const DescriptorHandleType& descriptorHandle,
+                                             const HandleType& handle)
+    : AbstractContextState(descriptorHandle, handle)
+  {
+  }
+  StateType LocationContextState::getStateType() const
+  {
+    return StateType::LOCATION_CONTEXT;
+  }
+  // AbstractOperationState
+  //
+  AbstractOperationState::AbstractOperationState(const DescriptorHandleType& descriptorHandle,
+                                                 const OperatingModeType& operatingMode)
+    : AbstractState(descriptorHandle)
+    , OperatingMode_(operatingMode)
+  {
+  }
+  const AbstractOperationState::OperatingModeType& AbstractOperationState::OperatingMode() const
+  {
+    return OperatingMode_;
+  }
+  AbstractOperationState::OperatingModeType& AbstractOperationState::OperatingMode()
+  {
+    return OperatingMode_;
   }
 
   // AbstractMetricState
@@ -418,7 +639,7 @@ namespace BICEPS::PM
   }
   StateType NumericMetricState::getStateType() const
   {
-    return StateType::NUMERIC_METRIC_STATE;
+    return StateType::NUMERIC_METRIC;
   }
   const NumericMetricState::MetricValueOptional& NumericMetricState::MetricValue() const
   {

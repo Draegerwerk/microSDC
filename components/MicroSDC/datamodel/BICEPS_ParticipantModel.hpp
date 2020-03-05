@@ -34,7 +34,18 @@ namespace BICEPS::PM
   };
   enum class StateType
   {
-    NUMERIC_METRIC_STATE,
+    NUMERIC_METRIC,
+    LOCATION_CONTEXT,
+  };
+  enum class OperationType
+  {
+    SET_VALUE,
+    SET_STRING,
+    ACTIVATE,
+    SET_ALERT_STATE,
+    SET_COMPONENT_STATE,
+    SET_CONTEXT_STATE,
+    SET_METRIC_STATE
   };
   enum class MeasurementValidity
   {
@@ -47,6 +58,13 @@ namespace BICEPS::PM
     Oflw,
     Uflw,
     NA
+  };
+  enum class ContextAssociation
+  {
+    No,
+    Pre,
+    Assoc,
+    Dis
   };
   enum class GenerationMode
   {
@@ -62,6 +80,12 @@ namespace BICEPS::PM
     Off,
     Shtdn,
     Fail
+  };
+  enum class OperatingMode
+  {
+    Dis,
+    En,
+    NA
   };
 
   class CodedValue
@@ -117,9 +141,32 @@ namespace BICEPS::PM
     DescriptorVersionOptional DescriptorVersion_;
     SafetyClassificationOptional SafetyClassification_;
   };
+
+  class AbstractOperationDescriptor : public AbstractDescriptor
+  {
+  public:
+    using OperationTargetType = std::string;
+    const OperationTargetType& OperationTarget() const;
+    OperationTargetType& OperationTarget();
+
+    virtual OperationType getOperationType() const = 0;
+
+  protected:
+    OperationTargetType OperationTarget_;
+    AbstractOperationDescriptor(const HandleType& handle,
+                                const OperationTargetType& operationTarget);
+  };
+
+  class SetValueOperationDescriptor : public AbstractOperationDescriptor
+  {
+  public:
+    SetValueOperationDescriptor(const HandleType& handle,
+                                const OperationTargetType& operationTarget);
+    OperationType getOperationType() const override;
+  };
   class AbstractDeviceComponentDescriptor : public AbstractDescriptor
   {
-  protected:
+  public:
     AbstractDeviceComponentDescriptor(const HandleType&);
   };
   class AbstractComplexDeviceComponentDescriptor : public AbstractDeviceComponentDescriptor
@@ -329,6 +376,19 @@ namespace BICEPS::PM
   protected:
     MetricSequence Metric_;
   };
+  class ScoDescriptor : public AbstractDeviceComponentDescriptor
+  {
+  public:
+    using OperationType = ::BICEPS::PM::AbstractOperationDescriptor;
+    using OperationSequence = std::vector<std::shared_ptr<OperationType>>;
+    const OperationSequence& Operation() const;
+    OperationSequence& Operation();
+
+    using AbstractDeviceComponentDescriptor::AbstractDeviceComponentDescriptor;
+
+  protected:
+    OperationSequence Operation_;
+  };
   class VmdDescriptor : public AbstractComplexDeviceComponentDescriptor
   {
   public:
@@ -339,10 +399,18 @@ namespace BICEPS::PM
     const ChannelSequence& Channel() const;
     ChannelSequence& Channel();
 
+    // Sco
+    //
+    using ScoType = ::BICEPS::PM::ScoDescriptor;
+    using ScoOptional = std::optional<ScoType>;
+    const ScoOptional& Sco() const;
+    ScoOptional& Sco();
+
     VmdDescriptor(const HandleType&);
 
   protected:
     ChannelSequence Channel_;
+    ScoOptional Sco_;
   };
   class MdsDescriptor : public AbstractComplexDeviceComponentDescriptor
   {
@@ -445,6 +513,142 @@ namespace BICEPS::PM
     StateVersionOptional StateVersion_;
     DescriptorHandleType DescriptorHandle_;
   };
+  class AbstractMultiState : public AbstractState
+  {
+  public:
+    using CategoryType = CodedValue;
+    using CategoryOptional = std::optional<CategoryType>;
+
+    using HandleType = std::string;
+    const HandleType& Handle() const;
+    HandleType& Handle();
+
+    AbstractMultiState(const DescriptorHandleType&, const HandleType&);
+
+  protected:
+    CategoryOptional Category_;
+    HandleType Handle_;
+  };
+  class InstanceIdentifier
+  {
+  public:
+    using ExtensionType = std::string;
+    using ExtensionOptional = std::optional<ExtensionType>;
+    const ExtensionOptional& Extension() const;
+    ExtensionOptional& Extension();
+
+    using RootType = WS::ADDRESSING::URIType;
+    using RootOptional = std::optional<RootType>;
+    const RootOptional& Root() const;
+    RootOptional& Root();
+
+  protected:
+    ExtensionOptional Extension_;
+    RootOptional Root_;
+  };
+  class AbstractContextState : public AbstractMultiState
+  {
+  public:
+    using BindingMdibVersionType = unsigned int;
+    using BindingMdibVersionOptional = std::optional<BindingMdibVersionType>;
+    const BindingMdibVersionOptional& BindingMdibVersion() const;
+    BindingMdibVersionOptional& BindingMdibVersion();
+
+    using ContextAssociationType = ::BICEPS::PM::ContextAssociation;
+    using ContextAssociationOptional = std::optional<ContextAssociationType>;
+    const ContextAssociationOptional& ContextAssociation() const;
+    ContextAssociationOptional& ContextAssociation();
+
+    using ValidatorType = InstanceIdentifier;
+    using ValidatorSequence = std::vector<ValidatorType>;
+    const ValidatorSequence& Validator() const;
+    ValidatorSequence& Validator();
+
+    using IdentificationType = InstanceIdentifier;
+    using IdentificationSequence = std::vector<IdentificationType>;
+    const IdentificationSequence& Identification() const;
+    IdentificationSequence& Identification();
+
+    AbstractContextState(const DescriptorHandleType&, const HandleType&);
+
+  protected:
+    BindingMdibVersionOptional BindingMdibVersion_;
+    ContextAssociationOptional ContextAssociation_;
+    ValidatorSequence Validator_;
+    IdentificationSequence Identification_;
+  };
+  class LocationDetailType
+  {
+  public:
+    using PoCType = std::string;
+    using PoCOptional = std::optional<PoCType>;
+    const PoCOptional& PoC() const;
+    PoCOptional& PoC();
+
+    using RoomType = std::string;
+    using RoomOptional = std::optional<RoomType>;
+    const RoomOptional& Room() const;
+    RoomOptional& Room();
+
+    using BedType = std::string;
+    using BedOptional = std::optional<PoCType>;
+    const BedOptional& Bed() const;
+    BedOptional& Bed();
+
+    using FacilityType = std::string;
+    using FacilityOptional = std::optional<FacilityType>;
+    const FacilityOptional& Facility() const;
+    FacilityOptional& Facility();
+
+    using BuildingType = std::string;
+    using BuildingOptional = std::optional<PoCType>;
+    const BuildingOptional& Building() const;
+    BuildingOptional& Building();
+
+    using FloorType = std::string;
+    using FloorOptional = std::optional<PoCType>;
+    const FloorOptional& Floor() const;
+    FloorOptional& Floor();
+
+  protected:
+    PoCOptional PoC_;
+    RoomOptional Room_;
+    BedOptional Bed_;
+    FacilityOptional Facility_;
+    BuildingOptional Building_;
+    FloorOptional Floor_;
+  };
+  class LocationContextState : public AbstractContextState
+  {
+  public:
+    using LocationDetailOptional = std::optional<LocationDetailType>;
+    const LocationDetailOptional& LocationDetail() const;
+    LocationDetailOptional& LocationDetail();
+
+    LocationContextState(const DescriptorHandleType&, const HandleType&);
+
+    StateType getStateType() const override;
+
+  protected:
+    LocationDetailOptional LocationDetail_;
+  };
+  class AbstractOperationState : public AbstractState
+  {
+  public:
+    using OperatingModeType = ::BICEPS::PM::OperatingMode;
+    const OperatingModeType& OperatingMode() const;
+    OperatingModeType& OperatingMode();
+
+  protected:
+    OperatingModeType OperatingMode_;
+
+    AbstractOperationState(const DescriptorHandleType& descriptorHandle,
+                           const OperatingModeType& operatingMode);
+  };
+  class SetValueOperationState : public AbstractOperationState
+  {
+    using AbstractOperationState::AbstractOperationState;
+  };
   class MetricQuality
   {
   public:
@@ -505,7 +709,7 @@ namespace BICEPS::PM
   class NumericMetricValue : public AbstractMetricValue
   {
   public:
-    using ValueType = int;
+    using ValueType = double;
     using ValueOptional = std::optional<ValueType>;
     const ValueOptional& Value() const;
     ValueOptional& Value();

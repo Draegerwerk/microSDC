@@ -16,9 +16,44 @@ namespace SDC
       "http://standards.ieee.org/downloads/11073/11073-10207-2017/extension";
 
   SDCConstant QNAME_GETSERVICE = "GetService";
+  SDCConstant QNAME_SETSERVICE = "SetService";
+  SDCConstant QNAME_STATEEVENTSERVICE = "StateEventService";
   SDCConstant ACTION_GET_MDIB_REQUEST =
       "http://standards.ieee.org/downloads/11073/11073-20701-2018/GetService/GetMdib";
   SDCConstant ACTION_GET_MDIB_RESPONSE =
       "http://standards.ieee.org/downloads/11073/11073-20701-2018/GetService/GetMdibResponse";
+
+  SDCConstant ACTION_OPERATION_INVOKED_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/SetService/"
+      "OperationInvokedReport";
+
+  SDCConstant ACTION_SET_VALUE =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/SetService/SetValue";
+  SDCConstant ACTION_SET_VALUE_RESPONSE =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/SetService/SetValueResponse";
+  SDCConstant ACTION_EPISODIC_ALERT_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "EpisodicAlertReport";
+  SDCConstant ACTION_PERIODIC_ALERT_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "PeriodicAlertReport";
+  SDCConstant ACTION_EPISODIC_COMPONENT_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "EpisodicComponentReport";
+  SDCConstant ACTION_PERIODIC_COMPONENT_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "PeriodicComponentReport";
+  SDCConstant ACTION_EPISODIC_METRIC_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "EpisodicMetricReport";
+  SDCConstant ACTION_PERIODIC_METRIC_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "PeriodicMetricReport";
+  SDCConstant ACTION_EPISODIC_OPERATIONAL_STATE_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "EpisodicOperationalStateReport";
+  SDCConstant ACTION_PERIODIC_OPERATIONAL_STATE_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
+      "PeriodicOperationalStateReport";
 
 } // namespace SDC

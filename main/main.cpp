@@ -9,7 +9,7 @@
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include <chrono>
-#include <iostream>
+#include <pthread.h>
 #include <sstream>
 #include <thread>
 
@@ -96,36 +96,6 @@ static void ethEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t 
   }
 }
 
-class NumericStateHandler : public MdStateHandler<BICEPS::PM::NumericMetricState>
-{
-public:
-  explicit NumericStateHandler(const std::string& descriptorHandle)
-    : MdStateHandler(descriptorHandle)
-  {
-  }
-
-  BICEPS::PM::MetricType getMetricType() const override
-  {
-    return BICEPS::PM::MetricType::NUMERIC;
-  }
-
-  std::shared_ptr<BICEPS::PM::NumericMetricState> getInitialState() const override
-  {
-    auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
-    BICEPS::PM::NumericMetricValue value;
-    value.Value() = 0;
-    state->MetricValue() = value;
-    return state;
-  }
-
-  void setValue(int value)
-  {
-    auto state = getInitialState();
-    state->MetricValue()->Value() = value;
-    updateState(state);
-  }
-};
-
 // force c linkage for app_main()
 extern "C" void app_main()
 {
@@ -151,12 +121,13 @@ extern "C" void app_main()
   metadata.Manufacturer().emplace_back("Draeger");
   metadata.ModelName().emplace_back("MicroSDC_Device01");
   metadata.ModelNumber().emplace("1");
-  metadata.SerialNumber().emplace_back("1234-5678");
+  metadata.SerialNumber().emplace_back("2345-6789");
 
   BICEPS::PM::SystemContextDescriptor systemContext("system_context");
   systemContext.PatientContext() = BICEPS::PM::PatientContextDescriptor("patient_context");
   systemContext.LocationContext() = BICEPS::PM::LocationContextDescriptor("location_context");
 
+  // States for measured values
   auto pressureState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "pressureState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
@@ -172,14 +143,27 @@ extern "C" void app_main()
       BICEPS::PM::MetricAvailability::Cont, 1);
   humidityState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
 
+  // Dummy settable state
+  auto settableState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "settableState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
+      BICEPS::PM::MetricAvailability::Cont, 1);
+  settableState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
+
   BICEPS::PM::ChannelDescriptor deviceChannel("device_channel");
   deviceChannel.Metric().emplace_back(pressureState);
   deviceChannel.Metric().emplace_back(temperatureState);
   deviceChannel.Metric().emplace_back(humidityState);
+  deviceChannel.Metric().emplace_back(settableState);
+
+  BICEPS::PM::ScoDescriptor deviceSco("sco_handle");
+  auto setValueOperation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
+      "setValueOperation_handle", "settableState_handle");
+  deviceSco.Operation().emplace_back(setValueOperation);
 
   deviceChannel.SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
   BICEPS::PM::VmdDescriptor deviceModule("device_vmd");
   deviceModule.Channel().emplace_back(deviceChannel);
+  deviceModule.Sco() = deviceSco;
 
   BICEPS::PM::MdsDescriptor deviceDescriptor("MedicalDevices");
   deviceDescriptor.MetaData() = metadata;
@@ -190,12 +174,23 @@ extern "C" void app_main()
   mdDescription.Mds().emplace_back(deviceDescriptor);
   sdc->setMdDescription(mdDescription);
 
+  BICEPS::PM::LocationDetailType locationDetail;
+  locationDetail.PoC() = "PoC-A";
+  locationDetail.Room() = "Room-A";
+  locationDetail.Bed() = "Bed-A";
+  locationDetail.Facility() = "Facility-A";
+  locationDetail.Building() = "Building-A";
+  locationDetail.Floor() = "Floor-A";
+  sdc->setLocation("location_context", locationDetail);
+
   auto pressureStateHandler = std::make_shared<NumericStateHandler>("pressureState_handle");
   auto temperatureStateHandler = std::make_shared<NumericStateHandler>("temperatureState_handle");
   auto humidityStateHandler = std::make_shared<NumericStateHandler>("humidityState_handle");
+  auto settableStateHandler = std::make_shared<NumericStateHandler>("settableState_handle");
   sdc->addMdState(pressureStateHandler);
   sdc->addMdState(temperatureStateHandler);
   sdc->addMdState(humidityStateHandler);
+  sdc->addMdState(settableStateHandler);
 
   ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ipEventHandler, sdc));
   ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, sdc));
@@ -204,17 +199,24 @@ extern "C" void app_main()
   ESP_LOGI(TAG, "Connecting...");
   ESP_ERROR_CHECK(NetworkHandler::getInstance().connect());
 
-  BME280 bme280(i2c_port_t::I2C_NUM_0, 0x76u, static_cast<gpio_num_t>(13),
-                static_cast<gpio_num_t>(16));
-  while (true)
-  {
-    const auto sensorData = bme280.getSensorData();
-    ESP_LOGI(TAG, "pressure: %0.2f, temp: %0.2f, humidity: %0.2f", sensorData.pressure,
-             sensorData.temperature, sensorData.humidity);
-    pressureStateHandler->setValue(static_cast<int>(sensorData.pressure));
-    temperatureStateHandler->setValue(static_cast<int>(sensorData.temperature));
-    humidityStateHandler->setValue(static_cast<int>(sensorData.humidity));
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-  }
+  esp_pthread_cfg_t pthreadConf = esp_pthread_get_default_config();
+  pthreadConf.stack_size = 8192;
+  esp_pthread_set_cfg(&pthreadConf);
+
+  std::thread updateThread([=]() {
+    BME280 bme280(i2c_port_t::I2C_NUM_0, 0x76u, static_cast<gpio_num_t>(13),
+                  static_cast<gpio_num_t>(16));
+    while (true)
+    {
+      const auto sensorData = bme280.getSensorData();
+      ESP_LOGI(TAG, "pressure: %0.2f, temp: %0.2f, humidity: %0.2f", sensorData.pressure,
+               sensorData.temperature, sensorData.humidity);
+      pressureStateHandler->setValue(sensorData.pressure);
+      temperatureStateHandler->setValue(sensorData.temperature);
+      humidityStateHandler->setValue(sensorData.humidity);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
+    }
+  });
+  updateThread.join();
   vTaskDelete(nullptr);
 }

@@ -7,21 +7,26 @@ set(COMPONENT_SOURCES
         "datamodel/ws-addressing.cpp"
         "datamodel/ws-discovery.cpp"
         "datamodel/ws-dpws.cpp"
+        "datamodel/ws-eventing.cpp"
         "datamodel/ws-MetadataExchange.cpp"
+        "datamodel/xs_duration.cpp"
         "dpws/DPWSHost.cpp"
         "dpws/MessagingContext.cpp"
         "dpws/MetadataProvider.cpp"
+        "services/DeviceService.cpp"
+        "services/GetService.cpp"
+        "services/SetService.cpp"
+        "services/StateEventService.cpp"
+        "services/SoapService.cpp"
+        "services/StaticService.cpp"
         "DeviceCharacteristics.cpp"
-        "DeviceService.cpp"
-        "GetService.cpp"
         "MicroSDC.cpp"
-        "SoapService.cpp"
-        "StaticService.cpp"
         "StateHandler.cpp"
+        "SubscriptionManager.cpp"
     )
 
 idf_component_register(
     SRCS ${COMPONENT_SOURCES}
     INCLUDE_DIRS "."
-    REQUIRES "WebServer" "UUID" "Networking" "rapidxml" "asio" "pthread"
+    REQUIRES "WebServer" "UUID" "Networking" "rapidxml" "asio" "pthread" "esp_http_client"
     )

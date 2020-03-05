@@ -58,8 +58,24 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Range& range);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& mdState);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractState& state);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::LocationDetailType& locationDetail);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractMetricValue& metricValue);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MetricQuality& quality);
+
+  void serialize(rapidxml::xml_node<>* parent,
+                 const WS::EVENTING::SubscribeResponse& subscribeResponse);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const WS::ADDRESSING::ReferenceParametersType& referenceParameters);
+  void serialize(rapidxml::xml_node<>* parent, const WS::EVENTING::RenewResponse& renewResponse);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::MM::SetValueResponse& setValueResponse);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::InvocationInfo& invocationInfo);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::EpisodicMetricReport& report);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::MetricReportPart&);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ScoDescriptor& sco);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractOperationDescriptor& operation);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::InstanceIdentifier& identifier);
 
   static std::string toString(BICEPS::PM::SafetyClassification);
   static std::string toString(const WS::DISCOVERY::UriListType& uriList);
@@ -67,6 +83,9 @@ public:
   static std::string toString(BICEPS::PM::MetricCategory);
   static std::string toString(BICEPS::PM::MetricAvailability);
   static std::string toString(BICEPS::PM::MeasurementValidity);
+  static std::string toString(BICEPS::MM::InvocationState invocationState);
+  static std::string toString(BICEPS::MM::InvocationError invocationError);
+  static std::string toString(BICEPS::PM::ContextAssociation contextAssociation);
 
 private:
   std::unique_ptr<rapidxml::xml_document<>> xmlDocument_;

@@ -22,11 +22,11 @@ public:
    */
   const std::string& getDescriptorHandle() const;
   /**
-   * @brief returns the metric type of this state. This is used to fake RTTI for dynamic
+   * @brief returns the state type of this state. This is used to fake RTTI for dynamic
    * subclassing.
-   * @return The metric type of this state
+   * @return The state type of this state
    */
-  virtual BICEPS::PM::MetricType getMetricType() const = 0;
+  virtual BICEPS::PM::StateType getStateType() const = 0;
   /**
    * @brief sets the MicroSDC instantation, which handles this state
    * @param microSDC the pointer MicroSDC object
@@ -76,4 +76,34 @@ public:
    * @return pointer to the MdState constructed
    */
   virtual std::shared_ptr<MdState> getInitialState() const = 0;
+};
+
+class NumericStateHandler : public MdStateHandler<BICEPS::PM::NumericMetricState>
+{
+public:
+  explicit NumericStateHandler(const std::string& descriptorHandle)
+    : MdStateHandler(descriptorHandle)
+  {
+  }
+
+  BICEPS::PM::StateType getStateType() const override
+  {
+    return BICEPS::PM::StateType::NUMERIC_METRIC;
+  }
+
+  std::shared_ptr<BICEPS::PM::NumericMetricState> getInitialState() const override
+  {
+    auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
+    BICEPS::PM::NumericMetricValue value;
+    value.Value() = 0;
+    state->MetricValue() = value;
+    return state;
+  }
+
+  void setValue(double value)
+  {
+    auto state = getInitialState();
+    state->MetricValue()->Value() = value;
+    updateState(state);
+  }
 };

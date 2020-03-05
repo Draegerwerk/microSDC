@@ -1,6 +1,7 @@
 #pragma once
 
 #include "DeviceCharacteristics.hpp"
+#include "SubscriptionManager.hpp"
 #include "WebServer.hpp"
 #include "datamodel/BICEPS_ParticipantModel.hpp"
 #include "dpws/DPWSHost.hpp"
@@ -80,13 +81,19 @@ public:
    * @brief updates a given state in the mdib representation
    * @param state the state to update
    */
-  void updateState(std::shared_ptr<BICEPS::PM::NumericMetricState> state);
+  void updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state);
+
+  void setLocation(const std::string& descriptorHandle,
+                   const BICEPS::PM::LocationDetailType& locationDetail);
 
 private:
+  std::shared_ptr<BICEPS::PM::LocationContextState> locationContextState_{nullptr};
   /// the SDC thread
   std::thread sdcThread_;
   /// pointer to the DPWS service
   std::unique_ptr<DPWSHost> dpws_{nullptr};
+  /// pointer to the subscription manager
+  std::shared_ptr<SubscriptionManager> subscriptionManager_{nullptr};
   /// pointer to the WebServer
   std::unique_ptr<WebServer> webserver_{nullptr};
   /// pointer to the mdib representation
@@ -94,7 +101,7 @@ private:
   /// mutex protecting changes in the mdib
   mutable std::mutex mdibMutex_;
   /// all states
-  std::map<std::string, std::shared_ptr<StateHandler>> stateHandlers_;
+  std::vector<std::shared_ptr<StateHandler>> stateHandlers_;
   /// whether the communication uses TLS
   bool useTLS_{true};
   /// whether SDC is started and connected
@@ -121,13 +128,19 @@ private:
    * @param state the new state to update in the mdib
    */
   template <class T>
-  void updateMdib(std::shared_ptr<T> state);
+  std::shared_ptr<const T> updateMdib(std::shared_ptr<T> state);
   /**
    * @brief update the version attribute of the mdib. Will be called everytime the mdib changes
    */
   void incrementMdibVersion();
   /**
+   * @brief returns the current mdib Version
+   * @return the mdib version
+   */
+  unsigned int getMdibVersion() const;
+  /**
    * @brief initializes all registered states by calling there initial state function
    */
   void initializeMdStates();
+  void notifyEpisodicMetricReport(std::shared_ptr<const BICEPS::PM::NumericMetricState> state);
 };

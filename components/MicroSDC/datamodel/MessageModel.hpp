@@ -148,6 +148,62 @@ namespace MESSAGEMODEL
     const GetMdibResponseOptional& GetMdibResponse() const;
     GetMdibResponseOptional& GetMdibResponse();
 
+    // Subscribe
+    //
+    using SubscribeType = WS::EVENTING::Subscribe;
+    using SubscribeOptional = std::optional<SubscribeType>;
+    const SubscribeOptional& Subscribe() const;
+    SubscribeOptional& Subscribe();
+
+    // SubscribeResponse
+    //
+    using SubscribeResponseType = WS::EVENTING::SubscribeResponse;
+    using SubscribeResponseOptional = std::optional<SubscribeResponseType>;
+    const SubscribeResponseOptional& SubscribeResponse() const;
+    SubscribeResponseOptional& SubscribeResponse();
+
+    // Renew
+    //
+    using RenewType = WS::EVENTING::Renew;
+    using RenewOptional = std::optional<RenewType>;
+    const RenewOptional& Renew() const;
+    RenewOptional& Renew();
+
+    // RenewResponse
+    //
+    using RenewResponseType = WS::EVENTING::RenewResponse;
+    using RenewResponseOptional = std::optional<RenewResponseType>;
+    const RenewResponseOptional& RenewResponse() const;
+    RenewResponseOptional& RenewResponse();
+
+    // Unsubscribe
+    //
+    using UnsubscribeType = WS::EVENTING::Unsubscribe;
+    using UnsubscribeOptional = std::optional<UnsubscribeType>;
+    const UnsubscribeOptional& Unsubscribe() const;
+    UnsubscribeOptional& Unsubscribe();
+
+    // SetValue
+    //
+    using SetValueType = BICEPS::MM::SetValue;
+    using SetValueOptional = std::optional<SetValueType>;
+    const SetValueOptional& SetValue() const;
+    SetValueOptional& SetValue();
+
+    // SetValueResponse
+    //
+    using SetValueResponseType = BICEPS::MM::SetValueResponse;
+    using SetValueResponseOptional = std::optional<SetValueResponseType>;
+    const SetValueResponseOptional& SetValueResponse() const;
+    SetValueResponseOptional& SetValueResponse();
+
+    // EpisodicMetricReport
+    //
+    using EpisodicMetricReportType = BICEPS::MM::EpisodicMetricReport;
+    using EpisodicMetricReportOptional = std::optional<EpisodicMetricReportType>;
+    const EpisodicMetricReportOptional& EpisodicMetricReport() const;
+    EpisodicMetricReportOptional& EpisodicMetricReport();
+
   protected:
     ByeOptional Bye_;
     HelloOptional Hello_;
@@ -159,6 +215,14 @@ namespace MESSAGEMODEL
     MetadataOptional Metadata_;
     GetMdibOptional GetMdib_;
     GetMdibResponseOptional GetMdibResponse_;
+    SubscribeOptional Subscribe_;
+    SubscribeResponseOptional SubscribeResponse_;
+    RenewOptional Renew_;
+    RenewResponseOptional RenewResponse_;
+    UnsubscribeOptional Unsubscribe_;
+    SetValueOptional SetValue_;
+    SetValueResponseOptional SetValueResponse_;
+    EpisodicMetricReportOptional EpisodicMetricReport_;
 
     void parse(const rapidxml::xml_node<>& node);
   };

@@ -35,6 +35,8 @@ public:
    */
   bool running() const;
 
+  void setLocation(const BICEPS::PM::LocationDetailType& locationDetail);
+
 private:
   /// whether this dpws host runs
   std::atomic_bool running_{false};

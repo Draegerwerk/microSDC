@@ -1,6 +1,8 @@
 #include "MessageModel.hpp"
 #include "ExpectedElement.hpp"
 #include "MDPWSConstants.hpp"
+#include "SDCConstants.hpp"
+#include "ws-eventing.hpp"
 #include <cstring>
 #include <memory>
 #include <optional>
@@ -159,9 +161,9 @@ namespace MESSAGEMODEL
         To_ = std::make_optional<ToType>(*entry);
       }
       else if (strncmp(entry->name(), "Identifier", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        // Identifier
+        Identifier_ = std::make_optional<IdentifierType>(*entry);
       }
     }
   }
@@ -280,6 +282,78 @@ namespace MESSAGEMODEL
     return GetMdibResponse_;
   }
 
+  const Body::SubscribeOptional& Body::Subscribe() const
+  {
+    return Subscribe_;
+  }
+  Body::SubscribeOptional& Body::Subscribe()
+  {
+    return Subscribe_;
+  }
+
+  const Body::SubscribeResponseOptional& Body::SubscribeResponse() const
+  {
+    return SubscribeResponse_;
+  }
+  Body::SubscribeResponseOptional& Body::SubscribeResponse()
+  {
+    return SubscribeResponse_;
+  }
+
+  const Body::RenewOptional& Body::Renew() const
+  {
+    return Renew_;
+  }
+  Body::RenewOptional& Body::Renew()
+  {
+    return Renew_;
+  }
+
+  const Body::RenewResponseOptional& Body::RenewResponse() const
+  {
+    return RenewResponse_;
+  }
+  Body::RenewResponseOptional& Body::RenewResponse()
+  {
+    return RenewResponse_;
+  }
+
+  const Body::UnsubscribeOptional& Body::Unsubscribe() const
+  {
+    return Unsubscribe_;
+  }
+  Body::UnsubscribeOptional& Body::Unsubscribe()
+  {
+    return Unsubscribe_;
+  }
+
+  const Body::SetValueOptional& Body::SetValue() const
+  {
+    return SetValue_;
+  }
+  Body::SetValueOptional& Body::SetValue()
+  {
+    return SetValue_;
+  }
+
+  const Body::SetValueResponseOptional& Body::SetValueResponse() const
+  {
+    return SetValueResponse_;
+  }
+  Body::SetValueResponseOptional& Body::SetValueResponse()
+  {
+    return SetValueResponse_;
+  }
+
+  const Body::EpisodicMetricReportOptional& Body::EpisodicMetricReport() const
+  {
+    return EpisodicMetricReport_;
+  }
+  Body::EpisodicMetricReportOptional& Body::EpisodicMetricReport()
+  {
+    return EpisodicMetricReport_;
+  }
+
   void Body::parse(const rapidxml::xml_node<>& node)
   {
     rapidxml::xml_node<>* bodyContent = node.first_node();
@@ -289,14 +363,12 @@ namespace MESSAGEMODEL
       return;
     }
     if (strncmp(bodyContent->name(), "Probe", bodyContent->name_size()) == 0 &&
-        strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY, bodyContent->xmlns_size()) ==
-            0)
+        strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY, bodyContent->xmlns_size()) == 0)
     {
       Probe_ = std::make_optional<ProbeType>(*bodyContent);
     }
     else if (strncmp(bodyContent->name(), "Resolve", bodyContent->name_size()) == 0 &&
-             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY,
-                     bodyContent->xmlns_size()) == 0)
+             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY, bodyContent->xmlns_size()) == 0)
     {
       Resolve_ = std::make_optional<ResolveType>(*bodyContent);
     }
@@ -305,6 +377,27 @@ namespace MESSAGEMODEL
                      bodyContent->xmlns_size()) == 0)
     {
       GetMetadata_ = std::make_optional<GetMetadataType>(*bodyContent);
+    }
+    else if (strncmp(bodyContent->name(), "Subscribe", bodyContent->name_size()) == 0 &&
+             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
+    {
+      Subscribe_ = std::make_optional<SubscribeType>(*bodyContent);
+    }
+    else if (strncmp(bodyContent->name(), "Renew", bodyContent->name_size()) == 0 &&
+             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
+    {
+      Renew_ = std::make_optional<RenewType>(*bodyContent);
+    }
+    else if (strncmp(bodyContent->name(), "Unsubscribe", bodyContent->name_size()) == 0 &&
+             strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
+    {
+      Unsubscribe_ = std::make_optional<UnsubscribeType>(*bodyContent);
+    }
+    else if (strncmp(bodyContent->name(), "SetValue", bodyContent->name_size()) == 0 &&
+             strncmp(bodyContent->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL,
+                     bodyContent->xmlns_size()) == 0)
+    {
+      SetValue_ = std::make_optional<SetValueType>(*bodyContent);
     }
   }
 

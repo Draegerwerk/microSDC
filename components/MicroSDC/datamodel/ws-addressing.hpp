@@ -1,14 +1,33 @@
 #pragma once
 
-#include "ws-eventing.hpp"
 #include <memory>
 #include <optional>
 #include <rapidxml.hpp>
+
+namespace WS::EVENTING
+{
+  class Identifier : public std::string
+  {
+  public:
+    using IsReferenceParameterType = bool;
+    using IsReferenceParameterOptional = std::optional<IsReferenceParameterType>;
+
+    Identifier(const rapidxml::xml_node<>& node);
+    Identifier(std::string identifier);
+
+  protected:
+    IsReferenceParameterOptional IsReferenceParameter_;
+
+  private:
+    void parse(const rapidxml::xml_node<>& node);
+  };
+} // namespace WS::EVENTING
 
 namespace WS::ADDRESSING
 {
   class URIType
   {
+    // TODO inherit from string not containing it
   public:
     explicit URIType(const rapidxml::xml_node<>& node);
     URIType(std::string);
@@ -49,6 +68,8 @@ namespace WS::ADDRESSING
     const IdentifierOptional& Identifier() const;
     IdentifierOptional& Identifier();
 
+    ReferenceParametersType(const IdentifierType& identifier);
+
   protected:
     IdentifierOptional Identifier_;
   };
@@ -58,13 +79,20 @@ namespace WS::ADDRESSING
   public:
     using AddressType = ::WS::ADDRESSING::URIType;
     const AddressType& Address() const;
+    AddressType& Address();
 
-    EndpointReferenceType(const EndpointReferenceType& epr);
+    using ReferenceParametersType = WS::ADDRESSING::ReferenceParametersType;
+    using ReferenceParametersOptional = std::optional<ReferenceParametersType>;
+    const ReferenceParametersOptional& ReferenceParameters() const;
+    ReferenceParametersOptional& ReferenceParameters();
+
+    // TODO: This has to be explicit
     EndpointReferenceType(const AddressType& address);
-    EndpointReferenceType(const rapidxml::xml_node<>& node);
+    explicit EndpointReferenceType(const rapidxml::xml_node<>& node);
 
   protected:
     AddressType Address_;
+    ReferenceParametersOptional ReferenceParameters_;
 
     void parse(const rapidxml::xml_node<>& node);
   };
