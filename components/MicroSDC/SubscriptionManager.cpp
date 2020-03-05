@@ -39,7 +39,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
     std::lock_guard<std::mutex> lock(subscriptionMutex_);
     subscriptions_.emplace(identifier, info);
   }
-  createClient(info.notifyTo.Address().uri());
+  createClient(info.notifyTo.Address());
 
   WS::EVENTING::SubscribeResponse::SubscriptionManagerType subscriptionManager(
       WS::ADDRESSING::EndpointReferenceType(
@@ -82,10 +82,10 @@ void SubscriptionManager::dispatch(const WS::EVENTING::Unsubscribe& /*unsubscrib
     throw std::runtime_error("Could not find subscription corresponding to Renew Identifier " +
                              identifier);
   }
-  const auto& notifyTo = subscriptionInfo->second.notifyTo.Address().uri();
+  const auto& notifyTo = subscriptionInfo->second.notifyTo.Address();
   const auto numSameClient =
       std::count_if(subscriptions_.begin(), subscriptions_.end(),
-                    [&](const auto& it) { return it.second.notifyTo.Address().uri() == notifyTo; });
+                    [&](const auto& it) { return it.second.notifyTo.Address() == notifyTo; });
 
   if (numSameClient == 1)
   {
@@ -138,11 +138,11 @@ void SubscriptionManager::fireEvent(const BICEPS::MM::EpisodicMetricReport& repo
   ESP_LOGD(TAG, "SENDING: %s", messageStr.c_str());
   for (const auto info : subscriber)
   {
-    auto clientIt = clients_.find(info->notifyTo.Address().uri());
+    auto clientIt = clients_.find(info->notifyTo.Address());
     if (clientIt == clients_.end())
     {
       ESP_LOGE(TAG, "Cannot find client session with address %s!",
-               info->notifyTo.Address().uri().c_str());
+               info->notifyTo.Address().c_str());
       continue;
     }
     ESP_LOGI(TAG, "Sending to %s", clientIt->first.c_str());
@@ -207,7 +207,7 @@ void SubscriptionManager::printSubscriptions() const
   out << "Subscriptions:\n";
   for (const auto& [key, val] : subscriptions_)
   {
-    out << key << " : " << val.notifyTo.Address().uri() << " : "
+    out << key << " : " << val.notifyTo.Address() << " : "
         << std::chrono::duration_cast<std::chrono::seconds>(val.expirationTime -
                                                             std::chrono::system_clock::now())
                .count()

@@ -155,7 +155,7 @@ void DPWSHost::handleUDPMessage(std::size_t bytesRecvd)
   {
     ESP_LOGD(TAG, "Received WS-Discovery Resolve message from %s asking for EndpointReference %s",
              addressString.data(),
-             envelope->Body().Resolve()->EndpointReference().Address().uri().c_str());
+             envelope->Body().Resolve()->EndpointReference().Address().c_str());
     handleResolve(*envelope);
   }
   else if (envelope->Body().ResolveMatches().has_value())
@@ -239,7 +239,7 @@ void DPWSHost::handleProbe(const MESSAGEMODEL::Envelope& envelope)
 
 void DPWSHost::handleResolve(const MESSAGEMODEL::Envelope& envelope)
 {
-  if (envelope.Body().Resolve()->EndpointReference().Address().uri() != endpointReference_.uri())
+  if (envelope.Body().Resolve()->EndpointReference().Address() != endpointReference_)
   {
     return;
   }
@@ -293,7 +293,8 @@ void DPWSHost::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
   }
   if (request.Header().MessageID().has_value())
   {
-    envelope.Header().RelatesTo() = request.Header().MessageID().value();
+    envelope.Header().RelatesTo() =
+        WS::ADDRESSING::RelatesToType(request.Header().MessageID().value());
   }
   envelope.Header().MessageID() = MicroSDC::calculateMessageID();
 }
@@ -328,7 +329,8 @@ void DPWSHost::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope,
   }
   if (request.Header().MessageID().has_value())
   {
-    envelope.Header().RelatesTo() = request.Header().MessageID().value();
+    envelope.Header().RelatesTo() =
+        WS::ADDRESSING::RelatesToType(request.Header().MessageID().value());
   }
   envelope.Header().MessageID() = MicroSDC::calculateMessageID();
 }

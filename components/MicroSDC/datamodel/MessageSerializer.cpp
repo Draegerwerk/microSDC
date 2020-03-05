@@ -71,19 +71,19 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   auto headerNode = xmlDocument_->allocate_node(rapidxml::node_element, "soap:Header");
   // Mandatory action element
   auto actionNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Action");
-  actionNode->value(header.Action().uri().c_str());
+  actionNode->value(header.Action().c_str());
   headerNode->append_node(actionNode);
   // optionals
   if (header.MessageID().has_value())
   {
     auto messageIdNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:MessageID");
-    messageIdNode->value(header.MessageID()->uri().c_str());
+    messageIdNode->value(header.MessageID()->c_str());
     headerNode->append_node(messageIdNode);
   }
   if (header.To().has_value())
   {
     auto toNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:To");
-    toNode->value(header.To()->uri().c_str());
+    toNode->value(header.To()->c_str());
     headerNode->append_node(toNode);
   }
   if (header.AppSequence().has_value())
@@ -143,7 +143,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::ADDRESSING::RelatesToType& relatesTo)
 {
   auto relatesToNode = xmlDocument_->allocate_node(rapidxml::node_element, "mdpws:RelatesTo");
-  relatesToNode->value(relatesTo.uri().c_str());
+  relatesToNode->value(relatesTo.c_str());
   parent->append_node(relatesToNode);
 }
 
@@ -152,7 +152,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto eprNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:EndpointReference");
   auto addressNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Address");
-  addressNode->value(endpointReference.Address().uri().c_str());
+  addressNode->value(endpointReference.Address().c_str());
   eprNode->append_node(addressNode);
   parent->append_node(eprNode);
 }
@@ -167,7 +167,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   appSequenceNode->append_attribute(instanceIdAttr);
   if (appSequence.SequenceId().has_value())
   {
-    auto sequenceId = xmlDocument_->allocate_string(appSequence.SequenceId()->uri().c_str());
+    auto sequenceId = xmlDocument_->allocate_string(appSequence.SequenceId()->c_str());
     auto sequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", sequenceId);
     appSequenceNode->append_attribute(sequenceIdAttr);
   }
@@ -184,7 +184,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto scopesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Scopes");
   if (scopes.MatchBy().has_value())
   {
-    auto matchByAttr = xmlDocument_->allocate_attribute("MatchBy", scopes.MatchBy()->uri().c_str());
+    auto matchByAttr = xmlDocument_->allocate_attribute("MatchBy", scopes.MatchBy()->c_str());
     scopesNode->append_attribute(matchByAttr);
   }
   const auto scopesStr = toString(scopes);
@@ -327,7 +327,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto metadataSectionNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "mex:MetadataSection");
   auto dialectAttr =
-      xmlDocument_->allocate_attribute("Dialect", metadataSection.Dialect().uri().c_str());
+      xmlDocument_->allocate_attribute("Dialect", metadataSection.Dialect().c_str());
   metadataSectionNode->append_attribute(dialectAttr);
   if (metadataSection.ThisModel().has_value())
   {
@@ -344,7 +344,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   else if (metadataSection.Location().has_value())
   {
     auto locationNode = xmlDocument_->allocate_node(rapidxml::node_element, "mex:Location");
-    locationNode->value(metadataSection.Location()->uri().c_str());
+    locationNode->value(metadataSection.Location()->c_str());
     metadataSectionNode->append_node(locationNode);
   }
   parent->append_node(metadataSectionNode);
@@ -431,7 +431,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   hostedNode->append_node(typesNode);
   // ServiceId
   auto serviceIdNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:ServiceId");
-  serviceIdNode->value(hosted.ServiceId().uri().c_str());
+  serviceIdNode->value(hosted.ServiceId().c_str());
   hostedNode->append_node(serviceIdNode);
   parent->append_node(hostedNode);
 }
@@ -450,7 +450,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Mdib& mdib)
 {
   auto mdibNode = xmlDocument_->allocate_node(rapidxml::node_element, "mm:Mdib");
-  auto sequenceId = xmlDocument_->allocate_string(mdib.SequenceId().uri().c_str());
+  auto sequenceId = xmlDocument_->allocate_string(mdib.SequenceId().c_str());
   auto sequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", sequenceId);
   mdibNode->append_attribute(sequenceIdAttr);
   auto mdibVersion =
@@ -835,7 +835,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   if (identifier.Root().has_value())
   {
     auto rootAttr =
-        xmlDocument_->allocate_attribute("Root", identifier.Root().value().uri().c_str());
+        xmlDocument_->allocate_attribute("Root", identifier.Root().value().c_str());
     parent->append_attribute(rootAttr);
   }
   if (identifier.Extension().has_value())
@@ -928,7 +928,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
       xmlDocument_->allocate_node(rapidxml::node_element, "wse:SubscriptionManager");
 
   auto addressNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Address");
-  addressNode->value(subscribeResponse.SubscriptionManager().Address().uri().c_str());
+  addressNode->value(subscribeResponse.SubscriptionManager().Address().c_str());
   subscriptionManagerNode->append_node(addressNode);
 
   serialize(subscriptionManagerNode,
@@ -986,7 +986,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     auto mdibVersionAttr = xmlDocument_->allocate_attribute("MdibVersion", mdibVersion);
     setValueResponseNode->append_attribute(mdibVersionAttr);
   }
-  auto sequenceId = xmlDocument_->allocate_string(setValueResponse.SequenceId().uri().c_str());
+  auto sequenceId = xmlDocument_->allocate_string(setValueResponse.SequenceId().c_str());
   auto SequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", sequenceId);
   setValueResponseNode->append_attribute(SequenceIdAttr);
   if (setValueResponse.InstanceId().has_value())
@@ -1126,7 +1126,7 @@ std::string MessageSerializer::toString(const WS::DISCOVERY::UriListType& uriLis
     {
       out += " ";
     }
-    out += uri->uri();
+    out += *uri;
   }
   return out;
 }

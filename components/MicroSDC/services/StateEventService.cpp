@@ -26,7 +26,7 @@ void StateEventService::handleRequest(httpd_req* req, char* message)
 {
   MESSAGEMODEL::Envelope requestEnvelope = parse(message);
   const auto& soapAction = requestEnvelope.Header().Action();
-  if (soapAction.uri() == MDPWS::WS_ACTION_GET_METADATA_REQUEST)
+  if (soapAction == MDPWS::WS_ACTION_GET_METADATA_REQUEST)
   {
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
@@ -39,7 +39,7 @@ void StateEventService::handleRequest(httpd_req* req, char* message)
     ESP_LOGD(TAG, "Sending GetMetadataResponse: \n %s", message.c_str());
     httpd_resp_send(req, message.c_str(), message.length());
   }
-  else if (soapAction.uri() == MDPWS::WS_ACTION_SUBSCRIBE)
+  else if (soapAction == MDPWS::WS_ACTION_SUBSCRIBE)
   {
     ESP_LOGD(TAG, "Got Subscribe: \n %s", message);
     auto subscribeRequest = requestEnvelope.Body().Subscribe();
@@ -57,7 +57,7 @@ void StateEventService::handleRequest(httpd_req* req, char* message)
     ESP_LOGD(TAG, "Sending SubscribeResponse: \n %s", message.c_str());
     httpd_resp_send(req, message.c_str(), message.length());
   }
-  else if (soapAction.uri() == MDPWS::WS_ACTION_RENEW)
+  else if (soapAction == MDPWS::WS_ACTION_RENEW)
   {
     ESP_LOGD(TAG, "Got Renew: \n %s", message);
     auto renewRequest = requestEnvelope.Body().Renew().value();
@@ -77,7 +77,7 @@ void StateEventService::handleRequest(httpd_req* req, char* message)
     ESP_LOGD(TAG, "Sending RenewResponse: \n %s", message.c_str());
     httpd_resp_send(req, message.c_str(), message.length());
   }
-  else if (soapAction.uri() == MDPWS::WS_ACTION_UNSUBSCRIBE)
+  else if (soapAction == MDPWS::WS_ACTION_UNSUBSCRIBE)
   {
     ESP_LOGD(TAG, "Got Unsubscribe: \n %s", message);
     auto unsubscribeRequest = requestEnvelope.Body().Unsubscribe().value();
@@ -95,7 +95,7 @@ void StateEventService::handleRequest(httpd_req* req, char* message)
   }
   else
   {
-    ESP_LOGD(TAG, "Unknown soap action %s \n %s", soapAction.uri().c_str(), message);
+    ESP_LOGD(TAG, "Unknown soap action %s \n %s", soapAction.c_str(), message);
     httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "500 Internal Server Error");
   }
 }

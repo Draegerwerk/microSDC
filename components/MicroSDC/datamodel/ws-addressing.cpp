@@ -46,16 +46,12 @@ namespace WS::ADDRESSING
     this->parse(node);
   }
   URIType::URIType(std::string uri)
-    : uri_(std::move(uri))
+    : std::string(std::move(uri))
   {
-  }
-  const std::string& URIType::uri() const
-  {
-    return uri_;
   }
   void URIType::parse(const rapidxml::xml_node<>& node)
   {
-    uri_ = {node.value(), node.value_size()};
+    *this = std::string(node.value(), node.value_size());
   }
 
   // EndpointReferenceType
@@ -110,11 +106,6 @@ namespace WS::ADDRESSING
   RelatesToType::RelatesToType(const URIType& x)
     : URIType(x)
   {
-  }
-  RelatesToType::RelatesToType(const RelatesToType& x)
-    : URIType(x)
-  {
-    RelationshipType_ = x.RelationshipType_;
   }
 
   // ReferenceParametersType

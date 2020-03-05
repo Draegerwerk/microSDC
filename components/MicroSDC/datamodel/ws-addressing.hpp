@@ -25,19 +25,14 @@ namespace WS::EVENTING
 
 namespace WS::ADDRESSING
 {
-  class URIType
+  class URIType : public std::string
   {
-    // TODO inherit from string not containing it
   public:
     explicit URIType(const rapidxml::xml_node<>& node);
     URIType(std::string);
     URIType() = default;
 
-    const std::string& uri() const;
-
-  protected:
-    std::string uri_;
-
+  private:
     void parse(const rapidxml::xml_node<>& node);
   };
 
@@ -53,8 +48,7 @@ namespace WS::ADDRESSING
     using RelationshipTypeType = ::WS::ADDRESSING::RelationshipTypeOpenEnum;
     using RelationshipTypeOptional = std::optional<RelationshipTypeType>;
 
-    RelatesToType(const URIType& x);
-    RelatesToType(const RelatesToType& x);
+    explicit RelatesToType(const URIType& x);
 
   protected:
     RelationshipTypeOptional RelationshipType_;
