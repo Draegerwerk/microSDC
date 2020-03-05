@@ -34,7 +34,8 @@ namespace BICEPS::PM
   };
   enum class StateType
   {
-    NUMERIC_METRIC_STATE,
+    NUMERIC_METRIC,
+    LOCATION_CONTEXT,
   };
   enum class MeasurementValidity
   {
@@ -444,6 +445,82 @@ namespace BICEPS::PM
   protected:
     StateVersionOptional StateVersion_;
     DescriptorHandleType DescriptorHandle_;
+  };
+  class AbstractMultiState : public AbstractState
+  {
+  public:
+    using CategoryType = CodedValue;
+    using CategoryOptional = std::optional<CategoryType>;
+
+    using HandleType = std::string;
+    const HandleType& Handle() const;
+    HandleType& Handle();
+
+    AbstractMultiState(const DescriptorHandleType&, const HandleType&);
+
+  protected:
+    CategoryOptional Category_;
+    HandleType Handle_;
+  };
+  class AbstractContextState : public AbstractMultiState
+  {
+  public:
+    AbstractContextState(const DescriptorHandleType&, const HandleType&);
+  };
+  class LocationDetailType
+  {
+  public:
+    using PoCType = std::string;
+    using PoCOptional = std::optional<PoCType>;
+    const PoCOptional& PoC() const;
+    PoCOptional& PoC();
+
+    using RoomType = std::string;
+    using RoomOptional = std::optional<RoomType>;
+    const RoomOptional& Room() const;
+    RoomOptional& Room();
+
+    using BedType = std::string;
+    using BedOptional = std::optional<PoCType>;
+    const BedOptional& Bed() const;
+    BedOptional& Bed();
+
+    using FacilityType = std::string;
+    using FacilityOptional = std::optional<FacilityType>;
+    const FacilityOptional& Facility() const;
+    FacilityOptional& Facility();
+
+    using BuildingType = std::string;
+    using BuildingOptional = std::optional<PoCType>;
+    const BuildingOptional& Building() const;
+    BuildingOptional& Building();
+
+    using FloorType = std::string;
+    using FloorOptional = std::optional<PoCType>;
+    const FloorOptional& Floor() const;
+    FloorOptional& Floor();
+
+  protected:
+    PoCOptional PoC_;
+    RoomOptional Room_;
+    BedOptional Bed_;
+    FacilityOptional Facility_;
+    BuildingOptional Building_;
+    FloorOptional Floor_;
+  };
+  class LocationContextState : public AbstractContextState
+  {
+  public:
+    using LocationDetailOptional = std::optional<LocationDetailType>;
+    const LocationDetailOptional& LocationDetail() const;
+    LocationDetailOptional& LocationDetail();
+
+    LocationContextState(const DescriptorHandleType&, const HandleType&);
+
+    StateType getStateType() const override;
+
+  protected:
+    LocationDetailOptional LocationDetail_;
   };
   class MetricQuality
   {

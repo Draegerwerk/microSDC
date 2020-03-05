@@ -22,11 +22,11 @@ public:
    */
   const std::string& getDescriptorHandle() const;
   /**
-   * @brief returns the metric type of this state. This is used to fake RTTI for dynamic
+   * @brief returns the state type of this state. This is used to fake RTTI for dynamic
    * subclassing.
-   * @return The metric type of this state
+   * @return The state type of this state
    */
-  virtual BICEPS::PM::MetricType getMetricType() const = 0;
+  virtual BICEPS::PM::StateType getStateType() const = 0;
   /**
    * @brief sets the MicroSDC instantation, which handles this state
    * @param microSDC the pointer MicroSDC object

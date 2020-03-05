@@ -411,6 +411,102 @@ namespace BICEPS::PM
     return DescriptorHandle_;
   }
 
+  // AbstractMultiState
+  //
+  const AbstractMultiState::HandleType& AbstractMultiState::Handle() const
+  {
+    return Handle_;
+  }
+  AbstractMultiState::HandleType& AbstractMultiState::Handle()
+  {
+    return Handle_;
+  }
+  AbstractMultiState::AbstractMultiState(const DescriptorHandleType& descriptorHandle,
+                                         const HandleType& handle)
+    : AbstractState(descriptorHandle)
+    , Handle_(handle)
+  {
+  }
+
+  // AbstractContextState
+  //
+  AbstractContextState::AbstractContextState(const DescriptorHandleType& descriptorHandle,
+                                             const HandleType& handle)
+    : AbstractMultiState(descriptorHandle, handle)
+  {
+  }
+
+  // LocationDetailType
+  //
+  const LocationDetailType::PoCOptional& LocationDetailType::PoC() const
+  {
+    return PoC_;
+  }
+  LocationDetailType::PoCOptional& LocationDetailType::PoC()
+  {
+    return PoC_;
+  }
+  const LocationDetailType::RoomOptional& LocationDetailType::Room() const
+  {
+    return Room_;
+  }
+  LocationDetailType::RoomOptional& LocationDetailType::Room()
+  {
+    return Room_;
+  }
+  const LocationDetailType::BedOptional& LocationDetailType::Bed() const
+  {
+    return Bed_;
+  }
+  LocationDetailType::BedOptional& LocationDetailType::Bed()
+  {
+    return Bed_;
+  }
+  const LocationDetailType::FacilityOptional& LocationDetailType::Facility() const
+  {
+    return Facility_;
+  }
+  LocationDetailType::FacilityOptional& LocationDetailType::Facility()
+  {
+    return Facility_;
+  }
+  const LocationDetailType::BuildingOptional& LocationDetailType::Building() const
+  {
+    return Building_;
+  }
+  LocationDetailType::BuildingOptional& LocationDetailType::Building()
+  {
+    return Building_;
+  }
+  const LocationDetailType::FloorOptional& LocationDetailType::Floor() const
+  {
+    return Floor_;
+  }
+  LocationDetailType::FloorOptional& LocationDetailType::Floor()
+  {
+    return Floor_;
+  }
+
+  // LocationContextState
+  //
+  const LocationContextState::LocationDetailOptional& LocationContextState::LocationDetail() const
+  {
+    return LocationDetail_;
+  }
+  LocationContextState::LocationDetailOptional& LocationContextState::LocationDetail()
+  {
+    return LocationDetail_;
+  }
+  LocationContextState::LocationContextState(const DescriptorHandleType& descriptorHandle,
+                                             const HandleType& handle)
+    : AbstractContextState(descriptorHandle, handle)
+  {
+  }
+  StateType LocationContextState::getStateType() const
+  {
+    return StateType::LOCATION_CONTEXT;
+  }
+
   // AbstractMetricState
   //
   AbstractMetricState::AbstractMetricState(DescriptorHandleType handle)
@@ -426,7 +522,7 @@ namespace BICEPS::PM
   }
   StateType NumericMetricState::getStateType() const
   {
-    return StateType::NUMERIC_METRIC_STATE;
+    return StateType::NUMERIC_METRIC;
   }
   const NumericMetricState::MetricValueOptional& NumericMetricState::MetricValue() const
   {

@@ -105,9 +105,9 @@ public:
   {
   }
 
-  BICEPS::PM::MetricType getMetricType() const override
+  BICEPS::PM::StateType getStateType() const override
   {
-    return BICEPS::PM::MetricType::NUMERIC;
+    return BICEPS::PM::StateType::NUMERIC_METRIC;
   }
 
   std::shared_ptr<BICEPS::PM::NumericMetricState> getInitialState() const override
@@ -124,6 +124,35 @@ public:
     auto state = getInitialState();
     state->MetricValue()->Value() = value;
     updateState(state);
+  }
+};
+
+class LocationContextStateHandler : public MdStateHandler<BICEPS::PM::LocationContextState>
+{
+public:
+  explicit LocationContextStateHandler(const std::string& descriptorHandle)
+    : MdStateHandler(descriptorHandle)
+  {
+  }
+
+  BICEPS::PM::StateType getStateType() const override
+  {
+    return BICEPS::PM::StateType::LOCATION_CONTEXT;
+  }
+
+  std::shared_ptr<BICEPS::PM::LocationContextState> getInitialState() const override
+  {
+    auto state = std::make_shared<BICEPS::PM::LocationContextState>(getDescriptorHandle(),
+                                                                    getDescriptorHandle());
+    BICEPS::PM::LocationDetailType locationDetail;
+    locationDetail.PoC() = "PoC-A";
+    locationDetail.Room() = "Room-A";
+    locationDetail.Bed() = "Bed-A";
+    locationDetail.Facility() = "Facility-A";
+    locationDetail.Building() = "Building-A";
+    locationDetail.Floor() = "Floor-A";
+    state->LocationDetail() = locationDetail;
+    return state;
   }
 };
 
@@ -190,6 +219,10 @@ extern "C" void app_main()
   BICEPS::PM::MdDescription mdDescription;
   mdDescription.Mds().emplace_back(deviceDescriptor);
   sdc->setMdDescription(mdDescription);
+
+  auto locationContextStateHandler =
+      std::make_shared<LocationContextStateHandler>("location_context");
+  sdc->addMdState(locationContextStateHandler);
 
   auto pressureStateHandler = std::make_shared<NumericStateHandler>("pressureState_handle");
   auto temperatureStateHandler = std::make_shared<NumericStateHandler>("temperatureState_handle");

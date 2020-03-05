@@ -58,6 +58,8 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Range& range);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& mdState);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractState& state);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::LocationDetailType& locationDetail);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractMetricValue& metricValue);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MetricQuality& quality);
 
@@ -66,7 +68,8 @@ public:
   void serialize(rapidxml::xml_node<>* parent,
                  const WS::ADDRESSING::ReferenceParametersType& referenceParameters);
   void serialize(rapidxml::xml_node<>* parent, const WS::EVENTING::RenewResponse& renewResponse);
-  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::SetValueResponse& setValueResponse);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::MM::SetValueResponse& setValueResponse);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::InvocationInfo& invocationInfo);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::EpisodicMetricReport& report);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::MetricReportPart&);

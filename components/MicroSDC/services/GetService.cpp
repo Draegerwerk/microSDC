@@ -45,7 +45,7 @@ void GetService::handleRequest(httpd_req* req, char* message)
     MessageSerializer serializer;
     serializer.serialize(responseEnvelope);
     const auto& message = serializer.str();
-    ESP_LOGD(TAG, "Sending GetMdibResponse: \n %s", message.c_str());
+    ESP_LOGI(TAG, "Sending GetMdibResponse: \n %s", message.c_str());
     httpd_resp_send(req, message.c_str(), message.length());
   }
   else

@@ -1,6 +1,7 @@
 #include "MessageSerializer.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "rapidxml_print.hpp"
+#include <iostream>
 
 MessageSerializer::MessageSerializer()
   : xmlDocument_(std::make_unique<rapidxml::xml_document<>>())
@@ -752,8 +753,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::AbstractState& state)
 {
   auto stateNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:State");
-  auto descriptorHandleAttr =
-      xmlDocument_->allocate_attribute("DescriptorHandle", state.DescriptorHandle().c_str());
+  auto descriptor = xmlDocument_->allocate_string(state.DescriptorHandle().c_str());
+  auto descriptorHandleAttr = xmlDocument_->allocate_attribute("DescriptorHandle", descriptor);
+  // std::cout << state.DescriptorHandle() << std::endl;
   stateNode->append_attribute(descriptorHandleAttr);
 
   if (state.StateVersion().has_value())
@@ -764,7 +766,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     stateNode->append_attribute(versionAttr);
   }
 
-  if (state.getStateType() == BICEPS::PM::StateType::NUMERIC_METRIC_STATE)
+  if (state.getStateType() == BICEPS::PM::StateType::NUMERIC_METRIC)
   {
     const auto& numericMetricState = static_cast<const BICEPS::PM::NumericMetricState&>(state);
     if (numericMetricState.MetricValue().has_value())
@@ -774,7 +776,61 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     auto typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:NumericMetricState");
     stateNode->append_attribute(typeAttr);
   }
+  else if (state.getStateType() == BICEPS::PM::StateType::LOCATION_CONTEXT)
+  {
+    const auto& locationContextState = static_cast<const BICEPS::PM::LocationContextState&>(state);
+    if (locationContextState.LocationDetail().has_value())
+    {
+      serialize(stateNode, locationContextState.LocationDetail().value());
+    }
+    auto typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:LocationContextState");
+    stateNode->append_attribute(typeAttr);
+    auto handleAttr =
+        xmlDocument_->allocate_attribute("Handle", locationContextState.Handle().c_str());
+    stateNode->append_attribute(handleAttr);
+  }
   parent->append_node(stateNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::LocationDetailType& locationDetail)
+{
+  auto locationDetailNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "pm:LocationDetail");
+  if (locationDetail.PoC().has_value())
+  {
+    auto pocAttr = xmlDocument_->allocate_attribute("PoC", locationDetail.PoC().value().c_str());
+    locationDetailNode->append_attribute(pocAttr);
+  }
+  if (locationDetail.Room().has_value())
+  {
+    auto pocAttr = xmlDocument_->allocate_attribute("Room", locationDetail.Room().value().c_str());
+    locationDetailNode->append_attribute(pocAttr);
+  }
+  if (locationDetail.Bed().has_value())
+  {
+    auto pocAttr = xmlDocument_->allocate_attribute("Bed", locationDetail.Bed().value().c_str());
+    locationDetailNode->append_attribute(pocAttr);
+  }
+  if (locationDetail.Facility().has_value())
+  {
+    auto pocAttr =
+        xmlDocument_->allocate_attribute("Facility", locationDetail.Facility().value().c_str());
+    locationDetailNode->append_attribute(pocAttr);
+  }
+  if (locationDetail.Building().has_value())
+  {
+    auto pocAttr =
+        xmlDocument_->allocate_attribute("Building", locationDetail.Building().value().c_str());
+    locationDetailNode->append_attribute(pocAttr);
+  }
+  if (locationDetail.Floor().has_value())
+  {
+    auto pocAttr =
+        xmlDocument_->allocate_attribute("Floor", locationDetail.Floor().value().c_str());
+    locationDetailNode->append_attribute(pocAttr);
+  }
+  parent->append_node(locationDetailNode);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
