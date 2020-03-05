@@ -267,7 +267,8 @@ void DPWSHost::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
 {
   auto& probeMatches = envelope.Body().ProbeMatches() = WS::DISCOVERY::ProbeMatchesType();
   // TODO: check for match
-  auto& match = probeMatches->ProbeMatch().emplace_back(endpointReference_, metadataVersion_);
+  auto& match = probeMatches->ProbeMatch().emplace_back(
+      WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
   if (!scopes_.empty())
   {
     match.Scopes() = scopes_;
@@ -301,7 +302,8 @@ void DPWSHost::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope,
                                         const MESSAGEMODEL::Envelope& request)
 {
   auto& resolveMatches = envelope.Body().ResolveMatches() = WS::DISCOVERY::ResolveMatchesType();
-  auto& match = resolveMatches->ResolveMatch().emplace_back(endpointReference_, metadataVersion_);
+  auto& match = resolveMatches->ResolveMatch().emplace_back(
+      WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
   if (!scopes_.empty())
   {
     match.Scopes() = scopes_;

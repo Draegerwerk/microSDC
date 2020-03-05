@@ -86,8 +86,7 @@ namespace WS::ADDRESSING
     const ReferenceParametersOptional& ReferenceParameters() const;
     ReferenceParametersOptional& ReferenceParameters();
 
-    // TODO: This has to be explicit
-    EndpointReferenceType(const AddressType& address);
+    explicit EndpointReferenceType(const AddressType& address);
     explicit EndpointReferenceType(const rapidxml::xml_node<>& node);
 
   protected:
