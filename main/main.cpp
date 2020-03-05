@@ -96,36 +96,6 @@ static void ethEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t 
   }
 }
 
-class NumericStateHandler : public MdStateHandler<BICEPS::PM::NumericMetricState>
-{
-public:
-  explicit NumericStateHandler(const std::string& descriptorHandle)
-    : MdStateHandler(descriptorHandle)
-  {
-  }
-
-  BICEPS::PM::StateType getStateType() const override
-  {
-    return BICEPS::PM::StateType::NUMERIC_METRIC;
-  }
-
-  std::shared_ptr<BICEPS::PM::NumericMetricState> getInitialState() const override
-  {
-    auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
-    BICEPS::PM::NumericMetricValue value;
-    value.Value() = 0;
-    state->MetricValue() = value;
-    return state;
-  }
-
-  void setValue(double value)
-  {
-    auto state = getInitialState();
-    state->MetricValue()->Value() = value;
-    updateState(state);
-  }
-};
-
 // force c linkage for app_main()
 extern "C" void app_main()
 {
@@ -157,10 +127,7 @@ extern "C" void app_main()
   systemContext.PatientContext() = BICEPS::PM::PatientContextDescriptor("patient_context");
   systemContext.LocationContext() = BICEPS::PM::LocationContextDescriptor("location_context");
 
-  auto settableState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "settableState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
-      BICEPS::PM::MetricAvailability::Cont, 1);
-  settableState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
+  // States for measured values
   auto pressureState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "pressureState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
@@ -175,6 +142,12 @@ extern "C" void app_main()
       "humidityState_handle", BICEPS::PM::CodedValue("262688"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
   humidityState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
+
+  // Dummy settable state
+  auto settableState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "settableState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
+      BICEPS::PM::MetricAvailability::Cont, 1);
+  settableState->SafetyClassification() = BICEPS::PM::SafetyClassification::MedA;
 
   BICEPS::PM::ChannelDescriptor deviceChannel("device_channel");
   deviceChannel.Metric().emplace_back(pressureState);
@@ -210,11 +183,10 @@ extern "C" void app_main()
   locationDetail.Floor() = "Floor-A";
   sdc->setLocation("location_context", locationDetail);
 
-  auto settableStateHandler = std::make_shared<NumericStateHandler>("settableState_handle");
   auto pressureStateHandler = std::make_shared<NumericStateHandler>("pressureState_handle");
   auto temperatureStateHandler = std::make_shared<NumericStateHandler>("temperatureState_handle");
   auto humidityStateHandler = std::make_shared<NumericStateHandler>("humidityState_handle");
-  sdc->addMdState(settableStateHandler);
+  auto settableStateHandler = std::make_shared<NumericStateHandler>("settableState_handle");
   sdc->addMdState(pressureStateHandler);
   sdc->addMdState(temperatureStateHandler);
   sdc->addMdState(humidityStateHandler);
@@ -230,7 +202,7 @@ extern "C" void app_main()
   esp_pthread_cfg_t pthreadConf = esp_pthread_get_default_config();
   pthreadConf.stack_size = 8192;
   esp_pthread_set_cfg(&pthreadConf);
-    settableStateHandler->setValue(1337);
+  settableStateHandler->setValue(1337);
 
   std::thread updateThread([=]() {
     BME280 bme280(i2c_port_t::I2C_NUM_0, 0x76u, static_cast<gpio_num_t>(13),

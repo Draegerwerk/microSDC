@@ -77,3 +77,33 @@ public:
    */
   virtual std::shared_ptr<MdState> getInitialState() const = 0;
 };
+
+class NumericStateHandler : public MdStateHandler<BICEPS::PM::NumericMetricState>
+{
+public:
+  explicit NumericStateHandler(const std::string& descriptorHandle)
+    : MdStateHandler(descriptorHandle)
+  {
+  }
+
+  BICEPS::PM::StateType getStateType() const override
+  {
+    return BICEPS::PM::StateType::NUMERIC_METRIC;
+  }
+
+  std::shared_ptr<BICEPS::PM::NumericMetricState> getInitialState() const override
+  {
+    auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
+    BICEPS::PM::NumericMetricValue value;
+    value.Value() = 0;
+    state->MetricValue() = value;
+    return state;
+  }
+
+  void setValue(double value)
+  {
+    auto state = getInitialState();
+    state->MetricValue()->Value() = value;
+    updateState(state);
+  }
+};
