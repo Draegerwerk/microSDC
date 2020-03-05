@@ -476,8 +476,61 @@ namespace BICEPS::PM
   {
   }
 
+  // InstanceIdentifier
+  //
+  const InstanceIdentifier::ExtensionOptional& InstanceIdentifier::Extension() const
+  {
+    return Extension_;
+  }
+  InstanceIdentifier::ExtensionOptional& InstanceIdentifier::Extension()
+  {
+    return Extension_;
+  }
+  const InstanceIdentifier::RootOptional& InstanceIdentifier::Root() const
+  {
+    return Root_;
+  }
+  InstanceIdentifier::RootOptional& InstanceIdentifier::Root()
+  {
+    return Root_;
+  }
+
   // AbstractContextState
   //
+  const AbstractContextState::BindingMdibVersionOptional&
+  AbstractContextState::BindingMdibVersion() const
+  {
+    return BindingMdibVersion_;
+  }
+  AbstractContextState::BindingMdibVersionOptional& AbstractContextState::BindingMdibVersion()
+  {
+    return BindingMdibVersion_;
+  }
+  const AbstractContextState::ContextAssociationOptional&
+  AbstractContextState::ContextAssociation() const
+  {
+    return ContextAssociation_;
+  }
+  AbstractContextState::ContextAssociationOptional& AbstractContextState::ContextAssociation()
+  {
+    return ContextAssociation_;
+  }
+  const AbstractContextState::ValidatorSequence& AbstractContextState::Validator() const
+  {
+    return Validator_;
+  }
+  AbstractContextState::ValidatorSequence& AbstractContextState::Validator()
+  {
+    return Validator_;
+  }
+  const AbstractContextState::IdentificationSequence& AbstractContextState::Identification() const
+  {
+    return Identification_;
+  }
+  AbstractContextState::IdentificationSequence& AbstractContextState::Identification()
+  {
+    return Identification_;
+  }
   AbstractContextState::AbstractContextState(const DescriptorHandleType& descriptorHandle,
                                              const HandleType& handle)
     : AbstractMultiState(descriptorHandle, handle)

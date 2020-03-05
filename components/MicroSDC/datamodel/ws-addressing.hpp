@@ -27,6 +27,7 @@ namespace WS::ADDRESSING
 {
   class URIType
   {
+    // TODO inherit from string not containing it
   public:
     explicit URIType(const rapidxml::xml_node<>& node);
     URIType(std::string);

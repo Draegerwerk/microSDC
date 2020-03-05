@@ -9,7 +9,6 @@
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include <chrono>
-#include <iostream>
 #include <pthread.h>
 #include <sstream>
 #include <thread>
@@ -127,35 +126,6 @@ public:
   }
 };
 
-class LocationContextStateHandler : public MdStateHandler<BICEPS::PM::LocationContextState>
-{
-public:
-  explicit LocationContextStateHandler(const std::string& descriptorHandle)
-    : MdStateHandler(descriptorHandle)
-  {
-  }
-
-  BICEPS::PM::StateType getStateType() const override
-  {
-    return BICEPS::PM::StateType::LOCATION_CONTEXT;
-  }
-
-  std::shared_ptr<BICEPS::PM::LocationContextState> getInitialState() const override
-  {
-    auto state = std::make_shared<BICEPS::PM::LocationContextState>(getDescriptorHandle(),
-                                                                    getDescriptorHandle());
-    BICEPS::PM::LocationDetailType locationDetail;
-    locationDetail.PoC() = "PoC-A";
-    locationDetail.Room() = "Room-A";
-    locationDetail.Bed() = "Bed-A";
-    locationDetail.Facility() = "Facility-A";
-    locationDetail.Building() = "Building-A";
-    locationDetail.Floor() = "Floor-A";
-    state->LocationDetail() = locationDetail;
-    return state;
-  }
-};
-
 // force c linkage for app_main()
 extern "C" void app_main()
 {
@@ -231,9 +201,14 @@ extern "C" void app_main()
   mdDescription.Mds().emplace_back(deviceDescriptor);
   sdc->setMdDescription(mdDescription);
 
-  auto locationContextStateHandler =
-      std::make_shared<LocationContextStateHandler>("location_context");
-  sdc->addMdState(locationContextStateHandler);
+  BICEPS::PM::LocationDetailType locationDetail;
+  locationDetail.PoC() = "PoC-A";
+  locationDetail.Room() = "Room-A";
+  locationDetail.Bed() = "Bed-A";
+  locationDetail.Facility() = "Facility-A";
+  locationDetail.Building() = "Building-A";
+  locationDetail.Floor() = "Floor-A";
+  sdc->setLocation("location_context", locationDetail);
 
   auto settableStateHandler = std::make_shared<NumericStateHandler>("settableState_handle");
   auto pressureStateHandler = std::make_shared<NumericStateHandler>("pressureState_handle");
@@ -268,7 +243,7 @@ extern "C" void app_main()
       pressureStateHandler->setValue(sensorData.pressure);
       temperatureStateHandler->setValue(sensorData.temperature);
       humidityStateHandler->setValue(sensorData.humidity);
-      vTaskDelay(500 / portTICK_PERIOD_MS);
+      vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
   });
   updateThread.join();

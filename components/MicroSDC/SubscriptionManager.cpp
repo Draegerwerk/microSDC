@@ -9,7 +9,6 @@
 #include "esp_http_client.h"
 #include "esp_log.h"
 #include <algorithm>
-#include <iostream>
 
 static constexpr const char* TAG = "SubscriptionManager";
 
@@ -107,7 +106,7 @@ void SubscriptionManager::dispatch(const WS::EVENTING::Unsubscribe& /*unsubscrib
 
 void SubscriptionManager::fireEvent(const BICEPS::MM::EpisodicMetricReport& report)
 {
-  ESP_LOGI(TAG, "Fire Event: EpisodicMetricReport");
+  ESP_LOGD(TAG, "Fire Event: EpisodicMetricReport");
   std::lock_guard<std::mutex> lock(subscriptionMutex_);
   std::vector<const SubscriptionInformation*> subscriber;
   for (const auto& [id, info] : subscriptions_)
@@ -204,19 +203,21 @@ void SubscriptionManager::createClient(const std::string& notifyTo)
 
 void SubscriptionManager::printSubscriptions() const
 {
-  std::cout << "Subscriptions:\n";
+  std::stringstream out;
+  out << "Subscriptions:\n";
   for (const auto& [key, val] : subscriptions_)
   {
-    std::cout << key << " : " << val.notifyTo.Address().uri() << " : "
-              << std::chrono::duration_cast<std::chrono::seconds>(val.expirationTime -
-                                                                  std::chrono::system_clock::now())
-                     .count()
-              << "s : ";
+    out << key << " : " << val.notifyTo.Address().uri() << " : "
+        << std::chrono::duration_cast<std::chrono::seconds>(val.expirationTime -
+                                                            std::chrono::system_clock::now())
+               .count()
+        << "s : ";
     for (const auto& action : val.filter)
     {
-      std::cout << action << " ";
+      out << action << " ";
     }
-    std::cout << "\n";
+    out << "\n";
   }
-  std::cout << std::endl;
+  out << std::endl;
+  ESP_LOGD(TAG, "%s", out.str().c_str());
 }

@@ -34,11 +34,6 @@ namespace WS::DISCOVERY
 
   void QNameListType::parse(const rapidxml::xml_node<>& node) {}
 
-  ScopesType::ScopesType(const ScopesType& x)
-  {
-    MatchBy_ = x.MatchBy();
-  }
-
   const ScopesType::MatchByOptional& ScopesType::MatchBy() const
   {
     return MatchBy_;
@@ -123,10 +118,6 @@ namespace WS::DISCOVERY
   {
     return Types_;
   }
-  void HelloType::Types(const TypesType& x)
-  {
-    Types_ = x;
-  }
 
   // Scopes
   //
@@ -138,10 +129,6 @@ namespace WS::DISCOVERY
   {
     return Scopes_;
   }
-  void HelloType::Scopes(const ScopesType& x)
-  {
-    Scopes_ = x;
-  }
 
   // XAddrs
   //
@@ -152,10 +139,6 @@ namespace WS::DISCOVERY
   HelloType::XAddrsOptional& HelloType::XAddrs()
   {
     return XAddrs_;
-  }
-  void HelloType::XAddrs(const XAddrsType& x)
-  {
-    XAddrs_ = x;
   }
 
   // MetadataVersion
@@ -205,21 +188,6 @@ namespace WS::DISCOVERY
 
   void ProbeType::parse(const rapidxml::xml_node<>& node) {}
 
-
-  void ProbeMatchType::Types(const TypesType& x)
-  {
-    Types_ = x;
-  }
-
-  void ProbeMatchType::Scopes(const ScopesType& x)
-  {
-    Scopes_ = x;
-  }
-
-  void ProbeMatchType::XAddrs(const XAddrsType& x)
-  {
-    XAddrs_ = x;
-  }
 
   const ProbeMatchType::EndpointReferenceType& ProbeMatchType::EndpointReference() const
   {
@@ -320,21 +288,6 @@ namespace WS::DISCOVERY
       throw ExpectedElement("EndpointReference", MDPWS::WS_NS_ADDRESSING);
     }
     EndpointReference_ = EndpointReferenceType(*eprNode);
-  }
-
-  void ResolveMatchType::Types(const TypesType& x)
-  {
-    Types_ = x;
-  }
-
-  void ResolveMatchType::Scopes(const ScopesType& x)
-  {
-    Scopes_ = x;
-  }
-
-  void ResolveMatchType::XAddrs(const XAddrsType& x)
-  {
-    XAddrs_ = x;
   }
 
   const ResolveMatchType::EndpointReferenceType& ResolveMatchType::EndpointReference() const

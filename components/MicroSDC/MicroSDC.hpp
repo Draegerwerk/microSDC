@@ -83,7 +83,11 @@ public:
    */
   void updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state);
 
+  void setLocation(const std::string& descriptorHandle,
+                   const BICEPS::PM::LocationDetailType& locationDetail);
+
 private:
+  std::shared_ptr<BICEPS::PM::LocationContextState> locationContextState_{nullptr};
   /// the SDC thread
   std::thread sdcThread_;
   /// pointer to the DPWS service
@@ -97,7 +101,7 @@ private:
   /// mutex protecting changes in the mdib
   mutable std::mutex mdibMutex_;
   /// all states
-  std::map<std::string, std::shared_ptr<StateHandler>> stateHandlers_;
+  std::vector<std::shared_ptr<StateHandler>> stateHandlers_;
   /// whether the communication uses TLS
   bool useTLS_{true};
   /// whether SDC is started and connected

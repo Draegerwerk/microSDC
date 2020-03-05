@@ -41,8 +41,6 @@ namespace WS::DISCOVERY
   class ScopesType : public WS::DISCOVERY::UriListType
   {
   public:
-    ScopesType() = default;
-    ScopesType(const ScopesType& x);
     using MatchByType = WS::ADDRESSING::URIType;
     using MatchByOptional = std::optional<MatchByType>;
     const MatchByOptional& MatchBy() const;
@@ -117,7 +115,6 @@ namespace WS::DISCOVERY
     using TypesOptional = std::optional<TypesType>;
     const TypesOptional& Types() const;
     TypesOptional& Types();
-    void Types(const TypesType& x);
 
     // Scopes
     //
@@ -125,7 +122,6 @@ namespace WS::DISCOVERY
     using ScopesOptional = std::optional<ScopesType>;
     const ScopesOptional& Scopes() const;
     ScopesOptional& Scopes();
-    void Scopes(const ScopesType& x);
 
     // XAddrs
     //
@@ -133,7 +129,6 @@ namespace WS::DISCOVERY
     using XAddrsOptional = std::optional<XAddrsType>;
     const XAddrsOptional& XAddrs() const;
     XAddrsOptional& XAddrs();
-    void XAddrs(const XAddrsType& x);
 
     // MetadataVersion
     //
@@ -194,7 +189,6 @@ namespace WS::DISCOVERY
     using TypesOptional = std::optional<TypesType>;
     const TypesOptional& Types() const;
     TypesOptional& Types();
-    void Types(const TypesType& x);
 
     // Scopes
     //
@@ -202,7 +196,6 @@ namespace WS::DISCOVERY
     using ScopesOptional = std::optional<ScopesType>;
     const ScopesOptional& Scopes() const;
     ScopesOptional& Scopes();
-    void Scopes(const ScopesType& x);
 
     // XAddrs
     //
@@ -210,7 +203,6 @@ namespace WS::DISCOVERY
     using XAddrsOptional = std::optional<XAddrsType>;
     const XAddrsOptional& XAddrs() const;
     XAddrsOptional& XAddrs();
-    void XAddrs(const XAddrsType& x);
 
     // MetadataVersion
     //
@@ -279,7 +271,6 @@ namespace WS::DISCOVERY
     using TypesOptional = std::optional<TypesType>;
     const TypesOptional& Types() const;
     TypesOptional& Types();
-    void Types(const TypesType& x);
 
     // Scopes
     //
@@ -287,7 +278,6 @@ namespace WS::DISCOVERY
     using ScopesOptional = std::optional<ScopesType>;
     const ScopesOptional& Scopes() const;
     ScopesOptional& Scopes();
-    void Scopes(const ScopesType& x);
 
     // XAddrs
     //
@@ -295,7 +285,6 @@ namespace WS::DISCOVERY
     using XAddrsOptional = std::optional<XAddrsType>;
     const XAddrsOptional& XAddrs() const;
     XAddrsOptional& XAddrs();
-    void XAddrs(const XAddrsType& x);
 
     // MetadataVersion
     //

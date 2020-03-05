@@ -63,6 +63,10 @@ void MicroSDC::startup()
   {
     dpws_ = std::make_unique<DPWSHost>(
         WS::ADDRESSING::EndpointReferenceType::AddressType(endpointReference_), types, xAddresses);
+    if (locationContextState_ != nullptr && locationContextState_->LocationDetail().has_value())
+    {
+      dpws_->setLocation(locationContextState_->LocationDetail().value());
+    }
   }
   catch (const asio::system_error& e)
   {
@@ -123,7 +127,7 @@ void MicroSDC::stop()
 
 void MicroSDC::initializeMdStates()
 {
-  for (const auto& [descriptorHandle, handler] : stateHandlers_)
+  for (const auto& handler : stateHandlers_)
   {
     if (handler->getStateType() == BICEPS::PM::StateType::NUMERIC_METRIC)
     {
@@ -132,13 +136,39 @@ void MicroSDC::initializeMdStates()
       std::lock_guard<std::mutex> lock(mdibMutex_);
       mdib_->MdState()->State().emplace_back(numericHandler.getInitialState());
     }
-    if (handler->getStateType() == BICEPS::PM::StateType::LOCATION_CONTEXT)
-    {
-      auto& locationContextHandler =
-          static_cast<const MdStateHandler<BICEPS::PM::LocationContextState>&>(*handler);
-      std::lock_guard<std::mutex> lock(mdibMutex_);
-      mdib_->MdState()->State().emplace_back(locationContextHandler.getInitialState());
-    }
+  }
+}
+
+void MicroSDC::setLocation(const std::string& descriptorHandle,
+                           const BICEPS::PM::LocationDetailType& locationDetail)
+{
+  auto mdibVersion = getMdibVersion();
+  std::lock_guard<std::mutex> lock(mdibMutex_);
+  if (locationContextState_ == nullptr)
+  {
+    locationContextState_ =
+        std::make_shared<BICEPS::PM::LocationContextState>(descriptorHandle, descriptorHandle);
+    mdib_->MdState()->State().emplace_back(locationContextState_);
+  }
+  locationContextState_->LocationDetail() = locationDetail;
+
+  BICEPS::PM::InstanceIdentifier identification;
+  identification.Root() = WS::ADDRESSING::URIType("sdc.ctxt.loc.detail");
+  identification.Extension() = locationDetail.Facility().value() + "///" +
+                               locationDetail.PoC().value() + "//" + locationDetail.Bed().value();
+  locationContextState_->Identification().emplace_back(identification);
+
+  BICEPS::PM::InstanceIdentifier validator;
+  identification.Root() = WS::ADDRESSING::URIType("Validator");
+  identification.Extension() = "System";
+  locationContextState_->Validator().emplace_back(validator);
+
+  locationContextState_->ContextAssociation() = BICEPS::PM::ContextAssociation::Assoc;
+  locationContextState_->BindingMdibVersion() = mdibVersion;
+
+  if (dpws_ != nullptr && locationContextState_->LocationDetail().has_value())
+  {
+    dpws_->setLocation(locationContextState_->LocationDetail().value());
   }
 }
 
@@ -198,7 +228,7 @@ std::string MicroSDC::calculateMessageID()
 void MicroSDC::addMdState(std::shared_ptr<StateHandler> stateHandler)
 {
   stateHandler->setMicroSDC(this);
-  stateHandlers_[stateHandler->getDescriptorHandle()] = std::move(stateHandler);
+  stateHandlers_.emplace_back(std::move(stateHandler));
 }
 
 void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state)

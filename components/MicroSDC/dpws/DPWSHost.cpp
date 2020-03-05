@@ -56,6 +56,18 @@ bool DPWSHost::running() const
   return running_.load();
 }
 
+void DPWSHost::setLocation(const BICEPS::PM::LocationDetailType& locationDetail)
+{
+  std::string ctxt = "sdc.ctxt.loc:/sdc.ctxt.loc.detail/?";
+  ctxt += "fac=" + locationDetail.Facility().value_or("");
+  ctxt += "&bldng=" + locationDetail.Building().value_or("");
+  ctxt += "&poc=" + locationDetail.PoC().value_or("");
+  ctxt += "&flr=" + locationDetail.Floor().value_or("");
+  ctxt += "&rm=" + locationDetail.Room().value_or("");
+  ctxt += "&bed=" + locationDetail.Bed().value_or("");
+  scopes_.emplace_back(WS::ADDRESSING::URIType(ctxt));
+}
+
 void DPWSHost::doReceive()
 {
   if (running_.load())
@@ -188,19 +200,19 @@ void DPWSHost::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
   envelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_HELLO);
   envelope.Header().To() = WS::ADDRESSING::URIType(MDPWS::WS_DISCOVERY_URN);
   envelope.Header().MessageID() = MicroSDC::calculateMessageID();
-  auto& hello = envelope.Body().Hello() =
-      WS::DISCOVERY::HelloType(WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
+  auto& hello = envelope.Body().Hello() = WS::DISCOVERY::HelloType(
+      WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
   if (!scopes_.empty())
   {
-    hello->Scopes(scopes_);
+    hello->Scopes() = scopes_;
   }
   if (!types_.empty())
   {
-    hello->Types(types_);
+    hello->Types() = types_;
   }
   if (!xAddresses_.empty())
   {
-    hello->XAddrs(xAddresses_);
+    hello->XAddrs() = xAddresses_;
   }
 }
 
@@ -258,15 +270,15 @@ void DPWSHost::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
   auto& match = probeMatches->ProbeMatch().emplace_back(endpointReference_, metadataVersion_);
   if (!scopes_.empty())
   {
-    match.Scopes(scopes_);
+    match.Scopes() = scopes_;
   }
   if (!types_.empty())
   {
-    match.Types(types_);
+    match.Types() = types_;
   }
   if (!xAddresses_.empty())
   {
-    match.XAddrs(xAddresses_);
+    match.XAddrs() = xAddresses_;
   }
 
   envelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_PROBE_MATCHES);
@@ -292,15 +304,15 @@ void DPWSHost::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope,
   auto& match = resolveMatches->ResolveMatch().emplace_back(endpointReference_, metadataVersion_);
   if (!scopes_.empty())
   {
-    match.Scopes(scopes_);
+    match.Scopes() = scopes_;
   }
   if (!types_.empty())
   {
-    match.Types(types_);
+    match.Types() = types_;
   }
   if (!xAddresses_.empty())
   {
-    match.XAddrs(xAddresses_);
+    match.XAddrs() = xAddresses_;
   }
 
   envelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RESOLVE_MATCHES);

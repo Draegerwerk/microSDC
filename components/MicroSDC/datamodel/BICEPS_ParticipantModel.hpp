@@ -59,6 +59,13 @@ namespace BICEPS::PM
     Uflw,
     NA
   };
+  enum class ContextAssociation
+  {
+    No,
+    Pre,
+    Assoc,
+    Dis
+  };
   enum class GenerationMode
   {
     Real,
@@ -522,10 +529,53 @@ namespace BICEPS::PM
     CategoryOptional Category_;
     HandleType Handle_;
   };
+  class InstanceIdentifier
+  {
+  public:
+    using ExtensionType = std::string;
+    using ExtensionOptional = std::optional<ExtensionType>;
+    const ExtensionOptional& Extension() const;
+    ExtensionOptional& Extension();
+
+    using RootType = WS::ADDRESSING::URIType;
+    using RootOptional = std::optional<RootType>;
+    const RootOptional& Root() const;
+    RootOptional& Root();
+
+  protected:
+    ExtensionOptional Extension_;
+    RootOptional Root_;
+  };
   class AbstractContextState : public AbstractMultiState
   {
   public:
+    using BindingMdibVersionType = unsigned int;
+    using BindingMdibVersionOptional = std::optional<BindingMdibVersionType>;
+    const BindingMdibVersionOptional& BindingMdibVersion() const;
+    BindingMdibVersionOptional& BindingMdibVersion();
+
+    using ContextAssociationType = ::BICEPS::PM::ContextAssociation;
+    using ContextAssociationOptional = std::optional<ContextAssociationType>;
+    const ContextAssociationOptional& ContextAssociation() const;
+    ContextAssociationOptional& ContextAssociation();
+
+    using ValidatorType = InstanceIdentifier;
+    using ValidatorSequence = std::vector<ValidatorType>;
+    const ValidatorSequence& Validator() const;
+    ValidatorSequence& Validator();
+
+    using IdentificationType = InstanceIdentifier;
+    using IdentificationSequence = std::vector<IdentificationType>;
+    const IdentificationSequence& Identification() const;
+    IdentificationSequence& Identification();
+
     AbstractContextState(const DescriptorHandleType&, const HandleType&);
+
+  protected:
+    BindingMdibVersionOptional BindingMdibVersion_;
+    ContextAssociationOptional ContextAssociation_;
+    ValidatorSequence Validator_;
+    IdentificationSequence Identification_;
   };
   class LocationDetailType
   {
