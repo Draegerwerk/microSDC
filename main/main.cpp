@@ -202,7 +202,6 @@ extern "C" void app_main()
   esp_pthread_cfg_t pthreadConf = esp_pthread_get_default_config();
   pthreadConf.stack_size = 8192;
   esp_pthread_set_cfg(&pthreadConf);
-  settableStateHandler->setValue(1337);
 
   std::thread updateThread([=]() {
     BME280 bme280(i2c_port_t::I2C_NUM_0, 0x76u, static_cast<gpio_num_t>(13),
