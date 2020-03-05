@@ -154,6 +154,18 @@ namespace BICEPS::PM
     return OperationTarget_;
   }
 
+  // SetValueOperationDescriptor
+  //
+  SetValueOperationDescriptor::SetValueOperationDescriptor(
+      const HandleType& handle, const OperationTargetType& operationTarget)
+    : AbstractOperationDescriptor(handle, operationTarget)
+  {
+  }
+  OperationType SetValueOperationDescriptor::getOperationType() const
+  {
+    return OperationType::SET_VALUE;
+  }
+
   // AbstractContextDescriptor
   //
   AbstractContextDescriptor::AbstractContextDescriptor(const HandleType& handle)
@@ -311,6 +323,16 @@ namespace BICEPS::PM
     : AbstractDeviceComponentDescriptor(handle)
   {
   }
+  // ScoDescriptor::
+  //
+  const ScoDescriptor::OperationSequence& ScoDescriptor::Operation() const
+  {
+    return Operation_;
+  }
+  ScoDescriptor::OperationSequence& ScoDescriptor::Operation()
+  {
+    return Operation_;
+  }
 
   // VmdDescriptor
   //
@@ -325,6 +347,14 @@ namespace BICEPS::PM
   VmdDescriptor::ChannelSequence& VmdDescriptor::Channel()
   {
     return Channel_;
+  }
+  const VmdDescriptor::ScoOptional& VmdDescriptor::Sco() const
+  {
+    return Sco_;
+  }
+  VmdDescriptor::ScoOptional& VmdDescriptor::Sco()
+  {
+    return Sco_;
   }
 
   // MdsDescriptor

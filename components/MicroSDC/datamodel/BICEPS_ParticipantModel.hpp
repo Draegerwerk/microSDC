@@ -37,6 +37,16 @@ namespace BICEPS::PM
     NUMERIC_METRIC,
     LOCATION_CONTEXT,
   };
+  enum class OperationType
+  {
+    SET_VALUE,
+    SET_STRING,
+    ACTIVATE,
+    SET_ALERT_STATE,
+    SET_COMPONENT_STATE,
+    SET_CONTEXT_STATE,
+    SET_METRIC_STATE
+  };
   enum class MeasurementValidity
   {
     Vld,
@@ -132,6 +142,8 @@ namespace BICEPS::PM
     const OperationTargetType& OperationTarget() const;
     OperationTargetType& OperationTarget();
 
+    virtual OperationType getOperationType() const = 0;
+
   protected:
     OperationTargetType OperationTarget_;
     AbstractOperationDescriptor(const HandleType& handle,
@@ -140,11 +152,14 @@ namespace BICEPS::PM
 
   class SetValueOperationDescriptor : public AbstractOperationDescriptor
   {
-    using AbstractOperationDescriptor::AbstractOperationDescriptor;
+  public:
+    SetValueOperationDescriptor(const HandleType& handle,
+                                const OperationTargetType& operationTarget);
+    OperationType getOperationType() const override;
   };
   class AbstractDeviceComponentDescriptor : public AbstractDescriptor
   {
-  protected:
+  public:
     AbstractDeviceComponentDescriptor(const HandleType&);
   };
   class AbstractComplexDeviceComponentDescriptor : public AbstractDeviceComponentDescriptor
@@ -354,6 +369,19 @@ namespace BICEPS::PM
   protected:
     MetricSequence Metric_;
   };
+  class ScoDescriptor : public AbstractDeviceComponentDescriptor
+  {
+  public:
+    using OperationType = ::BICEPS::PM::AbstractOperationDescriptor;
+    using OperationSequence = std::vector<std::shared_ptr<OperationType>>;
+    const OperationSequence& Operation() const;
+    OperationSequence& Operation();
+
+    using AbstractDeviceComponentDescriptor::AbstractDeviceComponentDescriptor;
+
+  protected:
+    OperationSequence Operation_;
+  };
   class VmdDescriptor : public AbstractComplexDeviceComponentDescriptor
   {
   public:
@@ -364,10 +392,18 @@ namespace BICEPS::PM
     const ChannelSequence& Channel() const;
     ChannelSequence& Channel();
 
+    // Sco
+    //
+    using ScoType = ::BICEPS::PM::ScoDescriptor;
+    using ScoOptional = std::optional<ScoType>;
+    const ScoOptional& Sco() const;
+    ScoOptional& Sco();
+
     VmdDescriptor(const HandleType&);
 
   protected:
     ChannelSequence Channel_;
+    ScoOptional Sco_;
   };
   class MdsDescriptor : public AbstractComplexDeviceComponentDescriptor
   {

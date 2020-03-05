@@ -3,6 +3,9 @@
 #include "rapidxml_print.hpp"
 #include <iostream>
 
+#include "esp_err.h"
+
+
 MessageSerializer::MessageSerializer()
   : xmlDocument_(std::make_unique<rapidxml::xml_document<>>())
 {
@@ -129,6 +132,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   else if (body.EpisodicMetricReport().has_value())
   {
     serialize(bodyNode, body.EpisodicMetricReport().value());
+  }
+  else if (body.SetValueResponse().has_value())
+  {
+    serialize(bodyNode, body.SetValueResponse().value());
   }
   parent->append_node(bodyNode);
 }
@@ -589,6 +596,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   {
     serialize(vmdNode, channel);
   }
+  if (vmd.Sco().has_value())
+  {
+    serialize(vmdNode, vmd.Sco().value());
+  }
   parent->append_node(vmdNode);
 }
 
@@ -927,17 +938,19 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   setValueResponseNode->append_attribute(xmlnsBicepsMessage);
   if (setValueResponse.MdibVersion().has_value())
   {
-    auto mdibVersionAttr = xmlDocument_->allocate_attribute(
-        "MdibVersion", std::to_string(setValueResponse.MdibVersion().value()).c_str());
+    auto mdibVersion = xmlDocument_->allocate_string(
+        std::to_string(setValueResponse.MdibVersion().value()).c_str());
+    auto mdibVersionAttr = xmlDocument_->allocate_attribute("MdibVersion", mdibVersion);
     setValueResponseNode->append_attribute(mdibVersionAttr);
   }
-  auto SequenceIdAttr =
-      xmlDocument_->allocate_attribute("SequenceId", setValueResponse.SequenceId().uri().c_str());
+  auto sequenceId = xmlDocument_->allocate_string(setValueResponse.SequenceId().uri().c_str());
+  auto SequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", sequenceId);
   setValueResponseNode->append_attribute(SequenceIdAttr);
   if (setValueResponse.InstanceId().has_value())
   {
-    auto instanceIdAttr = xmlDocument_->allocate_attribute(
-        "SequenceId", std::to_string(setValueResponse.InstanceId().value()).c_str());
+    auto instanceId = xmlDocument_->allocate_string(
+        std::to_string(setValueResponse.InstanceId().value()).c_str());
+    auto instanceIdAttr = xmlDocument_->allocate_attribute("SequenceId", instanceId);
     setValueResponseNode->append_attribute(instanceIdAttr);
   }
   serialize(setValueResponseNode, setValueResponse.InvocationInfo());
@@ -950,28 +963,33 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto invocationInfoNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationInfo");
 
-  auto transactionIdNode = xmlDocument_->allocate_node(rapidxml::node_element, "msg:TransactionId");
-  transactionIdNode->value(std::to_string(invocationInfo.TransactionId()).c_str());
+  auto transactionId =
+      xmlDocument_->allocate_string(std::to_string(invocationInfo.TransactionId()).c_str());
+  auto transactionIdNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "msg:TransactionId", transactionId);
   invocationInfoNode->append_node(transactionIdNode);
 
+  auto invocationState =
+      xmlDocument_->allocate_string(toString(invocationInfo.InvocationState()).c_str());
   auto invocationStateNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationState");
-  invocationStateNode->value(toString(invocationInfo.InvocationState()).c_str());
+      xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationState", invocationState);
   invocationInfoNode->append_node(invocationStateNode);
 
   if (invocationInfo.InvocationError().has_value())
   {
+    auto invocationError =
+        xmlDocument_->allocate_string(toString(invocationInfo.InvocationError().value()).c_str());
     auto invocationErrorNode =
-        xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationError");
-    invocationErrorNode->value(toString(invocationInfo.InvocationError().value()).c_str());
+        xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationError", invocationError);
     invocationInfoNode->append_node(invocationErrorNode);
   }
 
   if (invocationInfo.InvocationErrorMessage().has_value())
   {
-    auto invocationErrorMessageNode =
-        xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationErrorMessage");
-    invocationErrorMessageNode->value(invocationInfo.InvocationErrorMessage().value().c_str());
+    auto invocationErrorMessage =
+        xmlDocument_->allocate_string(invocationInfo.InvocationErrorMessage().value().c_str());
+    auto invocationErrorMessageNode = xmlDocument_->allocate_node(
+        rapidxml::node_element, "msg:InvocationErrorMessage", invocationErrorMessage);
     invocationInfoNode->append_node(invocationErrorMessageNode);
   }
   parent->append_node(invocationInfoNode);
@@ -1004,6 +1022,38 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     serialize(reportPartNode, *state);
   }
   parent->append_node(reportPartNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::ScoDescriptor& sco)
+{
+  auto scoNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Sco");
+  auto handleAttr = xmlDocument_->allocate_attribute("Handle", sco.Handle().c_str());
+  scoNode->append_attribute(handleAttr);
+  auto typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:ScoDescriptor");
+  scoNode->append_attribute(typeAttr);
+  for (const auto& operation : sco.Operation())
+  {
+    serialize(scoNode, *operation);
+  }
+  parent->append_node(scoNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::AbstractOperationDescriptor& operation)
+{
+  auto operationNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Operation");
+  auto handleAttr = xmlDocument_->allocate_attribute("Handle", operation.Handle().c_str());
+  operationNode->append_attribute(handleAttr);
+  auto operationTargetAttr =
+      xmlDocument_->allocate_attribute("OperationTarget", operation.OperationTarget().c_str());
+  operationNode->append_attribute(operationTargetAttr);
+  if (operation.getOperationType() == BICEPS::PM::OperationType::SET_VALUE)
+  {
+    auto typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:SetValueOperationDescriptor");
+    operationNode->append_attribute(typeAttr);
+  }
+  parent->append_node(operationNode);
 }
 
 /*static*/ std::string
