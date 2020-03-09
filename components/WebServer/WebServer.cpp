@@ -1,4 +1,5 @@
 #include "WebServer.hpp"
+#include "HTTPRequest.hpp"
 #include "esp_log.h"
 #include "rapidxml.hpp"
 #include <algorithm>
@@ -32,7 +33,7 @@ WebServer::WebServer(bool useTLS)
   config_.httpd.lru_purge_enable = true;
 }
 
-esp_err_t WebServer::start()
+void WebServer::start()
 {
   // start the server
   ESP_LOGI(TAG, "Starting WebServer server on port: '%d'",
@@ -43,16 +44,16 @@ esp_err_t WebServer::start()
   if (ret != ESP_OK)
   {
     ESP_LOGE(TAG, "Error starting server!");
-    return ESP_FAIL;
+    throw std::runtime_error("Cannot start WebServer!");
+    return;
   }
-  register_uri_handlers();
-  return ESP_OK;
+  registerUriHandlers();
 }
 
-esp_err_t WebServer::stop()
+void WebServer::stop()
 {
   ESP_LOGI(TAG, "Stopping...");
-  return httpd_stop(server_);
+  httpd_stop(server_);
 }
 
 void WebServer::addService(std::shared_ptr<ServiceInterface> service)
@@ -87,7 +88,8 @@ esp_err_t WebServer::handlerCallback(httpd_req_t* req)
 
   try
   {
-    (*service)->handleRequest(req, buffer.data());
+    const auto request = std::make_shared<HTTPRequest>(req, buffer.data());
+    (*service)->handleRequest(request);
   }
   catch (rapidxml::parse_error& e)
   {
@@ -108,7 +110,7 @@ esp_err_t WebServer::handlerCallback(httpd_req_t* req)
   return ESP_OK;
 }
 
-void WebServer::register_uri_handlers()
+void WebServer::registerUriHandlers()
 {
   ESP_LOGI(TAG, "Registering URI handlers...");
   const httpd_uri_t get = {

@@ -13,12 +13,16 @@ set(COMPONENT_SOURCES
         "dpws/DPWSHost.cpp"
         "dpws/MessagingContext.cpp"
         "dpws/MetadataProvider.cpp"
+        "networking/NetworkConfig.cpp"
         "services/DeviceService.cpp"
         "services/GetService.cpp"
+        "services/Request.cpp"
         "services/SetService.cpp"
         "services/StateEventService.cpp"
         "services/SoapService.cpp"
         "services/StaticService.cpp"
+        "uuid/UUID.cpp"
+        "uuid/UUIDGenerator.cpp"
         "DeviceCharacteristics.cpp"
         "MicroSDC.cpp"
         "StateHandler.cpp"
@@ -28,5 +32,5 @@ set(COMPONENT_SOURCES
 idf_component_register(
     SRCS ${COMPONENT_SOURCES}
     INCLUDE_DIRS "."
-    REQUIRES "WebServer" "UUID" "Networking" "rapidxml" "asio" "pthread" "esp_http_client"
+    REQUIRES "rapidxml" "asio" "pthread" "esp_http_client"
     )

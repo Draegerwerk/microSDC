@@ -1,7 +1,7 @@
 #include "SubscriptionManager.hpp"
 #include "MicroSDC.hpp"
 #include "SDCConstants.hpp"
-#include "UUIDGenerator.hpp"
+#include "uuid/UUIDGenerator.hpp"
 #include "datamodel/MessageModel.hpp"
 #include "datamodel/MessageSerializer.hpp"
 #include "datamodel/ws-addressing.hpp"

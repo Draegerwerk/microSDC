@@ -5,6 +5,7 @@
 class DeviceCharacteristics
 {
 public:
+  // TODO restructure to reference getters
   void setManufacturer(const std::string& name);
   void setManufacturerUrl(const std::string& url);
   void setModelName(const std::string& name);

@@ -2,14 +2,14 @@
 
 #include "DeviceCharacteristics.hpp"
 #include "SubscriptionManager.hpp"
-#include "WebServer.hpp"
-#include "datamodel/BICEPS_ParticipantModel.hpp"
 #include "dpws/DPWSHost.hpp"
 #include <map>
 #include <mutex>
 #include <thread>
 
+class NetworkConfig;
 class StateHandler;
+class WebServerInterface;
 
 class MicroSDC
 {
@@ -26,6 +26,11 @@ public:
    * @brief stops all components when disconnected
    */
   void stop();
+  /**
+   * @brief returns whether MicroSDC is running
+   * @return whether MicroSDC is running
+   */
+  bool isRunning() const;
   /**
    * @brief gets the mdib representation of this MicroSDC instance
    * @return constant reference to the mdib
@@ -57,11 +62,14 @@ public:
    */
   std::string getEndpointReference() const;
   /**
-   * @brief sets the useTLS bool member for TLS usage enable. This should be set before start is
-   * called!
-   * @param useTLS whether to use TLS for web services
+   * TODO
    */
-  void setUseTLS(bool useTLS);
+  void setWebServer(std::shared_ptr<WebServerInterface> webserver);
+  /**
+   * @brief sets the network config. This should be set before start is called!
+   * @param networkConfig the pointer to the network configuration
+   */
+  void setNetworkConfig(std::shared_ptr<NetworkConfig> networkConfig);
   /**
    * @brief get a valid message id for WS-Addressing
    * @return string of a message id
@@ -82,11 +90,14 @@ public:
    * @param state the state to update
    */
   void updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state);
-
+  /**
+   * TODO
+   */
   void setLocation(const std::string& descriptorHandle,
                    const BICEPS::PM::LocationDetailType& locationDetail);
 
 private:
+  /// TODO
   std::shared_ptr<BICEPS::PM::LocationContextState> locationContextState_{nullptr};
   /// the SDC thread
   std::thread sdcThread_;
@@ -95,16 +106,16 @@ private:
   /// pointer to the subscription manager
   std::shared_ptr<SubscriptionManager> subscriptionManager_{nullptr};
   /// pointer to the WebServer
-  std::unique_ptr<WebServer> webserver_{nullptr};
+  std::shared_ptr<WebServerInterface> webserver_{nullptr};
   /// pointer to the mdib representation
   std::unique_ptr<BICEPS::PM::Mdib> mdib_{nullptr};
   /// mutex protecting changes in the mdib
   mutable std::mutex mdibMutex_;
   /// all states
   std::vector<std::shared_ptr<StateHandler>> stateHandlers_;
-  /// whether the communication uses TLS
-  bool useTLS_{true};
-  /// whether SDC is started and connected
+  /// pointer to the network configuration
+  std::shared_ptr<NetworkConfig> networkConfig_{nullptr};
+  /// whether SDC is started or stopped
   bool running_{false};
   /// mutex protecting running_ member
   mutable std::mutex runningMutex_;
@@ -115,8 +126,6 @@ private:
 
   /// Device Characteristics of this instance
   DeviceCharacteristics deviceCharacteristics_;
-  /// mutex protecting the deviceCharacteristics
-  mutable std::mutex deviceCharacteristicsMutex_;
 
   /**
    * @brief Starts and initializes all SDC components and services
@@ -142,5 +151,8 @@ private:
    * @brief initializes all registered states by calling there initial state function
    */
   void initializeMdStates();
+  /**
+   * TODO
+   */
   void notifyEpisodicMetricReport(std::shared_ptr<const BICEPS::PM::NumericMetricState> state);
 };

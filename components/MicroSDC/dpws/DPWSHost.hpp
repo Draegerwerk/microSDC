@@ -1,13 +1,14 @@
 #pragma once
 
 #include "MessagingContext.hpp"
-#include "asio.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
-#include "esp_err.h"
 #include <array>
 #include <atomic>
 #include <thread>
+
+#include "asio.hpp"
+#include "esp_err.h"
 
 class DPWSHost
 {

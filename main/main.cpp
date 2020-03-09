@@ -3,15 +3,19 @@
 #include "MicroSDC.hpp"
 #include "NetworkHandler.hpp"
 #include "StateHandler.hpp"
-#include "esp_eth.h"
-#include "esp_log.h"
-#include "esp_pthread.h"
-#include "esp_system.h"
-#include "nvs_flash.h"
+#include "WebServer.hpp"
+#include "networking/NetworkConfig.hpp"
 #include <chrono>
 #include <pthread.h>
 #include <sstream>
 #include <thread>
+
+#include "esp_eth.h"
+#include "esp_log.h"
+#include "esp_pthread.h"
+#include "esp_system.h"
+#include "esp_tls.h"
+#include "nvs_flash.h"
 
 static constexpr const char* TAG = "main_component";
 
@@ -24,6 +28,9 @@ static void ipEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t e
       [[fallthrough]];
     case IP_EVENT_STA_GOT_IP: {
       auto sdc = reinterpret_cast<MicroSDC*>(arg);
+      auto networkConfig =
+          std::make_shared<NetworkConfig>(true, NetworkHandler::getInstance().address());
+      sdc->setNetworkConfig(networkConfig);
       sdc->start();
       break;
     }
@@ -107,9 +114,19 @@ extern "C" void app_main()
   tcpip_adapter_init();
   ESP_ERROR_CHECK(esp_event_loop_create_default());
 
+  // initialize global ca store for client communication
+  ESP_ERROR_CHECK(esp_tls_init_global_ca_store());
+  extern const unsigned char cacert_pem_start[] asm("_binary_cacert_pem_start");
+  extern const unsigned char cacert_pem_end[] asm("_binary_cacert_pem_end");
+  const std::size_t cacert_len = cacert_pem_end - cacert_pem_start;
+  ESP_ERROR_CHECK(esp_tls_set_global_ca_store(cacert_pem_start, cacert_len));
+
+
   auto sdc = new MicroSDC();
   sdc->setEndpointReference("urn:uuid:MicroSDC-provider-on-esp32");
-  sdc->setUseTLS(true);
+
+  auto webserver = std::make_shared<WebServer>(true);
+  sdc->setWebServer(webserver);
 
   DeviceCharacteristics deviceCharacteristics;
   deviceCharacteristics.setFriendlyName("MicroSDC on ESP32");

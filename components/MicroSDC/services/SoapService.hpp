@@ -8,10 +8,6 @@
 class SoapService : public ServiceInterface
 {
 public:
-  class SoapFault : public std::exception
-  {
-  };
-  static MESSAGEMODEL::Envelope parse(char* message);
   static void fillResponseMessageFromRequestMessage(MESSAGEMODEL::Envelope& envelope,
                                                     const MESSAGEMODEL::Envelope& request);
 };

@@ -1,17 +1,15 @@
 #pragma once
 
 #include "SoapService.hpp"
-#include "datamodel/MessageModel.hpp"
 #include "dpws/MetadataProvider.hpp"
-#include "esp_http_server.h"
 
 class DeviceService : public SoapService
 {
 public:
-  explicit DeviceService(MetadataProvider metadata);
-  void handleRequest(httpd_req_t* req, char* message) override;
+  explicit DeviceService(std::shared_ptr<const MetadataProvider> metadata);
   std::string getURI() const override;
+  void handleRequest(std::shared_ptr<Request> req) override;
 
 private:
-  const MetadataProvider metadata_;
+  const std::shared_ptr<const MetadataProvider> metadata_;
 };

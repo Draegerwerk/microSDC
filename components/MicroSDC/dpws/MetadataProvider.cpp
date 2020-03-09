@@ -1,11 +1,12 @@
 #include "dpws/MetadataProvider.hpp"
-#include "NetworkHandler.hpp"
 #include "SDCConstants.hpp"
 #include "datamodel/MDPWSConstants.hpp"
+#include "networking/NetworkConfig.hpp"
 
-MetadataProvider::MetadataProvider(const DeviceCharacteristics& devChar, const bool useTLS)
-  : deviceCharacteristics_(devChar)
-  , useTLS(useTLS)
+MetadataProvider::MetadataProvider(std::shared_ptr<const NetworkConfig> networkConfig,
+                                   DeviceCharacteristics devChar)
+  : networkConfig_(std::move(networkConfig))
+  , deviceCharacteristics_(std::move(devChar))
 {
 }
 
@@ -32,18 +33,19 @@ std::string MetadataProvider::getStateEventServicePath() const
 WS::ADDRESSING::URIType MetadataProvider::getSetServiceURI() const
 {
   // Endpoint Reference
-  const std::string protocol = useTLS ? "https" : "http";
-  const std::string xaddress = protocol + "://" + NetworkHandler::getInstance().address() +
-                               (useTLS ? ":443" : ":80") + getSetServicePath();
+  const std::string protocol = networkConfig_->useTLS() ? "https" : "http";
+  const std::string xaddress = protocol + "://" + networkConfig_->ipAddress() +
+                               (networkConfig_->useTLS() ? ":443" : ":80") + getSetServicePath();
   return xaddress;
 }
 
 WS::ADDRESSING::URIType MetadataProvider::getStateEventServiceURI() const
 {
   // Endpoint Reference
-  const std::string protocol = useTLS ? "https" : "http";
-  const std::string xaddress = protocol + "://" + NetworkHandler::getInstance().address() +
-                               (useTLS ? ":443" : ":80") + getStateEventServicePath();
+  const std::string protocol = networkConfig_->useTLS() ? "https" : "http";
+  const std::string xaddress = protocol + "://" + networkConfig_->ipAddress() +
+                               (networkConfig_->useTLS() ? ":443" : ":80") +
+                               getStateEventServicePath();
   return xaddress;
 }
 
@@ -121,9 +123,9 @@ MetadataProvider::createMetadataSectionRelationship(const Host& host,
 MetadataProvider::Hosted MetadataProvider::createHostedGetService() const
 {
   // Endpoint Reference
-  const std::string protocol = useTLS ? "https" : "http";
-  const std::string xaddress = protocol + "://" + NetworkHandler::getInstance().address() +
-                               (useTLS ? ":443" : ":80") + getGetServicePath();
+  const std::string protocol = networkConfig_->useTLS() ? "https" : "http";
+  const std::string xaddress = protocol + "://" + networkConfig_->ipAddress() +
+                               (networkConfig_->useTLS() ? ":443" : ":80") + getGetServicePath();
   Hosted::EndpointReferenceSequence endpointReference;
   endpointReference.emplace_back(Hosted::EndpointReferenceType::AddressType(xaddress));
   // Types
@@ -138,10 +140,10 @@ MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionWSDLGet
 {
   MetadataSection wsdlSection =
       MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_WSDL));
-  const std::string protocol = useTLS ? "https" : "http";
-  wsdlSection.Location() =
-      MetadataSection::LocationType(protocol + "://" + NetworkHandler::getInstance().address() +
-                                    (useTLS ? ":443" : ":80") + getGetServicePath() + "/?wsdl");
+  const std::string protocol = networkConfig_->useTLS() ? "https" : "http";
+  wsdlSection.Location() = MetadataSection::LocationType(
+      protocol + "://" + networkConfig_->ipAddress() + (networkConfig_->useTLS() ? ":443" : ":80") +
+      getGetServicePath() + "/?wsdl");
   return wsdlSection;
 }
 
@@ -162,10 +164,10 @@ MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionWSDLSet
 {
   MetadataSection wsdlSection =
       MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_WSDL));
-  const std::string protocol = useTLS ? "https" : "http";
-  wsdlSection.Location() =
-      MetadataSection::LocationType(protocol + "://" + NetworkHandler::getInstance().address() +
-                                    (useTLS ? ":443" : ":80") + getSetServicePath() + "/?wsdl");
+  const std::string protocol = networkConfig_->useTLS() ? "https" : "http";
+  wsdlSection.Location() = MetadataSection::LocationType(
+      protocol + "://" + networkConfig_->ipAddress() + (networkConfig_->useTLS() ? ":443" : ":80") +
+      getSetServicePath() + "/?wsdl");
   return wsdlSection;
 }
 
@@ -188,9 +190,9 @@ MetadataProvider::createMetadataSectionWSDLStateEventService() const
 {
   MetadataSection wsdlSection =
       MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_WSDL));
-  const std::string protocol = useTLS ? "https" : "http";
+  const std::string protocol = networkConfig_->useTLS() ? "https" : "http";
   wsdlSection.Location() = MetadataSection::LocationType(
-      protocol + "://" + NetworkHandler::getInstance().address() + (useTLS ? ":443" : ":80") +
+      protocol + "://" + networkConfig_->ipAddress() + (networkConfig_->useTLS() ? ":443" : ":80") +
       getStateEventServicePath() + "/?wsdl");
   return wsdlSection;
 }

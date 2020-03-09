@@ -1,17 +1,18 @@
 #pragma once
 
-#include "MicroSDC.hpp"
 #include "SoapService.hpp"
 #include "dpws/MetadataProvider.hpp"
+
+class MicroSDC;
 
 class GetService : public SoapService
 {
 public:
-  GetService(const MicroSDC& microSDC, MetadataProvider metadata);
+  GetService(const MicroSDC& microSDC, std::shared_ptr<const MetadataProvider> metadata);
   std::string getURI() const override;
-  void handleRequest(httpd_req* req, char* message) override;
+  void handleRequest(std::shared_ptr<Request> req) override;
 
 private:
   const MicroSDC& microSDC_;
-  const MetadataProvider metadata_;
+  const std::shared_ptr<const MetadataProvider> metadata_;
 };

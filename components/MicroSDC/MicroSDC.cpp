@@ -1,21 +1,24 @@
 #include "MicroSDC.hpp"
-#include "NetworkHandler.hpp"
+
 #include "SDCConstants.hpp"
 #include "StateHandler.hpp"
-#include "UUIDGenerator.hpp"
-#include "asio/system_error.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "dpws/MetadataProvider.hpp"
-#include "esp_log.h"
-#include "esp_tls.h"
+#include "networking/NetworkConfig.hpp"
 #include "services/DeviceService.hpp"
 #include "services/GetService.hpp"
 #include "services/SetService.hpp"
 #include "services/StateEventService.hpp"
 #include "services/StaticService.hpp"
+#include "services/WebServerInterface.hpp"
+#include "uuid/UUIDGenerator.hpp"
 #include "wsdl/GetServiceWSDL.hpp"
 #include "wsdl/SetServiceWSDL.hpp"
 #include "wsdl/StateEventServiceWSDL.hpp"
+
+#include "asio/system_error.hpp"
+
+#include "esp_log.h"
 
 static constexpr const char* TAG = "MicroSDC";
 
@@ -27,29 +30,41 @@ MicroSDC::MicroSDC()
 
 void MicroSDC::start()
 {
-  sdcThread_ = std::thread([this]() { startup(); });
+  if (networkConfig_ == nullptr)
+  {
+    ESP_LOGE(TAG, "Failed to start MicroSDC. Set NetworkConfig first!");
+    return;
+  }
+  if (webserver_ == nullptr)
+  {
+    ESP_LOGE(TAG, "Failed to start MicroSDC. Set WebServer first!");
+    return;
+  }
+
+  std::lock_guard<std::mutex> lock(runningMutex_);
+  if (running_)
+  {
+    ESP_LOGW(TAG, "called MicroSDC start but already running!");
+    return;
+  }
+  startup();
+  // MicroSDC is now ready und is running
+  running_ = true;
 }
 
 void MicroSDC::startup()
 {
-  {
-    std::lock_guard<std::mutex> lock(runningMutex_);
-    if (running_)
-    {
-      ESP_LOGW(TAG, "called MicroSDC connect but already running!");
-      return;
-    }
-    running_ = true;
-  } // free lock of running bool
   ESP_LOGI(TAG, "Initialize...");
 
-  MetadataProvider metadata(getDeviceCharacteristics(), useTLS_);
+  const auto metadata =
+      std::make_shared<const MetadataProvider>(networkConfig_, deviceCharacteristics_);
 
   // construct xAddresses containing reference to the service
   WS::DISCOVERY::UriListType xAddresses;
-  std::string protocol = useTLS_ ? "https" : "http";
-  std::string xaddress = protocol + "://" + NetworkHandler::getInstance().address() +
-                         (useTLS_ ? ":443" : ":80") + metadata.getDeviceServicePath();
+  std::string protocol = networkConfig_->useTLS() ? "https" : "http";
+  std::string xaddress = protocol + "://" + networkConfig_->ipAddress() +
+                         (networkConfig_->useTLS() ? ":443" : ":80") +
+                         metadata->getDeviceServicePath();
   xAddresses.emplace_back(xaddress);
 
   // fill discovery types
@@ -59,27 +74,12 @@ void MicroSDC::startup()
 
   initializeMdStates();
 
-  try
+  dpws_ = std::make_unique<DPWSHost>(
+      WS::ADDRESSING::EndpointReferenceType::AddressType(endpointReference_), types, xAddresses);
+  if (locationContextState_ != nullptr && locationContextState_->LocationDetail().has_value())
   {
-    dpws_ = std::make_unique<DPWSHost>(
-        WS::ADDRESSING::EndpointReferenceType::AddressType(endpointReference_), types, xAddresses);
-    if (locationContextState_ != nullptr && locationContextState_->LocationDetail().has_value())
-    {
-      dpws_->setLocation(locationContextState_->LocationDetail().value());
-    }
+    dpws_->setLocation(locationContextState_->LocationDetail().value());
   }
-  catch (const asio::system_error& e)
-  {
-    ESP_LOGE(TAG, "asio system_error: %s", e.what());
-    return;
-  }
-
-  // initialize global ca store for client communication
-  ESP_ERROR_CHECK(esp_tls_init_global_ca_store());
-  extern const unsigned char cacert_pem_start[] asm("_binary_cacert_pem_start");
-  extern const unsigned char cacert_pem_end[] asm("_binary_cacert_pem_end");
-  const std::size_t cacert_len = cacert_pem_end - cacert_pem_start;
-  ESP_ERROR_CHECK(esp_tls_set_global_ca_store(cacert_pem_start, cacert_len));
 
   // construct subscription manager
   subscriptionManager_ = std::make_shared<SubscriptionManager>();
@@ -96,8 +96,6 @@ void MicroSDC::startup()
       std::make_shared<StateEventService>(*this, metadata, subscriptionManager_);
   auto stateEventWSDLService = std::make_shared<StaticService>(
       stateEventService->getURI() + "/?wsdl", WSDL::STATE_EVENT_SERVICE_SERVICE_WSDL);
-
-  webserver_ = std::make_unique<WebServer>(useTLS_);
 
   // register webservices
   webserver_->addService(deviceService);
@@ -119,10 +117,16 @@ void MicroSDC::stop()
   {
     dpws_->stop();
     webserver_->stop();
-    running_ = false;
     sdcThread_.join();
+    running_ = false;
     ESP_LOGI(TAG, "stopped");
   }
+}
+
+bool MicroSDC::isRunning() const
+{
+  std::lock_guard<std::mutex> lock(runningMutex_);
+  return running_;
 }
 
 void MicroSDC::initializeMdStates()
@@ -180,21 +184,25 @@ const BICEPS::PM::Mdib& MicroSDC::getMdib() const
 
 void MicroSDC::setMdDescription(const BICEPS::PM::MdDescription& mdDescription)
 {
+  std::lock_guard<std::mutex> runningLock(runningMutex_);
+  if (running_)
+  {
+    throw std::runtime_error("MicroSDC has to be stopped to set MdDescription!");
+  }
   std::lock_guard<std::mutex> lock(mdibMutex_);
   mdib_->MdDescription() = mdDescription;
 }
 
 void MicroSDC::setDeviceCharacteristics(DeviceCharacteristics devChar)
 {
-  std::lock_guard<std::mutex> lock(deviceCharacteristicsMutex_);
+  std::lock_guard<std::mutex> lock(runningMutex_);
+  if (running_)
+  {
+    throw std::runtime_error("MicroSDC has to be stopped to set DeviceCharacteristics!");
+  }
   deviceCharacteristics_ = std::move(devChar);
+  std::lock_guard<std::mutex> eprLock(eprMutex_);
   deviceCharacteristics_.setEndpointReference(endpointReference_);
-}
-
-const DeviceCharacteristics& MicroSDC::getDeviceCharacteristics() const
-{
-  std::lock_guard<std::mutex> lock(deviceCharacteristicsMutex_);
-  return deviceCharacteristics_;
 }
 
 void MicroSDC::setEndpointReference(const std::string& epr)
@@ -206,12 +214,27 @@ void MicroSDC::setEndpointReference(const std::string& epr)
 std::string MicroSDC::getEndpointReference() const
 {
   std::lock_guard<std::mutex> eprLock{eprMutex_};
-  return std::string(endpointReference_);
+  return endpointReference_;
 }
 
-void MicroSDC::setUseTLS(const bool useTLS)
+void MicroSDC::setWebServer(std::shared_ptr<WebServerInterface> webserver)
 {
-  this->useTLS_ = useTLS;
+  std::lock_guard<std::mutex> lock(runningMutex_);
+  if (running_)
+  {
+    throw std::runtime_error("MicroSDC has to be stopped to set WebServer!");
+  }
+  webserver_ = std::move(webserver);
+}
+
+void MicroSDC::setNetworkConfig(std::shared_ptr<NetworkConfig> networkConfig)
+{
+  std::lock_guard<std::mutex> lock(runningMutex_);
+  if (running_)
+  {
+    throw std::runtime_error("MicroSDC has to be stopped to set NetworkConfig!");
+  }
+  networkConfig_ = std::move(networkConfig);
 }
 
 std::string MicroSDC::calculateUUID()
@@ -233,6 +256,7 @@ void MicroSDC::addMdState(std::shared_ptr<StateHandler> stateHandler)
 
 void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state)
 {
+  std::lock_guard<std::mutex> lock(runningMutex_);
   if (!running_)
   {
     return;
@@ -275,10 +299,6 @@ unsigned int MicroSDC::getMdibVersion() const
 void MicroSDC::notifyEpisodicMetricReport(
     std::shared_ptr<const BICEPS::PM::NumericMetricState> state)
 {
-  if (!running_)
-  {
-    return;
-  }
   BICEPS::MM::MetricReportPart reportPart;
   reportPart.MetricState().emplace_back(std::move(state));
   BICEPS::MM::EpisodicMetricReport report(WS::ADDRESSING::URIType("0"));

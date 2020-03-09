@@ -4,6 +4,8 @@
 #include "datamodel/MessageModel.hpp"
 #include "datamodel/ws-MetadataExchange.hpp"
 
+class NetworkConfig;
+
 class MetadataProvider
 {
 public:
@@ -13,11 +15,13 @@ public:
   using MetadataSection = WS::MEX::MetadataSection;
 
   /**
+   * TODO
    * @brief constructs a MetadataProvider object from given Device Characteristics
    * @param devChar Device Characteristics to provide with this MetadataProvider
    * @param useTLS whether TLS should is used for SDC communication
    */
-  MetadataProvider(const DeviceCharacteristics& devChar, bool useTLS);
+  MetadataProvider(std::shared_ptr<const NetworkConfig> networkConfig,
+                   DeviceCharacteristics devChar);
 
   /**
    * @brief get the URI of the Device Service
@@ -124,8 +128,8 @@ public:
   Hosted createHostedStateEventService() const;
 
 private:
+  /// network configuration of this device
+  const std::shared_ptr<const NetworkConfig> networkConfig_;
   /// device characteristics to provide
   const DeviceCharacteristics deviceCharacteristics_;
-  /// whether the URIs should include https as header
-  const bool useTLS;
 };
