@@ -17,7 +17,8 @@ public:
   /**
    * @brief constructs an MicroSDC instance
    */
-  MicroSDC();
+  MicroSDC(std::shared_ptr<WebServerInterface> webServer,
+           std::shared_ptr<SessionManagerInterface> sessionManager);
   /**
    * @brief starts the sdcThread calling startup()
    */
@@ -62,10 +63,6 @@ public:
    */
   std::string getEndpointReference() const;
   /**
-   * TODO
-   */
-  void setWebServer(std::shared_ptr<WebServerInterface> webserver);
-  /**
    * @brief sets the network config. This should be set before start is called!
    * @param networkConfig the pointer to the network configuration
    */
@@ -107,6 +104,8 @@ private:
   std::shared_ptr<SubscriptionManager> subscriptionManager_{nullptr};
   /// pointer to the WebServer
   std::shared_ptr<WebServerInterface> webserver_{nullptr};
+  /// pointer to the Session Manager
+  std::shared_ptr<SessionManagerInterface> sessionManager_{nullptr};
   /// pointer to the mdib representation
   std::unique_ptr<BICEPS::PM::Mdib> mdib_{nullptr};
   /// mutex protecting changes in the mdib

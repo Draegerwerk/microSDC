@@ -16,6 +16,7 @@ class SessionManagerInterface;
 class SubscriptionManager
 {
 public:
+  explicit SubscriptionManager(std::shared_ptr<SessionManagerInterface> sessionManager);
   WS::EVENTING::SubscribeResponse dispatch(const WS::EVENTING::Subscribe& subscribeRequest);
   WS::EVENTING::RenewResponse dispatch(const WS::EVENTING::Renew& renewRequest,
                                        const WS::EVENTING::Identifier& identifier);

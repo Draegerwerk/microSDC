@@ -22,8 +22,11 @@
 
 static constexpr const char* TAG = "MicroSDC";
 
-MicroSDC::MicroSDC()
-  : mdib_(std::make_unique<BICEPS::PM::Mdib>(std::string("0")))
+MicroSDC::MicroSDC(std::shared_ptr<WebServerInterface> webServer,
+                   std::shared_ptr<SessionManagerInterface> sessionManager)
+  : webserver_(std::move(webServer))
+  , sessionManager_(std::move(sessionManager))
+  , mdib_(std::make_unique<BICEPS::PM::Mdib>(std::string("0")))
 {
   mdib_->MdState() = BICEPS::PM::MdState();
 }
@@ -33,11 +36,6 @@ void MicroSDC::start()
   if (networkConfig_ == nullptr)
   {
     LOG(LogLevel::ERROR, "Failed to start MicroSDC. Set NetworkConfig first!");
-    return;
-  }
-  if (webserver_ == nullptr)
-  {
-    LOG(LogLevel::ERROR, "Failed to start MicroSDC. Set WebServer first!");
     return;
   }
 
@@ -82,7 +80,7 @@ void MicroSDC::startup()
   }
 
   // construct subscription manager
-  subscriptionManager_ = std::make_shared<SubscriptionManager>();
+  subscriptionManager_ = std::make_shared<SubscriptionManager>(sessionManager_);
 
   // construct web services
   auto deviceService = std::make_shared<DeviceService>(metadata);
@@ -215,16 +213,6 @@ std::string MicroSDC::getEndpointReference() const
 {
   std::lock_guard<std::mutex> eprLock{eprMutex_};
   return endpointReference_;
-}
-
-void MicroSDC::setWebServer(std::shared_ptr<WebServerInterface> webserver)
-{
-  std::lock_guard<std::mutex> lock(runningMutex_);
-  if (running_)
-  {
-    throw std::runtime_error("MicroSDC has to be stopped to set WebServer!");
-  }
-  webserver_ = std::move(webserver);
 }
 
 void MicroSDC::setNetworkConfig(std::shared_ptr<NetworkConfig> networkConfig)

@@ -13,6 +13,11 @@
 
 static constexpr const char* TAG = "SubscriptionManager";
 
+SubscriptionManager::SubscriptionManager(std::shared_ptr<SessionManagerInterface> sessionManager)
+  : sessionManager_(std::move(sessionManager))
+{
+}
+
 WS::EVENTING::SubscribeResponse
 SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
 {
@@ -128,7 +133,7 @@ void SubscriptionManager::fireEvent(const BICEPS::MM::EpisodicMetricReport& repo
   serializer.serialize(notifyEnvelope);
   const auto messageStr = serializer.str();
   LOG(LogLevel::DEBUG, "SENDING: " << messageStr);
-  for (const auto info : subscriber)
+  for (const auto *const info : subscriber)
   {
     sessionManager_->sendToSession(info->notifyTo.Address(), messageStr);
   }

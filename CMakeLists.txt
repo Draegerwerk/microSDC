@@ -92,5 +92,5 @@ set(SOURCES
     "src/SubscriptionManager.cpp"
     )
 
-add_library(microSDC SHARED ${SOURCES} ${HEADERS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+add_library(microSDC ${SOURCES} ${HEADERS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)

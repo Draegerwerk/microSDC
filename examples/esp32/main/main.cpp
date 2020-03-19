@@ -2,6 +2,7 @@
 #include "DeviceCharacteristics.hpp"
 #include "MicroSDC.hpp"
 #include "NetworkHandler.hpp"
+#include "SessionManager.hpp"
 #include "StateHandler.hpp"
 #include "WebServer.hpp"
 #include "networking/NetworkConfig.hpp"
@@ -123,11 +124,8 @@ extern "C" void app_main()
   ESP_ERROR_CHECK(esp_tls_set_global_ca_store(cacert_pem_start, cacert_len));
 
 
-  auto sdc = new MicroSDC();
+  auto sdc = new MicroSDC(std::make_shared<WebServer>(true), std::make_shared<SessionManager>());
   sdc->setEndpointReference("urn:uuid:MicroSDC-provider-on-esp32");
-
-  auto webserver = std::make_shared<WebServer>(true);
-  sdc->setWebServer(webserver);
 
   DeviceCharacteristics deviceCharacteristics;
   deviceCharacteristics.setFriendlyName("MicroSDC on ESP32");
