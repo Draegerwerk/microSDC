@@ -14,13 +14,13 @@ WebServer::WebServer(bool useTLS)
 {
   extern const unsigned char cacert_pem_start[] asm("_binary_cacert_pem_start");
   extern const unsigned char cacert_pem_end[] asm("_binary_cacert_pem_end");
-  config_.cacert_pem = cacert_pem_start;
-  config_.cacert_len = cacert_pem_end - cacert_pem_start;
+  config_.client_verify_cert_pem = cacert_pem_start;
+  config_.client_verify_cert_len = cacert_pem_end - cacert_pem_start;
 
   extern const unsigned char serverCert_pem_start[] asm("_binary_serverCert_pem_start");
   extern const unsigned char serverCert_pem_end[] asm("_binary_serverCert_pem_end");
-  config_.servercert_pem = serverCert_pem_start;
-  config_.servercert_len = serverCert_pem_end - serverCert_pem_start;
+  config_.cacert_pem = serverCert_pem_start;
+  config_.cacert_len = serverCert_pem_end - serverCert_pem_start;
   extern const unsigned char serverKey_pem_start[] asm("_binary_serverKey_pem_start");
   extern const unsigned char serverKey_pem_end[] asm("_binary_serverKey_pem_end");
   config_.prvtkey_pem = serverKey_pem_start;

@@ -38,14 +38,14 @@ void BME280::initSensor(std::uint8_t deviceAddress)
   device_.intf = BME280_I2C_INTF;
   switch (i2cPort_)
   {
-    case i2c_port_t::I2C_NUM_0: {
-      device_.read = readI2C<i2c_port_t::I2C_NUM_0>;
-      device_.write = writeI2C<i2c_port_t::I2C_NUM_0>;
+    case I2C_NUM_0: {
+      device_.read = readI2C<I2C_NUM_0>;
+      device_.write = writeI2C<I2C_NUM_0>;
       break;
     }
-    case i2c_port_t::I2C_NUM_1: {
-      device_.read = readI2C<i2c_port_t::I2C_NUM_1>;
-      device_.write = writeI2C<i2c_port_t::I2C_NUM_1>;
+    case I2C_NUM_1: {
+      device_.read = readI2C<I2C_NUM_1>;
+      device_.write = writeI2C<I2C_NUM_1>;
       break;
     }
     default: {

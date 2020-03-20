@@ -117,5 +117,5 @@ private:
    * @brief Initialize BME280 sensor in normal mode
    * @param devAddress The sensor's address
    */
-  void initSensor(std::uint8_t devAddress);
+  void initSensor(std::uint8_t deviceAddress);
 };
