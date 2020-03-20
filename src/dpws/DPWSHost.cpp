@@ -71,7 +71,7 @@ void DPWSHost::doReceive()
     socket_.async_receive_from(
         asio::buffer(receiveBuffer_->data(), receiveBuffer_->size()), senderEndpoint_,
         [this](const std::error_code& error, std::size_t bytesRecvd) {
-          LOG(LogLevel::ERROR, "Received " << bytesRecvd << " bytes, ec: " << error.message());
+          LOG(LogLevel::DEBUG, "Received " << bytesRecvd << " bytes, ec: " << error.message());
           // null terminate whatever received
           receiveBuffer_->at(bytesRecvd) = '\0';
           if (!error)
