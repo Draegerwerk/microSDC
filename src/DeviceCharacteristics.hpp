@@ -5,7 +5,8 @@
 class DeviceCharacteristics
 {
 public:
-  // TODO restructure to reference getters
+  // TODO: restructure to reference getters
+  // TODO: add doxygen comments
   void setManufacturer(const std::string& name);
   void setManufacturerUrl(const std::string& url);
   void setModelName(const std::string& name);
