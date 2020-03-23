@@ -72,7 +72,7 @@ void SetService::handleRequest(std::shared_ptr<Request> req)
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
     responseEnvelope.Header().Action() =
         WS::ADDRESSING::URIType(MDPWS::WS_ACTION_UNSUBSCRIBE_RESPONSE);
-    req->respond(requestEnvelope);
+    req->respond(responseEnvelope);
   }
   else if (soapAction == SDC::ACTION_SET_VALUE)
   {
