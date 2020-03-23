@@ -124,15 +124,16 @@ void initWifi()
   ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
   wifi_config_t wifiConfig = {.sta = {
-                                  CONFIG_WIFI_SSID,          // ssid
-                                  CONFIG_WIFI_PASSWORD,      // password
-                                  WIFI_FAST_SCAN,            // scan_method
-                                  false,                     // bssid_set
-                                  {},                        // bssid
-                                  0,                         // channel
-                                  0,                         // listen_interval
-                                  WIFI_CONNECT_AP_BY_SIGNAL, // sort_method
-                                  {}                         // threshold
+                                  CONFIG_WIFI_SSID,     // ssid
+                                  CONFIG_WIFI_PASSWORD, // password
+                                  {},                   // scan_method
+                                  {},                   // bssid_set
+                                  {},                   // bssid
+                                  {},                   // channel
+                                  {},                   // listen_interval
+                                  {},                   // sort_method
+                                  {},                   // threshold
+                                  {}                    // pmf_cfg
                               }};
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
   ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig));
