@@ -94,3 +94,20 @@ set(SOURCES
 
 add_library(microSDC ${SOURCES} ${HEADERS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+# include doxygen documentation to cmake
+find_package(Doxygen)
+option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" ${DOXYGEN_FOUND})
+
+if(BUILD_DOCUMENTATION)
+    if(NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR "Doxygen is needed to build the documentation.")
+    endif()
+
+    set(DOXYGEN_EXCLUDE_PATTERNS "${PROJECT_SOURCE_DIR}/src/rapidxml")
+
+    doxygen_add_docs(Documentation
+        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src"
+        COMMENT "Generating API documentation with Doxygen"
+    )
+endif()
