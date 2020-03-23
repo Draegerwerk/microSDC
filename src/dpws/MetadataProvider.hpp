@@ -15,10 +15,9 @@ public:
   using MetadataSection = WS::MEX::MetadataSection;
 
   /**
-   * TODO
    * @brief constructs a MetadataProvider object from given Device Characteristics
+   * @param networkConfig the network configuration of MicroSDC
    * @param devChar Device Characteristics to provide with this MetadataProvider
-   * @param useTLS whether TLS should is used for SDC communication
    */
   MetadataProvider(std::shared_ptr<const NetworkConfig> networkConfig,
                    DeviceCharacteristics devChar);
