@@ -1,6 +1,9 @@
 #pragma once
 
-#include "services/Request.hpp"
+#include <string>
+#include <memory>
+
+class Request;
 
 /// @brief ServiceInterface defines an interface to arbitrary services attached to a WebServer for
 /// handling requests

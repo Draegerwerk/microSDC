@@ -2,6 +2,7 @@
 #include "HTTPRequest.hpp"
 #include "esp_log.h"
 #include "rapidxml/rapidxml.hpp"
+#include "services/ServiceInterface.hpp"
 #include <algorithm>
 #include <array>
 #include <memory>

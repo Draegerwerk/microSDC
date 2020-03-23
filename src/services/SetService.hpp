@@ -1,12 +1,16 @@
 #pragma once
 
 #include "SoapService.hpp"
-#include "SubscriptionManager.hpp"
-#include "dpws/MetadataProvider.hpp"
 #include "datamodel/BICEPS_MessageModel.hpp"
 #include <memory>
 
 class MicroSDC;
+class SubscriptionManager;
+class MetadataProvider;
+namespace BICEPS::MM
+{
+  class SetValue;
+} // namespace BICEPS::MM
 
 /// @brief SetService implements the SDC Set service
 class SetService : public SoapService

@@ -1,15 +1,25 @@
 #pragma once
 
 #include "DeviceCharacteristics.hpp"
-#include "SubscriptionManager.hpp"
 #include "dpws/DPWSHost.hpp"
 #include <map>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 class NetworkConfig;
 class StateHandler;
 class WebServerInterface;
+class SubscriptionManager;
+class SessionManagerInterface;
+namespace BICEPS::PM
+{
+  class LocationContextState;
+  class LocationDetailType;
+  class MdDescription;
+  class Mdib;
+  class NumericMetricState;
+} // namespace BICEPS::PM
 
 /// @brief MicroSDC implements the central SDC instance with an interface to any SDC utility
 class MicroSDC

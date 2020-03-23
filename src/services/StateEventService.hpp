@@ -1,10 +1,10 @@
 #pragma once
 
 #include "SoapService.hpp"
-#include "SubscriptionManager.hpp"
-#include "dpws/MetadataProvider.hpp"
 
 class MicroSDC;
+class MetadataProvider;
+class SubscriptionManager;
 
 /// @brief StateEventService implements the SDC StateEventService
 class StateEventService : public SoapService

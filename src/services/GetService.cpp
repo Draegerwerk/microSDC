@@ -2,10 +2,12 @@
 
 #include "Log.hpp"
 #include "MicroSDC.hpp"
+#include "Request.hpp"
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
 #include "datamodel/MessageSerializer.hpp"
+#include "dpws/MetadataProvider.hpp"
 #include "services/SoapFault.hpp"
 
 static constexpr const char* TAG = "GetService";

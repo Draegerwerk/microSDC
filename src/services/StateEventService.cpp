@@ -1,12 +1,13 @@
 #include "StateEventService.hpp"
 
 #include "Log.hpp"
+#include "Request.hpp"
+#include "SubscriptionManager.hpp"
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
+#include "dpws/MetadataProvider.hpp"
 #include "services/SoapFault.hpp"
-
-static constexpr const char* TAG = "StateEventService";
 
 StateEventService::StateEventService(const MicroSDC& microSDC,
                                      std::shared_ptr<const MetadataProvider> metadata,

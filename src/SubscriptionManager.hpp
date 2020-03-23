@@ -1,7 +1,6 @@
 #pragma once
 
 #include "SDCConstants.hpp"
-#include "datamodel/BICEPS_MessageModel.hpp"
 #include "datamodel/ws-addressing.hpp"
 #include "datamodel/ws-eventing.hpp"
 #include <chrono>
@@ -12,6 +11,10 @@
 
 struct esp_http_client;
 class SessionManagerInterface;
+namespace BICEPS::MM
+{
+  class EpisodicMetricReport;
+} // namespace BICEPS::MM
 
 /// @brief SubscriptionManager manages subscriptions in terms of ws-eventing
 class SubscriptionManager
@@ -50,7 +53,8 @@ private:
   /// @brief SubscriptionInformation stores stateful information about a subscription
   struct SubscriptionInformation
   {
-    /// @brief constructs a new SubscriptionInformation from given information describing the subscriber
+    /// @brief constructs a new SubscriptionInformation from given information describing the
+    /// subscriber
     /// @param notifyTo the address of the subscriber
     /// @param filter the eventing filters of this subscription
     /// @param expirationTime the time this subscription is valid

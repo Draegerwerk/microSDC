@@ -1,6 +1,6 @@
 #pragma once
 
-#include <atomic>
+#include <mutex>
 
 /// @brief MessagingContext holds information about the general context of messages send by a single
 /// instance. This information is used for AppSequence information and ordering of messages in terms
@@ -25,8 +25,11 @@ public:
   uint64_t getNextMessageCounter();
 
 private:
+  mutable std::mutex instanceIdMutex_;
+  mutable std::mutex messageCounterMutex_;
+
   /// the instance id of this sequence and context
-  std::atomic<uint64_t> instanceId_{0};
+  uint64_t instanceId_{0};
   /// the message counter representing the number of messages sent in this sequence
-  std::atomic<uint64_t> messageCounter_{0};
+  uint64_t messageCounter_{0};
 };

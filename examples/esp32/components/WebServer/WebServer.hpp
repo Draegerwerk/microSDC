@@ -1,8 +1,10 @@
 #pragma once
 
-#include "services/WebServerInterface.hpp"
 #include "esp_https_server.h"
+#include "services/WebServerInterface.hpp"
 #include <vector>
+
+class ServiceInterface;
 
 class WebServer : public WebServerInterface
 {

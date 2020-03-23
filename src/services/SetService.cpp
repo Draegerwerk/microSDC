@@ -1,9 +1,11 @@
 #include "SetService.hpp"
 #include "Log.hpp"
+#include "Request.hpp"
+#include "SubscriptionManager.hpp"
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
-#include "datamodel/MessageModel.hpp"
 #include "datamodel/MessageSerializer.hpp"
+#include "dpws/MetadataProvider.hpp"
 #include "services/SoapFault.hpp"
 #include "uuid/UUIDGenerator.hpp"
 

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "SoapService.hpp"
-#include "dpws/MetadataProvider.hpp"
+
+class MetadataProvider;
 
 /// @brief DeviceService implements the SDC Device service
 class DeviceService : public SoapService

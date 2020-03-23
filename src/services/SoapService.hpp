@@ -1,8 +1,12 @@
 #pragma once
 
 #include "ServiceInterface.hpp"
-#include "datamodel/MessageModel.hpp"
 #include <exception>
+
+namespace MESSAGEMODEL
+{
+  class Envelope;
+} // namespace MESSAGEMODEL
 
 /// @brief SoapService defines an interface to a very general SOAP service
 class SoapService : public ServiceInterface

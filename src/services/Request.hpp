@@ -1,8 +1,12 @@
 #pragma once
 
-#include "datamodel/MessageModel.hpp"
 #include <memory>
 
+
+namespace MESSAGEMODEL
+{
+  class Envelope;
+} // namespace MESSAGEMODEL
 
 /// @brief Request hold any information about a request a client sends to a server
 class Request

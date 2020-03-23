@@ -36,7 +36,7 @@ void Request::parse()
   rapidxml::xml_document<> doc;
   doc.parse<rapidxml::parse_fastest>(message_);
 
-  auto envelopeNode = doc.first_node("Envelope", MDPWS::WS_NS_SOAP_ENVELOPE);
+  auto* envelopeNode = doc.first_node("Envelope", MDPWS::WS_NS_SOAP_ENVELOPE);
   if (envelopeNode == nullptr)
   {
     LOG(LogLevel::ERROR, "Cannot find soap envelope node in received message!");

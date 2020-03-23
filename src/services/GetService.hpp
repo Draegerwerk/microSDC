@@ -1,9 +1,9 @@
 #pragma once
 
 #include "SoapService.hpp"
-#include "dpws/MetadataProvider.hpp"
 
 class MicroSDC;
+class MetadataProvider;
 
 /// @brief GetService implements the SDC Get service
 class GetService : public SoapService

@@ -3,6 +3,7 @@
 #include "Log.hpp"
 #include "SDCConstants.hpp"
 #include "StateHandler.hpp"
+#include "SubscriptionManager.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "dpws/MetadataProvider.hpp"
 #include "networking/NetworkConfig.hpp"
@@ -19,8 +20,6 @@
 
 #include "asio/system_error.hpp"
 
-
-static constexpr const char* TAG = "MicroSDC";
 
 MicroSDC::MicroSDC(std::shared_ptr<WebServerInterface> webServer,
                    std::shared_ptr<SessionManagerInterface> sessionManager)

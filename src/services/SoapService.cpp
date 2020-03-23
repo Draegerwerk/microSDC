@@ -1,7 +1,6 @@
 #include "SoapService.hpp"
 #include "MicroSDC.hpp"
-
-static constexpr const char* TAG = "SoapService";
+#include "datamodel/MessageModel.hpp"
 
 void SoapService::fillResponseMessageFromRequestMessage(MESSAGEMODEL::Envelope& envelope,
                                                         const MESSAGEMODEL::Envelope& request)

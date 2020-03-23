@@ -1,7 +1,6 @@
 #include "StaticService.hpp"
 #include "Log.hpp"
-
-static constexpr const char* TAG = "StaticService";
+#include "Request.hpp"
 
 StaticService::StaticService(std::string uri, std::string staticContent)
   : content_(std::move(staticContent))
