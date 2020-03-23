@@ -2,6 +2,7 @@
 
 #include "ServiceInterface.hpp"
 
+// TODO: add doxygen
 class StaticService : public ServiceInterface
 {
 public:

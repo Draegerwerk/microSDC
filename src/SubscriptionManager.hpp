@@ -13,6 +13,7 @@
 struct esp_http_client;
 class SessionManagerInterface;
 
+// TODO: add doxygen
 class SubscriptionManager
 {
 public:

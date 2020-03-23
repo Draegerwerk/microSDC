@@ -6,6 +6,7 @@
 
 class MicroSDC;
 
+// TODO: add doxygen
 class StateEventService : public SoapService
 {
 public:

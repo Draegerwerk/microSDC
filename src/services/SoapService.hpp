@@ -4,6 +4,7 @@
 #include "datamodel/MessageModel.hpp"
 #include <exception>
 
+// TODO: add doxygen
 class SoapService : public ServiceInterface
 {
 public:

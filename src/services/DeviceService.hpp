@@ -3,6 +3,7 @@
 #include "SoapService.hpp"
 #include "dpws/MetadataProvider.hpp"
 
+// TODO: doxygen
 class DeviceService : public SoapService
 {
 public:

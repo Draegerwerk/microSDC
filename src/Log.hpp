@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+/// @brief LogLevel describes the level of severity of a log message
 enum class LogLevel
 {
   DEBUG,

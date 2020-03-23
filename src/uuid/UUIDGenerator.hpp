@@ -9,9 +9,8 @@ class UUIDGenerator
 {
 public:
   UUIDGenerator() = default;
-  /**
-   * @brief create a new UUID
-   * @return the created UUID
-   */
+
+  /// @brief create a new UUID
+  /// @return the created UUID
   UUID operator()();
 };

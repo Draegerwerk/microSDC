@@ -11,27 +11,22 @@
 class DPWSHost
 {
 public:
-  /**
-   * @brief Constructs DPWS host
-   */
+  /// @brief Constructs DPWS host
   DPWSHost(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
            WS::DISCOVERY::QNameListType types, WS::DISCOVERY::UriListType xAddresses,
            WS::DISCOVERY::HelloType::MetadataVersionType metadataVersion = 1);
 
-  /**
-   * @brief listens on udp multicast socket for DPWS messages
-   */
+
+  /// @brief listens on udp multicast socket for DPWS messages
   void start();
 
-  /**
-   * @brief stop the DPWS host
-   */
+
+  /// @brief stop the DPWS host
   void stop();
 
-  /**
-   * @brief Returns whether this DPWS host is running
-   * @return whether this host runs
-   */
+
+  /// @brief Returns whether this DPWS host is running
+  /// @return whether this host runs
   bool running() const;
 
   void setLocation(const BICEPS::PM::LocationDetailType& locationDetail);
@@ -61,25 +56,20 @@ private:
   WS::DISCOVERY::UriListType xAddresses_;
   const WS::DISCOVERY::HelloType::MetadataVersionType metadataVersion_;
 
-  /**
-   * @brief creates an endpoint v4 address from string
-   * @return the ipv4 address
-   */
+
+  /// @brief creates an endpoint v4 address from string
+  /// @return the ipv4 address
   static asio::ip::address_v4 addressFromString(const char* addressString);
 
-  /*
-   * @brief handle incoming udp message packet by determine its type.
-   */
+  /// @brief handle incoming udp message packet by determine its type.
   void handleUDPMessage(std::size_t bytesRecvd);
-  /*
-   * @brief handle a WS-Discovery message of type PROBE
-   * @param doc a pointer to the parsed xml document message
-   */
+
+  /// @brief handle a WS-Discovery message of type PROBE
+  /// @param doc a pointer to the parsed xml document message
   void handleProbe(const MESSAGEMODEL::Envelope& envelope);
-  /*
-   * @brief handle a WS-Discovery message of type RESOLVE
-   * @param doc a pointer to the parsed xml document message
-   */
+
+  /// @brief handle a WS-Discovery message of type RESOLVE
+  /// @param doc a pointer to the parsed xml document message
   void handleResolve(const MESSAGEMODEL::Envelope& envelope);
 
   void doReceive();

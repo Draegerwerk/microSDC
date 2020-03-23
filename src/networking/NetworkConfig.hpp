@@ -2,29 +2,18 @@
 
 #include <string>
 
+// TODO: add doxygen
 class NetworkConfig
 {
 public:
   NetworkConfig(bool useTLS, std::string ipAddress);
 
-  /**
-   * TODO
-   */
   void setUseTLS(bool useTLS);
 
-  /**
-   * TODO
-   */
   bool useTLS() const;
 
-  /**
-   * TODO
-   */
   const std::string& ipAddress() const;
 
-  /**
-   * TODO
-   */
   std::string& ipAddress();
 
 private:

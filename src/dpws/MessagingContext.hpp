@@ -2,6 +2,7 @@
 
 #include <mutex>
 
+// TODO: add doxygen
 class MessagingContext
 {
 public:

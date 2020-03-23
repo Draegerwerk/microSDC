@@ -8,6 +8,7 @@
 
 class MicroSDC;
 
+// TODO: add doxygen
 class SetService : public SoapService
 {
 public:

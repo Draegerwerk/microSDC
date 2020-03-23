@@ -14,82 +14,65 @@ class WebServerInterface;
 class MicroSDC
 {
 public:
-  /**
-   * @brief constructs an MicroSDC instance
-   */
+  /// @brief constructs an MicroSDC instance
   MicroSDC(std::shared_ptr<WebServerInterface> webServer,
            std::shared_ptr<SessionManagerInterface> sessionManager);
-  /**
-   * @brief starts the sdcThread calling startup()
-   */
+
+  /// @brief starts the sdcThread calling startup()
   void start();
-  /**
-   * @brief stops all components when disconnected
-   */
+
+  /// @brief stops all components when disconnected
   void stop();
-  /**
-   * @brief returns whether MicroSDC is running
-   * @return whether MicroSDC is running
-   */
+
+  /// @brief returns whether MicroSDC is running
+  /// @return whether MicroSDC is running
   bool isRunning() const;
-  /**
-   * @brief gets the mdib representation of this MicroSDC instance
-   * @return constant reference to the mdib
-   */
+
+  /// @brief gets the mdib representation of this MicroSDC instance
+  /// @return constant reference to the mdib
   const BICEPS::PM::Mdib& getMdib() const;
-  /**
-   * @brief updates the MdDescription part of the mdib
-   * @param mdDescription the new mdDescription
-   */
+
+  /// @brief updates the MdDescription part of the mdib
+  /// @param mdDescription the new mdDescription
   void setMdDescription(const BICEPS::PM::MdDescription& mdDescription);
-  /**
-   * @brief sets the device characteristics of this SDC service
-   * @param devChar characteristics to be set
-   */
+
+  /// @brief sets the device characteristics of this SDC service
+  /// @param devChar characteristics to be set
   void setDeviceCharacteristics(DeviceCharacteristics devChar);
-  /**
-   * @brief gets the device characteristics of this SDC service
-   * @return reference to the device characteristics
-   */
+
+  /// @brief gets the device characteristics of this SDC service
+  /// @return reference to the device characteristics
   const DeviceCharacteristics& getDeviceCharacteristics() const;
-  /**
-   * @brief set a new endpoint reference of this MicroSDC instance
-   * @param epr the new endpoint reference
-   */
+
+  /// @brief set a new endpoint reference of this MicroSDC instance
+  /// @param epr the new endpoint reference
   void setEndpointReference(const std::string& epr);
-  /**
-   * @brief gets the endpoint reference of this MicroSDC instance
-   * @return string containing the endpoint reference of this instance
-   */
+
+  /// @brief gets the endpoint reference of this MicroSDC instance
+  /// @return string containing the endpoint reference of this instance
   std::string getEndpointReference() const;
-  /**
-   * @brief sets the network config. This should be set before start is called!
-   * @param networkConfig the pointer to the network configuration
-   */
+
+  /// @brief sets the network config. This should be set before start is called!
+  /// @param networkConfig the pointer to the network configuration
   void setNetworkConfig(std::shared_ptr<NetworkConfig> networkConfig);
-  /**
-   * @brief get a valid message id for WS-Addressing
-   * @return string of a message id
-   */
+
+  /// @brief get a valid message id for WS-Addressing
+  /// @return string of a message id
   static std::string calculateMessageID();
-  /**
-   * @brief get a uuid
-   * @return string containing a UUID
-   */
+
+  /// @brief get a uuid
+  /// @return string containing a UUID
   static std::string calculateUUID();
-  /**
-   * @brief Adds an state and its handle
-   * @param stateHandler the pointer the stateHandler to add
-   */
+
+  /// @brief Adds an state and its handle
+  /// @param stateHandler the pointer the stateHandler to add
   void addMdState(std::shared_ptr<StateHandler> stateHandler);
-  /**
-   * @brief updates a given state in the mdib representation
-   * @param state the state to update
-   */
+
+  /// @brief updates a given state in the mdib representation
+  /// @param state the state to update
   void updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state);
-  /**
-   * TODO
-   */
+
+  // TODO: add doxygen
   void setLocation(const std::string& descriptorHandle,
                    const BICEPS::PM::LocationDetailType& locationDetail);
 
@@ -126,32 +109,26 @@ private:
   /// Device Characteristics of this instance
   DeviceCharacteristics deviceCharacteristics_;
 
-  /**
-   * @brief Starts and initializes all SDC components and services
-   */
+
+  /// @brief Starts and initializes all SDC components and services
   void startup();
-  /**
-   * @brief updates the internal mdib representation with a given state
-   * @tparam infered state type of the state to update
-   * @param state the new state to update in the mdib
-   */
+
+  /// @brief updates the internal mdib representation with a given state
+  /// @tparam infered state type of the state to update
+  /// @param state the new state to update in the mdib
   template <class T>
   std::shared_ptr<const T> updateMdib(std::shared_ptr<T> state);
-  /**
-   * @brief update the version attribute of the mdib. Will be called everytime the mdib changes
-   */
+
+  /// @brief update the version attribute of the mdib. Will be called everytime the mdib changes
   void incrementMdibVersion();
-  /**
-   * @brief returns the current mdib Version
-   * @return the mdib version
-   */
+
+  /// @brief returns the current mdib Version
+  /// @return the mdib version
   unsigned int getMdibVersion() const;
-  /**
-   * @brief initializes all registered states by calling there initial state function
-   */
+
+  /// @brief initializes all registered states by calling there initial state function
   void initializeMdStates();
-  /**
-   * TODO
-   */
+
+  // TODO: add doxygen here
   void notifyEpisodicMetricReport(std::shared_ptr<const BICEPS::PM::NumericMetricState> state);
 };

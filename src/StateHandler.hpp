@@ -4,39 +4,32 @@
 #include "MicroSDC.hpp"
 #include "datamodel/BICEPS_ParticipantModel.hpp"
 
-/**
- * @brief Abstract class to handle states of this device. Exposes updateState() to update this state
- * in the microSDC mdib.
- */
+
+/// @brief Abstract class to handle states of this device. Exposes updateState() to update this
+/// state in the microSDC mdib.
 class StateHandler
 {
 public:
-  /**
-   * @brief Constructs a new StateHandler referring to a descriptor
-   * @param descriptorHandle the handle of the associated descriptor
-   */
+  /// @brief Constructs a new StateHandler referring to a descriptor
+  /// @param descriptorHandle the handle of the associated descriptor
   explicit StateHandler(std::string descriptorHandle);
-  /**
-   * @brief gets the handle of the associated descriptor
-   * @return the descriptor's handle of this state
-   */
+
+  /// @brief gets the handle of the associated descriptor
+  /// @return the descriptor's handle of this state
   const std::string& getDescriptorHandle() const;
-  /**
-   * @brief returns the state type of this state. This is used to fake RTTI for dynamic
-   * subclassing.
-   * @return The state type of this state
-   */
+
+  /// @brief returns the state type of this state. This is used to fake RTTI for dynamic
+  /// subclassing.
+  /// @return The state type of this state
   virtual BICEPS::PM::StateType getStateType() const = 0;
-  /**
-   * @brief sets the MicroSDC instantation, which handles this state
-   * @param microSDC the pointer MicroSDC object
-   */
+
+  /// @brief sets the MicroSDC instantation, which handles this state
+  /// @param microSDC the pointer MicroSDC object
   void setMicroSDC(MicroSDC* microSDC);
-  /**
-   * @brief updates this state in the mdib of the holding MicroSDC object
-   * @tparam State infered state type of this state
-   * @param state the new state to update
-   */
+
+  /// @brief updates this state in the mdib of the holding MicroSDC object
+  /// @tparam State infered state type of this state
+  /// @param state the new state to update
   template <class State>
   void updateState(std::shared_ptr<State> state)
   {
@@ -55,26 +48,22 @@ private:
   std::string descriptorHandle_;
 };
 
-/**
- * @brief Implements a StateHandler of an arbitrary MdState
- * @tparam MdState the state type of this metric state
- */
+
+/// @brief Implements a StateHandler of an arbitrary MdState
+/// @tparam MdState the state type of this metric state
 template <class MdState>
 class MdStateHandler : public StateHandler
 {
 public:
-  /**
-   * @brief constructs a new MdStateHandler referring to a descriptor
-   * @param descriptorHandle the handle of the associated descriptor
-   */
+  /// @brief constructs a new MdStateHandler referring to a descriptor
+  /// @param descriptorHandle the handle of the associated descriptor
   explicit MdStateHandler(const std::string& descriptorHandle)
     : StateHandler(descriptorHandle)
   {
   }
-  /**
-   * @brief gets the initial state object of this metric
-   * @return pointer to the MdState constructed
-   */
+
+  /// @brief gets the initial state object of this metric
+  /// @return pointer to the MdState constructed
   virtual std::shared_ptr<MdState> getInitialState() const = 0;
 };
 

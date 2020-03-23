@@ -4,12 +4,14 @@
 #include <memory>
 #include <string>
 
+// TODO: add doxygen
 class ClientSessionInterface
 {
 public:
   virtual void send(const std::string& message) const = 0;
 };
 
+// TODO: add doxygen
 class SessionManagerInterface
 {
 public:

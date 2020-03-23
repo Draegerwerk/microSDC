@@ -6,22 +6,18 @@
 class UUID
 {
 public:
-  /**
-   * @brief default construct an empty UUID
-   */
+  /// @brief default construct an empty UUID
   UUID() = default;
-  /**
-   * @brief Construct UUID from data
-   */
+
+  /// @brief Construct UUID from data
   constexpr explicit UUID(std::array<std::uint8_t, 16> data)
     : data_(data)
   {
   }
 
-  /**
-   * @brief convert string from UUID object
-   * @return string representing the UUID
-   */
+
+  /// @brief convert string from UUID object
+  /// @return string representing the UUID
   std::string toString() const;
 
 private:
