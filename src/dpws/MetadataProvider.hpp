@@ -6,6 +6,7 @@
 
 class NetworkConfig;
 
+/// @brief MetadataProvider provides any metadata information to SDC services
 class MetadataProvider
 {
 public:

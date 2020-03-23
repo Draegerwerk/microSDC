@@ -8,6 +8,8 @@
 #include <atomic>
 #include <thread>
 
+/// @brief DPWSHost manages all dpws related communication like sending hello messages for discovery
+/// and replying to probes/resolves.
 class DPWSHost
 {
 public:
@@ -29,6 +31,8 @@ public:
   /// @return whether this host runs
   bool running() const;
 
+  /// @brief sets a new location of this instance
+  /// @param locationDetail the location state information
   void setLocation(const BICEPS::PM::LocationDetailType& locationDetail);
 
 private:
@@ -51,9 +55,13 @@ private:
   MessagingContext messagingContext_;
   /// endpoint reference of this host
   const WS::ADDRESSING::EndpointReferenceType::AddressType endpointReference_;
+  /// scopes provided by this instance of MicroSDC
   WS::DISCOVERY::ScopesType scopes_;
+  /// types represented by the services implementing this device
   WS::DISCOVERY::QNameListType types_;
+  /// addresses of the services exposed by this device
   WS::DISCOVERY::UriListType xAddresses_;
+  /// the version of the metadata
   const WS::DISCOVERY::HelloType::MetadataVersionType metadataVersion_;
 
 
@@ -72,13 +80,26 @@ private:
   /// @param doc a pointer to the parsed xml document message
   void handleResolve(const MESSAGEMODEL::Envelope& envelope);
 
+  /// @brief registers for socket receive at any discovery multicast address and the configured
+  /// address of this device
   void doReceive();
 
+  /// @breif sends a hello message to the multicast endpoint
   void sendHello();
 
+  /// @brief constructs a hello message into a given envelope
+  /// @param[out] envelope the envelope to fill the hello message into
   void buildHelloMessage(MESSAGEMODEL::Envelope& envelope);
+
+  /// @brief constructs a probe match into a given envelope
+  /// @param[out] envelope the envelope to fill the probe match into
+  /// @param request the probe request to construct the response from
   void buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
                               const MESSAGEMODEL::Envelope& request);
+
+  /// @brief constructs a resolve match into a given envelope
+  /// @param[out] envelope the envelope to fill the resolve match into
+  /// @param request the resolve request to construct the response from
   void buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope,
                                 const MESSAGEMODEL::Envelope& request);
 };

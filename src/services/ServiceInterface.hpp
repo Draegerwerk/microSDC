@@ -2,12 +2,13 @@
 
 #include "services/Request.hpp"
 
+/// @brief ServiceInterface defines an interface to arbitrary services attached to a WebServer for
+/// handling requests
 class ServiceInterface
 {
 public:
   /// @brief virtual default construtor for polymorphism
   virtual ~ServiceInterface() = default;
-
 
   /// @brief returns the URI of this service
   /// @return the URI

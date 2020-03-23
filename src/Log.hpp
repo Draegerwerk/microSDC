@@ -45,9 +45,13 @@ constexpr LogData<std::pair<Begin&&, PfnManipulator>> operator<<(LogData<Begin>&
   return {{std::forward<Begin>(begin.list), value}};
 }
 
+/// @brief Log models a simple logger; logging to an std::ostream
 class Log
 {
 private:
+  /// @brief writes an LogData to the output
+  /// @param os the output stream to write to
+  /// @param data the templated list of data to log
   template <typename Begin, typename Last>
   static void output(std::ostream& os, std::pair<Begin, Last>&& data)
   {
@@ -55,14 +59,20 @@ private:
     os << data.second;
   }
 
+  /// @brief list termination for the None LogData
   static inline void output(std::ostream& os, None /*unused*/) {}
 
+  /// the lowest log level this logger is writing to the output
   static LogLevel logLevel__;
 
 public:
-
+  /// @brief sets the lowest log level this logger is writing to its output
   static void setLogLevel(LogLevel level);
 
+  /// @brief logs data to the output
+  /// @param file the filename the log command was issued
+  /// @param line the line of the file the log statement was issued
+  /// @param data the data to log to the output
   template <LogLevel level, typename List>
   static void log(const char* file, int line, LogData<List>&& data)
   {
@@ -75,11 +85,11 @@ public:
     {
       std::cout << "31m";
     }
- else if constexpr    (level == LogLevel::WARNING)
+    else if constexpr (level == LogLevel::WARNING)
     {
       std::cout << "33m";
     }
- else if constexpr    (level == LogLevel::INFO)
+    else if constexpr (level == LogLevel::INFO)
     {
       std::cout << "32m";
     }

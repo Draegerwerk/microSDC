@@ -11,6 +11,7 @@ class NetworkConfig;
 class StateHandler;
 class WebServerInterface;
 
+/// @brief MicroSDC implements the central SDC instance with an interface to any SDC utility
 class MicroSDC
 {
 public:
@@ -72,12 +73,15 @@ public:
   /// @param state the state to update
   void updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state);
 
-  // TODO: add doxygen
+  /// @brief sets the location of this instance
+  /// @param descriptorHandle the descriptor of the location state descriptor
+  /// @param locationDetail the location information to set
   void setLocation(const std::string& descriptorHandle,
                    const BICEPS::PM::LocationDetailType& locationDetail);
 
 private:
-  /// TODO
+  // TODO: make this a const shared ptr?
+  /// a pointer to the location context state holding location descriptor of this instance
   std::shared_ptr<BICEPS::PM::LocationContextState> locationContextState_{nullptr};
   /// the SDC thread
   std::thread sdcThread_;
@@ -129,6 +133,7 @@ private:
   /// @brief initializes all registered states by calling there initial state function
   void initializeMdStates();
 
-  // TODO: add doxygen here
+  /// @brief sends a notification to subscriber about a changed numeric metric state
+  /// @param state a pointer to the state which was updated
   void notifyEpisodicMetricReport(std::shared_ptr<const BICEPS::PM::NumericMetricState> state);
 };

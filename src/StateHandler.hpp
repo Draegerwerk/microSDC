@@ -67,9 +67,12 @@ public:
   virtual std::shared_ptr<MdState> getInitialState() const = 0;
 };
 
+/// @brief Implements a MdStateHandler for NumericStates
 class NumericStateHandler : public MdStateHandler<BICEPS::PM::NumericMetricState>
 {
 public:
+  /// @brief constructs a new NumericStateHandler attached to a given descriptor state handle
+  /// @param descriptorHandle the handle of the state's descriptor
   explicit NumericStateHandler(const std::string& descriptorHandle)
     : MdStateHandler(descriptorHandle)
   {
@@ -89,6 +92,8 @@ public:
     return state;
   }
 
+  /// @param sets a new numeric value to the state handled by this handler and updates the mdib
+  /// @param value the new value to set
   void setValue(double value)
   {
     auto state = getInitialState();

@@ -5,6 +5,7 @@
 #include <mutex>
 #include <random>
 
+/// @brief UUIDGenerator generates version 4 UUIDs using a pseudo-random number generator engine
 class UUIDGenerator
 {
 public:

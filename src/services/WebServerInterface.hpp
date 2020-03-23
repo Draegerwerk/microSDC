@@ -3,6 +3,8 @@
 #include "services/ServiceInterface.hpp"
 #include <memory>
 
+/// @brief WebServerInterface defines an interface to a WebServer handling HTTP(s) requests and
+/// disptaching them to the respective registered services
 class WebServerInterface
 {
 public:
