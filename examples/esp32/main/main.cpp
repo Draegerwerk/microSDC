@@ -193,7 +193,7 @@ extern "C" void app_main()
   ESP_ERROR_CHECK(esp_tls_set_global_ca_store(cacert_pem_start, cacert_len));
 
   // create MicroSDC instance
-  auto* sdc = new MicroSDC(std::make_shared<WebServer>(true), std::make_shared<SessionManager>());
+  auto* sdc = new MicroSDC(std::make_unique<WebServer>(true), std::make_unique<SessionManager>());
   sdc->setEndpointReference("urn:uuid:MicroSDC-provider-on-esp32");
 
   DeviceCharacteristics deviceCharacteristics;

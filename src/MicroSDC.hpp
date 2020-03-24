@@ -1,7 +1,9 @@
 #pragma once
 
 #include "DeviceCharacteristics.hpp"
+#include "SessionManagerInterface.hpp"
 #include "dpws/DPWSHost.hpp"
+#include "services/WebServerInterface.hpp"
 #include <map>
 #include <mutex>
 #include <thread>
@@ -9,9 +11,7 @@
 
 class NetworkConfig;
 class StateHandler;
-class WebServerInterface;
 class SubscriptionManager;
-class SessionManagerInterface;
 namespace BICEPS::PM
 {
   class LocationContextState;
@@ -26,8 +26,8 @@ class MicroSDC
 {
 public:
   /// @brief constructs an MicroSDC instance
-  MicroSDC(std::shared_ptr<WebServerInterface> webServer,
-           std::shared_ptr<SessionManagerInterface> sessionManager);
+  MicroSDC(std::unique_ptr<WebServerInterface> webServer,
+           std::unique_ptr<SessionManagerInterface> sessionManager);
 
   /// @brief starts the sdcThread calling startup()
   void start();
@@ -100,9 +100,9 @@ private:
   /// pointer to the subscription manager
   std::shared_ptr<SubscriptionManager> subscriptionManager_{nullptr};
   /// pointer to the WebServer
-  std::shared_ptr<WebServerInterface> webserver_{nullptr};
+  std::unique_ptr<WebServerInterface> webserver_{nullptr};
   /// pointer to the Session Manager
-  std::shared_ptr<SessionManagerInterface> sessionManager_{nullptr};
+  std::unique_ptr<SessionManagerInterface> sessionManager_{nullptr};
   /// pointer to the mdib representation
   std::unique_ptr<BICEPS::PM::Mdib> mdib_{nullptr};
   /// mutex protecting changes in the mdib

@@ -21,8 +21,8 @@
 #include "asio/system_error.hpp"
 
 
-MicroSDC::MicroSDC(std::shared_ptr<WebServerInterface> webServer,
-                   std::shared_ptr<SessionManagerInterface> sessionManager)
+MicroSDC::MicroSDC(std::unique_ptr<WebServerInterface> webServer,
+                   std::unique_ptr<SessionManagerInterface> sessionManager)
   : webserver_(std::move(webServer))
   , sessionManager_(std::move(sessionManager))
   , mdib_(std::make_unique<BICEPS::PM::Mdib>(std::string("0")))
@@ -79,7 +79,7 @@ void MicroSDC::startup()
   }
 
   // construct subscription manager
-  subscriptionManager_ = std::make_shared<SubscriptionManager>(sessionManager_);
+  subscriptionManager_ = std::make_shared<SubscriptionManager>(std::move(sessionManager_));
 
   // construct web services
   auto deviceService = std::make_shared<DeviceService>(metadata);
