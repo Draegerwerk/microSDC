@@ -10,9 +10,14 @@
 class StateHandler
 {
 public:
+  enum class StateHandlerKind
+  {
+    NUMERIC_METRIC,
+  };
+
   /// @brief Constructs a new StateHandler referring to a descriptor
   /// @param descriptorHandle the handle of the associated descriptor
-  explicit StateHandler(std::string descriptorHandle);
+  explicit StateHandler(StateHandlerKind k, std::string descriptorHandle);
 
   /// @brief gets the handle of the associated descriptor
   /// @return the descriptor's handle of this state
@@ -21,7 +26,7 @@ public:
   /// @brief returns the state type of this state. This is used to fake RTTI for dynamic
   /// subclassing.
   /// @return The state type of this state
-  virtual BICEPS::PM::StateType getStateType() const = 0;
+  StateHandlerKind getKind() const;
 
   /// @brief sets the MicroSDC instantation, which handles this state
   /// @param microSDC the pointer MicroSDC object
@@ -42,6 +47,7 @@ public:
   }
 
 private:
+  const StateHandlerKind kind_;
   /// pointer to the holding MicroSDC object
   MicroSDC* microSDC_{nullptr};
   /// handle of the associated descriptor
@@ -57,8 +63,8 @@ class MdStateHandler : public StateHandler
 public:
   /// @brief constructs a new MdStateHandler referring to a descriptor
   /// @param descriptorHandle the handle of the associated descriptor
-  explicit MdStateHandler(const std::string& descriptorHandle)
-    : StateHandler(descriptorHandle)
+  explicit MdStateHandler(StateHandlerKind k, const std::string& descriptorHandle)
+    : StateHandler(k, descriptorHandle)
   {
   }
 
@@ -74,19 +80,20 @@ public:
   /// @brief constructs a new NumericStateHandler attached to a given descriptor state handle
   /// @param descriptorHandle the handle of the state's descriptor
   explicit NumericStateHandler(const std::string& descriptorHandle)
-    : MdStateHandler(descriptorHandle)
+    : MdStateHandler(StateHandlerKind::NUMERIC_METRIC, descriptorHandle)
   {
   }
 
-  BICEPS::PM::StateType getStateType() const override
+  static bool classof(const StateHandler* other)
   {
-    return BICEPS::PM::StateType::NUMERIC_METRIC;
+    return other->getKind() == StateHandlerKind::NUMERIC_METRIC;
   }
 
   std::shared_ptr<BICEPS::PM::NumericMetricState> getInitialState() const override
   {
     auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
-    BICEPS::PM::NumericMetricValue value;
+    BICEPS::PM::NumericMetricValue value{
+        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld}};
     value.Value() = 0;
     state->MetricValue() = value;
     return state;

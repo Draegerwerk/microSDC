@@ -1,8 +1,14 @@
 #include "StateHandler.hpp"
 
-StateHandler::StateHandler(std::string descriptorHandle)
-  : descriptorHandle_(std::move(descriptorHandle))
+StateHandler::StateHandler(const StateHandlerKind k, std::string descriptorHandle)
+  : kind_(k)
+  , descriptorHandle_(std::move(descriptorHandle))
 {
+}
+
+StateHandler::StateHandlerKind StateHandler::getKind() const
+{
+  return kind_;
 }
 
 const std::string& StateHandler::getDescriptorHandle() const

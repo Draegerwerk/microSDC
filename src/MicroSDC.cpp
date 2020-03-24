@@ -1,5 +1,6 @@
 #include "MicroSDC.hpp"
 
+#include "Casting.hpp"
 #include "Log.hpp"
 #include "SDCConstants.hpp"
 #include "StateHandler.hpp"
@@ -130,12 +131,11 @@ void MicroSDC::initializeMdStates()
 {
   for (const auto& handler : stateHandlers_)
   {
-    if (handler->getStateType() == BICEPS::PM::StateType::NUMERIC_METRIC)
+    if (const auto numericHandler = dyn_cast<NumericStateHandler>(handler);
+        numericHandler != nullptr)
     {
-      const auto& numericHandler =
-          static_cast<const MdStateHandler<BICEPS::PM::NumericMetricState>&>(*handler);
       std::lock_guard<std::mutex> lock(mdibMutex_);
-      mdib_->MdState()->State().emplace_back(numericHandler.getInitialState());
+      mdib_->MdState()->State().emplace_back(numericHandler->getInitialState());
     }
   }
 }

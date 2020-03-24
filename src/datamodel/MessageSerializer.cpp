@@ -1,4 +1,5 @@
 #include "MessageSerializer.hpp"
+#include "Casting.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include <rapidxml/rapidxml_print.hpp>
 
@@ -677,30 +678,30 @@ void MessageSerializer::serialize(
       xmlDocument_->allocate_attribute("MetricAvailability", metricAvailability);
   metricNode->append_attribute(metricAvailabilityAttr);
 
-  if (abstractMetricDescriptor.getMetricType() == BICEPS::PM::MetricType::NUMERIC)
+  if (const auto* const numericDescriptor =
+          dyn_cast<BICEPS::PM::NumericMetricDescriptor>(&abstractMetricDescriptor);
+      numericDescriptor != nullptr)
   {
-    const auto& numericDescriptor =
-        static_cast<const BICEPS::PM::NumericMetricDescriptor&>(abstractMetricDescriptor);
-    auto typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:NumericMetricDescriptor");
+    auto* typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:NumericMetricDescriptor");
     metricNode->append_attribute(typeAttr);
 
-    for (const auto& range : numericDescriptor.TechnicalRange())
+    for (const auto& range : numericDescriptor->TechnicalRange())
     {
-      auto technicalRangeNode =
+      auto* technicalRangeNode =
           xmlDocument_->allocate_node(rapidxml::node_element, "TechnicalRange");
       serialize(technicalRangeNode, range);
       metricNode->append_node(technicalRangeNode);
     }
 
-    auto resolution =
-        xmlDocument_->allocate_string(std::to_string(numericDescriptor.Resolution()).c_str());
-    auto resolutionAttr = xmlDocument_->allocate_attribute("Resolution", resolution);
+    auto* resolution =
+        xmlDocument_->allocate_string(std::to_string(numericDescriptor->Resolution()).c_str());
+    auto* resolutionAttr = xmlDocument_->allocate_attribute("Resolution", resolution);
     metricNode->append_attribute(resolutionAttr);
 
-    if (numericDescriptor.AveragingPeriod().has_value())
+    if (numericDescriptor->AveragingPeriod().has_value())
     {
-      auto averagingPeriodAttr = xmlDocument_->allocate_attribute(
-          "AveragingPeriod", numericDescriptor.AveragingPeriod()->c_str());
+      auto* averagingPeriodAttr = xmlDocument_->allocate_attribute(
+          "AveragingPeriod", numericDescriptor->AveragingPeriod()->c_str());
       metricNode->append_attribute(averagingPeriodAttr);
     }
   }
@@ -773,53 +774,53 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     stateNode->append_attribute(versionAttr);
   }
 
-  if (state.getStateType() == BICEPS::PM::StateType::NUMERIC_METRIC)
+  if (const auto* numericMetricState = dyn_cast<BICEPS::PM::NumericMetricState>(&state);
+      numericMetricState != nullptr)
   {
-    const auto& numericMetricState = static_cast<const BICEPS::PM::NumericMetricState&>(state);
-    if (numericMetricState.MetricValue().has_value())
+    if (numericMetricState->MetricValue().has_value())
     {
-      serialize(stateNode, numericMetricState.MetricValue().value());
+      serialize(stateNode, numericMetricState->MetricValue().value());
     }
-    auto typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:NumericMetricState");
+    auto* typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:NumericMetricState");
     stateNode->append_attribute(typeAttr);
   }
-  else if (state.getStateType() == BICEPS::PM::StateType::LOCATION_CONTEXT)
+  if (const auto* locationContextState = dyn_cast<BICEPS::PM::LocationContextState>(&state);
+      locationContextState != nullptr)
   {
-    const auto& locationContextState = static_cast<const BICEPS::PM::LocationContextState&>(state);
-    if (locationContextState.LocationDetail().has_value())
+    if (locationContextState->LocationDetail().has_value())
     {
-      serialize(stateNode, locationContextState.LocationDetail().value());
+      serialize(stateNode, locationContextState->LocationDetail().value());
     }
-    for (const auto& validator : locationContextState.Validator())
+    for (const auto& validator : locationContextState->Validator())
     {
       auto node = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Validator");
       serialize(node, validator);
       stateNode->append_node(node);
     }
-    for (const auto& identifier : locationContextState.Identification())
+    for (const auto& identifier : locationContextState->Identification())
     {
       auto node = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Identification");
       serialize(node, identifier);
       stateNode->append_node(node);
     }
-    if (locationContextState.BindingMdibVersion().has_value())
+    if (locationContextState->BindingMdibVersion().has_value())
     {
       auto version = xmlDocument_->allocate_string(
-          std::to_string(locationContextState.BindingMdibVersion().value()).c_str());
+          std::to_string(locationContextState->BindingMdibVersion().value()).c_str());
       auto attr = xmlDocument_->allocate_attribute("BindingMdibVersion", version);
       stateNode->append_attribute(attr);
     }
-    if (locationContextState.ContextAssociation().has_value())
+    if (locationContextState->ContextAssociation().has_value())
     {
       auto assoc = xmlDocument_->allocate_string(
-          toString(locationContextState.ContextAssociation().value()).c_str());
+          toString(locationContextState->ContextAssociation().value()).c_str());
       auto attr = xmlDocument_->allocate_attribute("ContextAssociation", assoc);
       stateNode->append_attribute(attr);
     }
     auto typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:LocationContextState");
     stateNode->append_attribute(typeAttr);
     auto handleAttr =
-        xmlDocument_->allocate_attribute("Handle", locationContextState.Handle().c_str());
+        xmlDocument_->allocate_attribute("Handle", locationContextState->Handle().c_str());
     stateNode->append_attribute(handleAttr);
   }
   parent->append_node(stateNode);
@@ -888,13 +889,13 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto valueNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MetricValue");
   serialize(valueNode, value.Quality());
 
-  if (value.getMetricType() == BICEPS::PM::MetricType::NUMERIC)
+  if (const auto* numericValue = dyn_cast<BICEPS::PM::NumericMetricValue>(&value);
+      numericValue != nullptr)
   {
-    const auto& numericValue = static_cast<const BICEPS::PM::NumericMetricValue&>(value);
-    if (numericValue.Value().has_value())
+    if (numericValue->Value().has_value())
     {
       auto num =
-          xmlDocument_->allocate_string(std::to_string(numericValue.Value().value()).c_str());
+          xmlDocument_->allocate_string(std::to_string(numericValue->Value().value()).c_str());
       auto valueAttr = xmlDocument_->allocate_attribute("Value", num);
       valueNode->append_attribute(valueAttr);
     }
@@ -1086,7 +1087,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto operationTargetAttr =
       xmlDocument_->allocate_attribute("OperationTarget", operation.OperationTarget().c_str());
   operationNode->append_attribute(operationTargetAttr);
-  if (operation.getOperationType() == BICEPS::PM::OperationType::SET_VALUE)
+  if (isa<BICEPS::PM::SetValueOperationDescriptor>(&operation))
   {
     auto typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:SetValueOperationDescriptor");
     operationNode->append_attribute(typeAttr);

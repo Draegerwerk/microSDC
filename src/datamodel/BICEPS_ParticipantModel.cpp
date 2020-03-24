@@ -1,5 +1,7 @@
 #include "BICEPS_ParticipantModel.hpp"
 
+#include <utility>
+
 namespace BICEPS::PM
 {
 
@@ -98,9 +100,14 @@ namespace BICEPS::PM
 
   // AbstractDescriptor
   //
-  AbstractDescriptor::AbstractDescriptor(const HandleType& handle)
-    : Handle_(handle)
+  AbstractDescriptor::AbstractDescriptor(const DescriptorKind kind, HandleType handle)
+    : kind_(kind)
+    , Handle_(std::move(handle))
   {
+  }
+  AbstractDescriptor::DescriptorKind AbstractDescriptor::getKind() const
+  {
+    return kind_;
   }
   const AbstractDescriptor::TypeOptional& AbstractDescriptor::Type() const
   {
@@ -138,10 +145,11 @@ namespace BICEPS::PM
 
   // AbstractOperationDescriptor
   //
-  AbstractOperationDescriptor::AbstractOperationDescriptor(
-      const HandleType& handle, const OperationTargetType& operationTarget)
-    : AbstractDescriptor(handle)
-    , OperationTarget_(operationTarget)
+  AbstractOperationDescriptor::AbstractOperationDescriptor(const DescriptorKind kind,
+                                                           const HandleType& handle,
+                                                           OperationTargetType operationTarget)
+    : AbstractDescriptor(kind, handle)
+    , OperationTarget_(std::move(operationTarget))
   {
   }
   const AbstractOperationDescriptor::OperationTargetType&
@@ -153,45 +161,69 @@ namespace BICEPS::PM
   {
     return OperationTarget_;
   }
+  bool AbstractOperationDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() >= DescriptorKind::OPERATION_DESCRIPTOR &&
+           other->getKind() < DescriptorKind::LAST_OPERATION_DESCRIPTOR;
+  }
 
   // SetValueOperationDescriptor
   //
   SetValueOperationDescriptor::SetValueOperationDescriptor(
       const HandleType& handle, const OperationTargetType& operationTarget)
-    : AbstractOperationDescriptor(handle, operationTarget)
+    : AbstractOperationDescriptor(DescriptorKind::SET_VALUE_OPERATION_DESCRIPTOR, handle,
+                                  operationTarget)
   {
   }
-  OperationType SetValueOperationDescriptor::getOperationType() const
+  bool SetValueOperationDescriptor::classof(const AbstractDescriptor* other)
   {
-    return OperationType::SET_VALUE;
+    return other->getKind() == DescriptorKind::SET_VALUE_OPERATION_DESCRIPTOR;
   }
 
   // AbstractContextDescriptor
   //
-  AbstractContextDescriptor::AbstractContextDescriptor(const HandleType& handle)
-    : AbstractDescriptor(handle)
+  AbstractContextDescriptor::AbstractContextDescriptor(const DescriptorKind kind,
+                                                       const HandleType& handle)
+    : AbstractDescriptor(kind, handle)
   {
+  }
+  bool AbstractContextDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() >= DescriptorKind::CONTEXT_DESCRIPTOR &&
+           other->getKind() < DescriptorKind::LAST_CONTEXT_DESCRIPTOR;
   }
 
   // PatientContext
   //
   PatientContextDescriptor::PatientContextDescriptor(const HandleType& handle)
-    : AbstractContextDescriptor(handle)
+    : AbstractContextDescriptor(DescriptorKind::PATIENT_CONTEXT_DESCRIPTOR, handle)
   {
+  }
+  bool PatientContextDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() == DescriptorKind::PATIENT_CONTEXT_DESCRIPTOR;
   }
 
   // LocationContext
   //
   LocationContextDescriptor::LocationContextDescriptor(const HandleType& handle)
-    : AbstractContextDescriptor(handle)
+    : AbstractContextDescriptor(DescriptorKind::LOCATION_CONTEXT_DESCRIPTOR, handle)
   {
+  }
+  bool LocationContextDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() == DescriptorKind::LOCATION_CONTEXT_DESCRIPTOR;
   }
 
   // SystemContext
   //
   SystemContextDescriptor::SystemContextDescriptor(const HandleType& handle)
-    : AbstractContextDescriptor(handle)
+    : AbstractContextDescriptor(DescriptorKind::SYSTEM_CONTEXT_DESCRIPTOR, handle)
   {
+  }
+  bool SystemContextDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() == DescriptorKind::SYSTEM_CONTEXT_DESCRIPTOR;
   }
   const SystemContextDescriptor::PatientContextOptional&
   SystemContextDescriptor::PatientContext() const
@@ -214,21 +246,32 @@ namespace BICEPS::PM
 
   // AbstractDeviceComponentDescriptor
   //
-  AbstractDeviceComponentDescriptor::AbstractDeviceComponentDescriptor(const HandleType& handle)
-    : AbstractDescriptor(handle)
+  AbstractDeviceComponentDescriptor::AbstractDeviceComponentDescriptor(const DescriptorKind kind,
+                                                                       const HandleType& handle)
+    : AbstractDescriptor(kind, handle)
   {
+  }
+  bool AbstractDeviceComponentDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() >= DescriptorKind::DEVICE_COMPONENT_DESCRIPTOR &&
+           other->getKind() < AbstractDescriptor::DescriptorKind::LAST_DEVICE_COMPONENT_DESCRIPTOR;
   }
 
   // AbstractMetricDescriptor
   //
   AbstractMetricDescriptor::AbstractMetricDescriptor(
-      const HandleType& handle, const UnitType& unit, const MetricCategoryType& metricCategory,
-      const MetricAvailabilityType& metricAvailability)
-    : AbstractDescriptor(handle)
+      const DescriptorKind kind, const HandleType& handle, const UnitType& unit,
+      const MetricCategoryType& metricCategory, const MetricAvailabilityType& metricAvailability)
+    : AbstractDescriptor(kind, handle)
     , Unit_(unit)
     , MetricCategory_(metricCategory)
     , MetricAvailability_(metricAvailability)
   {
+  }
+  bool AbstractMetricDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() >= DescriptorKind::METRIC_DESCRIPTOR &&
+           other->getKind() < DescriptorKind::LAST_METRIC_DESCRIPTOR;
   }
   const AbstractMetricDescriptor::UnitType& AbstractMetricDescriptor::Unit() const
   {
@@ -264,14 +307,15 @@ namespace BICEPS::PM
                                                    const MetricCategoryType& metricCategory,
                                                    const MetricAvailabilityType& metricAvailability,
                                                    const ResolutionType& resolution)
-    : AbstractMetricDescriptor(handle, unit, metricCategory, metricAvailability)
+    : AbstractMetricDescriptor(DescriptorKind::NUMERIC_METRIC_DESCRIPTOR, handle, unit,
+                               metricCategory, metricAvailability)
     , Resolution_(resolution)
   {
   }
 
-  MetricType NumericMetricDescriptor::getMetricType() const
+  bool NumericMetricDescriptor::classof(const AbstractDescriptor* other)
   {
-    return MetricType::NUMERIC;
+    return other->getKind() == DescriptorKind::NUMERIC_METRIC_DESCRIPTOR;
   }
 
   const NumericMetricDescriptor::TechnicalRangeSequence&
@@ -304,8 +348,12 @@ namespace BICEPS::PM
   // ChannelDescriptor
   //
   ChannelDescriptor::ChannelDescriptor(const HandleType& handle)
-    : AbstractDeviceComponentDescriptor(handle)
+    : AbstractDeviceComponentDescriptor(DescriptorKind::CHANNEL_DESCRIPTOR, handle)
   {
+  }
+  bool ChannelDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() == DescriptorKind::CHANNEL_DESCRIPTOR;
   }
   const ChannelDescriptor::MetricSequence& ChannelDescriptor::Metric() const
   {
@@ -319,12 +367,26 @@ namespace BICEPS::PM
   // AbstractComplexDeviceComponentDescriptor
   //
   AbstractComplexDeviceComponentDescriptor::AbstractComplexDeviceComponentDescriptor(
-      const HandleType& handle)
-    : AbstractDeviceComponentDescriptor(handle)
+      const DescriptorKind kind, const HandleType& handle)
+    : AbstractDeviceComponentDescriptor(kind, handle)
   {
+  }
+  bool AbstractComplexDeviceComponentDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() >= DescriptorKind::COMPLEX_DEVICE_COMPONENT_DESCRIPTOR &&
+           other->getKind() <
+               AbstractDescriptor::DescriptorKind::LAST_COMPLEX_DEVICE_COMPONENT_DESCRIPTOR;
   }
   // ScoDescriptor::
   //
+  ScoDescriptor::ScoDescriptor(const HandleType& handle)
+    : AbstractDeviceComponentDescriptor(DescriptorKind::SCO_DESCRIPTOR, handle)
+  {
+  }
+  bool ScoDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() == DescriptorKind::SCO_DESCRIPTOR;
+  }
   const ScoDescriptor::OperationSequence& ScoDescriptor::Operation() const
   {
     return Operation_;
@@ -337,7 +399,7 @@ namespace BICEPS::PM
   // VmdDescriptor
   //
   VmdDescriptor::VmdDescriptor(const HandleType& handle)
-    : AbstractComplexDeviceComponentDescriptor(handle)
+    : AbstractComplexDeviceComponentDescriptor(DescriptorKind::VMD_DESCRIPTOR, handle)
   {
   }
   const VmdDescriptor::ChannelSequence& VmdDescriptor::Channel() const
@@ -356,12 +418,20 @@ namespace BICEPS::PM
   {
     return Sco_;
   }
+  bool VmdDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() == DescriptorKind::VMD_DESCRIPTOR;
+  }
 
   // MdsDescriptor
   //
   MdsDescriptor::MdsDescriptor(const HandleType& handle)
-    : AbstractComplexDeviceComponentDescriptor(handle)
+    : AbstractComplexDeviceComponentDescriptor(DescriptorKind::MDS_DESCRIPTOR, handle)
   {
+  }
+  bool MdsDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() == DescriptorKind::MDS_DESCRIPTOR;
   }
   const MdsDescriptor::VmdSequence& MdsDescriptor::Vmd() const
   {
@@ -401,6 +471,10 @@ namespace BICEPS::PM
 
   // MetricQuality
   //
+  MetricQuality::MetricQuality(const ValidityType& validity)
+    : Validity_(validity)
+  {
+  }
   const MetricQuality::ValidityType& MetricQuality::Validity() const
   {
     return Validity_;
@@ -412,6 +486,16 @@ namespace BICEPS::PM
 
   // AbstractMetricValue
   //
+  AbstractMetricValue::AbstractMetricValue(const MetricKind kind,
+                                           const MetricQualityType& metricQuality)
+    : kind_(kind)
+    , MetricQuality_(metricQuality)
+  {
+  }
+  AbstractMetricValue::MetricKind AbstractMetricValue::getKind() const
+  {
+    return kind_;
+  }
   const AbstractMetricValue::MetricQualityType& AbstractMetricValue::Quality() const
   {
     return MetricQuality_;
@@ -423,6 +507,14 @@ namespace BICEPS::PM
 
   // NumericMetricValue
   //
+  NumericMetricValue::NumericMetricValue(const MetricQuality& metricQuality)
+    : AbstractMetricValue(MetricKind::NUMERIC_METRIC, metricQuality)
+  {
+  }
+  bool NumericMetricValue::classof(const AbstractMetricValue* other)
+  {
+    return other->getKind() == MetricKind::NUMERIC_METRIC;
+  }
   const NumericMetricValue::ValueOptional& NumericMetricValue::Value() const
   {
     return Value_;
@@ -430,10 +522,6 @@ namespace BICEPS::PM
   NumericMetricValue::ValueOptional& NumericMetricValue::Value()
   {
     return Value_;
-  }
-  MetricType NumericMetricValue::getMetricType() const
-  {
-    return MetricType::NUMERIC;
   }
 
   // AbstractState
@@ -446,9 +534,14 @@ namespace BICEPS::PM
   {
     return StateVersion_;
   }
-  AbstractState::AbstractState(DescriptorHandleType handle)
-    : DescriptorHandle_(std::move(handle))
+  AbstractState::AbstractState(const StateKind kind, DescriptorHandleType handle)
+    : kind_(kind)
+    , DescriptorHandle_(std::move(handle))
   {
+  }
+  AbstractState::StateKind AbstractState::getKind() const
+  {
+    return kind_;
   }
   const AbstractState::DescriptorHandleType& AbstractState::DescriptorHandle() const
   {
@@ -469,11 +562,17 @@ namespace BICEPS::PM
   {
     return Handle_;
   }
-  AbstractMultiState::AbstractMultiState(const DescriptorHandleType& descriptorHandle,
+  AbstractMultiState::AbstractMultiState(const StateKind kind,
+                                         const DescriptorHandleType& descriptorHandle,
                                          const HandleType& handle)
-    : AbstractState(descriptorHandle)
+    : AbstractState(kind, descriptorHandle)
     , Handle_(handle)
   {
+  }
+  bool AbstractMultiState::classof(const AbstractState* other)
+  {
+    return other->getKind() >= StateKind::MULTI_STATE &&
+           other->getKind() < StateKind::LAST_MULTI_STATE;
   }
 
   // InstanceIdentifier
@@ -531,10 +630,16 @@ namespace BICEPS::PM
   {
     return Identification_;
   }
-  AbstractContextState::AbstractContextState(const DescriptorHandleType& descriptorHandle,
+  AbstractContextState::AbstractContextState(const StateKind kind,
+                                             const DescriptorHandleType& descriptorHandle,
                                              const HandleType& handle)
-    : AbstractMultiState(descriptorHandle, handle)
+    : AbstractMultiState(kind, descriptorHandle, handle)
   {
+  }
+  bool AbstractContextState::classof(const AbstractState* other)
+  {
+    return other->getKind() >= StateKind::CONTEXT_STATE &&
+           other->getKind() < StateKind::LAST_CONTEXT_STATE;
   }
 
   // LocationDetailType
@@ -600,20 +705,26 @@ namespace BICEPS::PM
   }
   LocationContextState::LocationContextState(const DescriptorHandleType& descriptorHandle,
                                              const HandleType& handle)
-    : AbstractContextState(descriptorHandle, handle)
+    : AbstractContextState(StateKind::LOCATION_CONTEXT_STATE, descriptorHandle, handle)
   {
   }
-  StateType LocationContextState::getStateType() const
+  bool LocationContextState::classof(const AbstractState* other)
   {
-    return StateType::LOCATION_CONTEXT;
+    return other->getKind() == StateKind::LOCATION_CONTEXT_STATE;
   }
   // AbstractOperationState
   //
-  AbstractOperationState::AbstractOperationState(const DescriptorHandleType& descriptorHandle,
+  AbstractOperationState::AbstractOperationState(const StateKind kind,
+                                                 const DescriptorHandleType& descriptorHandle,
                                                  const OperatingModeType& operatingMode)
-    : AbstractState(descriptorHandle)
+    : AbstractState(kind, descriptorHandle)
     , OperatingMode_(operatingMode)
   {
+  }
+  bool AbstractOperationState::classof(const AbstractState* other)
+  {
+    return other->getKind() >= StateKind::OPERATION_STATE &&
+           other->getKind() < StateKind::LAST_OPERATION_STATE;
   }
   const AbstractOperationState::OperatingModeType& AbstractOperationState::OperatingMode() const
   {
@@ -624,22 +735,39 @@ namespace BICEPS::PM
     return OperatingMode_;
   }
 
+  // SetValueOperationState
+  //
+  SetValueOperationState::SetValueOperationState(const DescriptorHandleType& descriptorHandle,
+                                                 const OperatingModeType& operatingMode)
+    : AbstractOperationState(StateKind::SET_VALUE_OPERATION_STATE, descriptorHandle, operatingMode)
+  {
+  }
+  bool SetValueOperationState::classof(const AbstractState* other)
+  {
+    return other->getKind() == StateKind::SET_VALUE_OPERATION_STATE;
+  }
+
   // AbstractMetricState
   //
-  AbstractMetricState::AbstractMetricState(DescriptorHandleType handle)
-    : AbstractState(std::move(handle))
+  AbstractMetricState::AbstractMetricState(const StateKind kind, DescriptorHandleType handle)
+    : AbstractState(kind, std::move(handle))
   {
+  }
+  bool AbstractMetricState::classof(const AbstractState* other)
+  {
+    return other->getKind() >= StateKind::METRIC_STATE &&
+           other->getKind() < StateKind::LAST_METRIC_STATE;
   }
 
   // NumericMetricState
   //
   NumericMetricState::NumericMetricState(DescriptorHandleType handle)
-    : AbstractMetricState(std::move(handle))
+    : AbstractMetricState(StateKind::NUMERIC_METRIC_STATE, std::move(handle))
   {
   }
-  StateType NumericMetricState::getStateType() const
+  bool NumericMetricState::classof(const AbstractState* other)
   {
-    return StateType::NUMERIC_METRIC;
+    return other->getKind() == StateKind::NUMERIC_METRIC_STATE;
   }
   const NumericMetricState::MetricValueOptional& NumericMetricState::MetricValue() const
   {
