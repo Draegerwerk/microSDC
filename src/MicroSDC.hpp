@@ -90,7 +90,6 @@ public:
                    const BICEPS::PM::LocationDetailType& locationDetail);
 
 private:
-  // TODO: make this a const shared ptr?
   /// a pointer to the location context state holding location descriptor of this instance
   std::shared_ptr<BICEPS::PM::LocationContextState> locationContextState_{nullptr};
   /// the SDC thread

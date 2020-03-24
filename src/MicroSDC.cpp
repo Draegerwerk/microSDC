@@ -132,7 +132,7 @@ void MicroSDC::initializeMdStates()
   {
     if (handler->getStateType() == BICEPS::PM::StateType::NUMERIC_METRIC)
     {
-      auto& numericHandler =
+      const auto& numericHandler =
           static_cast<const MdStateHandler<BICEPS::PM::NumericMetricState>&>(*handler);
       std::lock_guard<std::mutex> lock(mdibMutex_);
       mdib_->MdState()->State().emplace_back(numericHandler.getInitialState());
