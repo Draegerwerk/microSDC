@@ -1,6 +1,6 @@
 #include "StaticService.hpp"
 #include "Log.hpp"
-#include "Request.hpp"
+#include "WebServer/Request.hpp"
 
 StaticService::StaticService(std::string uri, std::string staticContent)
   : content_(std::move(staticContent))

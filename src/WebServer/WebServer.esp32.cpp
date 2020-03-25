@@ -1,6 +1,7 @@
-#include "WebServer.hpp"
-#include "HTTPRequest.hpp"
-#include "esp_log.h"
+#include "WebServer.esp32.hpp"
+#include "Log.hpp"
+#include "Request.esp32.hpp"
+#include "networking/NetworkConfig.hpp"
 #include "rapidxml/rapidxml.hpp"
 #include "services/ServiceInterface.hpp"
 #include <algorithm>
@@ -9,9 +10,12 @@
 #include <string>
 #include <vector>
 
-static constexpr const char* TAG = "WebServer";
+std::unique_ptr<WebServerInterface> WebServerFactory::produce(const NetworkConfig& networkConfig)
+{
+  return std::make_unique<WebServerEsp32>(networkConfig.useTLS());
+}
 
-WebServer::WebServer(bool useTLS)
+WebServerEsp32::WebServerEsp32(bool useTLS)
 {
   extern const unsigned char cacert_pem_start[] asm("_binary_cacert_pem_start");
   extern const unsigned char cacert_pem_end[] asm("_binary_cacert_pem_end");
@@ -34,49 +38,52 @@ WebServer::WebServer(bool useTLS)
   config_.httpd.lru_purge_enable = true;
 }
 
-void WebServer::start()
+void WebServerEsp32::start()
 {
   // start the server
-  ESP_LOGI(TAG, "Starting WebServer server on port: '%d'",
-           config_.transport_mode == HTTPD_SSL_TRANSPORT_SECURE ? config_.port_secure
-                                                                : config_.port_insecure);
+  LOG(LogLevel::INFO,
+      "Starting WebServer server on port: " << (config_.transport_mode == HTTPD_SSL_TRANSPORT_SECURE
+                                                    ? config_.port_secure
+                                                    : config_.port_insecure));
   esp_err_t ret = httpd_ssl_start(&server_, &config_);
 
   if (ret != ESP_OK)
   {
-    ESP_LOGE(TAG, "Error starting server!");
+    LOG(LogLevel::ERROR, "Error starting server!");
     throw std::runtime_error("Cannot start WebServer!");
     return;
   }
   registerUriHandlers();
 }
 
-void WebServer::stop()
+void WebServerEsp32::stop()
 {
-  ESP_LOGI(TAG, "Stopping...");
+  LOG(LogLevel::INFO, "Stopping WebServer...");
   httpd_stop(server_);
 }
 
-void WebServer::addService(std::shared_ptr<ServiceInterface> service)
+void WebServerEsp32::addService(std::shared_ptr<ServiceInterface> service)
 {
   services_.emplace_back(service);
 }
 
-esp_err_t WebServer::handlerCallback(httpd_req_t* req)
+esp_err_t WebServerEsp32::handlerCallback(httpd_req_t* req)
 {
   std::vector<char> buffer;
   buffer.resize(req->content_len + 1);
   size_t received = httpd_req_recv(req, buffer.data(), req->content_len);
   if (received != req->content_len)
   {
-    ESP_LOGE(TAG, "Could not receive all bytes!");
+    LOG(LogLevel::ERROR, "Could not receive all bytes!");
     return ESP_FAIL;
   }
   // null-terminate the buffer
   buffer.emplace_back('\0');
-  ESP_LOGD(TAG, "Received %d of %d bytes: \n%s", received, req->content_len, buffer.data());
-  auto webServer = reinterpret_cast<WebServer*>(req->user_ctx);
-  ESP_LOGI(TAG, "Dispatch URI: %s", req->uri);
+  LOG(LogLevel::DEBUG, "Received " << std::to_string(received) << " of "
+                                   << std::to_string(req->content_len) << " bytes: \n"
+                                   << buffer.data());
+  auto webServer = reinterpret_cast<WebServerEsp32*>(req->user_ctx);
+  LOG(LogLevel::INFO, "Dispatch URI: " << req->uri);
   auto service = std::find_if(
       webServer->services_.begin(), webServer->services_.end(),
       [&](const auto& service) { return strcmp(service->getURI().c_str(), req->uri) == 0; });
@@ -89,31 +96,32 @@ esp_err_t WebServer::handlerCallback(httpd_req_t* req)
 
   try
   {
-    const auto request = std::make_shared<HTTPRequest>(req, buffer.data());
+    const auto request = std::make_shared<RequestEsp32>(req, buffer.data());
+    // TODO: make this a unique ptr?
     (*service)->handleRequest(request);
   }
   catch (rapidxml::parse_error& e)
   {
-    ESP_LOGE(TAG, "Rapidxml Parse error: %s", e.what());
+    LOG(LogLevel::ERROR, "Rapidxml Parse error: " << e.what());
     return ESP_FAIL;
   }
   catch (std::exception& e)
   {
-    ESP_LOGE(TAG, "Error handling Request: std::exception: %s", e.what());
+    LOG(LogLevel::ERROR, "Error handling Request: std::exception: " << e.what());
     return ESP_FAIL;
   }
   catch (...)
   {
-    ESP_LOGE(TAG, "Error while handling request!");
+    LOG(LogLevel::ERROR, "Error while handling request!");
     // httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "500 Internal Server Error");
     return ESP_FAIL;
   }
   return ESP_OK;
 }
 
-void WebServer::registerUriHandlers()
+void WebServerEsp32::registerUriHandlers()
 {
-  ESP_LOGI(TAG, "Registering URI handlers...");
+  LOG(LogLevel::INFO, "Registering URI handlers...");
   const httpd_uri_t get = {
       "*",             // uri
       HTTP_GET,        // method

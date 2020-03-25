@@ -1,15 +1,15 @@
 #pragma once
 
+#include "WebServer/WebServer.hpp"
 #include "esp_https_server.h"
-#include "services/WebServerInterface.hpp"
 #include <vector>
 
 class ServiceInterface;
 
-class WebServer : public WebServerInterface
+class WebServerEsp32 : public WebServerInterface
 {
 public:
-  explicit WebServer(bool useTLS);
+  explicit WebServerEsp32(bool useTLS);
   void start() override;
   void stop() override;
 

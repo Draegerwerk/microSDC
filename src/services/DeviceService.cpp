@@ -1,6 +1,6 @@
 #include "services/DeviceService.hpp"
 #include "Log.hpp"
-#include "Request.hpp"
+#include "WebServer/Request.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "dpws/MetadataProvider.hpp"
 #include "services/SoapFault.hpp"

@@ -1,9 +1,7 @@
 #include "BME280.hpp"
 #include "DeviceCharacteristics.hpp"
 #include "MicroSDC.hpp"
-#include "SessionManager.hpp"
 #include "StateHandler.hpp"
-#include "WebServer.hpp"
 #include "networking/NetworkConfig.hpp"
 #include <chrono>
 #include <pthread.h>
@@ -193,7 +191,7 @@ extern "C" void app_main()
   ESP_ERROR_CHECK(esp_tls_set_global_ca_store(cacert_pem_start, cacert_len));
 
   // create MicroSDC instance
-  auto* sdc = new MicroSDC(std::make_unique<WebServer>(true), std::make_unique<SessionManager>());
+  auto* sdc = new MicroSDC();
   sdc->setEndpointReference("urn:uuid:MicroSDC-provider-on-esp32");
 
   DeviceCharacteristics deviceCharacteristics;

@@ -19,7 +19,6 @@ set(SOURCES
 
     "src/services/DeviceService.cpp"
     "src/services/GetService.cpp"
-    "src/services/Request.cpp"
     "src/services/SetService.cpp"
     "src/services/StateEventService.cpp"
     "src/services/SoapService.cpp"
@@ -33,6 +32,19 @@ set(SOURCES
     "src/MicroSDC.cpp"
     "src/StateHandler.cpp"
     "src/SubscriptionManager.cpp"
+
+    "src/WebServer/WebServer.esp32.cpp"
+    "src/WebServer/Request.cpp"
+    "src/WebServer/Request.esp32.cpp"
+
+    "src/SessionManager/SessionManager.esp32.cpp"
     )
 
-idf_component_register(SRCS ${SOURCES} INCLUDE_DIRS "./src/" REQUIRES "asio")
+idf_component_register(
+    SRCS ${SOURCES}
+    INCLUDE_DIRS "./src/"
+    REQUIRES "asio" "esp_https_server" "esp_http_client"
+    EMBED_TXTFILES "certs/cacert.pem"
+                   "certs/serverCert.pem"
+                   "certs/serverKey.pem"
+   )

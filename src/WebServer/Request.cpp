@@ -28,7 +28,12 @@ void Request::respond(const MESSAGEMODEL::Envelope& responseEnvelope) const
 {
   MessageSerializer serializer;
   serializer.serialize(responseEnvelope);
-  respond(serializer.str());
+  sendResponse(serializer.str());
+}
+
+void Request::respond(const std::string& msg) const
+{
+  sendResponse(msg);
 }
 
 void Request::parse()

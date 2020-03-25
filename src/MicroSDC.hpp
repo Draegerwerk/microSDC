@@ -1,9 +1,9 @@
 #pragma once
 
 #include "DeviceCharacteristics.hpp"
-#include "SessionManagerInterface.hpp"
+#include "SessionManager/SessionManager.hpp"
+#include "WebServer/WebServer.hpp"
 #include "dpws/DPWSHost.hpp"
-#include "services/WebServerInterface.hpp"
 #include <map>
 #include <mutex>
 #include <thread>
@@ -26,8 +26,7 @@ class MicroSDC
 {
 public:
   /// @brief constructs an MicroSDC instance
-  MicroSDC(std::unique_ptr<WebServerInterface> webServer,
-           std::unique_ptr<SessionManagerInterface> sessionManager);
+  explicit MicroSDC();
 
   /// @brief starts the sdcThread calling startup()
   void start();

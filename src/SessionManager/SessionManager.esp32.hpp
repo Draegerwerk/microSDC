@@ -1,14 +1,14 @@
 #pragma once
 
-#include "SessionManagerInterface.hpp"
+#include "SessionManager.hpp"
 
 struct esp_http_client;
 
-class ClientSession : public ClientSessionInterface
+class ClientSessionEsp32 : public ClientSessionInterface
 {
 public:
-  explicit ClientSession(const std::string& notifyTo);
-  ~ClientSession();
+  explicit ClientSessionEsp32(const std::string& notifyTo);
+  ~ClientSessionEsp32() override;
   void send(const std::string& message) const override;
 
 private:
@@ -16,7 +16,7 @@ private:
   const std::string notifyTo_;
 };
 
-class SessionManager : public SessionManagerInterface
+class SessionManagerEsp32 : public SessionManagerInterface
 {
 public:
   void createSession(const std::string& notifyTo) override;

@@ -1,9 +1,14 @@
-#include "SessionManager.hpp"
+#include "SessionManager.esp32.hpp"
 #include "Log.hpp"
 
 #include "esp_http_client.h"
 
-ClientSession::ClientSession(const std::string& notifyTo)
+std::unique_ptr<SessionManagerInterface> SessionManagerFactory::produce()
+{
+  return std::make_unique<SessionManagerEsp32>();
+}
+
+ClientSessionEsp32::ClientSessionEsp32(const std::string& notifyTo)
   : notifyTo_(notifyTo)
 {
   extern const char serverCert_pem_start[] asm("_binary_serverCert_pem_start");
@@ -35,7 +40,7 @@ ClientSession::ClientSession(const std::string& notifyTo)
   session_ = esp_http_client_init(&config);
 }
 
-ClientSession::~ClientSession()
+ClientSessionEsp32::~ClientSessionEsp32()
 {
   auto err = esp_http_client_cleanup(session_);
   if (err == ESP_OK)
@@ -48,15 +53,15 @@ ClientSession::~ClientSession()
   }
 }
 
-void ClientSession::send(const std::string& message) const
+void ClientSessionEsp32::send(const std::string& message) const
 {
   esp_http_client_set_post_field(session_, message.c_str(), message.length());
   esp_err_t err = esp_http_client_perform(session_);
   if (err == ESP_OK)
   {
-    LOG(LogLevel::DEBUG,
-        "HTTPS Status = " << esp_http_client_get_status_code(session_)
-                          << " , content_length = " << esp_http_client_get_content_length(session_));
+    LOG(LogLevel::DEBUG, "HTTPS Status = " << esp_http_client_get_status_code(session_)
+                                           << " , content_length = "
+                                           << esp_http_client_get_content_length(session_));
   }
   else
   {
@@ -64,17 +69,17 @@ void ClientSession::send(const std::string& message) const
   }
 }
 
-void SessionManager::createSession(const std::string& notifyTo)
+void SessionManagerEsp32::createSession(const std::string& notifyTo)
 {
   if (sessions_.count(notifyTo) != 0)
   {
     LOG(LogLevel::INFO, "Client session already exists");
     return;
   }
-  sessions_.emplace(notifyTo, std::make_shared<ClientSession>(notifyTo));
+  sessions_.emplace(notifyTo, std::make_shared<ClientSessionEsp32>(notifyTo));
 }
 
-void SessionManager::sendToSession(const std::string& notifyTo, const std::string& message)
+void SessionManagerEsp32::sendToSession(const std::string& notifyTo, const std::string& message)
 {
   auto sessionIt = sessions_.find(notifyTo);
   if (sessionIt == sessions_.end())
@@ -86,7 +91,7 @@ void SessionManager::sendToSession(const std::string& notifyTo, const std::strin
   sessionIt->second->send(message);
 }
 
-void SessionManager::deleteSession(const std::string& notifyTo)
+void SessionManagerEsp32::deleteSession(const std::string& notifyTo)
 {
   sessions_.erase(notifyTo);
 }

@@ -9,6 +9,9 @@ class ServiceInterface;
 class WebServerInterface
 {
 public:
+  /// @brief virtual destructor for polymorphism
+  virtual ~WebServerInterface() = default;
+
   /// @brief starts and itinializes the WebServer
   virtual void start() = 0;
 
@@ -18,4 +21,12 @@ public:
   /// @brief adds a service to the handlers
   /// @param service a pointer to the service to add
   virtual void addService(std::shared_ptr<ServiceInterface> service) = 0;
+};
+
+class NetworkConfig;
+
+class WebServerFactory
+{
+public:
+  static std::unique_ptr<WebServerInterface> produce(const NetworkConfig& networkConfig);
 };

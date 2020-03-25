@@ -16,6 +16,8 @@ public:
   /// @param message the raw HTTP message content
   explicit Request(char* message);
 
+  virtual ~Request() = default;
+
 
   /// @brief gets the parsed envelope inside this request
   /// @return shared pointer to the envelope
@@ -31,12 +33,16 @@ public:
   /// @param responseEnvelope the SOAP envelope to send
   void respond(const MESSAGEMODEL::Envelope& responseEnvelope) const;
 
-
   /// @brief sends an actual response string to the requesting client
   /// @param msg the string to send
-  virtual void respond(const std::string& msg) const = 0;
+  virtual void respond(const std::string& msg) const;
+
 
 private:
+  /// @brief sends an actual response string to the requesting client
+  /// @param msg the string to send
+  virtual void sendResponse(const std::string& msg) const = 0;
+
   /// @brief parses the content of this request's raw message
   void parse();
 

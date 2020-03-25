@@ -13,7 +13,6 @@
 #include "services/SetService.hpp"
 #include "services/StateEventService.hpp"
 #include "services/StaticService.hpp"
-#include "services/WebServerInterface.hpp"
 #include "uuid/UUIDGenerator.hpp"
 #include "wsdl/GetServiceWSDL.hpp"
 #include "wsdl/SetServiceWSDL.hpp"
@@ -21,11 +20,8 @@
 
 #include "asio/system_error.hpp"
 
-
-MicroSDC::MicroSDC(std::unique_ptr<WebServerInterface> webServer,
-                   std::unique_ptr<SessionManagerInterface> sessionManager)
-  : webserver_(std::move(webServer))
-  , sessionManager_(std::move(sessionManager))
+MicroSDC::MicroSDC()
+  : sessionManager_(SessionManagerFactory::produce())
   , mdib_(std::make_unique<BICEPS::PM::Mdib>(std::string("0")))
 {
   mdib_->MdState() = BICEPS::PM::MdState();
@@ -45,6 +41,7 @@ void MicroSDC::start()
     LOG(LogLevel::WARNING, "called MicroSDC start but already running!");
     return;
   }
+  webserver_ = WebServerFactory::produce(*networkConfig_);
   startup();
   // MicroSDC is now ready und is running
   running_ = true;

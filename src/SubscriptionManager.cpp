@@ -3,7 +3,7 @@
 #include "Log.hpp"
 #include "MicroSDC.hpp"
 #include "SDCConstants.hpp"
-#include "SessionManagerInterface.hpp"
+#include "SessionManager/SessionManager.hpp"
 #include "datamodel/MessageModel.hpp"
 #include "datamodel/MessageSerializer.hpp"
 #include "datamodel/ws-addressing.hpp"
@@ -133,7 +133,7 @@ void SubscriptionManager::fireEvent(const BICEPS::MM::EpisodicMetricReport& repo
   serializer.serialize(notifyEnvelope);
   const auto messageStr = serializer.str();
   LOG(LogLevel::DEBUG, "SENDING: " << messageStr);
-  for (const auto *const info : subscriber)
+  for (const auto* const info : subscriber)
   {
     sessionManager_->sendToSession(info->notifyTo.Address(), messageStr);
   }
