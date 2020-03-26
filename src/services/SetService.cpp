@@ -1,7 +1,7 @@
 #include "SetService.hpp"
 #include "Log.hpp"
-#include "WebServer/Request.hpp"
 #include "SubscriptionManager.hpp"
+#include "WebServer/Request.hpp"
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageSerializer.hpp"
@@ -24,7 +24,7 @@ std::string SetService::getURI() const
   return metadata_->getSetServicePath();
 }
 
-void SetService::handleRequest(std::shared_ptr<Request> req)
+void SetService::handleRequest(std::unique_ptr<Request> req)
 {
   const auto requestEnvelope = req->getEnvelope();
   const auto& soapAction = requestEnvelope.Header().Action();

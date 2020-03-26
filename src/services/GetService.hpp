@@ -15,7 +15,7 @@ public:
   GetService(const MicroSDC& microSDC, std::shared_ptr<const MetadataProvider> metadata);
 
   std::string getURI() const override;
-  void handleRequest(std::shared_ptr<Request> req) override;
+  void handleRequest(std::unique_ptr<Request> req) override;
 
 private:
   /// a reference to the microSDC instance holding this service

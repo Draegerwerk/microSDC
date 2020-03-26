@@ -12,7 +12,7 @@ public:
   StaticService(std::string uri, std::string staticContent);
 
   std::string getURI() const override;
-  void handleRequest(std::shared_ptr<Request> req) override;
+  void handleRequest(std::unique_ptr<Request> req) override;
 
 private:
   /// the content this service exposes and provides

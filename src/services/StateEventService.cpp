@@ -1,8 +1,8 @@
 #include "StateEventService.hpp"
 
 #include "Log.hpp"
-#include "WebServer/Request.hpp"
 #include "SubscriptionManager.hpp"
+#include "WebServer/Request.hpp"
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
@@ -23,7 +23,7 @@ std::string StateEventService::getURI() const
   return metadata_->getStateEventServicePath();
 }
 
-void StateEventService::handleRequest(std::shared_ptr<Request> req)
+void StateEventService::handleRequest(std::unique_ptr<Request> req)
 {
   const auto& requestEnvelope = req->getEnvelope();
   const auto& soapAction = requestEnvelope.Header().Action();

@@ -96,9 +96,7 @@ esp_err_t WebServerEsp32::handlerCallback(httpd_req_t* req)
 
   try
   {
-    const auto request = std::make_shared<RequestEsp32>(req, buffer.data());
-    // TODO: make this a unique ptr?
-    (*service)->handleRequest(request);
+    (*service)->handleRequest(std::make_unique<RequestEsp32>(req, buffer.data()));
   }
   catch (rapidxml::parse_error& e)
   {

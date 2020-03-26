@@ -30,14 +30,12 @@ set(HEADERS
 
     "src/services/DeviceService.hpp"
     "src/services/GetService.hpp"
-    "src/services/Request.hpp"
     "src/services/ServiceInterface.hpp"
     "src/services/SetService.hpp"
     "src/services/SoapFault.hpp"
     "src/services/SoapService.hpp"
     "src/services/StateEventService.hpp"
     "src/services/StaticService.hpp"
-    "src/services/WebServerInterface.hpp"
 
     "src/uuid/UUID.hpp"
     "src/uuid/UUIDGenerator.hpp"
@@ -52,6 +50,11 @@ set(HEADERS
     "src/SDCConstants.hpp"
     "src/StateHandler.hpp"
     "src/SubscriptionManager.hpp"
+
+    "src/WebServer/Request.hpp"
+    "src/WebServer/WebServer.hpp"
+
+    "src/SessionManager/SessionManager.hpp"
     )
 
 
@@ -76,7 +79,6 @@ set(SOURCES
 
     "src/services/DeviceService.cpp"
     "src/services/GetService.cpp"
-    "src/services/Request.cpp"
     "src/services/SetService.cpp"
     "src/services/StateEventService.cpp"
     "src/services/SoapService.cpp"
@@ -90,6 +92,8 @@ set(SOURCES
     "src/MicroSDC.cpp"
     "src/StateHandler.cpp"
     "src/SubscriptionManager.cpp"
+
+    "src/WebServer/Request.cpp"
     )
 
 add_library(microSDC ${SOURCES} ${HEADERS})

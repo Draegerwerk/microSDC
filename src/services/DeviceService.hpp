@@ -14,7 +14,7 @@ public:
 
   std::string getURI() const override;
 
-  void handleRequest(std::shared_ptr<Request> req) override;
+  void handleRequest(std::unique_ptr<Request> req) override;
 
 private:
   /// a pointer to the metadata

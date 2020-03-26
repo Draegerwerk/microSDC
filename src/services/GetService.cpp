@@ -23,7 +23,7 @@ std::string GetService::getURI() const
   return metadata_->getGetServicePath();
 }
 
-void GetService::handleRequest(std::shared_ptr<Request> req)
+void GetService::handleRequest(std::unique_ptr<Request> req)
 {
   const auto& requestEnvelope = req->getEnvelope();
   const auto& soapAction = requestEnvelope.Header().Action();

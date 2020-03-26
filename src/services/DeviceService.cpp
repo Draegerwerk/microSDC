@@ -17,7 +17,7 @@ std::string DeviceService::getURI() const
   return metadata_->getDeviceServicePath();
 }
 
-void DeviceService::handleRequest(std::shared_ptr<Request> req)
+void DeviceService::handleRequest(std::unique_ptr<Request> req)
 {
   const auto requestEnvelope = req->getEnvelope();
   const auto& soapAction = requestEnvelope.Header().Action();

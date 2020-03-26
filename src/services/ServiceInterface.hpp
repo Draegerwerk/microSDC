@@ -19,5 +19,5 @@ public:
 
   /// @brief handles any kind of incoming request
   /// @param req a pointer to the Request to be handled
-  virtual void handleRequest(std::shared_ptr<Request> req) = 0;
+  virtual void handleRequest(std::unique_ptr<Request> req) = 0;
 };
