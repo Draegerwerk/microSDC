@@ -1,50 +1,20 @@
 set(SOURCES
-    "src/datamodel/BICEPS_MessageModel.cpp"
-    "src/datamodel/BICEPS_ParticipantModel.cpp"
-    "src/datamodel/ExpectedElement.cpp"
-    "src/datamodel/MessageModel.cpp"
-    "src/datamodel/MessageSerializer.cpp"
-    "src/datamodel/ws-addressing.cpp"
-    "src/datamodel/ws-discovery.cpp"
-    "src/datamodel/ws-dpws.cpp"
-    "src/datamodel/ws-eventing.cpp"
-    "src/datamodel/ws-MetadataExchange.cpp"
-    "src/datamodel/xs_duration.cpp"
-
-    "src/dpws/DPWSHost.cpp"
-    "src/dpws/MessagingContext.cpp"
-    "src/dpws/MetadataProvider.cpp"
-
-    "src/networking/NetworkConfig.cpp"
-
-    "src/services/DeviceService.cpp"
-    "src/services/GetService.cpp"
-    "src/services/SetService.cpp"
-    "src/services/StateEventService.cpp"
-    "src/services/SoapService.cpp"
-    "src/services/StaticService.cpp"
-
-    "src/uuid/UUID.cpp"
-    "src/uuid/UUIDGenerator.cpp"
-
-    "src/DeviceCharacteristics.cpp"
-    "src/Log.cpp"
-    "src/MicroSDC.cpp"
-    "src/StateHandler.cpp"
-    "src/SubscriptionManager.cpp"
-
-    "src/WebServer/WebServer.esp32.cpp"
-    "src/WebServer/Request.cpp"
-    "src/WebServer/Request.esp32.cpp"
-
-    "src/SessionManager/SessionManager.esp32.cpp"
+    "WebServer.esp32.cpp"
+    "Request.esp32.cpp"
+    "SessionManager.esp32.cpp"
     )
 
 idf_component_register(
     SRCS ${SOURCES}
-    INCLUDE_DIRS "./src/"
-    REQUIRES "asio" "esp_https_server" "esp_http_client"
+    REQUIRES "esp_https_server" "esp_http_client"
     EMBED_TXTFILES "certs/cacert.pem"
                    "certs/serverCert.pem"
                    "certs/serverKey.pem"
    )
+
+add_subdirectory(src/)
+cmake_policy(SET CMP0079 NEW)
+target_link_libraries(microSDC PRIVATE idf::asio)
+
+target_include_directories(${COMPONENT_LIB} PUBLIC src/)
+target_sources(${COMPONENT_LIB} PUBLIC $<TARGET_OBJECTS:microSDC>)
