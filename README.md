@@ -9,7 +9,7 @@ MicroSDC targets the ESP32 using the official development framework [ESP-IDF](ht
 - C++17 compiler support ([C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support#cpp17))
 - CMake (>= 3.10)
 
-using the reference implementation for esp32 targets:
+using the reference implementation for ePsp32 targets:
 
 - [ESP-IDF](https://github.com/espressif/esp-idf/) at master with at least [572408351](https://github.com/espressif/esp-idf/commit/582f5dd697fde49eea1f1dfe0c86f9f2f48bb223)
 
@@ -19,6 +19,21 @@ The reference example is found at [examples/esp32/](examples/esp32/).
 As [ESP-IDF](https://github.com/espressif/esp-idf/) uses it's own CMake based build chain, MicroSDC is embedded as a single component.
 
 To setup [ESP-IDF](https://github.com/espressif/esp-idf/) follow the installation steps at [Get Started](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/).
+
+Furthermore you need to set the c++ standard to c++17.  
+This can be achieved by replacing the line
+
+```
+list(APPEND cxx_compile_options "-std=gnu++11")
+```
+
+with
+
+```
+list(APPEND cxx_compile_options "-std=gnu++17")
+```
+
+in the file `$IDF_PATH/tools/cmake/build.cmake`.
 
 The MicroSDC project example can be configured with:
 
