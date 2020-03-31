@@ -9,7 +9,7 @@ MicroSDC targets the ESP32 using the official development framework [ESP-IDF](ht
 - C++17 compiler support ([C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support#cpp17))
 - CMake (>= 3.10)
 
-using the reference implementation for ePsp32 targets:
+using the reference implementation for esp32 targets:
 
 - [ESP-IDF](https://github.com/espressif/esp-idf/) at master with at least [572408351](https://github.com/espressif/esp-idf/commit/582f5dd697fde49eea1f1dfe0c86f9f2f48bb223)
 
