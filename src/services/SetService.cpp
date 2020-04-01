@@ -84,7 +84,7 @@ void SetService::handleRequest(std::unique_ptr<Request> req)
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
     responseEnvelope.Header().Action() = WS::ADDRESSING::URIType(SDC::ACTION_SET_VALUE_RESPONSE);
     responseEnvelope.Body().SetValueResponse() = setValueResponse;
-    req->respond(requestEnvelope);
+    req->respond(responseEnvelope);
   }
   else
   {
