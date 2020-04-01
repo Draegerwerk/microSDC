@@ -8,5 +8,6 @@ ExpectedElement::ExpectedElement(std::string name, std::string ns)
 
 const char* ExpectedElement::what() const noexcept
 {
-  return "expected element not encountered";
+  auto msg = "expected element " + name_ + " from namespace " + ns_ + " not encountered";
+  return msg.c_str();
 }
