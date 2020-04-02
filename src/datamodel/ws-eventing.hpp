@@ -79,8 +79,7 @@ namespace WS::EVENTING
     FilterOptional& Filter();
 
     explicit Subscribe(const DeliveryType& delivery);
-    Subscribe(const rapidxml::xml_node<>& node);
-    Subscribe() = default;
+    explicit Subscribe(const rapidxml::xml_node<>& node);
 
   protected:
     EndToOptional EndTo_;
