@@ -4,11 +4,15 @@
 #include "networking/NetworkConfig.hpp"
 #include <thread>
 
-static volatile bool keepRunning = true;
+static volatile std::atomic_bool keepRunning = true;
+static std::condition_variable cvRunning;
+static std::mutex runningMutex;
 
 void intHandler(int /*unused*/)
 {
   keepRunning = false;
+  std::unique_lock<std::mutex> lock(runningMutex);
+  cvRunning.notify_all();
 }
 
 int main()
@@ -71,6 +75,16 @@ int main()
 
   microSDC->start();
 
+  auto valueThread = std::thread([stateHandler]() {
+    double i = 0.0;
+    while (keepRunning)
+    {
+      stateHandler->setValue(i++);
+      std::unique_lock<std::mutex> lock(runningMutex);
+      cvRunning.wait_for(lock, std::chrono::seconds(1));
+    }
+  });
+
   struct sigaction sa
   {
   };
@@ -82,12 +96,10 @@ int main()
 
   sigset_t mask;
   sigemptyset(&mask);
-  double i = 0.0;
   while (keepRunning)
   {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    // stateHandler->setValue(i++);
-    // sigsuspend(&mask);
+    sigsuspend(&mask);
   }
+  valueThread.join();
   return 0;
 }
