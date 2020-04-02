@@ -50,8 +50,8 @@ namespace BICEPS::PM
 
   // CodedValue
   //
-  CodedValue::CodedValue(const CodeType& code)
-    : Code_(code)
+  CodedValue::CodedValue(CodeType code)
+    : Code_(std::move(code))
   {
   }
   const CodedValue::CodeType& CodedValue::Code() const
@@ -260,10 +260,10 @@ namespace BICEPS::PM
   // AbstractMetricDescriptor
   //
   AbstractMetricDescriptor::AbstractMetricDescriptor(
-      const DescriptorKind kind, const HandleType& handle, const UnitType& unit,
+      const DescriptorKind kind, const HandleType& handle, UnitType unit,
       const MetricCategoryType& metricCategory, const MetricAvailabilityType& metricAvailability)
     : AbstractDescriptor(kind, handle)
-    , Unit_(unit)
+    , Unit_(std::move(unit))
     , MetricCategory_(metricCategory)
     , MetricAvailability_(metricAvailability)
   {
@@ -564,9 +564,9 @@ namespace BICEPS::PM
   }
   AbstractMultiState::AbstractMultiState(const StateKind kind,
                                          const DescriptorHandleType& descriptorHandle,
-                                         const HandleType& handle)
+                                         HandleType handle)
     : AbstractState(kind, descriptorHandle)
-    , Handle_(handle)
+    , Handle_(std::move(handle))
   {
   }
   bool AbstractMultiState::classof(const AbstractState* other)
@@ -791,8 +791,8 @@ namespace BICEPS::PM
 
   // Mdib
   //
-  Mdib::Mdib(const SequenceIdType& sequenceIdType)
-    : SequenceId_(sequenceIdType)
+  Mdib::Mdib(SequenceIdType sequenceIdType)
+    : SequenceId_(std::move(sequenceIdType))
   {
   }
   const Mdib::MdDescriptionOptional& Mdib::MdDescription() const

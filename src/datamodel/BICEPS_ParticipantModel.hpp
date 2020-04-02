@@ -76,7 +76,7 @@ namespace BICEPS::PM
     const CodeType& Code() const;
     CodeType& Code();
 
-    CodedValue(const CodeType& code);
+    explicit CodedValue(CodeType code);
 
   private:
     CodeType Code_;
@@ -148,7 +148,7 @@ namespace BICEPS::PM
   private:
     DescriptorKind kind_;
 
-  protected:
+  private:
     TypeOptional Type_;
     HandleType Handle_;
     DescriptorVersionOptional DescriptorVersion_;
@@ -165,9 +165,11 @@ namespace BICEPS::PM
     static bool classof(const AbstractDescriptor* other);
 
   protected:
-    OperationTargetType OperationTarget_;
     AbstractOperationDescriptor(DescriptorKind kind, const HandleType& handle,
                                 OperationTargetType operationTarget);
+
+  private:
+    OperationTargetType OperationTarget_;
   };
 
   class SetValueOperationDescriptor : public AbstractOperationDescriptor
@@ -224,7 +226,7 @@ namespace BICEPS::PM
     const SerialNumberSequence& SerialNumber() const;
     SerialNumberSequence& SerialNumber();
 
-  protected:
+  private:
     ManufacturerSequence Manufacturer_;
     ModelNameSequence ModelName_;
     ModelNumberOptional ModelNumber_;
@@ -243,7 +245,7 @@ namespace BICEPS::PM
   public:
     // Constructors
     //
-    PatientContextDescriptor(const HandleType&);
+    explicit PatientContextDescriptor(const HandleType&);
     static bool classof(const AbstractDescriptor* other);
   };
   class LocationContextDescriptor : public AbstractContextDescriptor
@@ -251,7 +253,7 @@ namespace BICEPS::PM
   public:
     // Constructors
     //
-    LocationContextDescriptor(const HandleType&);
+    explicit LocationContextDescriptor(const HandleType&);
     static bool classof(const AbstractDescriptor* other);
   };
   class SystemContextDescriptor : public AbstractContextDescriptor
@@ -273,10 +275,10 @@ namespace BICEPS::PM
 
     // Constructors
     //
-    SystemContextDescriptor(const HandleType&);
+    explicit SystemContextDescriptor(const HandleType&);
     static bool classof(const AbstractDescriptor* other);
 
-  protected:
+  private:
     PatientContextOptional PatientContext_;
     LocationContextOptional LocationContext_;
   };
@@ -314,7 +316,7 @@ namespace BICEPS::PM
     const AbsoluteAccuracyOptional& AbsoluteAccuracy() const;
     AbsoluteAccuracyOptional& AbsoluteAccuracy();
 
-  protected:
+  private:
     LowerOptional Lower_;
     UpperOptional Upper_;
     StepWidthOptional StepWidth_;
@@ -344,14 +346,19 @@ namespace BICEPS::PM
 
     static bool classof(const AbstractDescriptor* other);
 
+    AbstractMetricDescriptor(const AbstractMetricDescriptor&) = delete;
+    AbstractMetricDescriptor& operator=(const AbstractMetricDescriptor&) = delete;
+
   protected:
     // Constructors.
     //
-    AbstractMetricDescriptor(DescriptorKind kind, const HandleType&, const UnitType&,
+    AbstractMetricDescriptor(DescriptorKind kind, const HandleType&, UnitType,
                              const MetricCategoryType&, const MetricAvailabilityType&);
+    AbstractMetricDescriptor(AbstractMetricDescriptor&&) = default;
+    AbstractMetricDescriptor& operator=(AbstractMetricDescriptor&&) = default;
     virtual ~AbstractMetricDescriptor() = default;
 
-  protected:
+  private:
     UnitType Unit_;
     MetricCategoryType MetricCategory_;
     MetricAvailabilityType MetricAvailability_;
@@ -380,7 +387,7 @@ namespace BICEPS::PM
     NumericMetricDescriptor(const HandleType&, const UnitType&, const MetricCategoryType&,
                             const MetricAvailabilityType&, const ResolutionType&);
 
-  protected:
+  private:
     TechnicalRangeSequence TechnicalRange_;
     ResolutionType Resolution_;
     AveragingPeriodOptional AveragingPeriod_;
@@ -396,10 +403,10 @@ namespace BICEPS::PM
     MetricSequence& Metric();
     // Constructors
     //
-    ChannelDescriptor(const HandleType&);
+    explicit ChannelDescriptor(const HandleType&);
     static bool classof(const AbstractDescriptor* other);
 
-  protected:
+  private:
     MetricSequence Metric_;
   };
   class ScoDescriptor : public AbstractDeviceComponentDescriptor
@@ -413,7 +420,7 @@ namespace BICEPS::PM
     explicit ScoDescriptor(const HandleType& handle);
     static bool classof(const AbstractDescriptor* other);
 
-  protected:
+  private:
     OperationSequence Operation_;
   };
   class VmdDescriptor : public AbstractComplexDeviceComponentDescriptor
@@ -433,11 +440,11 @@ namespace BICEPS::PM
     const ScoOptional& Sco() const;
     ScoOptional& Sco();
 
-    VmdDescriptor(const HandleType&);
+    explicit VmdDescriptor(const HandleType&);
 
     static bool classof(const AbstractDescriptor* other);
 
-  protected:
+  private:
     ChannelSequence Channel_;
     ScoOptional Sco_;
   };
@@ -481,10 +488,10 @@ namespace BICEPS::PM
 
     // Constructors.
     //
-    MdsDescriptor(const HandleType&);
+    explicit MdsDescriptor(const HandleType&);
     static bool classof(const AbstractDescriptor* other);
 
-  protected:
+  private:
     MetaDataOptional MetaData_;
     SystemContextOptional SystemContext_;
     ClockOptional Clock_;
@@ -512,7 +519,7 @@ namespace BICEPS::PM
     //
     MdDescription() = default;
 
-  protected:
+  private:
     MdsSequence Mds_;
     DescriptionVersionOptional DescriptionVersion_;
   };
@@ -558,7 +565,7 @@ namespace BICEPS::PM
   private:
     StateKind kind_;
 
-  protected:
+  private:
     StateVersionOptional StateVersion_;
     DescriptorHandleType DescriptorHandle_;
   };
@@ -572,10 +579,10 @@ namespace BICEPS::PM
     const HandleType& Handle() const;
     HandleType& Handle();
 
-    AbstractMultiState(StateKind kind, const DescriptorHandleType&, const HandleType&);
+    AbstractMultiState(StateKind kind, const DescriptorHandleType&, HandleType);
     static bool classof(const AbstractState* other);
 
-  protected:
+  private:
     CategoryOptional Category_;
     HandleType Handle_;
   };
@@ -592,7 +599,7 @@ namespace BICEPS::PM
     const RootOptional& Root() const;
     RootOptional& Root();
 
-  protected:
+  private:
     ExtensionOptional Extension_;
     RootOptional Root_;
   };
@@ -622,7 +629,7 @@ namespace BICEPS::PM
     AbstractContextState(StateKind kind, const DescriptorHandleType&, const HandleType&);
     static bool classof(const AbstractState* other);
 
-  protected:
+  private:
     BindingMdibVersionOptional BindingMdibVersion_;
     ContextAssociationOptional ContextAssociation_;
     ValidatorSequence Validator_;
@@ -661,7 +668,7 @@ namespace BICEPS::PM
     const FloorOptional& Floor() const;
     FloorOptional& Floor();
 
-  protected:
+  private:
     PoCOptional PoC_;
     RoomOptional Room_;
     BedOptional Bed_;
@@ -679,7 +686,7 @@ namespace BICEPS::PM
     LocationContextState(const DescriptorHandleType&, const HandleType&);
     static bool classof(const AbstractState* other);
 
-  protected:
+  private:
     LocationDetailOptional LocationDetail_;
   };
   class AbstractOperationState : public AbstractState
@@ -691,10 +698,11 @@ namespace BICEPS::PM
     static bool classof(const AbstractState* other);
 
   protected:
-    OperatingModeType OperatingMode_;
-
     AbstractOperationState(StateKind kind, const DescriptorHandleType& descriptorHandle,
                            const OperatingModeType& operatingMode);
+
+  private:
+    OperatingModeType OperatingMode_;
   };
   class SetValueOperationState : public AbstractOperationState
   {
@@ -718,7 +726,7 @@ namespace BICEPS::PM
 
     explicit MetricQuality(const ValidityType& validity);
 
-  protected:
+  private:
     ValidityType Validity_;
     ModeOptional Mode_;
     QiOptional Qi_;
@@ -728,7 +736,7 @@ namespace BICEPS::PM
   public:
     using TypeType = CodedValue;
 
-  protected:
+  private:
     TypeType Type_;
   };
 
@@ -765,6 +773,7 @@ namespace BICEPS::PM
   protected:
     explicit AbstractMetricValue(MetricKind kind, const MetricQualityType& metricQuality);
 
+  private:
     MetricQualityType MetricQuality_;
     AnnotationSequence Annotation_;
     StartTimeOptional StartTime_;
@@ -782,7 +791,7 @@ namespace BICEPS::PM
     explicit NumericMetricValue(const MetricQualityType& metricQuality);
     static bool classof(const AbstractMetricValue* other);
 
-  protected:
+  private:
     ValueOptional Value_;
   };
   class AbstractMetricState : public AbstractState
@@ -797,6 +806,7 @@ namespace BICEPS::PM
     //
     AbstractMetricState(StateKind kind, DescriptorHandleType handle);
 
+  private:
     ActivationStateOptional ActivationState_;
   };
   class NumericMetricState : public AbstractMetricState
@@ -819,7 +829,7 @@ namespace BICEPS::PM
     //
     explicit NumericMetricState(DescriptorHandleType handle);
 
-  protected:
+  private:
     MetricValueOptional MetricValue_;
     PhysiologicalRangeSequence PhysiologicalRange_;
     ActiveAveragingPeriodOptional ActiveAveragingPeriod_;
@@ -841,7 +851,7 @@ namespace BICEPS::PM
     const StateVersionOptional& StateVersion() const;
     StateVersionOptional& StateVersion();
 
-  protected:
+  private:
     StateSequence State_;
     StateVersionOptional StateVersion_;
   };
@@ -884,9 +894,9 @@ namespace BICEPS::PM
 
     // Constructors.
     //
-    Mdib(const SequenceIdType&);
+    explicit Mdib(SequenceIdType sequenceIdType);
 
-  protected:
+  private:
     MdDescriptionOptional MdDescription_;
     MdStateOptional MdState_;
     MdibVersionOptional MdibVersion_;
