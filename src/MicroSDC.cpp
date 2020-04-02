@@ -40,7 +40,7 @@ void MicroSDC::start()
     LOG(LogLevel::WARNING, "called MicroSDC start but already running!");
     return;
   }
-  webserver_ = WebServerFactory::produce(*networkConfig_);
+  webserver_ = WebServerFactory::produce(networkConfig_);
   startup();
   // MicroSDC is now ready und is running
   running_ = true;
@@ -209,7 +209,7 @@ std::string MicroSDC::getEndpointReference() const
   return endpointReference_;
 }
 
-void MicroSDC::setNetworkConfig(std::shared_ptr<NetworkConfig> networkConfig)
+void MicroSDC::setNetworkConfig(std::unique_ptr<NetworkConfig> networkConfig)
 {
   std::lock_guard<std::mutex> lock(runningMutex_);
   if (running_)

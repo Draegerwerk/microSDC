@@ -28,5 +28,5 @@ class NetworkConfig;
 class WebServerFactory
 {
 public:
-  static std::unique_ptr<WebServerInterface> produce(const NetworkConfig& networkConfig);
+  static std::unique_ptr<WebServerInterface> produce(const std::shared_ptr<const NetworkConfig>& networkConfig);
 };

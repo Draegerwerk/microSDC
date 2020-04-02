@@ -10,9 +10,10 @@
 #include <string>
 #include <vector>
 
-std::unique_ptr<WebServerInterface> WebServerFactory::produce(const NetworkConfig& networkConfig)
+std::unique_ptr<WebServerInterface>
+WebServerFactory::produce(const std::shared_ptr<const NetworkConfig>& networkConfig)
 {
-  return std::make_unique<WebServerEsp32>(networkConfig.useTLS());
+  return std::make_unique<WebServerEsp32>(networkConfig->useTLS());
 }
 
 WebServerEsp32::WebServerEsp32(bool useTLS)
@@ -96,7 +97,8 @@ esp_err_t WebServerEsp32::handlerCallback(httpd_req_t* req)
 
   try
   {
-    (*service)->handleRequest(std::make_unique<RequestEsp32>(req, std::string(buffer.begin(), buffer.end())));
+    (*service)->handleRequest(
+        std::make_unique<RequestEsp32>(req, std::string(buffer.begin(), buffer.end())));
   }
   catch (rapidxml::parse_error& e)
   {

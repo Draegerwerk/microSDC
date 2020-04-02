@@ -1,9 +1,10 @@
 #include "WebServer.linux.hpp"
 #include "networking/NetworkConfig.hpp"
 
-std::unique_ptr<WebServerInterface> WebServerFactory::produce(const NetworkConfig& networkConfig)
+std::unique_ptr<WebServerInterface>
+WebServerFactory::produce(const std::shared_ptr<const NetworkConfig>& networkConfig)
 {
-  if (networkConfig.useTLS())
+  if (networkConfig->useTLS())
   {
     return std::make_unique<WebServerSimple<SimpleWeb::HTTPS>>();
   }
@@ -19,11 +20,8 @@ WebServerSimple<SimpleWeb::HTTPS>::WebServerSimple()
   server_->config.timeout_content = 0;
   server_->config.timeout_request = 0;
   server_->on_error = [](std::shared_ptr<SimpleWeb::Server<SimpleWeb::HTTPS>::Request> /*request*/,
-                        const SimpleWeb::error_code& ec) {
-    LOG(LogLevel::ERROR, ec);
-    // Handle errors here
-    // Note that connection timeouts will also call this handle with ec set to
-    // SimpleWeb::errc::operation_canceled
+                         const SimpleWeb::error_code& ec) {
+    LOG(LogLevel::ERROR, "Error processing request: " << ec);
   };
 }
 
@@ -32,6 +30,6 @@ WebServerSimple<SimpleWeb::HTTP>::WebServerSimple()
   : server_(std::make_unique<SimpleWeb::Server<SimpleWeb::HTTP>>())
 {
   server_->config.port = 8080;
-  //server_->config.timeout_content = 10;
-  //server_->config.timeout_request = 10;
+  // server_->config.timeout_content = 10;
+  // server_->config.timeout_request = 10;
 }

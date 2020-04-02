@@ -63,7 +63,7 @@ public:
 
   /// @brief sets the network config. This should be set before start is called!
   /// @param networkConfig the pointer to the network configuration
-  void setNetworkConfig(std::shared_ptr<NetworkConfig> networkConfig);
+  void setNetworkConfig(std::unique_ptr<NetworkConfig> networkConfig);
 
   /// @brief get a valid message id for WS-Addressing
   /// @return string of a message id

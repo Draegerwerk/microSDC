@@ -1,8 +1,8 @@
 #include "Log.hpp"
-#include "StateHandler.hpp"
 #include "MicroSDC.hpp"
-#include <thread>
+#include "StateHandler.hpp"
 #include "networking/NetworkConfig.hpp"
+#include <thread>
 
 static volatile bool keepRunning = true;
 
@@ -18,9 +18,7 @@ int main()
 
   auto microSDC = std::make_unique<MicroSDC>();
 
-  // TODO: make this unique
-  auto networkConfig = std::make_shared<NetworkConfig>(true, "192.168.178.97", 8080);
-  microSDC->setNetworkConfig(networkConfig);
+  microSDC->setNetworkConfig(std::make_unique<NetworkConfig>(true, "192.168.178.97", 8080));
 
   DeviceCharacteristics deviceCharacteristics;
   deviceCharacteristics.setFriendlyName("MicroSDC on Linux");
@@ -73,7 +71,9 @@ int main()
 
   microSDC->start();
 
-  struct sigaction sa{};
+  struct sigaction sa
+  {
+  };
   sa.sa_handler = &intHandler;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_RESTART;
@@ -86,8 +86,8 @@ int main()
   while (keepRunning)
   {
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    //stateHandler->setValue(i++);
-    //sigsuspend(&mask);
+    // stateHandler->setValue(i++);
+    // sigsuspend(&mask);
   }
   return 0;
 }
