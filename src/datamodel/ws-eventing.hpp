@@ -21,9 +21,9 @@ namespace WS::EVENTING
     ModeOptional& Mode();
 
     explicit DeliveryType(const NotifyToType& notifyTo);
-    DeliveryType(const rapidxml::xml_node<>& node);
+    explicit DeliveryType(const rapidxml::xml_node<>& node);
 
-  protected:
+  private:
     NotifyToType NotifyTo_;
     ModeOptional Mode_;
 
@@ -48,9 +48,9 @@ namespace WS::EVENTING
     DialectType& Dialect();
 
     explicit FilterType(const DialectType& dialect);
-    FilterType(const rapidxml::xml_node<>& node);
+    explicit FilterType(const rapidxml::xml_node<>& node);
 
-  protected:
+  private:
     DialectType Dialect_;
 
     void parse(const rapidxml::xml_node<>& node);
@@ -81,7 +81,7 @@ namespace WS::EVENTING
     explicit Subscribe(const DeliveryType& delivery);
     explicit Subscribe(const rapidxml::xml_node<>& node);
 
-  protected:
+  private:
     EndToOptional EndTo_;
     DeliveryType Delivery_;
     ExpiresOptional Expires_;
@@ -104,7 +104,7 @@ namespace WS::EVENTING
     SubscribeResponse(const SubscriptionManagerType& subscriptionManager,
                       const ExpiresType& expires);
 
-  protected:
+  private:
     SubscriptionManagerType SubscriptionManager_;
     ExpiresType Expires_;
   };
@@ -112,13 +112,13 @@ namespace WS::EVENTING
   class Renew
   {
   public:
-    Renew(const rapidxml::xml_node<>& node);
+    explicit Renew(const rapidxml::xml_node<>& node);
     using ExpiresType = WS::EVENTING::ExpirationType;
     using ExpiresOptional = std::optional<ExpiresType>;
     const ExpiresOptional& Expires() const;
     ExpiresOptional& Expires();
 
-  protected:
+  private:
     ExpiresOptional Expires_;
 
   private:
@@ -133,14 +133,14 @@ namespace WS::EVENTING
     const ExpiresOptional& Expires() const;
     ExpiresOptional& Expires();
 
-  protected:
+  private:
     ExpiresOptional Expires_;
   };
 
   class Unsubscribe
   {
   public:
-    Unsubscribe(const rapidxml::xml_node<>& node);
+    explicit Unsubscribe(const rapidxml::xml_node<>& node);
   };
 
 } // namespace WS::EVENTING

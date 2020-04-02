@@ -32,8 +32,8 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
   const Duration duration(
       subscribeRequest.Expires().value_or(WS::EVENTING::ExpirationType("PT1H")));
   const auto expires = duration.toExpirationTimePoint();
-  SubscriptionInformation info(subscribeRequest.Delivery().NotifyTo(),
-                               subscribeRequest.Filter().value(), expires);
+  SubscriptionInformation info{subscribeRequest.Delivery().NotifyTo(),
+                               subscribeRequest.Filter().value(), expires};
 
   {
     std::lock_guard<std::mutex> lock(subscriptionMutex_);
