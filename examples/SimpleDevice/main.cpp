@@ -19,7 +19,7 @@ int main()
   auto microSDC = std::make_unique<MicroSDC>();
 
   // TODO: make this unique
-  auto networkConfig = std::make_shared<NetworkConfig>(false, "192.168.178.97", 8080);
+  auto networkConfig = std::make_shared<NetworkConfig>(true, "192.168.178.97", 8080);
   microSDC->setNetworkConfig(networkConfig);
 
   DeviceCharacteristics deviceCharacteristics;
