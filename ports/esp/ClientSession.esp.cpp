@@ -1,20 +1,20 @@
-#include "SessionManager.esp32.hpp"
+#include "ClientSession.esp.hpp"
 #include "Log.hpp"
 
 #include "esp_http_client.h"
 
-std::unique_ptr<SessionManagerInterface> SessionManagerFactory::produce()
+std::unique_ptr<ClientSessionInterface> ClientSessionFactory::produce(const std::string& address)
 {
-  return std::make_unique<SessionManagerEsp32>();
+  return std::make_unique<ClientSessionEsp32>(address);
 }
 
-ClientSessionEsp32::ClientSessionEsp32(const std::string& notifyTo)
-  : notifyTo_(notifyTo)
+ClientSessionEsp32::ClientSessionEsp32(std::string notifyTo)
+  : notifyTo_(std::move(notifyTo))
 {
-  extern const char serverCert_pem_start[] asm("_binary_serverCert_pem_start");
-  extern const char serverKey_pem_start[] asm("_binary_serverKey_pem_start");
+  extern const char server_crt_start[] asm("_binary_server_crt_start");
+  extern const char server_key_start[] asm("_binary_server_key_start");
   esp_http_client_config_t config;
-  config.url = notifyTo.c_str();
+  config.url = notifyTo_.c_str();
   config.host = nullptr;
   config.port = 0;
   config.username = nullptr;
@@ -23,8 +23,8 @@ ClientSessionEsp32::ClientSessionEsp32(const std::string& notifyTo)
   config.path = nullptr;
   config.query = nullptr;
   config.cert_pem = nullptr;
-  config.client_cert_pem = serverCert_pem_start;
-  config.client_key_pem = serverKey_pem_start;
+  config.client_cert_pem = server_crt_start;
+  config.client_key_pem = server_key_start;
   config.method = HTTP_METHOD_POST;
   config.timeout_ms = 0;
   config.disable_auto_redirect = false;
@@ -53,7 +53,7 @@ ClientSessionEsp32::~ClientSessionEsp32()
   }
 }
 
-void ClientSessionEsp32::send(const std::string& message) const
+void ClientSessionEsp32::send(const std::string& message)
 {
   esp_http_client_set_post_field(session_, message.c_str(), message.length());
   esp_err_t err = esp_http_client_perform(session_);
@@ -69,29 +69,3 @@ void ClientSessionEsp32::send(const std::string& message) const
   }
 }
 
-void SessionManagerEsp32::createSession(const std::string& notifyTo)
-{
-  if (sessions_.count(notifyTo) != 0)
-  {
-    LOG(LogLevel::INFO, "Client session already exists");
-    return;
-  }
-  sessions_.emplace(notifyTo, std::make_shared<ClientSessionEsp32>(notifyTo));
-}
-
-void SessionManagerEsp32::sendToSession(const std::string& notifyTo, const std::string& message)
-{
-  auto sessionIt = sessions_.find(notifyTo);
-  if (sessionIt == sessions_.end())
-  {
-    LOG(LogLevel::ERROR, "Cannot find client session with address " << notifyTo);
-    return;
-  }
-  LOG(LogLevel::INFO, "Sending to " << notifyTo);
-  sessionIt->second->send(message);
-}
-
-void SessionManagerEsp32::deleteSession(const std::string& notifyTo)
-{
-  sessions_.erase(notifyTo);
-}

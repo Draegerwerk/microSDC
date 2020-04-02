@@ -19,9 +19,6 @@ set(HEADERS
 
     "networking/NetworkConfig.hpp"
 
-    "rapidxml/rapidxml.hpp"
-    "rapidxml/rapidxml_print.hpp"
-
     "services/DeviceService.hpp"
     "services/GetService.hpp"
     "services/ServiceInterface.hpp"
@@ -88,7 +85,10 @@ set(SOURCES
     "SubscriptionManager.cpp"
 
     "WebServer/Request.cpp"
+
+    "SessionManager/SessionManager.cpp"
     )
 
-add_library(microSDC OBJECT ${SOURCES} ${HEADERS})
-target_include_directories(microSDC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(microSDC_common OBJECT ${SOURCES} ${HEADERS})
+target_include_directories(microSDC_common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(microSDC_common PUBLIC rapidxml)

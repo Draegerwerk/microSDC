@@ -14,7 +14,7 @@ class Request
 public:
   /// @brief consturcts a new request based on a given message
   /// @param message the raw HTTP message content
-  explicit Request(char* message);
+  explicit Request(std::string msg);
 
   virtual ~Request() = default;
 
@@ -49,5 +49,5 @@ private:
   /// contains the parsed envelope of this request
   std::shared_ptr<MESSAGEMODEL::Envelope> envelope_{nullptr};
   /// the raw message string
-  char* message_;
+  std::string message_;
 };

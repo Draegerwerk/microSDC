@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DeviceCharacteristics.hpp"
-#include "SessionManager/SessionManager.hpp"
 #include "WebServer/WebServer.hpp"
 #include "dpws/DPWSHost.hpp"
 #include <map>
@@ -64,7 +63,7 @@ public:
 
   /// @brief sets the network config. This should be set before start is called!
   /// @param networkConfig the pointer to the network configuration
-  void setNetworkConfig(std::shared_ptr<NetworkConfig> networkConfig);
+  void setNetworkConfig(std::unique_ptr<NetworkConfig> networkConfig);
 
   /// @brief get a valid message id for WS-Addressing
   /// @return string of a message id
@@ -99,8 +98,6 @@ private:
   std::shared_ptr<SubscriptionManager> subscriptionManager_{nullptr};
   /// pointer to the WebServer
   std::unique_ptr<WebServerInterface> webserver_{nullptr};
-  /// pointer to the Session Manager
-  std::unique_ptr<SessionManagerInterface> sessionManager_{nullptr};
   /// pointer to the mdib representation
   std::unique_ptr<BICEPS::PM::Mdib> mdib_{nullptr};
   /// mutex protecting changes in the mdib

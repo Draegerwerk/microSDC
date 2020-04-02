@@ -26,6 +26,11 @@ DPWSHost::DPWSHost(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
   socket_.set_option(asio::ip::multicast::join_group(multicastEndpoint_.address()));
 }
 
+DPWSHost::~DPWSHost()
+{
+  stop();
+}
+
 void DPWSHost::stop()
 {
   LOG(LogLevel::INFO, "Stopping...");
@@ -161,7 +166,7 @@ void DPWSHost::handleUDPMessage(std::size_t bytesRecvd)
   }
   else
   {
-    LOG(LogLevel::INFO, "Received unhandled UDP message");
+    LOG(LogLevel::WARNING, "Received unhandled UDP message");
   }
   doc.clear();
 }
@@ -189,7 +194,7 @@ void DPWSHost::sendHello()
               "Error while sending Hello: ec " << ec.value() << ": " << ec.message());
           return;
         }
-        LOG(LogLevel::DEBUG, "Sent hello msg (" << bytesTransferred << " bytes): \n" << msg);
+        LOG(LogLevel::DEBUG, "Sent hello msg (" << bytesTransferred << " bytes): \n" << *msg);
       });
 }
 
@@ -231,7 +236,7 @@ void DPWSHost::handleProbe(const MESSAGEMODEL::Envelope& envelope)
               "Error while sending ProbeMatch: ec " << ec.value() << ": " << ec.message());
           return;
         }
-        LOG(LogLevel::DEBUG, "Sent ProbeMatch msg (" << bytesTransferred << " bytes): \n" << msg);
+        LOG(LogLevel::DEBUG, "Sent ProbeMatch msg (" << bytesTransferred << " bytes): \n" << *msg);
       });
 }
 
@@ -256,7 +261,7 @@ void DPWSHost::handleResolve(const MESSAGEMODEL::Envelope& envelope)
               "Error while sending ResolveMatch: ec " << ec.value() << ": " << ec.message());
           return;
         }
-        LOG(LogLevel::DEBUG, "Sent ResolveMatch msg (" << bytesTransferred << " bytes): \n" << msg);
+        LOG(LogLevel::DEBUG, "Sent ResolveMatch msg (" << bytesTransferred << " bytes): \n" << *msg);
       });
 }
 

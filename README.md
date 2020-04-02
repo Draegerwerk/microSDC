@@ -8,10 +8,34 @@ MicroSDC targets the ESP32 using the official development framework [ESP-IDF](ht
 
 - C++17 compiler support ([C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support#cpp17))
 - CMake (>= 3.10)
+- asio (>=1.12.2) ([Asio C++ Library](https://think-async.com/Asio/))
 
 using the reference implementation for esp32 targets:
 
 - [ESP-IDF](https://github.com/espressif/esp-idf/) at master with at least [572408351](https://github.com/espressif/esp-idf/commit/582f5dd697fde49eea1f1dfe0c86f9f2f48bb223)
+
+## Setup and build for Linux
+
+```
+cmake -H. -Bbuild -G Ninja
+cmake --build build
+```
+
+The examples are built by default.
+
+```
+./build/examples/SimpleDevice/SimpleDevice
+```
+
+## Documentation
+
+For further documentation consult the doxygen generated pages as well as the example at [examples/esp32/main/main.cpp](examples/esp32/main/main.cpp).
+
+To build the doxygen based documentation [Doxygen](http://doxygen.nl/) is required.
+
+```
+cmake --build build -t Documentation
+```
 
 ## Setup and build for ESP32
 
@@ -56,6 +80,3 @@ and flashed via:
 idf.py flash monitor
 ```
 
-## Documentation
-
-For further documentation consult the doxygen generated pages as well as the example at [examples/esp32/main/main.cpp](examples/esp32/main/main.cpp).

@@ -8,34 +8,37 @@
 class ClientSessionInterface
 {
 public:
+  // TODO copy constructors etc
   virtual ~ClientSessionInterface() = default;
   /// @brief sends a given data message string the this client
   /// @param message the message to send
-  virtual void send(const std::string& message) const = 0;
+  virtual void send(const std::string& message) = 0;
 };
 
-/// @brief SessionManagerInterface defines an interface to client sessions for eventing
+/// @brief SessionManager defines an interface to client sessions for eventing
 /// notifications
-class SessionManagerInterface
+class SessionManager
 {
 public:
-  virtual ~SessionManagerInterface() = default;
   /// @brief creates a new session for a given client address
   /// @param notifyTo the address of the client
-  virtual void createSession(const std::string& notifyTo) = 0;
+  void createSession(const std::string& notifyTo);
 
   /// @brief sends a message string to a client session with given address
   /// @param notifyTo the address of the client
   /// @param message the message to send to the client
-  virtual void sendToSession(const std::string& notifyTo, const std::string& message) = 0;
+  void sendToSession(const std::string& notifyTo, const std::string& message);
 
   /// @brief deletes the session of the client with given address
   /// @param notifyTo the address of the client
-  virtual void deleteSession(const std::string& notifyTo) = 0;
+  void deleteSession(const std::string& notifyTo);
+
+private:
+  std::map<std::string, std::shared_ptr<ClientSessionInterface>> sessions_;
 };
 
-class SessionManagerFactory
+class ClientSessionFactory
 {
 public:
-  static std::unique_ptr<SessionManagerInterface> produce();
+  static std::unique_ptr<ClientSessionInterface> produce(const std::string& address);
 };

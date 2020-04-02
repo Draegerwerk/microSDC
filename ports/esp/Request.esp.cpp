@@ -1,7 +1,7 @@
-#include "Request.esp32.hpp"
+#include "Request.esp.hpp"
 
-RequestEsp32::RequestEsp32(httpd_req_t* req, char* message)
-  : Request(message)
+RequestEsp32::RequestEsp32(httpd_req_t* req, std::string msg)
+  : Request(std::move(msg))
   , httpdReq_(req)
 {
 }

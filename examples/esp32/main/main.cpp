@@ -34,10 +34,9 @@ static void ipEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t e
       ipAddress += std::to_string(esp_ip4_addr3_16(&event->ip_info.ip));
       ipAddress += ".";
       ipAddress += std::to_string(esp_ip4_addr4_16(&event->ip_info.ip));
-      auto networkConfig = std::make_shared<NetworkConfig>(true, ipAddress);
       // startup MicroSDC
       auto* sdc = static_cast<MicroSDC*>(arg);
-      sdc->setNetworkConfig(networkConfig);
+      sdc->setNetworkConfig(std::make_unique<NetworkConfig>(true, ipAddress, 443));
       sdc->start();
       break;
     }
@@ -166,7 +165,7 @@ void initEthernet()
 // force c linkage for app_main()
 extern "C" void app_main()
 {
-  Log::setLogLevel(LogLevel::INFO);
+  Log::setLogLevel(LogLevel::DEBUG);
   LOG(LogLevel::INFO, "Starting up....");
 
   // Initialize NVS
@@ -185,10 +184,10 @@ extern "C" void app_main()
 
   // initialize global ca store for client communication
   ESP_ERROR_CHECK(esp_tls_init_global_ca_store());
-  extern const unsigned char cacert_pem_start[] asm("_binary_cacert_pem_start");
-  extern const unsigned char cacert_pem_end[] asm("_binary_cacert_pem_end");
-  const std::size_t cacert_len = cacert_pem_end - cacert_pem_start;
-  ESP_ERROR_CHECK(esp_tls_set_global_ca_store(cacert_pem_start, cacert_len));
+  extern const unsigned char ca_crt_start[] asm("_binary_ca_crt_start");
+  extern const unsigned char ca_crt_end[] asm("_binary_ca_crt_end");
+  const std::size_t ca_cert_len = ca_crt_end - ca_crt_start;
+  ESP_ERROR_CHECK(esp_tls_set_global_ca_store(ca_crt_start, ca_cert_len));
 
   // create MicroSDC instance
   auto* sdc = new MicroSDC();

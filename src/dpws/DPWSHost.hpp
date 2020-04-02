@@ -17,6 +17,7 @@ public:
   DPWSHost(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
            WS::DISCOVERY::QNameListType types, WS::DISCOVERY::UriListType xAddresses,
            WS::DISCOVERY::HelloType::MetadataVersionType metadataVersion = 1);
+  ~DPWSHost();
 
 
   /// @brief listens on udp multicast socket for DPWS messages
