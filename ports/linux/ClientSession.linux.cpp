@@ -7,7 +7,7 @@ std::unique_ptr<ClientSessionInterface> ClientSessionFactory::produce(const std:
 }
 
 ClientSessionSimple::ClientSessionSimple(const std::string& address)
-  : client_(std::regex_replace(address, std::regex("https://"), ""), false, "certs/server.crt",
+  : client_(std::regex_replace(address, std::regex("http(s)?://"), ""), false, "certs/server.crt",
             "certs/server.key", "certs/ca.crt")
 {
 }
