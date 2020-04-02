@@ -281,7 +281,6 @@ namespace BICEPS::MM
     ReportPartType& ReportPart();
 
     OperationInvokedReport(const SequenceIdType& sequenceId, const ReportPartType& reportPart);
-    OperationInvokedReport() = default;
 
   protected:
     ReportPartType ReportPart_;
