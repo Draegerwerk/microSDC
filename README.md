@@ -8,7 +8,7 @@ MicroSDC targets the ESP32 using the official development framework [ESP-IDF](ht
 
 - C++17 compiler support ([C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support#cpp17))
 - CMake (>= 3.10)
-- asio ([Asio C++ Library](https://think-async.com/Asio/))
+- asio (>=1.12.2) ([Asio C++ Library](https://think-async.com/Asio/))
 
 using the reference implementation for esp32 targets:
 
