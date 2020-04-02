@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SDCConstants.hpp"
+#include "SessionManager/SessionManager.hpp"
 #include "datamodel/ws-addressing.hpp"
 #include "datamodel/ws-eventing.hpp"
 #include <chrono>
@@ -10,7 +11,6 @@
 #include <vector>
 
 struct esp_http_client;
-class SessionManagerInterface;
 namespace BICEPS::MM
 {
   class EpisodicMetricReport;
@@ -20,11 +20,6 @@ namespace BICEPS::MM
 class SubscriptionManager
 {
 public:
-  /// @brief constructs a new SubscriptionManager
-  /// @param sessionManager a pointer to the session manager implementation maintaining client
-  /// sessions
-  explicit SubscriptionManager(std::shared_ptr<SessionManagerInterface> sessionManager);
-
   /// @brief dispatches a subscribe request, registers the new subscriber and creates a client
   /// session
   /// @param subscribeRequest the request the client send to subscribe
@@ -80,7 +75,7 @@ private:
   /// active subscriptions of the subscriber with a unique identifier
   std::map<std::string, SubscriptionInformation> subscriptions_;
   /// a pointer to the SessionManager implementation
-  std::shared_ptr<SessionManagerInterface> sessionManager_;
+  SessionManager sessionManager_;
   /// all allowed subscriptions of this manager
   std::vector<std::string> allowedSubscriptionEventActions_{
       SDC::ACTION_OPERATION_INVOKED_REPORT,

@@ -1,8 +1,8 @@
-#include "WebServer.esp32.hpp"
+#include "WebServer.esp.hpp"
 #include "Log.hpp"
-#include "Request.esp32.hpp"
+#include "Request.esp.hpp"
 #include "networking/NetworkConfig.hpp"
-#include "rapidxml/rapidxml.hpp"
+#include "rapidxml.hpp"
 #include "services/ServiceInterface.hpp"
 #include <algorithm>
 #include <array>
@@ -17,19 +17,19 @@ std::unique_ptr<WebServerInterface> WebServerFactory::produce(const NetworkConfi
 
 WebServerEsp32::WebServerEsp32(bool useTLS)
 {
-  extern const unsigned char cacert_pem_start[] asm("_binary_cacert_pem_start");
-  extern const unsigned char cacert_pem_end[] asm("_binary_cacert_pem_end");
-  config_.client_verify_cert_pem = cacert_pem_start;
-  config_.client_verify_cert_len = cacert_pem_end - cacert_pem_start;
+  extern const unsigned char ca_crt_start[] asm("_binary_ca_crt_start");
+  extern const unsigned char ca_crt_end[] asm("_binary_ca_crt_end");
+  config_.client_verify_cert_pem = ca_crt_start;
+  config_.client_verify_cert_len = ca_crt_end - ca_crt_start;
 
-  extern const unsigned char serverCert_pem_start[] asm("_binary_serverCert_pem_start");
-  extern const unsigned char serverCert_pem_end[] asm("_binary_serverCert_pem_end");
-  config_.cacert_pem = serverCert_pem_start;
-  config_.cacert_len = serverCert_pem_end - serverCert_pem_start;
-  extern const unsigned char serverKey_pem_start[] asm("_binary_serverKey_pem_start");
-  extern const unsigned char serverKey_pem_end[] asm("_binary_serverKey_pem_end");
-  config_.prvtkey_pem = serverKey_pem_start;
-  config_.prvtkey_len = serverKey_pem_end - serverKey_pem_start;
+  extern const unsigned char server_crt_start[] asm("_binary_server_crt_start");
+  extern const unsigned char server_crt_end[] asm("_binary_server_crt_end");
+  config_.cacert_pem = server_crt_start;
+  config_.cacert_len = server_crt_end - server_crt_start;
+  extern const unsigned char server_key_start[] asm("_binary_server_key_start");
+  extern const unsigned char server_key_end[] asm("_binary_server_key_end");
+  config_.prvtkey_pem = server_key_start;
+  config_.prvtkey_len = server_key_end - server_key_start;
 
   config_.transport_mode = useTLS ? HTTPD_SSL_TRANSPORT_SECURE : HTTPD_SSL_TRANSPORT_INSECURE;
   // use the URI wildcard matching function
@@ -96,7 +96,7 @@ esp_err_t WebServerEsp32::handlerCallback(httpd_req_t* req)
 
   try
   {
-    (*service)->handleRequest(std::make_unique<RequestEsp32>(req, buffer.data()));
+    (*service)->handleRequest(std::make_unique<RequestEsp32>(req, std::string(buffer.begin(), buffer.end())));
   }
   catch (rapidxml::parse_error& e)
   {

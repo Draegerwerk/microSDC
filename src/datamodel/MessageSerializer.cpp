@@ -1,7 +1,7 @@
 #include "MessageSerializer.hpp"
 #include "Casting.hpp"
 #include "datamodel/MDPWSConstants.hpp"
-#include <rapidxml/rapidxml_print.hpp>
+#include "rapidxml_print.hpp"
 
 MessageSerializer::MessageSerializer()
   : xmlDocument_(std::make_unique<rapidxml::xml_document<>>())

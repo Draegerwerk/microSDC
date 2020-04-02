@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <optional>
-#include "rapidxml/rapidxml.hpp"
+#include "rapidxml.hpp"
 
 namespace WS::EVENTING
 {

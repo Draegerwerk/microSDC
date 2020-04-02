@@ -5,8 +5,8 @@
 #include "datamodel/MessageSerializer.hpp"
 #include "services/SoapFault.hpp"
 
-Request::Request(char* message)
-  : message_(message)
+Request::Request(std::string msg)
+  : message_(std::move(msg))
 {
 }
 
@@ -21,7 +21,7 @@ const MESSAGEMODEL::Envelope& Request::getEnvelope()
 
 const char* Request::data() const
 {
-  return message_;
+  return message_.c_str();
 }
 
 void Request::respond(const MESSAGEMODEL::Envelope& responseEnvelope) const
@@ -39,7 +39,7 @@ void Request::respond(const std::string& msg) const
 void Request::parse()
 {
   rapidxml::xml_document<> doc;
-  doc.parse<rapidxml::parse_fastest>(message_);
+  doc.parse<rapidxml::parse_fastest>(message_.data());
 
   auto* envelopeNode = doc.first_node("Envelope", MDPWS::WS_NS_SOAP_ENVELOPE);
   if (envelopeNode == nullptr)

@@ -21,8 +21,7 @@
 #include "asio/system_error.hpp"
 
 MicroSDC::MicroSDC()
-  : sessionManager_(SessionManagerFactory::produce())
-  , mdib_(std::make_unique<BICEPS::PM::Mdib>(std::string("0")))
+  : mdib_(std::make_unique<BICEPS::PM::Mdib>(std::string("0")))
 {
   mdib_->MdState() = BICEPS::PM::MdState();
 }
@@ -57,9 +56,8 @@ void MicroSDC::startup()
   // construct xAddresses containing reference to the service
   WS::DISCOVERY::UriListType xAddresses;
   std::string protocol = networkConfig_->useTLS() ? "https" : "http";
-  std::string xaddress = protocol + "://" + networkConfig_->ipAddress() +
-                         (networkConfig_->useTLS() ? ":443" : ":80") +
-                         metadata->getDeviceServicePath();
+  std::string xaddress = protocol + "://" + networkConfig_->ipAddress() + ":" +
+                         std::to_string(networkConfig_->port()) + metadata->getDeviceServicePath();
   xAddresses.emplace_back(xaddress);
 
   // fill discovery types
@@ -77,20 +75,20 @@ void MicroSDC::startup()
   }
 
   // construct subscription manager
-  subscriptionManager_ = std::make_shared<SubscriptionManager>(std::move(sessionManager_));
+  subscriptionManager_ = std::make_shared<SubscriptionManager>();
 
   // construct web services
   auto deviceService = std::make_shared<DeviceService>(metadata);
   auto getService = std::make_shared<GetService>(*this, metadata);
   auto getWSDLService =
-      std::make_shared<StaticService>(getService->getURI() + "/?wsdl", WSDL::GET_SERVICE_WSDL);
+      std::make_shared<StaticService>(getService->getURI() + "/wsdl", WSDL::GET_SERVICE_WSDL);
   auto setService = std::make_shared<SetService>(*this, metadata, subscriptionManager_);
   auto setWSDLService =
-      std::make_shared<StaticService>(setService->getURI() + "/?wsdl", WSDL::SET_SERVICE_WSDL);
+      std::make_shared<StaticService>(setService->getURI() + "/wsdl", WSDL::SET_SERVICE_WSDL);
   auto stateEventService =
       std::make_shared<StateEventService>(*this, metadata, subscriptionManager_);
   auto stateEventWSDLService = std::make_shared<StaticService>(
-      stateEventService->getURI() + "/?wsdl", WSDL::STATE_EVENT_SERVICE_SERVICE_WSDL);
+      stateEventService->getURI() + "/wsdl", WSDL::STATE_EVENT_SERVICE_SERVICE_WSDL);
 
   // register webservices
   webserver_->addService(deviceService);

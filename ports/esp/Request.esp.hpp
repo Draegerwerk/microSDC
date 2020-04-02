@@ -6,7 +6,7 @@
 class RequestEsp32 : public Request
 {
 public:
-  explicit RequestEsp32(httpd_req_t* req, char* message);
+  explicit RequestEsp32(httpd_req_t* req, std::string msg);
 
 private:
   void sendResponse(const std::string& msg) const override;

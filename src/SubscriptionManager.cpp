@@ -3,7 +3,6 @@
 #include "Log.hpp"
 #include "MicroSDC.hpp"
 #include "SDCConstants.hpp"
-#include "SessionManager/SessionManager.hpp"
 #include "datamodel/MessageModel.hpp"
 #include "datamodel/MessageSerializer.hpp"
 #include "datamodel/ws-addressing.hpp"
@@ -12,11 +11,6 @@
 #include <algorithm>
 
 static constexpr const char* TAG = "SubscriptionManager";
-
-SubscriptionManager::SubscriptionManager(std::shared_ptr<SessionManagerInterface> sessionManager)
-  : sessionManager_(std::move(sessionManager))
-{
-}
 
 WS::EVENTING::SubscribeResponse
 SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
@@ -45,7 +39,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
     std::lock_guard<std::mutex> lock(subscriptionMutex_);
     subscriptions_.emplace(identifier, info);
   }
-  sessionManager_->createSession(info.notifyTo.Address());
+  sessionManager_.createSession(info.notifyTo.Address());
 
   WS::EVENTING::SubscribeResponse::SubscriptionManagerType subscriptionManager(
       WS::ADDRESSING::EndpointReferenceType(
@@ -95,7 +89,7 @@ void SubscriptionManager::dispatch(const WS::EVENTING::Unsubscribe& /*unsubscrib
 
   if (numSameClient == 1)
   {
-    sessionManager_->deleteSession(notifyTo);
+    sessionManager_.deleteSession(notifyTo);
   }
   subscriptions_.erase(subscriptionInfo);
   printSubscriptions();
@@ -135,7 +129,7 @@ void SubscriptionManager::fireEvent(const BICEPS::MM::EpisodicMetricReport& repo
   LOG(LogLevel::DEBUG, "SENDING: " << messageStr);
   for (const auto* const info : subscriber)
   {
-    sessionManager_->sendToSession(info->notifyTo.Address(), messageStr);
+    sessionManager_.sendToSession(info->notifyTo.Address(), messageStr);
   }
 }
 

@@ -11,6 +11,10 @@ namespace BICEPS::MM
     : Mdib_(mdib)
   {
   }
+  const GetMdibResponse::MdibType& GetMdibResponse::Mdib() const
+  {
+    return Mdib_;
+  }
 
   // AbstractReport
   //
