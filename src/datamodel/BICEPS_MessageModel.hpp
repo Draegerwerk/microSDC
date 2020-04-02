@@ -37,9 +37,9 @@ namespace BICEPS::MM
     const MdibType& Mdib() const;
     MdibType& Mdib();
 
-    GetMdibResponse(const MdibType& mdib);
+    explicit GetMdibResponse(MdibType mdib);
 
-  protected:
+  private:
     MdibType Mdib_;
   };
 
@@ -68,7 +68,7 @@ namespace BICEPS::MM
     {
     }
 
-  protected:
+  private:
     MdibVersionOptional MdibVersion_;
     SequenceIdType SequenceId_;
     InstanceIdOptional InstanceId_;
@@ -83,7 +83,7 @@ namespace BICEPS::MM
   protected:
     AbstractReportPart() = default;
 
-  protected:
+  private:
     SourceMdsOptional SourceMds_;
   };
 
@@ -95,7 +95,7 @@ namespace BICEPS::MM
     const MetricStateSequence& MetricState() const;
     MetricStateSequence& MetricState();
 
-  protected:
+  private:
     MetricStateSequence MetricState_;
   };
 
@@ -110,7 +110,7 @@ namespace BICEPS::MM
   protected:
     explicit AbstractMetricReport(const SequenceIdType& sequenceId);
 
-  protected:
+  private:
     ReportPartSequence ReportPart_;
   };
 
@@ -124,7 +124,7 @@ namespace BICEPS::MM
   class OperationHandleRef : public std::string
   {
   public:
-    OperationHandleRef(std::string operationHandleRef);
+    explicit OperationHandleRef(std::string operationHandleRef);
     OperationHandleRef() = default;
   };
 
@@ -133,8 +133,9 @@ namespace BICEPS::MM
   public:
     using OperationHandleRefType = ::BICEPS::MM::OperationHandleRef;
     const OperationHandleRefType& OperationHandleRef() const;
+    OperationHandleRefType& OperationHandleRef();
 
-  protected:
+  private:
     OperationHandleRefType OperationHandleRef_;
 
     virtual void parse(const rapidxml::xml_node<>& node) = 0;
@@ -146,12 +147,12 @@ namespace BICEPS::MM
     using RequestedNumericValueType = double;
     const RequestedNumericValueType& RequestedNumericValue() const;
 
-    SetValue(const rapidxml::xml_node<>& node);
+    explicit SetValue(const rapidxml::xml_node<>& node);
 
-  protected:
-    RequestedNumericValueType RequestedNumericValue_;
+  private:
+    RequestedNumericValueType RequestedNumericValue_{};
 
-    void parse(const rapidxml::xml_node<>& node);
+    void parse(const rapidxml::xml_node<>& node) override;
   };
 
   // SetValueResponse
@@ -159,7 +160,7 @@ namespace BICEPS::MM
   class InvocationErrorMessage : public std::string
   {
   public:
-    InvocationErrorMessage(std::string invocationErrorMessage);
+    explicit InvocationErrorMessage(std::string invocationErrorMessage);
   };
 
   class InvocationInfo
@@ -185,9 +186,8 @@ namespace BICEPS::MM
 
     InvocationInfo(const TransactionIdType& transactionId,
                    const InvocationStateType& invocationState);
-    InvocationInfo() = default;
 
-  protected:
+  private:
     TransactionIdType TranscationId_;
     InvocationStateType InvocationState_;
     InvocationErrorOptional InvocationError_;
@@ -215,10 +215,9 @@ namespace BICEPS::MM
     const InvocationInfoType& InvocationInfo() const;
     InvocationInfoType& InvocationInfo();
 
-    AbstractSetResponse(const SequenceIdType& sequenceId, const InvocationInfoType& invocationInfo);
-    AbstractSetResponse() = default;
+    AbstractSetResponse(SequenceIdType sequenceId, InvocationInfoType invocationInfo);
 
-  protected:
+  private:
     MdibVersionOptional MdibVersion_;
     SequenceIdType SequenceId_;
     InstanceIdOptional InstanceId_;
@@ -261,12 +260,10 @@ namespace BICEPS::MM
     const InvocationSourceType& InvocationSource() const;
     InvocationSourceType& InvocationSource();
 
-    ReportPart(const OperationHandleRefType& operationHandleRef,
-               const InvocationInfoType& invocationInfo,
-               const InvocationSourceType& invocationSource);
-    ReportPart() = default;
+    ReportPart(OperationHandleRefType operationHandleRef, InvocationInfoType invocationInfo,
+               InvocationSourceType invocationSource);
 
-  protected:
+  private:
     OperationHandleRefType OperationHandleRef_;
     OperationTargetOptional OperationTarget_;
     InvocationInfoType InvocationInfo_;
@@ -280,9 +277,9 @@ namespace BICEPS::MM
     const ReportPartType& ReportPart() const;
     ReportPartType& ReportPart();
 
-    OperationInvokedReport(const SequenceIdType& sequenceId, const ReportPartType& reportPart);
+    OperationInvokedReport(const SequenceIdType& sequenceId, ReportPartType reportPart);
 
-  protected:
+  private:
     ReportPartType ReportPart_;
   };
 
