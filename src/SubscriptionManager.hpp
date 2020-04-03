@@ -48,20 +48,6 @@ private:
   /// @brief SubscriptionInformation stores stateful information about a subscription
   struct SubscriptionInformation
   {
-    /// @brief constructs a new SubscriptionInformation from given information describing the
-    /// subscriber
-    /// @param notifyTo the address of the subscriber
-    /// @param filter the eventing filters of this subscription
-    /// @param expirationTime the time this subscription is valid
-    SubscriptionInformation(WS::ADDRESSING::EndpointReferenceType notifyTo,
-                            WS::EVENTING::FilterType filter,
-                            std::chrono::system_clock::time_point expirationTime)
-      : notifyTo(std::move(notifyTo))
-      , filter(std::move(filter))
-      , expirationTime(expirationTime)
-    {
-    }
-
     /// the address of the subscriber
     const WS::ADDRESSING::EndpointReferenceType notifyTo;
     /// the ws eventing filter of this subscripiton

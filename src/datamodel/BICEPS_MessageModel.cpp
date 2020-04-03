@@ -2,13 +2,14 @@
 #include "MDPWSConstants.hpp"
 #include "SDCConstants.hpp"
 #include <cstring>
+#include <utility>
 
 namespace BICEPS::MM
 {
   // GetMdibResponse
   //
-  GetMdibResponse::GetMdibResponse(const MdibType& mdib)
-    : Mdib_(mdib)
+  GetMdibResponse::GetMdibResponse(MdibType mdib)
+    : Mdib_(std::move(mdib))
   {
   }
   const GetMdibResponse::MdibType& GetMdibResponse::Mdib() const
@@ -82,13 +83,17 @@ namespace BICEPS::MM
   // OperationHandleRef
   //
   OperationHandleRef::OperationHandleRef(std::string operationHandleRef)
-    : std::string(operationHandleRef)
+    : std::string(std::move(operationHandleRef))
   {
   }
 
   // AbstractSet
   //
   const AbstractSet::OperationHandleRefType& AbstractSet::OperationHandleRef() const
+  {
+    return OperationHandleRef_;
+  }
+  AbstractSet::OperationHandleRefType& AbstractSet::OperationHandleRef()
   {
     return OperationHandleRef_;
   }
@@ -108,7 +113,7 @@ namespace BICEPS::MM
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE, entry->xmlns_size()) ==
               0)
       {
-        OperationHandleRef_ =
+        AbstractSet::OperationHandleRef() =
             OperationHandleRefType(std::string(entry->value(), entry->value_size()));
       }
       else if (strncmp(entry->name(), "RequestedNumericValue", entry->name_size()) == 0 &&
@@ -123,7 +128,7 @@ namespace BICEPS::MM
   // InvocationErrorMessage
   //
   InvocationErrorMessage::InvocationErrorMessage(std::string invocationError)
-    : std::string(invocationError)
+    : std::string(std::move(invocationError))
   {
   }
 
@@ -171,10 +176,10 @@ namespace BICEPS::MM
 
   // AbstractSetResponse
   //
-  AbstractSetResponse::AbstractSetResponse(const SequenceIdType& sequenceId,
-                                           const InvocationInfoType& invocationInfo)
-    : SequenceId_(sequenceId)
-    , InvocationInfo_(invocationInfo)
+  AbstractSetResponse::AbstractSetResponse(SequenceIdType sequenceId,
+                                           InvocationInfoType invocationInfo)
+    : SequenceId_(std::move(sequenceId))
+    , InvocationInfo_(std::move(invocationInfo))
   {
   }
   const AbstractSetResponse::MdibVersionOptional& AbstractSetResponse::MdibVersion() const
@@ -212,11 +217,10 @@ namespace BICEPS::MM
 
   // ReportPart
   //
-  ReportPart::ReportPart(const OperationHandleRefType& operationHandleRef,
-                         const InvocationInfoType& invocationInfo,
-                         const InvocationSourceType& invocationSource)
-    : OperationHandleRef_(operationHandleRef)
-    , InvocationInfo_(invocationInfo)
+  ReportPart::ReportPart(OperationHandleRefType operationHandleRef,
+                         InvocationInfoType invocationInfo, InvocationSourceType invocationSource)
+    : OperationHandleRef_(std::move(operationHandleRef))
+    , InvocationInfo_(std::move(invocationInfo))
     , InvocationSource_(invocationSource)
   {
   }
@@ -256,9 +260,9 @@ namespace BICEPS::MM
   // OperationInvokedReport
   //
   OperationInvokedReport::OperationInvokedReport(const SequenceIdType& sequenceId,
-                                                 const ReportPartType& reportPart)
+                                                 ReportPartType reportPart)
     : AbstractReport(sequenceId)
-    , ReportPart_(reportPart)
+    , ReportPart_(std::move(reportPart))
   {
   }
   const OperationInvokedReport::ReportPartType& OperationInvokedReport::ReportPart() const

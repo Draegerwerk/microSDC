@@ -1,8 +1,8 @@
 #pragma once
 
+#include "rapidxml.hpp"
 #include <memory>
 #include <optional>
-#include "rapidxml.hpp"
 
 namespace WS::EVENTING
 {
@@ -12,13 +12,15 @@ namespace WS::EVENTING
     using IsReferenceParameterType = bool;
     using IsReferenceParameterOptional = std::optional<IsReferenceParameterType>;
 
-    Identifier(const rapidxml::xml_node<>& node);
-    Identifier(std::string identifier);
-
-  protected:
-    IsReferenceParameterOptional IsReferenceParameter_;
+    explicit Identifier(const rapidxml::xml_node<>& node);
+    explicit Identifier(const std::string& other);
+    explicit Identifier(std::string&& other);
+    using std::string::string;
+    using std::string::operator=;
 
   private:
+    IsReferenceParameterOptional IsReferenceParameter_;
+
     void parse(const rapidxml::xml_node<>& node);
   };
 } // namespace WS::EVENTING
@@ -29,11 +31,10 @@ namespace WS::ADDRESSING
   {
   public:
     explicit URIType(const rapidxml::xml_node<>& node);
-    URIType(std::string);
+    explicit URIType(const std::string& other);
+    explicit URIType(std::string&& other);
     URIType() = default;
-
-  private:
-    void parse(const rapidxml::xml_node<>& node);
+    using std::string::string;
   };
 
   class RelationshipTypeOpenEnum : public std::string
@@ -50,7 +51,7 @@ namespace WS::ADDRESSING
 
     explicit RelatesToType(const URIType& x);
 
-  protected:
+  private:
     RelationshipTypeOptional RelationshipType_;
   };
 
@@ -62,9 +63,9 @@ namespace WS::ADDRESSING
     const IdentifierOptional& Identifier() const;
     IdentifierOptional& Identifier();
 
-    ReferenceParametersType(const IdentifierType& identifier);
+    explicit ReferenceParametersType(const IdentifierType& identifier);
 
-  protected:
+  private:
     IdentifierOptional Identifier_;
   };
 
@@ -80,10 +81,10 @@ namespace WS::ADDRESSING
     const ReferenceParametersOptional& ReferenceParameters() const;
     ReferenceParametersOptional& ReferenceParameters();
 
-    explicit EndpointReferenceType(const AddressType& address);
+    explicit EndpointReferenceType(AddressType address);
     explicit EndpointReferenceType(const rapidxml::xml_node<>& node);
 
-  protected:
+  private:
     AddressType Address_;
     ReferenceParametersOptional ReferenceParameters_;
 

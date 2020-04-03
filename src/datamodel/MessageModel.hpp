@@ -66,7 +66,7 @@ namespace MESSAGEMODEL
     const IdentifierOptional& Identifier() const;
     IdentifierOptional& Identifier();
 
-  protected:
+  private:
     ActionType Action_;
     AppSequenceOptional AppSequence_;
     FaultToOptional FaultTo_;
@@ -203,7 +203,7 @@ namespace MESSAGEMODEL
     const EpisodicMetricReportOptional& EpisodicMetricReport() const;
     EpisodicMetricReportOptional& EpisodicMetricReport();
 
-  protected:
+  private:
     ByeOptional Bye_;
     HelloOptional Hello_;
     ProbeOptional Probe_;
@@ -241,7 +241,7 @@ namespace MESSAGEMODEL
     explicit Envelope(const rapidxml::xml_node<>& node);
     Envelope() = default;
 
-  protected:
+  private:
     HeaderType Header_;
     BodyType Body_;
 

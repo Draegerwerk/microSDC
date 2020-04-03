@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #define NameSpaceConstant static constexpr const char*
 #define MDPWSConstant static constexpr const char*
 
@@ -26,8 +27,8 @@ namespace MDPWS
   static constexpr int UDP_UNICAST_MIN_DELAY = 50;
   static constexpr int UDP_UNICAST_MAX_DELAY = 250;
   static constexpr int UDP_UNICAST_UPPER_DELAY = 500;
-  static constexpr unsigned short UDP_MULTICAST_DISCOVERY_PORT = 3702;
-  static constexpr unsigned short UDP_MULTICAST_STREAMING_PORT = 5555;
+  static constexpr std::uint16_t UDP_MULTICAST_DISCOVERY_PORT = 3702;
+  static constexpr std::uint16_t UDP_MULTICAST_STREAMING_PORT = 5555;
   static constexpr int UDP_MULTICAST_TIMETOLIVE = 8;
 
   static constexpr int UDP_MULTICAST_UDP_REPEAT = 2;

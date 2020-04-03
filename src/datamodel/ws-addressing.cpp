@@ -13,8 +13,12 @@ namespace WS::EVENTING
   {
     parse(node);
   }
-  Identifier::Identifier(std::string identifier)
-    : std::string(std::move(identifier))
+  Identifier::Identifier(const std::string& other)
+    : std::string(other)
+  {
+  }
+  Identifier::Identifier(std::string&& other)
+    : std::string(other)
   {
   }
   void Identifier::parse(const rapidxml::xml_node<>& node)
@@ -42,22 +46,22 @@ namespace WS::ADDRESSING
   // URIType
   //
   URIType::URIType(const rapidxml::xml_node<>& node)
-  {
-    this->parse(node);
-  }
-  URIType::URIType(std::string uri)
-    : std::string(std::move(uri))
+    : std::string{node.value(), node.value_size()}
   {
   }
-  void URIType::parse(const rapidxml::xml_node<>& node)
+  URIType::URIType(const std::string& other)
+    : std::string(other)
   {
-    *this = std::string(node.value(), node.value_size());
+  }
+  URIType::URIType(std::string&& other)
+    : std::string(other)
+  {
   }
 
   // EndpointReferenceType
   //
-  EndpointReferenceType::EndpointReferenceType(const AddressType& address)
-    : Address_(address)
+  EndpointReferenceType::EndpointReferenceType(AddressType address)
+    : Address_(std::move(address))
   {
   }
   const EndpointReferenceType::AddressType& EndpointReferenceType::Address() const
@@ -88,7 +92,7 @@ namespace WS::ADDRESSING
     {
       throw ExpectedElement("Address", MDPWS::WS_NS_ADDRESSING);
     }
-    Address_ = URIType({addressNode->value(), addressNode->value_size()});
+    Address_ = URIType{addressNode->value(), addressNode->value_size()};
   }
 
   // RelatesToType

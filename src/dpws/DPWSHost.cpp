@@ -202,7 +202,7 @@ void DPWSHost::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
 {
   envelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_HELLO);
   envelope.Header().To() = WS::ADDRESSING::URIType(MDPWS::WS_DISCOVERY_URN);
-  envelope.Header().MessageID() = MicroSDC::calculateMessageID();
+  envelope.Header().MessageID() = WS::ADDRESSING::URIType{MicroSDC::calculateMessageID()};
   auto& hello = envelope.Body().Hello() = WS::DISCOVERY::HelloType(
       WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
   if (!scopes_.empty())
@@ -252,17 +252,18 @@ void DPWSHost::handleResolve(const MESSAGEMODEL::Envelope& envelope)
   serializer.serialize(*responseMessage);
   LOG(LogLevel::INFO, "Sending ResolveMatch");
   auto msg = std::make_shared<std::string>(serializer.str());
-  socket_.async_send_to(
-      asio::buffer(*msg), senderEndpoint_,
-      [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
-        if (ec)
-        {
-          LOG(LogLevel::ERROR,
-              "Error while sending ResolveMatch: ec " << ec.value() << ": " << ec.message());
-          return;
-        }
-        LOG(LogLevel::DEBUG, "Sent ResolveMatch msg (" << bytesTransferred << " bytes): \n" << *msg);
-      });
+  socket_.async_send_to(asio::buffer(*msg), senderEndpoint_,
+                        [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
+                          if (ec)
+                          {
+                            LOG(LogLevel::ERROR, "Error while sending ResolveMatch: ec "
+                                                     << ec.value() << ": " << ec.message());
+                            return;
+                          }
+                          LOG(LogLevel::DEBUG, "Sent ResolveMatch msg (" << bytesTransferred
+                                                                         << " bytes): \n"
+                                                                         << *msg);
+                        });
 }
 
 void DPWSHost::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
@@ -299,7 +300,7 @@ void DPWSHost::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
     envelope.Header().RelatesTo() =
         WS::ADDRESSING::RelatesToType(request.Header().MessageID().value());
   }
-  envelope.Header().MessageID() = MicroSDC::calculateMessageID();
+  envelope.Header().MessageID() = WS::ADDRESSING::URIType{MicroSDC::calculateMessageID()};
 }
 
 void DPWSHost::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope,
@@ -335,5 +336,5 @@ void DPWSHost::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope,
     envelope.Header().RelatesTo() =
         WS::ADDRESSING::RelatesToType(request.Header().MessageID().value());
   }
-  envelope.Header().MessageID() = MicroSDC::calculateMessageID();
+  envelope.Header().MessageID() = WS::ADDRESSING::URIType{MicroSDC::calculateMessageID()};
 }
