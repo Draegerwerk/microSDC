@@ -27,7 +27,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
       throw std::runtime_error("Unknown event action");
     }
   }
-  const auto identifier = WS::EVENTING::Identifier("uuid:" + UUIDGenerator{}().toString());
+  const auto identifier = "uuid:" + UUIDGenerator{}().toString();
 
   const Duration duration(
       subscribeRequest.Expires().value_or(WS::EVENTING::ExpirationType("PT1H")));
@@ -44,7 +44,8 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
   WS::EVENTING::SubscribeResponse::SubscriptionManagerType subscriptionManager(
       WS::ADDRESSING::EndpointReferenceType(
           WS::ADDRESSING::URIType("To be filled by Soap Service")));
-  subscriptionManager.ReferenceParameters() = WS::ADDRESSING::ReferenceParametersType(identifier);
+  subscriptionManager.ReferenceParameters() =
+      WS::ADDRESSING::ReferenceParametersType(WS::EVENTING::Identifier(identifier));
   WS::EVENTING::SubscribeResponse subscribeResponse(subscriptionManager,
                                                     WS::EVENTING::ExpirationType(duration.str()));
   LOG(LogLevel::INFO, "Successfully created subscription for " << identifier);

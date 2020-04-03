@@ -36,7 +36,7 @@ WS::ADDRESSING::URIType MetadataProvider::getSetServiceURI() const
   const std::string protocol = networkConfig_->useTLS() ? "https" : "http";
   const std::string xaddress = protocol + "://" + networkConfig_->ipAddress() + ":" +
                                std::to_string(networkConfig_->port()) + getSetServicePath();
-  return xaddress;
+  return WS::ADDRESSING::URIType(xaddress);
 }
 
 WS::ADDRESSING::URIType MetadataProvider::getStateEventServiceURI() const
@@ -45,7 +45,7 @@ WS::ADDRESSING::URIType MetadataProvider::getStateEventServiceURI() const
   const std::string protocol = networkConfig_->useTLS() ? "https" : "http";
   const std::string xaddress = protocol + "://" + networkConfig_->ipAddress() + ":" +
                                std::to_string(networkConfig_->port()) + getStateEventServicePath();
-  return xaddress;
+  return WS::ADDRESSING::URIType(xaddress);
 }
 
 void MetadataProvider::fillDeviceMetadata(MESSAGEMODEL::Envelope& envelope) const
@@ -103,7 +103,8 @@ MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionThisDev
 
 MetadataProvider::Host MetadataProvider::createHostMetadata() const
 {
-  Host host(WS::ADDRESSING::EndpointReferenceType(deviceCharacteristics_.getEndpointReference()));
+  Host host(WS::ADDRESSING::EndpointReferenceType(
+      WS::ADDRESSING::URIType(deviceCharacteristics_.getEndpointReference())));
   host.Types() = Host::TypesType();
   host.Types()->emplace_back(MDPWS::WS_NS_DPWS, "Device");
   host.Types()->emplace_back(MDPWS::NS_MDPWS, "MedicalDevice");

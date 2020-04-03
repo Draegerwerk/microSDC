@@ -21,7 +21,7 @@
 #include "asio/system_error.hpp"
 
 MicroSDC::MicroSDC()
-  : mdib_(std::make_unique<BICEPS::PM::Mdib>(std::string("0")))
+  : mdib_(std::make_unique<BICEPS::PM::Mdib>(WS::ADDRESSING::URIType("0")))
 {
   mdib_->MdState() = BICEPS::PM::MdState();
 }

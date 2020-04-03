@@ -1,6 +1,5 @@
 #include "ws-MetadataExchange.hpp"
 #include "MDPWSConstants.hpp"
-
 #include <cstring>
 
 namespace WS::MEX
@@ -17,18 +16,14 @@ namespace WS::MEX
          entry = entry->next_sibling())
     {
       if (strncmp(entry->name(), "Dialect", entry->name_size()) == 0 &&
-          strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE, entry->xmlns_size()) ==
-              0)
+          strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE, entry->xmlns_size()) == 0)
       {
-        Dialect_ =
-            std::make_optional<DialectType>(std::string(entry->value(), entry->value_size()));
+        Dialect_ = std::make_optional<DialectType>(entry->value(), entry->value_size());
       }
       else if (strncmp(entry->name(), "Identifier", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE,
-                       entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE, entry->xmlns_size()) == 0)
       {
-        Identifier_ =
-            std::make_optional<IdentifierType>(std::string(entry->value(), entry->value_size()));
+        Identifier_ = std::make_optional<IdentifierType>(entry->value(), entry->value_size());
       }
     }
   }
