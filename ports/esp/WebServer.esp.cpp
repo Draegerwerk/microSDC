@@ -1,6 +1,7 @@
 #include "WebServer.esp.hpp"
 #include "Log.hpp"
 #include "Request.esp.hpp"
+#include "datamodel/ExpectedElement.hpp"
 #include "networking/NetworkConfig.hpp"
 #include "rapidxml.hpp"
 #include "services/ServiceInterface.hpp"
@@ -103,6 +104,11 @@ esp_err_t WebServerEsp32::handlerCallback(httpd_req_t* req)
   catch (rapidxml::parse_error& e)
   {
     LOG(LogLevel::ERROR, "Rapidxml Parse error: " << e.what());
+    return ESP_FAIL;
+  }
+  catch (ExpectedElement& e)
+  {
+    LOG(LogLevel::ERROR, "ExpectedElement " << e.ns() << ":" << e.name() << " not encountered");
     return ESP_FAIL;
   }
   catch (std::exception& e)
