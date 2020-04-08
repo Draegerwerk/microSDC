@@ -27,6 +27,7 @@ public:
                  const WS::ADDRESSING::EndpointReferenceType& endpointReference);
   void serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::AppSequenceType& appSequence);
   void serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::HelloType& hello);
+  void serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::ByeType& bye);
   void serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::ProbeMatchType& probeMatch);
   void serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::ProbeMatchesType& probeMatches);
   void serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::ResolveMatchType& resolveMatch);
@@ -74,7 +75,8 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::EpisodicMetricReport& report);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::MetricReportPart&);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ScoDescriptor& sco);
-  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractOperationDescriptor& operation);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::AbstractOperationDescriptor& operation);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::InstanceIdentifier& identifier);
 
   static std::string toString(BICEPS::PM::SafetyClassification);

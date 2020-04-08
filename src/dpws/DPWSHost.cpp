@@ -34,6 +34,7 @@ DPWSHost::~DPWSHost()
 void DPWSHost::stop()
 {
   LOG(LogLevel::INFO, "Stopping...");
+  sendBye();
   running_.store(false);
   socket_.close();
   ioContext_.stop();
@@ -216,6 +217,53 @@ void DPWSHost::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
   if (!xAddresses_.empty())
   {
     hello->XAddrs() = xAddresses_;
+  }
+}
+
+void DPWSHost::sendBye()
+{
+  // Construct Bye Message
+  auto message = std::make_unique<MESSAGEMODEL::Envelope>();
+  buildByeMessage(*message);
+  MESSAGEMODEL::Envelope::HeaderType::AppSequenceType appSequence(
+      messagingContext_.getInstanceId(), messagingContext_.getNextMessageCounter());
+  message->Header().AppSequence() = appSequence;
+  // Serialize and send
+  MessageSerializer serializer;
+  serializer.serialize(*message);
+  auto msg = std::make_shared<std::string>(serializer.str());
+  LOG(LogLevel::INFO, "Sending bye message...");
+  socket_.async_send_to(asio::buffer(*msg), multicastEndpoint_,
+                        [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
+                          if (ec)
+                          {
+                            LOG(LogLevel::ERROR, "Error while sending Bye: ec "
+                                                     << ec.value() << ": " << ec.message());
+                            return;
+                          }
+                          LOG(LogLevel::DEBUG, "Sent bye msg (" << bytesTransferred << " bytes): \n"
+                                                                << *msg);
+                        });
+}
+
+void DPWSHost::buildByeMessage(MESSAGEMODEL::Envelope& envelope)
+{
+  envelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_BYE);
+  envelope.Header().To() = WS::ADDRESSING::URIType(MDPWS::WS_DISCOVERY_URN);
+  envelope.Header().MessageID() = WS::ADDRESSING::URIType{MicroSDC::calculateMessageID()};
+  auto& bye = envelope.Body().Bye() =
+      WS::DISCOVERY::ByeType(WS::ADDRESSING::EndpointReferenceType(endpointReference_));
+  if (!scopes_.empty())
+  {
+    bye->Scopes() = scopes_;
+  }
+  if (!types_.empty())
+  {
+    bye->Types() = types_;
+  }
+  if (!xAddresses_.empty())
+  {
+    bye->XAddrs() = xAddresses_;
   }
 }
 
