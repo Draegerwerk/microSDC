@@ -1,5 +1,6 @@
 #include "Log.hpp"
 #include "MicroSDC.hpp"
+#include "NetworkInterface.hpp"
 #include "StateHandler.hpp"
 #include "networking/NetworkConfig.hpp"
 #include <thread>
@@ -22,7 +23,8 @@ int main()
 
   auto microSDC = std::make_unique<MicroSDC>();
 
-  microSDC->setNetworkConfig(std::make_unique<NetworkConfig>(true, "192.168.178.97", 8080));
+  microSDC->setNetworkConfig(std::make_unique<NetworkConfig>(
+      true, NetworkInterface::getDefaultInterface().address(), 8080));
 
   DeviceCharacteristics deviceCharacteristics;
   deviceCharacteristics.setFriendlyName("MicroSDC on Linux");
