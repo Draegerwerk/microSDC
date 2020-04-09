@@ -269,10 +269,14 @@ extern "C" void app_main()
   auto temperatureStateHandler = std::make_shared<NumericStateHandler>("temperatureState_handle");
   auto humidityStateHandler = std::make_shared<NumericStateHandler>("humidityState_handle");
   auto settableStateHandler = std::make_shared<NumericStateHandler>("settableState_handle");
+  auto setValueOperationStateHandler = std::make_shared<SetValueOperationStateHandler>(
+      "setValueOperation_handle", BICEPS::PM::OperatingMode::En);
+
   sdc->addMdState(pressureStateHandler);
   sdc->addMdState(temperatureStateHandler);
   sdc->addMdState(humidityStateHandler);
   sdc->addMdState(settableStateHandler);
+  sdc->addMdState(setValueOperationStateHandler);
 
   ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ipEventHandler, sdc));
   ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, sdc));
