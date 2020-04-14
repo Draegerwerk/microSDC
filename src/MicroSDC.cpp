@@ -261,6 +261,7 @@ void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::SetValueOperationSt
     return;
   }
   auto newState = updateMdib(state);
+  // TODO: Send EpisodicOperationalStateReport
 }
 
 template <class T>
