@@ -82,18 +82,54 @@ namespace WS::DISCOVERY
     return MessageNumber_;
   }
 
+  ByeType::ByeType(const EndpointReferenceType& epr)
+    : EndpointReference_(epr)
+  {
+  }
+  const ByeType::EndpointReferenceType& ByeType::EndpointReference() const
+  {
+    return EndpointReference_;
+  }
+  ByeType::EndpointReferenceType& ByeType::EndpointReference()
+  {
+    return EndpointReference_;
+  }
+  const ByeType::TypesOptional& ByeType::Types() const
+  {
+    return Types_;
+  }
+  ByeType::TypesOptional& ByeType::Types()
+  {
+    return Types_;
+  }
+  const ByeType::ScopesOptional& ByeType::Scopes() const
+  {
+    return Scopes_;
+  }
+  ByeType::ScopesOptional& ByeType::Scopes()
+  {
+    return Scopes_;
+  }
+  const ByeType::XAddrsOptional& ByeType::XAddrs() const
+  {
+    return XAddrs_;
+  }
+  ByeType::XAddrsOptional& ByeType::XAddrs()
+  {
+    return XAddrs_;
+  }
+  const ByeType::MetadataVersionOptional& ByeType::MetadataVersion() const
+  {
+    return MetadataVersion_;
+  }
+  ByeType::MetadataVersionOptional& ByeType::MetadataVersion()
+  {
+    return MetadataVersion_;
+  }
+
   HelloType::HelloType(const EndpointReferenceType& epr, const MetadataVersionType& metadataVersion)
     : EndpointReference_(epr)
     , MetadataVersion_(metadataVersion)
-  {
-  }
-
-  HelloType::HelloType(const HelloType& x)
-    : EndpointReference_(x.EndpointReference_)
-    , Types_(x.Types_)
-    , Scopes_(x.Scopes_)
-    , XAddrs_(x.XAddrs_)
-    , MetadataVersion_(x.MetadataVersion_)
   {
   }
 

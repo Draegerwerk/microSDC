@@ -79,18 +79,30 @@ namespace WS::DISCOVERY
   {
   public:
     using EndpointReferenceType = WS::ADDRESSING::EndpointReferenceType;
+    const EndpointReferenceType& EndpointReference() const;
+    EndpointReferenceType& EndpointReference();
 
     using TypesType = WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
+    const TypesOptional& Types() const;
+    TypesOptional& Types();
 
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
+    const ScopesOptional& Scopes() const;
+    ScopesOptional& Scopes();
 
     using XAddrsType = WS::DISCOVERY::UriListType;
     using XAddrsOptional = std::optional<XAddrsType>;
+    const XAddrsOptional& XAddrs() const;
+    XAddrsOptional& XAddrs();
 
     using MetadataVersionType = unsigned int;
     using MetadataVersionOptional = std::optional<MetadataVersionType>;
+    const MetadataVersionOptional& MetadataVersion() const;
+    MetadataVersionOptional& MetadataVersion();
+
+    ByeType(const EndpointReferenceType& epr);
 
   protected:
     EndpointReferenceType EndpointReference_;
@@ -137,7 +149,7 @@ namespace WS::DISCOVERY
     MetadataVersionType& MetadataVersion();
 
     HelloType(const EndpointReferenceType& epr, const MetadataVersionType& metadataVersion);
-    HelloType(const HelloType& x);
+    // HelloType(const HelloType& x);
 
   protected:
     EndpointReferenceType EndpointReference_;

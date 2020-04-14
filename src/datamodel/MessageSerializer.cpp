@@ -102,6 +102,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   {
     serialize(bodyNode, body.Hello().value());
   }
+  else if (body.Bye().has_value())
+  {
+    serialize(bodyNode, body.Bye().value());
+  }
   else if (body.ProbeMatches().has_value())
   {
     serialize(bodyNode, body.ProbeMatches().value());
@@ -220,6 +224,39 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
       xmlDocument_->allocate_string(std::to_string(hello.MetadataVersion()).c_str());
   metadataVersionNode->value(metadataVersion);
   parent->append_node(helloNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::ByeType& bye)
+{
+  auto* byeNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:bye");
+  serialize(byeNode, bye.EndpointReference());
+  if (bye.Types().has_value())
+  {
+    auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Types");
+    auto* typesStr = xmlDocument_->allocate_string(toString(bye.Types().value()).c_str());
+    typesNode->value(typesStr);
+    byeNode->append_node(typesNode);
+  }
+  if (bye.Scopes().has_value())
+  {
+    serialize(byeNode, bye.Scopes().value());
+  }
+  if (bye.XAddrs().has_value())
+  {
+    auto* xAddrsNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
+    auto* xAddrsStr = xmlDocument_->allocate_string(toString(bye.XAddrs().value()).c_str());
+    xAddrsNode->value(xAddrsStr);
+    byeNode->append_node(xAddrsNode);
+  }
+  if (bye.MetadataVersion().has_value())
+  {
+    auto* metadataVersionNode =
+        xmlDocument_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
+    auto* metadataVersion =
+        xmlDocument_->allocate_string(std::to_string(bye.MetadataVersion().value()).c_str());
+    metadataVersionNode->value(metadataVersion);
+  }
+  parent->append_node(byeNode);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,

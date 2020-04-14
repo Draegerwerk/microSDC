@@ -92,6 +92,13 @@ private:
   /// @param[out] envelope the envelope to fill the hello message into
   void buildHelloMessage(MESSAGEMODEL::Envelope& envelope);
 
+  /// @breif sends a bye message to the multicast endpoint
+  void sendBye();
+
+  /// @brief constructs a bye message into a given envelope
+  /// @param[out] envelope the envelope to fill the bye message into
+  void buildByeMessage(MESSAGEMODEL::Envelope& envelope);
+
   /// @brief constructs a probe match into a given envelope
   /// @param[out] envelope the envelope to fill the probe match into
   /// @param request the probe request to construct the response from
