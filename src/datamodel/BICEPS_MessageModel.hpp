@@ -99,6 +99,18 @@ namespace BICEPS::MM
     MetricStateSequence MetricState_;
   };
 
+  class OperationalStateReportPart : AbstractReportPart
+  {
+  public:
+    using OperationStateType = std::shared_ptr<const PM::AbstractOperationState>;
+    using OperationStateSequence = std::vector<OperationStateType>;
+    const OperationStateSequence& OperationState() const;
+    OperationStateSequence& OperationState();
+
+  private:
+    OperationStateSequence OperationState_;
+  };
+
   class AbstractMetricReport : public AbstractReport
   {
   public:
@@ -114,11 +126,33 @@ namespace BICEPS::MM
     ReportPartSequence ReportPart_;
   };
 
+  class AbstractOperationalStateReport : public AbstractReport
+  {
+  public:
+    using ReportPartType = OperationalStateReportPart;
+    using ReportPartSequence = std::vector<ReportPartType>;
+    const ReportPartSequence& ReportPart() const;
+    ReportPartSequence& ReportPart();
+
+  protected:
+    explicit AbstractOperationalStateReport(const SequenceIdType& sequenceId);
+
+  private:
+    ReportPartSequence ReportPart_;
+  };
+
   class EpisodicMetricReport : public AbstractMetricReport
   {
   public:
     explicit EpisodicMetricReport(const SequenceIdType& sequenceId);
   };
+
+  class EpisodicOperationalStateReport : public AbstractOperationalStateReport
+  {
+  public:
+    explicit EpisodicOperationalStateReport(const SequenceIdType& sequenceId);
+  };
+
   // SetValue
   //
   class OperationHandleRef : public std::string

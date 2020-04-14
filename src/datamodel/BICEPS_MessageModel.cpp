@@ -19,7 +19,6 @@ namespace BICEPS::MM
 
   // AbstractReport
   //
-
   const AbstractReport::MdibVersionOptional& AbstractReport::MdibVersion() const
   {
     return MdibVersion_;
@@ -47,7 +46,6 @@ namespace BICEPS::MM
 
   // MetricReportPart
   //
-
   const MetricReportPart::MetricStateSequence& MetricReportPart::MetricState() const
   {
     return MetricState_;
@@ -57,9 +55,20 @@ namespace BICEPS::MM
     return MetricState_;
   }
 
+  // OperationalStateReportPart
+  //
+  const OperationalStateReportPart::OperationStateSequence&
+  OperationalStateReportPart::OperationState() const
+  {
+    return OperationState_;
+  }
+  OperationalStateReportPart::OperationStateSequence& OperationalStateReportPart::OperationState()
+  {
+    return OperationState_;
+  }
+
   // AbstractMetricReport
   //
-
   const AbstractMetricReport::ReportPartSequence& AbstractMetricReport::ReportPart() const
   {
     return ReportPart_;
@@ -68,8 +77,23 @@ namespace BICEPS::MM
   {
     return ReportPart_;
   }
-
   AbstractMetricReport::AbstractMetricReport(const SequenceIdType& sequenceId)
+    : AbstractReport(sequenceId)
+  {
+  }
+
+  // AbstractOperationalStateReport
+  //
+  const AbstractOperationalStateReport::ReportPartSequence&
+  AbstractOperationalStateReport::ReportPart() const
+  {
+    return ReportPart_;
+  }
+  AbstractOperationalStateReport::ReportPartSequence& AbstractOperationalStateReport::ReportPart()
+  {
+    return ReportPart_;
+  }
+  AbstractOperationalStateReport::AbstractOperationalStateReport(const SequenceIdType& sequenceId)
     : AbstractReport(sequenceId)
   {
   }
@@ -80,6 +104,14 @@ namespace BICEPS::MM
     : AbstractMetricReport(sequenceId)
   {
   }
+
+  // EpisodicOperationalStateReport
+  //
+  EpisodicOperationalStateReport::EpisodicOperationalStateReport(const SequenceIdType& sequenceId)
+    : AbstractOperationalStateReport(sequenceId)
+  {
+  }
+
   // OperationHandleRef
   //
   OperationHandleRef::OperationHandleRef(std::string operationHandleRef)
