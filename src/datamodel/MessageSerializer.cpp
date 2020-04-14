@@ -826,7 +826,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   if (const auto* setValueOperationState = dyn_cast<BICEPS::PM::SetValueOperationState>(&state);
       setValueOperationState != nullptr)
   {
-    auto operatingMode =
+    auto* operatingMode =
         xmlDocument_->allocate_string(toString(setValueOperationState->OperatingMode()).c_str());
     auto* operatingModeAttr = xmlDocument_->allocate_attribute("OperatingMode", operatingMode);
     auto* typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:SetValueOperationState");
