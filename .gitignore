@@ -10,6 +10,9 @@ compile_commands.json
 # vim configuration
 .vim/
 
+# vscode configuration
+.vscode/
+
 # ccls cache directory
 .ccls-cache
 

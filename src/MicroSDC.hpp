@@ -18,6 +18,7 @@ namespace BICEPS::PM
   class MdDescription;
   class Mdib;
   class NumericMetricState;
+  class SetValueOperationState;
 } // namespace BICEPS::PM
 
 /// @brief MicroSDC implements the central SDC instance with an interface to any SDC utility
@@ -80,6 +81,7 @@ public:
   /// @brief updates a given state in the mdib representation
   /// @param state the state to update
   void updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state);
+  void updateState(const std::shared_ptr<BICEPS::PM::SetValueOperationState>& state);
 
   /// @brief sets the location of this instance
   /// @param descriptorHandle the descriptor of the location state descriptor

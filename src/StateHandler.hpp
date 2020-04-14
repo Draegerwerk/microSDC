@@ -13,6 +13,7 @@ public:
   enum class StateHandlerKind
   {
     NUMERIC_METRIC,
+    SET_VALUE_OPERATION
   };
 
   /// @brief Constructs a new StateHandler referring to a descriptor
@@ -99,7 +100,7 @@ public:
     return state;
   }
 
-  /// @param sets a new numeric value to the state handled by this handler and updates the mdib
+  /// @brief sets a new numeric value to the state handled by this handler and updates the mdib
   /// @param value the new value to set
   void setValue(double value)
   {
@@ -107,4 +108,46 @@ public:
     state->MetricValue()->Value() = value;
     updateState(state);
   }
+};
+
+/// @brief Implements a MdStateHandler for SetValueOperationStates
+class SetValueOperationStateHandler : public MdStateHandler<BICEPS::PM::SetValueOperationState>
+{
+public:
+  explicit SetValueOperationStateHandler(const std::string& descriptorHandle,
+                                         BICEPS::PM::OperatingMode operatingMode)
+    : MdStateHandler(StateHandlerKind::SET_VALUE_OPERATION, descriptorHandle)
+    , operatingMode_(operatingMode)
+  {
+  }
+
+  static bool classof(const StateHandler* other)
+  {
+    return other->getKind() == StateHandlerKind::SET_VALUE_OPERATION;
+  }
+
+  std::shared_ptr<BICEPS::PM::SetValueOperationState> getInitialState() const override
+  {
+    auto state =
+        std::make_shared<BICEPS::PM::SetValueOperationState>(getDescriptorHandle(), operatingMode_);
+    return state;
+  }
+
+  /// @brief sets a new operating mode of the state handled by this handler and updates the mdib
+  /// @param operatingMode the new operating mode to set
+  void setOperatingMode(BICEPS::PM::OperatingMode operatingMode)
+  {
+    operatingMode_ = operatingMode;
+    auto state = getInitialState();
+    updateState(state);
+  }
+
+  BICEPS::PM::OperatingMode getOperatingMode() const
+  {
+    return operatingMode_;
+  }
+
+private:
+  /// the OperatingMode attribute to control the accessibility of the service operation
+  BICEPS::PM::OperatingMode operatingMode_;
 };

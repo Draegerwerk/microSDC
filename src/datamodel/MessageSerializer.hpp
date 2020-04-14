@@ -88,6 +88,7 @@ public:
   static std::string toString(BICEPS::MM::InvocationState invocationState);
   static std::string toString(BICEPS::MM::InvocationError invocationError);
   static std::string toString(BICEPS::PM::ContextAssociation contextAssociation);
+  static std::string toString(BICEPS::PM::OperatingMode operatingMode);
 
 private:
   std::unique_ptr<rapidxml::xml_document<>> xmlDocument_;

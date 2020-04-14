@@ -132,6 +132,12 @@ void MicroSDC::initializeMdStates()
       std::lock_guard<std::mutex> lock(mdibMutex_);
       mdib_->MdState()->State().emplace_back(numericHandler->getInitialState());
     }
+    if (const auto setValueHandler = dyn_cast<SetValueOperationStateHandler>(handler);
+        setValueHandler != nullptr)
+    {
+      std::lock_guard<std::mutex> lock(mdibMutex_);
+      mdib_->MdState()->State().emplace_back(setValueHandler->getInitialState());
+    }
   }
 }
 
@@ -245,6 +251,17 @@ void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>
   }
   auto newState = updateMdib(state);
   notifyEpisodicMetricReport(newState);
+}
+
+void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::SetValueOperationState>& state)
+{
+  std::lock_guard<std::mutex> lock(runningMutex_);
+  if (!running_)
+  {
+    return;
+  }
+  auto newState = updateMdib(state);
+  // TODO: Send EpisodicOperationalStateReport
 }
 
 template <class T>
