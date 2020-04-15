@@ -96,6 +96,8 @@ void SetService::handleRequest(std::unique_ptr<Request> req)
 BICEPS::MM::SetValueResponse SetService::dispatch(const BICEPS::MM::SetValue& setValueRequest)
 {
   // TODO: check if request is valid and update Mdib
+  LOG(LogLevel::INFO, "Setting value '" << setValueRequest.OperationHandleRef()
+                                        << "' to: " << setValueRequest.RequestedNumericValue());
   WS::ADDRESSING::URIType sequenceId("uuid:" + UUIDGenerator{}().toString());
   unsigned int transactionId = 0;
   BICEPS::MM::InvocationInfo invocationInfo(transactionId, BICEPS::MM::InvocationState::Fin);

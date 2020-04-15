@@ -136,21 +136,23 @@ namespace BICEPS::MM
   {
     this->parse(node);
   }
+  const SetValue::RequestedNumericValueType& SetValue::RequestedNumericValue() const
+  {
+    return RequestedNumericValue_;
+  }
   void SetValue::parse(const rapidxml::xml_node<>& node)
   {
     for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
          entry = entry->next_sibling())
     {
       if (strncmp(entry->name(), "OperationHandleRef", entry->name_size()) == 0 &&
-          strncmp(entry->xmlns(), ::MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE, entry->xmlns_size()) ==
-              0)
+          strncmp(entry->xmlns(), ::SDC::NS_BICEPS_MESSAGE_MODEL, entry->xmlns_size()) == 0)
       {
         AbstractSet::OperationHandleRef() =
             OperationHandleRefType(std::string(entry->value(), entry->value_size()));
       }
       else if (strncmp(entry->name(), "RequestedNumericValue", entry->name_size()) == 0 &&
-               strncmp(entry->xmlns(), ::MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE,
-                       entry->xmlns_size()) == 0)
+               strncmp(entry->xmlns(), ::SDC::NS_BICEPS_MESSAGE_MODEL, entry->xmlns_size()) == 0)
       {
         RequestedNumericValue_ = std::stod(std::string(entry->value(), entry->value_size()));
       }
