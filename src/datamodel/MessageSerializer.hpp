@@ -73,7 +73,9 @@ public:
                  const BICEPS::MM::SetValueResponse& setValueResponse);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::InvocationInfo& invocationInfo);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::EpisodicMetricReport& report);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::EpisodicOperationalStateReport& report);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::MetricReportPart&);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::OperationalStateReportPart&);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ScoDescriptor& sco);
   void serialize(rapidxml::xml_node<>* parent,
                  const BICEPS::PM::AbstractOperationDescriptor& operation);
