@@ -261,7 +261,7 @@ void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::SetValueOperationSt
     return;
   }
   auto newState = updateMdib(state);
-  // TODO: Send EpisodicOperationalStateReport
+  notifyEpisodicOperationalStateReport(newState);
 }
 
 template <class T>
@@ -301,6 +301,17 @@ void MicroSDC::notifyEpisodicMetricReport(
   BICEPS::MM::MetricReportPart reportPart;
   reportPart.MetricState().emplace_back(std::move(state));
   BICEPS::MM::EpisodicMetricReport report(WS::ADDRESSING::URIType("0"));
+  report.ReportPart().emplace_back(std::move(reportPart));
+  report.MdibVersion() = getMdibVersion();
+  subscriptionManager_->fireEvent(report);
+}
+
+void MicroSDC::notifyEpisodicOperationalStateReport(
+    std::shared_ptr<const BICEPS::PM::SetValueOperationState> state)
+{
+  BICEPS::MM::OperationalStateReportPart reportPart;
+  reportPart.OperationState().emplace_back(std::move(state));
+  BICEPS::MM::EpisodicOperationalStateReport report(WS::ADDRESSING::URIType("0"));
   report.ReportPart().emplace_back(std::move(reportPart));
   report.MdibVersion() = getMdibVersion();
   subscriptionManager_->fireEvent(report);

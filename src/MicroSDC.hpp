@@ -143,4 +143,8 @@ private:
   /// @brief sends a notification to subscriber about a changed numeric metric state
   /// @param state a pointer to the state which was updated
   void notifyEpisodicMetricReport(std::shared_ptr<const BICEPS::PM::NumericMetricState> state);
+
+  /// @brief sends a notification to subscriber about a changed SetValue operation state
+  /// @param state a pointer to the state which was updated
+  void notifyEpisodicOperationalStateReport(std::shared_ptr<const BICEPS::PM::SetValueOperationState> state);
 };
