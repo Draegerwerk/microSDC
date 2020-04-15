@@ -203,6 +203,14 @@ namespace MESSAGEMODEL
     const EpisodicMetricReportOptional& EpisodicMetricReport() const;
     EpisodicMetricReportOptional& EpisodicMetricReport();
 
+    // EpisodicOperationalStateReport
+    //
+    using EpisodicOperationalStateReportType = BICEPS::MM::EpisodicOperationalStateReport;
+    using EpisodicOperationalStateReportOptional =
+        std::optional<EpisodicOperationalStateReportType>;
+    const EpisodicOperationalStateReportOptional& EpisodicOperationalStateReport() const;
+    EpisodicOperationalStateReportOptional& EpisodicOperationalStateReport();
+
   private:
     ByeOptional Bye_;
     HelloOptional Hello_;
@@ -222,6 +230,7 @@ namespace MESSAGEMODEL
     SetValueOptional SetValue_;
     SetValueResponseOptional SetValueResponse_;
     EpisodicMetricReportOptional EpisodicMetricReport_;
+    EpisodicOperationalStateReportOptional EpisodicOperationalStateReport_;
 
     void parse(const rapidxml::xml_node<>& node);
   };
