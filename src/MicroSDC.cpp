@@ -239,8 +239,7 @@ std::string MicroSDC::calculateMessageID()
 void MicroSDC::addMdState(std::shared_ptr<StateHandler> stateHandler)
 {
   stateHandler->setMicroSDC(this);
-  auto handle = stateHandler->getDescriptorHandle();
-  stateHandlers_.emplace(handle, std::move(stateHandler));
+  stateHandlers_.emplace(stateHandler->getDescriptorHandle(), std::move(stateHandler));
 }
 
 void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state)
