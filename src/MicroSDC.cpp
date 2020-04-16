@@ -124,15 +124,15 @@ bool MicroSDC::isRunning() const
 
 void MicroSDC::initializeMdStates()
 {
-  for (const auto& handler : stateHandlers_)
+  for (const auto& [handle, stateHandler] : stateHandlers_)
   {
-    if (const auto numericHandler = dyn_cast<NumericStateHandler>(handler);
+    if (const auto numericHandler = dyn_cast<NumericStateHandler>(stateHandler);
         numericHandler != nullptr)
     {
       std::lock_guard<std::mutex> lock(mdibMutex_);
       mdib_->MdState()->State().emplace_back(numericHandler->getInitialState());
     }
-    if (const auto setValueHandler = dyn_cast<SetValueOperationStateHandler>(handler);
+    if (const auto setValueHandler = dyn_cast<SetValueOperationStateHandler>(stateHandler);
         setValueHandler != nullptr)
     {
       std::lock_guard<std::mutex> lock(mdibMutex_);
@@ -239,7 +239,7 @@ std::string MicroSDC::calculateMessageID()
 void MicroSDC::addMdState(std::shared_ptr<StateHandler> stateHandler)
 {
   stateHandler->setMicroSDC(this);
-  stateHandlers_.emplace_back(std::move(stateHandler));
+  stateHandlers_.emplace(stateHandler->getDescriptorHandle(), std::move(stateHandler));
 }
 
 void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state)

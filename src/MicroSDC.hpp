@@ -104,8 +104,8 @@ private:
   std::unique_ptr<BICEPS::PM::Mdib> mdib_{nullptr};
   /// mutex protecting changes in the mdib
   mutable std::mutex mdibMutex_;
-  /// all states
-  std::vector<std::shared_ptr<StateHandler>> stateHandlers_;
+  /// map of all states identified by handle
+  std::map<std::string, std::shared_ptr<StateHandler>> stateHandlers_;
   /// pointer to the network configuration
   std::shared_ptr<NetworkConfig> networkConfig_{nullptr};
   /// whether SDC is started or stopped
@@ -146,5 +146,6 @@ private:
 
   /// @brief sends a notification to subscriber about a changed SetValue operation state
   /// @param state a pointer to the state which was updated
-  void notifyEpisodicOperationalStateReport(std::shared_ptr<const BICEPS::PM::SetValueOperationState> state);
+  void notifyEpisodicOperationalStateReport(
+      std::shared_ptr<const BICEPS::PM::SetValueOperationState> state);
 };
