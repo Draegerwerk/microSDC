@@ -48,11 +48,9 @@ public:
     microSDC_->updateState(state);
   }
 
-protected:
+private:
   /// pointer to the holding MicroSDC object
   MicroSDC* microSDC_{nullptr};
-
-private:
   const StateHandlerKind kind_;
   /// handle of the associated descriptor
   std::string descriptorHandle_;
