@@ -157,6 +157,8 @@ public:
     return targetHandle_;
   }
 
+  /// @brief attaches a pointer of the OperationTarget StateHandler to this StateHandler instance
+  /// @param stateHandler the pointer of the OperationTarget's StateHandler
   void attachTargetStateHandler(std::shared_ptr<StateHandler> stateHandler)
   {
     if (auto numericHandler = dyn_cast<NumericStateHandler>(stateHandler);
