@@ -10,6 +10,7 @@
 
 class NetworkConfig;
 class StateHandler;
+class NumericStateHandler;
 class SubscriptionManager;
 namespace BICEPS::PM
 {
@@ -148,4 +149,9 @@ private:
   /// @param state a pointer to the state which was updated
   void notifyEpisodicOperationalStateReport(
       std::shared_ptr<const BICEPS::PM::SetValueOperationState> state);
+
+  /// @brief get a StateHandler corresponding to a given handle
+  /// @param handle the DescriptorHandle the StateHandler is associated with
+  /// @return pointer to the matching StateHandler
+  std::shared_ptr<StateHandler> getStateHandler(const std::string& handle);
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Casting.hpp"
 #include "Log.hpp"
 #include "MicroSDC.hpp"
 #include "datamodel/BICEPS_ParticipantModel.hpp"
@@ -48,9 +49,9 @@ public:
   }
 
 private:
-  const StateHandlerKind kind_;
   /// pointer to the holding MicroSDC object
   MicroSDC* microSDC_{nullptr};
+  const StateHandlerKind kind_;
   /// handle of the associated descriptor
   std::string descriptorHandle_;
 };
@@ -115,9 +116,11 @@ class SetValueOperationStateHandler : public MdStateHandler<BICEPS::PM::SetValue
 {
 public:
   explicit SetValueOperationStateHandler(const std::string& descriptorHandle,
+                                         const std::string& targetHandle,
                                          BICEPS::PM::OperatingMode operatingMode)
     : MdStateHandler(StateHandlerKind::SET_VALUE_OPERATION, descriptorHandle)
     , operatingMode_(operatingMode)
+    , targetHandle_(targetHandle)
   {
   }
 
@@ -147,7 +150,25 @@ public:
     return operatingMode_;
   }
 
+  const std::string& getTargetHandle() const
+  {
+    return targetHandle_;
+  }
+
+  /// @brief attaches a pointer of the OperationTarget StateHandler to this StateHandler instance
+  /// @param stateHandler the pointer of the OperationTarget's StateHandler
+  void attachTargetStateHandler(std::shared_ptr<StateHandler> stateHandler)
+  {
+    if (auto numericHandler = dyn_cast<NumericStateHandler>(stateHandler);
+        numericHandler != nullptr)
+    {
+      targetStateHandler_ = numericHandler;
+    }
+  }
+
 private:
   /// the OperatingMode attribute to control the accessibility of the service operation
   BICEPS::PM::OperatingMode operatingMode_;
+  std::shared_ptr<NumericStateHandler> targetStateHandler_{nullptr};
+  std::string targetHandle_;
 };
