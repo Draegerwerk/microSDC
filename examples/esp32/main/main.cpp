@@ -270,7 +270,7 @@ extern "C" void app_main()
   auto humidityStateHandler = std::make_shared<NumericStateHandler>("humidityState_handle");
   auto settableStateHandler = std::make_shared<NumericStateHandler>("settableState_handle");
   auto setValueOperationStateHandler = std::make_shared<SetValueOperationStateHandler>(
-      "setValueOperation_handle", BICEPS::PM::OperatingMode::En);
+      "setValueOperation_handle", "settableState_handle", BICEPS::PM::OperatingMode::En);
 
   sdc->addMdState(pressureStateHandler);
   sdc->addMdState(temperatureStateHandler);

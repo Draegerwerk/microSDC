@@ -135,6 +135,8 @@ void MicroSDC::initializeMdStates()
     if (const auto setValueHandler = dyn_cast<SetValueOperationStateHandler>(stateHandler);
         setValueHandler != nullptr)
     {
+      setValueHandler->attachTargetStateHandler(
+          getStateHandler(setValueHandler->getTargetHandle()));
       std::lock_guard<std::mutex> lock(mdibMutex_);
       mdib_->MdState()->State().emplace_back(setValueHandler->getInitialState());
     }
@@ -240,6 +242,16 @@ void MicroSDC::addMdState(std::shared_ptr<StateHandler> stateHandler)
 {
   stateHandler->setMicroSDC(this);
   stateHandlers_.emplace(stateHandler->getDescriptorHandle(), std::move(stateHandler));
+}
+
+std::shared_ptr<StateHandler> MicroSDC::getStateHandler(const std::string& handle)
+{
+  auto stateHandlerIt = stateHandlers_.find(handle);
+  if (stateHandlerIt == stateHandlers_.end())
+  {
+    LOG(LogLevel::ERROR, "No matching StateHandler for handle '" << handle << "'");
+  }
+  return stateHandlerIt->second;
 }
 
 void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state)
