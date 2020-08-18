@@ -40,6 +40,7 @@ set(PORTS_ESP_HEADERS
 if (UNIX)
     message("Configuring linux target...")
     # Dependency WebServer
+    set(USE_STANDALONE_ASIO ON CACHE BOOL "set ON to use standalone Asio instead of Boost.Asio")
     add_subdirectory(Simple-Web-Server/)
     add_library(microSDC ${PORTS_LINUX_SOURCES} ${PORTS_LINUX_HEADERS} $<TARGET_OBJECTS:microSDC_common>)
     target_include_directories(microSDC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/ports/linux)
