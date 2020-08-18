@@ -36,7 +36,7 @@ public:
     for (auto* ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next)
     {
       if ((ifa->ifa_flags & IFF_LOOPBACK) != 0 || (ifa->ifa_flags & IFF_UP) == 0 ||
-          (ifa->ifa_flags & IFF_RUNNING) == 0 ||
+          (ifa->ifa_flags & IFF_RUNNING) == 0 || ifa->ifa_addr == nullptr ||
           (ifa->ifa_addr->sa_family != AF_INET && ifa->ifa_addr->sa_family != AF_INET6))
       {
         continue;
