@@ -16,14 +16,14 @@ using the reference implementation for esp32 targets:
 
 ## Setup and build for Linux
 
-```
+```shell
 cmake -H. -Bbuild -G Ninja
 cmake --build build
 ```
 
 The examples are built by default.
 
-```
+```shell
 ./build/examples/SimpleDevice/SimpleDevice
 ```
 
@@ -33,7 +33,7 @@ For further documentation consult the doxygen generated pages as well as the exa
 
 To build the doxygen based documentation [Doxygen](http://doxygen.nl/) is required.
 
-```
+```shell
 cmake --build build -t Documentation
 ```
 
@@ -44,16 +44,16 @@ As [ESP-IDF](https://github.com/espressif/esp-idf/) uses it's own CMake based bu
 
 To setup [ESP-IDF](https://github.com/espressif/esp-idf/) follow the installation steps at [Get Started](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/).
 
-Furthermore you need to set the c++ standard to c++17.  
+Furthermore you need to set the c++ standard to c++17.
 This can be achieved by replacing the line
 
-```
+```cmake
 list(APPEND cxx_compile_options "-std=gnu++11")
 ```
 
 with
 
-```
+```cmake
 list(APPEND cxx_compile_options "-std=gnu++17")
 ```
 
@@ -61,7 +61,7 @@ in the file `$IDF_PATH/tools/cmake/build.cmake`.
 
 The MicroSDC project example can be configured with:
 
-```
+```shell
 cd examples/esp32/
 idf.py menuconfig
 ```
@@ -70,13 +70,12 @@ Network is configured in `menuconfig --> Network Configuration`.
 
 After setup and configuration the image is built with:
 
-```
+```shell
 idf.py build
 ```
 
 and flashed via:
 
-```
+```shell
 idf.py flash monitor
 ```
-
