@@ -36,7 +36,6 @@ WebServerEsp32::WebServerEsp32(bool useTLS)
   config_.transport_mode = useTLS ? HTTPD_SSL_TRANSPORT_SECURE : HTTPD_SSL_TRANSPORT_INSECURE;
   // use the URI wildcard matching function
   config_.httpd.uri_match_fn = httpd_uri_match_wildcard;
-  config_.httpd.max_open_sockets = useTLS ? 2 : 7;
   config_.httpd.lru_purge_enable = true;
 }
 
