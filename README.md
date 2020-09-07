@@ -44,21 +44,6 @@ As [ESP-IDF](https://github.com/espressif/esp-idf/) uses it's own CMake based bu
 
 To setup [ESP-IDF](https://github.com/espressif/esp-idf/) follow the installation steps at [Get Started](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/).
 
-Furthermore you need to set the c++ standard to c++17.
-This can be achieved by replacing the line
-
-```cmake
-list(APPEND cxx_compile_options "-std=gnu++11")
-```
-
-with
-
-```cmake
-list(APPEND cxx_compile_options "-std=gnu++17")
-```
-
-in the file `$IDF_PATH/tools/cmake/build.cmake`.
-
 The MicroSDC project example can be configured with:
 
 ```shell
