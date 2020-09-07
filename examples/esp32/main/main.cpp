@@ -36,6 +36,7 @@ static void ipEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t e
       ipAddress += std::to_string(esp_ip4_addr4_16(&event->ip_info.ip));
       // startup MicroSDC
       auto* sdc = static_cast<MicroSDC*>(arg);
+      LOG(LogLevel::INFO, "Got IP: " << ipAddress);
       sdc->setNetworkConfig(std::make_unique<NetworkConfig>(true, ipAddress, 443));
       sdc->start();
       break;
