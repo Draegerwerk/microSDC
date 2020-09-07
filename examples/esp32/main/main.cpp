@@ -14,6 +14,13 @@
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 
+#ifndef CONFIG_WIFI_SSID
+#define CONFIG_WIFI_SSID {}
+#endif
+#ifndef CONFIG_WIFI_PASSWORD
+#define CONFIG_WIFI_PASSWORD {}
+#endif
+
 static constexpr const char* TAG = "main_component";
 
 static void ipEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t eventId,
