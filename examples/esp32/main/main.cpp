@@ -93,7 +93,7 @@ static void wifiEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t
 static void ethEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t eventId,
                             void* eventData)
 {
-  uint8_t macAddress[6] = {0};
+  std::uint8_t macAddress[6] = {0};
   // we can get the ethernet driver handle from event data
   esp_eth_handle_t ethHandle = *static_cast<esp_eth_handle_t*>(eventData);
 
@@ -102,9 +102,13 @@ static void ethEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t 
     case ETHERNET_EVENT_CONNECTED: {
       esp_eth_ioctl(ethHandle, ETH_CMD_G_MAC_ADDR, macAddress);
       LOG(LogLevel::INFO, "Ethernet Link Up");
-      LOG(LogLevel::INFO, "Ethernet HW Addr " << std::hex << macAddress[0] << ":" << macAddress[1]
-                                              << ":" << macAddress[2] << ":" << macAddress[3] << ":"
-                                              << macAddress[4] << ":" << macAddress[5]);
+      LOG(LogLevel::INFO, "Ethernet HW Addr " << std::hex
+                                              << static_cast<unsigned int>(macAddress[0]) << ":"
+                                              << static_cast<unsigned int>(macAddress[1]) << ":"
+                                              << static_cast<unsigned int>(macAddress[2]) << ":"
+                                              << static_cast<unsigned int>(macAddress[3]) << ":"
+                                              << static_cast<unsigned int>(macAddress[4]) << ":"
+                                              << static_cast<unsigned int>(macAddress[5]));
       break;
     }
     case ETHERNET_EVENT_DISCONNECTED: {
