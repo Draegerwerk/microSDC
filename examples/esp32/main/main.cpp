@@ -149,17 +149,15 @@ void initEthernet()
 {
   esp_netif_config_t cfg = ESP_NETIF_DEFAULT_ETH();
   esp_netif_t* ethNetif = esp_netif_new(&cfg);
+
   // Set default handlers to process TCP/IP stuffs
   ESP_ERROR_CHECK(esp_eth_set_default_handlers(ethNetif));
 
   eth_mac_config_t macConfig = ETH_MAC_DEFAULT_CONFIG();
   eth_phy_config_t phyConfig = ETH_PHY_DEFAULT_CONFIG();
 
-  // ESP OLIMEX EVB specific phy address
-  phyConfig.phy_addr = 0;
-
   esp_eth_mac_t* mac = esp_eth_mac_new_esp32(&macConfig);
-  esp_eth_phy_t* phy = esp_eth_phy_new_lan8720(&phyConfig);
+  esp_eth_phy_t* phy = esp_eth_phy_new_ip101(&phyConfig);
 
   esp_eth_config_t config = ETH_DEFAULT_CONFIG(mac, phy);
   esp_eth_handle_t ethHandle = nullptr;
