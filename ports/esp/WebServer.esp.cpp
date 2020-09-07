@@ -83,7 +83,7 @@ esp_err_t WebServerEsp32::handlerCallback(httpd_req_t* req)
   LOG(LogLevel::DEBUG, "Received " << std::to_string(received) << " of "
                                    << std::to_string(req->content_len) << " bytes: \n"
                                    << buffer.data());
-  auto webServer = reinterpret_cast<WebServerEsp32*>(req->user_ctx);
+  auto* webServer = static_cast<WebServerEsp32*>(req->user_ctx);
   LOG(LogLevel::INFO, "Dispatch URI: " << req->uri);
   auto service = std::find_if(
       webServer->services_.begin(), webServer->services_.end(),
