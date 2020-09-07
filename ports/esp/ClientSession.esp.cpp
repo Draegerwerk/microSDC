@@ -11,30 +11,14 @@ std::unique_ptr<ClientSessionInterface> ClientSessionFactory::produce(const std:
 ClientSessionEsp32::ClientSessionEsp32(std::string notifyTo)
   : notifyTo_(std::move(notifyTo))
 {
-  extern const char server_crt_start[] asm("_binary_server_crt_start");
-  extern const char server_key_start[] asm("_binary_server_key_start");
-  esp_http_client_config_t config;
+  extern const char serverCrtStart[] asm("_binary_server_crt_start");
+  extern const char serverKeyStart[] asm("_binary_server_key_start");
+  esp_http_client_config_t config{};
   config.url = notifyTo_.c_str();
-  config.host = nullptr;
-  config.port = 0;
-  config.username = nullptr;
-  config.password = nullptr;
-  config.auth_type = HTTP_AUTH_TYPE_NONE;
-  config.path = nullptr;
-  config.query = nullptr;
-  config.cert_pem = nullptr;
-  config.client_cert_pem = server_crt_start;
-  config.client_key_pem = server_key_start;
+  config.client_cert_pem = serverCrtStart;
+  config.client_key_pem = serverKeyStart;
   config.method = HTTP_METHOD_POST;
-  config.timeout_ms = 0;
-  config.disable_auto_redirect = false;
-  config.max_redirection_count = 0;
-  config.event_handler = nullptr;
   config.transport_type = HTTP_TRANSPORT_OVER_TCP;
-  config.buffer_size = 0;
-  config.buffer_size_tx = 0;
-  config.user_data = nullptr;
-  config.is_async = false;
   config.use_global_ca_store = true;
   config.skip_cert_common_name_check = true;
   session_ = esp_http_client_init(&config);
@@ -68,4 +52,3 @@ void ClientSessionEsp32::send(const std::string& message)
     LOG(LogLevel::ERROR, "Error perform http request " << esp_err_to_name(err));
   }
 }
-
