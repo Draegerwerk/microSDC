@@ -15,7 +15,10 @@ public:
   /// @brief consturcts a new request based on a given message
   /// @param message the raw HTTP message content
   explicit Request(std::string msg);
-
+  Request(const Request&) = delete;
+  Request(Request&&) = delete;
+  Request& operator=(const Request&) = delete;
+  Request& operator=(Request&&) = delete;
   virtual ~Request() = default;
 
 
