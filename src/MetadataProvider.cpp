@@ -1,4 +1,4 @@
-#include "dpws/MetadataProvider.hpp"
+#include "MetadataProvider.hpp"
 #include "SDCConstants.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "networking/NetworkConfig.hpp"

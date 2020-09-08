@@ -2,7 +2,7 @@
 
 #include "DeviceCharacteristics.hpp"
 #include "WebServer/WebServer.hpp"
-#include "dpws/DPWSHost.hpp"
+#include "discovery/DiscoveryService.hpp"
 #include <map>
 #include <mutex>
 #include <thread>
@@ -92,8 +92,8 @@ private:
   std::shared_ptr<BICEPS::PM::LocationContextState> locationContextState_{nullptr};
   /// the SDC thread
   std::thread sdcThread_;
-  /// pointer to the DPWS service
-  std::unique_ptr<DPWSHost> dpws_{nullptr};
+  /// pointer to the discovery service
+  std::unique_ptr<DiscoveryService> discoveryService_{nullptr};
   /// pointer to the subscription manager
   std::shared_ptr<SubscriptionManager> subscriptionManager_{nullptr};
   /// pointer to the WebServer

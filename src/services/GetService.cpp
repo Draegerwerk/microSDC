@@ -7,7 +7,7 @@
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
 #include "datamodel/MessageSerializer.hpp"
-#include "dpws/MetadataProvider.hpp"
+#include "MetadataProvider.hpp"
 #include "services/SoapFault.hpp"
 
 static constexpr const char* TAG = "GetService";

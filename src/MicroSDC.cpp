@@ -6,7 +6,7 @@
 #include "StateHandler.hpp"
 #include "SubscriptionManager.hpp"
 #include "datamodel/MDPWSConstants.hpp"
-#include "dpws/MetadataProvider.hpp"
+#include "MetadataProvider.hpp"
 #include "networking/NetworkConfig.hpp"
 #include "services/DeviceService.hpp"
 #include "services/GetService.hpp"
@@ -67,11 +67,11 @@ void MicroSDC::startup()
 
   initializeMdStates();
 
-  dpws_ = std::make_unique<DPWSHost>(
+  discoveryService_ = std::make_unique<DiscoveryService>(
       WS::ADDRESSING::EndpointReferenceType::AddressType(endpointReference_), types, xAddresses);
   if (locationContextState_ != nullptr && locationContextState_->LocationDetail().has_value())
   {
-    dpws_->setLocation(locationContextState_->LocationDetail().value());
+    discoveryService_->setLocation(locationContextState_->LocationDetail().value());
   }
 
   // construct subscription manager
@@ -100,7 +100,7 @@ void MicroSDC::startup()
   webserver_->addService(stateEventWSDLService);
 
   webserver_->start();
-  dpws_->start();
+  discoveryService_->start();
 }
 
 void MicroSDC::stop()
@@ -108,7 +108,7 @@ void MicroSDC::stop()
   std::lock_guard<std::mutex> lock(runningMutex_);
   if (running_)
   {
-    dpws_->stop();
+    discoveryService_->stop();
     webserver_->stop();
     sdcThread_.join();
     running_ = false;
@@ -162,9 +162,9 @@ void MicroSDC::setLocation(const std::string& descriptorHandle,
   locationContextState_->ContextAssociation() = BICEPS::PM::ContextAssociation::Assoc;
   locationContextState_->BindingMdibVersion() = mdibVersion;
 
-  if (dpws_ != nullptr && locationContextState_->LocationDetail().has_value())
+  if (discoveryService_ != nullptr && locationContextState_->LocationDetail().has_value())
   {
-    dpws_->setLocation(locationContextState_->LocationDetail().value());
+    discoveryService_->setLocation(locationContextState_->LocationDetail().value());
   }
 }
 

@@ -2,7 +2,7 @@
 #include "Log.hpp"
 #include "WebServer/Request.hpp"
 #include "datamodel/MDPWSConstants.hpp"
-#include "dpws/MetadataProvider.hpp"
+#include "MetadataProvider.hpp"
 #include "services/SoapFault.hpp"
 
 static constexpr const char* TAG = "DeviceService";

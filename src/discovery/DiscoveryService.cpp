@@ -1,4 +1,4 @@
-#include "DPWSHost.hpp"
+#include "DiscoveryService.hpp"
 #include "Log.hpp"
 #include "MicroSDC.hpp"
 #include "datamodel/ExpectedElement.hpp"
@@ -6,18 +6,20 @@
 #include "datamodel/MessageSerializer.hpp"
 #include <array>
 #include <memory>
+#include <utility>
 
 static constexpr const char* TAG = "DPWS";
 
-DPWSHost::DPWSHost(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
-                   WS::DISCOVERY::QNameListType types, WS::DISCOVERY::UriListType xAddresses,
-                   WS::DISCOVERY::HelloType::MetadataVersionType metadataVersion)
+DiscoveryService::DiscoveryService(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
+                                   WS::DISCOVERY::QNameListType types,
+                                   WS::DISCOVERY::UriListType xAddresses,
+                                   WS::DISCOVERY::HelloType::MetadataVersionType metadataVersion)
   : socket_(ioContext_,
             asio::ip::udp::endpoint(asio::ip::udp::v4(), MDPWS::UDP_MULTICAST_DISCOVERY_PORT))
   , multicastEndpoint_(addressFromString(MDPWS::UDP_MULTICAST_DISCOVERY_IP_V4),
                        MDPWS::UDP_MULTICAST_DISCOVERY_PORT)
   , receiveBuffer_(std::make_unique<std::array<char, MDPWS::MAX_ENVELOPE_SIZE + 1>>())
-  , endpointReference_(epr)
+  , endpointReference_(std::move(epr))
   , types_(types)
   , xAddresses_(std::move(xAddresses))
   , metadataVersion_(metadataVersion)
@@ -26,12 +28,12 @@ DPWSHost::DPWSHost(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
   socket_.set_option(asio::ip::multicast::join_group(multicastEndpoint_.address()));
 }
 
-DPWSHost::~DPWSHost()
+DiscoveryService::~DiscoveryService()
 {
   stop();
 }
 
-void DPWSHost::stop()
+void DiscoveryService::stop()
 {
   LOG(LogLevel::INFO, "Stopping...");
   sendBye();
@@ -41,7 +43,7 @@ void DPWSHost::stop()
   thread_.join();
 }
 
-void DPWSHost::start()
+void DiscoveryService::start()
 {
   thread_ = std::thread([&]() {
     running_.store(true);
@@ -49,16 +51,16 @@ void DPWSHost::start()
     LOG(LogLevel::INFO, "Start listening for discovery messages...");
     doReceive();
     ioContext_.run();
-    LOG(LogLevel::INFO, "Shutting down dpws thread...");
+    LOG(LogLevel::INFO, "Shutting down discovery service thread...");
   });
 }
 
-bool DPWSHost::running() const
+bool DiscoveryService::running() const
 {
   return running_.load();
 }
 
-void DPWSHost::setLocation(const BICEPS::PM::LocationDetailType& locationDetail)
+void DiscoveryService::setLocation(const BICEPS::PM::LocationDetailType& locationDetail)
 {
   std::string ctxt = "sdc.ctxt.loc:/sdc.ctxt.loc.detail/?";
   ctxt += "fac=" + locationDetail.Facility().value_or("");
@@ -70,7 +72,7 @@ void DPWSHost::setLocation(const BICEPS::PM::LocationDetailType& locationDetail)
   scopes_.emplace_back(WS::ADDRESSING::URIType(ctxt));
 }
 
-void DPWSHost::doReceive()
+void DiscoveryService::doReceive()
 {
   if (running_.load())
   {
@@ -89,7 +91,7 @@ void DPWSHost::doReceive()
   }
 }
 
-asio::ip::address_v4 DPWSHost::addressFromString(const char* addressString)
+asio::ip::address_v4 DiscoveryService::addressFromString(const char* addressString)
 {
   asio::ip::address_v4::bytes_type addressBytes;
   if (inet_pton(AF_INET, addressString, &addressBytes) <= 0)
@@ -99,7 +101,7 @@ asio::ip::address_v4 DPWSHost::addressFromString(const char* addressString)
   return asio::ip::address_v4(addressBytes);
 }
 
-void DPWSHost::handleUDPMessage(std::size_t bytesRecvd)
+void DiscoveryService::handleUDPMessage(std::size_t bytesRecvd)
 {
   std::array<char, 32> addressData{};
   const auto addressBytes = senderEndpoint_.address().to_v4().to_bytes();
@@ -172,7 +174,7 @@ void DPWSHost::handleUDPMessage(std::size_t bytesRecvd)
   doc.clear();
 }
 
-void DPWSHost::sendHello()
+void DiscoveryService::sendHello()
 {
   messagingContext_.resetInstanceId();
   // Construct Hello Message
@@ -199,7 +201,7 @@ void DPWSHost::sendHello()
       });
 }
 
-void DPWSHost::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
+void DiscoveryService::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
 {
   envelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_HELLO);
   envelope.Header().To() = WS::ADDRESSING::URIType(MDPWS::WS_DISCOVERY_URN);
@@ -220,7 +222,7 @@ void DPWSHost::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
   }
 }
 
-void DPWSHost::sendBye()
+void DiscoveryService::sendBye()
 {
   // Construct Bye Message
   auto message = std::make_unique<MESSAGEMODEL::Envelope>();
@@ -246,7 +248,7 @@ void DPWSHost::sendBye()
                         });
 }
 
-void DPWSHost::buildByeMessage(MESSAGEMODEL::Envelope& envelope)
+void DiscoveryService::buildByeMessage(MESSAGEMODEL::Envelope& envelope)
 {
   envelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_BYE);
   envelope.Header().To() = WS::ADDRESSING::URIType(MDPWS::WS_DISCOVERY_URN);
@@ -267,7 +269,7 @@ void DPWSHost::buildByeMessage(MESSAGEMODEL::Envelope& envelope)
   }
 }
 
-void DPWSHost::handleProbe(const MESSAGEMODEL::Envelope& envelope)
+void DiscoveryService::handleProbe(const MESSAGEMODEL::Envelope& envelope)
 {
   auto responseMessage = std::make_unique<MESSAGEMODEL::Envelope>();
   buildProbeMatchMessage(*responseMessage, envelope);
@@ -288,7 +290,7 @@ void DPWSHost::handleProbe(const MESSAGEMODEL::Envelope& envelope)
       });
 }
 
-void DPWSHost::handleResolve(const MESSAGEMODEL::Envelope& envelope)
+void DiscoveryService::handleResolve(const MESSAGEMODEL::Envelope& envelope)
 {
   if (envelope.Body().Resolve()->EndpointReference().Address() != endpointReference_)
   {
@@ -314,8 +316,8 @@ void DPWSHost::handleResolve(const MESSAGEMODEL::Envelope& envelope)
                         });
 }
 
-void DPWSHost::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
-                                      const MESSAGEMODEL::Envelope& request)
+void DiscoveryService::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
+                                              const MESSAGEMODEL::Envelope& request)
 {
   auto& probeMatches = envelope.Body().ProbeMatches() = WS::DISCOVERY::ProbeMatchesType();
   // TODO: check for match
@@ -351,8 +353,8 @@ void DPWSHost::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
   envelope.Header().MessageID() = WS::ADDRESSING::URIType{MicroSDC::calculateMessageID()};
 }
 
-void DPWSHost::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope,
-                                        const MESSAGEMODEL::Envelope& request)
+void DiscoveryService::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope,
+                                                const MESSAGEMODEL::Envelope& request)
 {
   auto& resolveMatches = envelope.Body().ResolveMatches() = WS::DISCOVERY::ResolveMatchesType();
   auto& match = resolveMatches->ResolveMatch().emplace_back(

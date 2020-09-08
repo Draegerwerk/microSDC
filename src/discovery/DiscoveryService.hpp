@@ -8,27 +8,31 @@
 #include <atomic>
 #include <thread>
 
-/// @brief DPWSHost manages all dpws related communication like sending hello messages for discovery
-/// and replying to probes/resolves.
-class DPWSHost
+/// @brief DiscoveryService manages all discovery related communication like sending hello messages
+/// for discovery and replying to probes/resolves.
+class DiscoveryService
 {
 public:
-  /// @brief Constructs DPWS host
-  DPWSHost(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
-           WS::DISCOVERY::QNameListType types, WS::DISCOVERY::UriListType xAddresses,
-           WS::DISCOVERY::HelloType::MetadataVersionType metadataVersion = 1);
-  ~DPWSHost();
+  /// @brief Constructs DiscoveryService
+  DiscoveryService(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
+                   WS::DISCOVERY::QNameListType types, WS::DISCOVERY::UriListType xAddresses,
+                   WS::DISCOVERY::HelloType::MetadataVersionType metadataVersion = 1);
+  DiscoveryService(const DiscoveryService&) = delete;
+  DiscoveryService(DiscoveryService&&) = delete;
+  DiscoveryService& operator=(const DiscoveryService&) = delete;
+  DiscoveryService& operator=(DiscoveryService&&) = delete;
+  ~DiscoveryService();
 
 
-  /// @brief listens on udp multicast socket for DPWS messages
+  /// @brief listens on udp multicast socket for discovery messages
   void start();
 
 
-  /// @brief stop the DPWS host
+  /// @brief stop the discovery service
   void stop();
 
 
-  /// @brief Returns whether this DPWS host is running
+  /// @brief Returns whether this discovery service is running
   /// @return whether this host runs
   bool running() const;
 
@@ -37,13 +41,13 @@ public:
   void setLocation(const BICEPS::PM::LocationDetailType& locationDetail);
 
 private:
-  /// whether this dpws host runs
+  /// whether this discovery service runs
   std::atomic_bool running_{false};
   /// thread of this host
   std::thread thread_;
-  /// asio IO context for DPWS
+  /// asio IO context for discovery service
   asio::io_context ioContext_;
-  /// sending and receiving socket for DPWS messages
+  /// sending and receiving socket for discovery messages
   asio::ip::udp::socket socket_;
   /// multicast endpoint 239.255.255.250:3702
   asio::ip::udp::endpoint multicastEndpoint_;
@@ -52,7 +56,7 @@ private:
   /// sending endpoint of a received packet
   asio::ip::udp::endpoint senderEndpoint_;
 
-  /// messaging context of this DPWS host
+  /// messaging context of this discovery host
   MessagingContext messagingContext_;
   /// endpoint reference of this host
   const WS::ADDRESSING::EndpointReferenceType::AddressType endpointReference_;

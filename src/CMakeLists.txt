@@ -13,9 +13,8 @@ set(HEADERS
     "datamodel/ws-eventing.hpp"
     "datamodel/xs_duration.hpp"
 
-    "dpws/DPWSHost.hpp"
-    "dpws/MessagingContext.hpp"
-    "dpws/MetadataProvider.hpp"
+    "discovery/DiscoveryService.hpp"
+    "discovery/MessagingContext.hpp"
 
     "networking/NetworkConfig.hpp"
 
@@ -37,6 +36,7 @@ set(HEADERS
 
     "DeviceCharacteristics.hpp"
     "Log.hpp"
+    "MetadataProvider.hpp"
     "MicroSDC.hpp"
     "SDCConstants.hpp"
     "StateHandler.hpp"
@@ -62,9 +62,8 @@ set(SOURCES
     "datamodel/ws-MetadataExchange.cpp"
     "datamodel/xs_duration.cpp"
 
-    "dpws/DPWSHost.cpp"
-    "dpws/MessagingContext.cpp"
-    "dpws/MetadataProvider.cpp"
+    "discovery/DiscoveryService.cpp"
+    "discovery/MessagingContext.cpp"
 
     "networking/NetworkConfig.cpp"
 
@@ -80,6 +79,7 @@ set(SOURCES
 
     "DeviceCharacteristics.cpp"
     "Log.cpp"
+    "MetadataProvider.cpp"
     "MicroSDC.cpp"
     "StateHandler.cpp"
     "SubscriptionManager.cpp"

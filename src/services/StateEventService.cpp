@@ -6,7 +6,7 @@
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
-#include "dpws/MetadataProvider.hpp"
+#include "MetadataProvider.hpp"
 #include "services/SoapFault.hpp"
 
 StateEventService::StateEventService(const MicroSDC& microSDC,
