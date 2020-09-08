@@ -10,6 +10,11 @@ class RequestSimple : public Request
 public:
   explicit RequestSimple(std::shared_ptr<typename SimpleWeb::Server<SocketType>::Response> response,
                          std::shared_ptr<typename SimpleWeb::Server<SocketType>::Request> request);
+  RequestSimple(const RequestSimple&) = delete;
+  RequestSimple(RequestSimple&&) = delete;
+  RequestSimple& operator=(const RequestSimple&) = delete;
+  RequestSimple& operator=(RequestSimple&&) = delete;
+  ~RequestSimple() override = default;
 
 private:
   void sendResponse(const std::string& msg) const override;
