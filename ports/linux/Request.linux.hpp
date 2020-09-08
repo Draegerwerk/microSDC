@@ -37,6 +37,6 @@ template <class SocketType>
 void RequestSimple<SocketType>::sendResponse(const std::string& msg) const
 {
   LOG(LogLevel::DEBUG, "Writing: \n" << msg);
-  //response_->close_connection_after_response = true;
+  // response_->close_connection_after_response = true;
   response_->write(msg);
 }
