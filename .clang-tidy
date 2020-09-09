@@ -1,4 +1,15 @@
-Checks: '*, -google-runtime-references, -modernize-use-nodiscard, -modernize-use-trailing-return-type, -fuchsia-default-arguments-calls, -hicpp-uppercase-literal-suffix, -readibility-uppercase-literal-suffix'
+Checks: >
+    *,
+    -fuchsia-default-arguments-calls,
+    -fuchsia-default-arguments-declarations,
+    -google-readability-todo,
+    -google-runtime-references,
+    -hicpp-uppercase-literal-suffix,
+    -llvm-header-guard,
+    -modernize-use-nodiscard,
+    -modernize-use-trailing-return-type,
+    -readibility-uppercase-literal-suffix
+
 CheckOptions:
   - { key: readability-identifier-naming.NamespaceCase,         value: CamelCase  }
   - { key: readability-identifier-naming.ClassCase,             value: CamelCase  }
