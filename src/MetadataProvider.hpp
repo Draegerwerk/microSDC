@@ -23,19 +23,19 @@ public:
 
   /// @brief get the URI of the Device Service
   /// @return string containing the URI
-  std::string getDeviceServicePath() const;
+  static std::string getDeviceServicePath();
 
   /// @brief get the URI of the GetService
   /// @return string containing the URI
-  std::string getGetServicePath() const;
+  static std::string getGetServicePath();
 
   /// @brief get the URI of the SetService
   /// @return string containing the URI
-  std::string getSetServicePath() const;
+  static std::string getSetServicePath();
 
   /// @brief get the URI of the StateEventService
   /// @return string containing the URI
-  std::string getStateEventServicePath() const;
+  static std::string getStateEventServicePath();
 
   /// @brief gets the endpoint URI of the SetService
   /// @return URI containing information regarding the set service
@@ -77,8 +77,8 @@ public:
   /// @param host Host section custructed by createHostMetadata()
   /// @param hosted sequence of Hosted services
   /// @return filled Relationship section
-  MetadataSection createMetadataSectionRelationship(const Host& host,
-                                                    const HostedSequence& hosted) const;
+  static MetadataSection createMetadataSectionRelationship(const Host& host,
+                                                           const HostedSequence& hosted);
 
   /// @brief compile information about WSDL for GetService
   /// @return constructed MetadataSection

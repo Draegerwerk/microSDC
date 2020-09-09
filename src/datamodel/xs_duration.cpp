@@ -58,6 +58,7 @@ std::string Duration::str() const
 
 std::chrono::seconds Duration::toDurationSeconds() const
 {
+  // TODO rewrite using std::chrono
   const auto now = std::time(nullptr);
   auto localTime = *std::localtime(&now);
   localTime.tm_year += years();

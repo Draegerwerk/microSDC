@@ -15,11 +15,11 @@ static constexpr const char* TAG = "SubscriptionManager";
 WS::EVENTING::SubscribeResponse
 SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
 {
-  if (!subscribeRequest.Filter().has_value())
+  if (!subscribeRequest.Filter.has_value())
   {
     throw std::runtime_error("No filter specified");
   }
-  for (const auto& filterAction : subscribeRequest.Filter().value())
+  for (const auto& filterAction : subscribeRequest.Filter.value())
   {
     if (std::find(allowedSubscriptionEventActions_.begin(), allowedSubscriptionEventActions_.end(),
                   filterAction) == allowedSubscriptionEventActions_.end())
@@ -29,23 +29,22 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
   }
   const auto identifier = "uuid:" + UUIDGenerator{}().toString();
 
-  const Duration duration(
-      subscribeRequest.Expires().value_or(WS::EVENTING::ExpirationType("PT1H")));
+  const Duration duration(subscribeRequest.Expires.value_or(WS::EVENTING::ExpirationType("PT1H")));
   const auto expires = duration.toExpirationTimePoint();
-  SubscriptionInformation info{subscribeRequest.Delivery().NotifyTo(),
-                               subscribeRequest.Filter().value(), expires};
+  SubscriptionInformation info{subscribeRequest.Delivery.NotifyTo, subscribeRequest.Filter.value(),
+                               expires};
 
   {
     std::lock_guard<std::mutex> lock(subscriptionMutex_);
     subscriptions_.emplace(identifier, info);
   }
-  sessionManager_.createSession(info.notifyTo.Address());
+  sessionManager_.createSession(info.notifyTo.Address);
 
   WS::EVENTING::SubscribeResponse::SubscriptionManagerType subscriptionManager(
       WS::ADDRESSING::EndpointReferenceType(
           WS::ADDRESSING::URIType("To be filled by Soap Service")));
-  subscriptionManager.ReferenceParameters() =
-      WS::ADDRESSING::ReferenceParametersType(WS::EVENTING::Identifier(identifier));
+  subscriptionManager.ReferenceParameters =
+      WS::ADDRESSING::ReferenceParametersType(WS::EVENTING::Identifier{identifier});
   WS::EVENTING::SubscribeResponse subscribeResponse(subscriptionManager,
                                                     WS::EVENTING::ExpirationType(duration.str()));
   LOG(LogLevel::INFO, "Successfully created subscription for " << identifier);
@@ -58,7 +57,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Renew& renewRequest,
                               const WS::EVENTING::Identifier& identifier)
 {
   std::lock_guard<std::mutex> lock(subscriptionMutex_);
-  const Duration duration(renewRequest.Expires().value_or(WS::EVENTING::ExpirationType("PT1H")));
+  const Duration duration(renewRequest.Expires.value_or(WS::EVENTING::ExpirationType("PT1H")));
   auto subscriptionInfo = subscriptions_.find(identifier);
   if (subscriptionInfo == subscriptions_.end())
   {
@@ -67,7 +66,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Renew& renewRequest,
   }
   subscriptionInfo->second.expirationTime = duration.toExpirationTimePoint();
   WS::EVENTING::RenewResponse renewResponse;
-  renewResponse.Expires() = WS::EVENTING::ExpirationType(duration.str());
+  renewResponse.Expires = WS::EVENTING::ExpirationType(duration.str());
   LOG(LogLevel::INFO, "Successfully renewed subscription for " << identifier);
   printSubscriptions();
   return renewResponse;
@@ -83,10 +82,10 @@ void SubscriptionManager::dispatch(const WS::EVENTING::Unsubscribe& /*unsubscrib
     throw std::runtime_error("Could not find subscription corresponding to Renew Identifier " +
                              identifier);
   }
-  const auto& notifyTo = subscriptionInfo->second.notifyTo.Address();
+  const auto& notifyTo = subscriptionInfo->second.notifyTo.Address;
   const auto numSameClient =
       std::count_if(subscriptions_.begin(), subscriptions_.end(),
-                    [&](const auto& it) { return it.second.notifyTo.Address() == notifyTo; });
+                    [&](const auto& it) { return it.second.notifyTo.Address == notifyTo; });
 
   if (numSameClient == 1)
   {
@@ -114,15 +113,15 @@ void SubscriptionManager::fireEvent(const BICEPS::MM::EpisodicMetricReport& repo
     return;
   }
   MESSAGEMODEL::Header header;
-  header.MessageID() = MESSAGEMODEL::Header::MessageIDType(MicroSDC::calculateMessageID());
-  header.Action() = WS::ADDRESSING::URIType(SDC::ACTION_EPISODIC_METRIC_REPORT);
+  header.MessageID = MESSAGEMODEL::Header::MessageIDType(MicroSDC::calculateMessageID());
+  header.Action = WS::ADDRESSING::URIType(SDC::ACTION_EPISODIC_METRIC_REPORT);
 
   MESSAGEMODEL::Body body;
-  body.EpisodicMetricReport() = report;
+  body.EpisodicMetricReport = report;
 
   MESSAGEMODEL::Envelope notifyEnvelope;
-  notifyEnvelope.Header() = std::move(header);
-  notifyEnvelope.Body() = std::move(body);
+  notifyEnvelope.Header = std::move(header);
+  notifyEnvelope.Body = std::move(body);
 
   MessageSerializer serializer;
   serializer.serialize(notifyEnvelope);
@@ -130,7 +129,7 @@ void SubscriptionManager::fireEvent(const BICEPS::MM::EpisodicMetricReport& repo
   LOG(LogLevel::DEBUG, "SENDING: " << messageStr);
   for (const auto* const info : subscriber)
   {
-    sessionManager_.sendToSession(info->notifyTo.Address(), messageStr);
+    sessionManager_.sendToSession(info->notifyTo.Address, messageStr);
   }
 }
 
@@ -140,7 +139,7 @@ void SubscriptionManager::printSubscriptions() const
   out << "Subscriptions:\n";
   for (const auto& [key, val] : subscriptions_)
   {
-    out << key << " : " << val.notifyTo.Address() << " : "
+    out << key << " : " << val.notifyTo.Address << " : "
         << std::chrono::duration_cast<std::chrono::seconds>(val.expirationTime -
                                                             std::chrono::system_clock::now())
                .count()

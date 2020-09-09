@@ -147,8 +147,6 @@ namespace BICEPS::PM
 
   private:
     DescriptorKind kind_;
-
-  private:
     TypeOptional Type_;
     HandleType Handle_;
     DescriptorVersionOptional DescriptorVersion_;
@@ -564,8 +562,6 @@ namespace BICEPS::PM
 
   private:
     StateKind kind_;
-
-  private:
     StateVersionOptional StateVersion_;
     DescriptorHandleType DescriptorHandle_;
   };

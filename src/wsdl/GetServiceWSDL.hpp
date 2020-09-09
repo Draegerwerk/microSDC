@@ -79,4 +79,4 @@ namespace WSDL
         </wsdl:operation>
     </wsdl:binding>
 </wsdl:definitions>)";
-}
+} // namespace WSDL

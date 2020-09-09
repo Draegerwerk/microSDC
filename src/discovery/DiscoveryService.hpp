@@ -21,7 +21,7 @@ public:
   DiscoveryService(DiscoveryService&&) = delete;
   DiscoveryService& operator=(const DiscoveryService&) = delete;
   DiscoveryService& operator=(DiscoveryService&&) = delete;
-  ~DiscoveryService();
+  ~DiscoveryService() noexcept;
 
 
   /// @brief listens on udp multicast socket for discovery messages

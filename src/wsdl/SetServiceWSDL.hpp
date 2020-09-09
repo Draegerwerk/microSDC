@@ -123,4 +123,4 @@ namespace WSDL
 </wsdl:binding>
 </wsdl:definitions>)";
 
-}
+} // namespace WSDL

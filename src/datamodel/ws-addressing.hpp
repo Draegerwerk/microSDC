@@ -6,88 +6,65 @@
 
 namespace WS::EVENTING
 {
-  class Identifier : public std::string
+  struct Identifier : public std::string
   {
-  public:
     using IsReferenceParameterType = bool;
     using IsReferenceParameterOptional = std::optional<IsReferenceParameterType>;
+    IsReferenceParameterOptional IsReferenceParameter;
 
     explicit Identifier(const rapidxml::xml_node<>& node);
-    explicit Identifier(const std::string& other);
-    explicit Identifier(std::string&& other);
+    explicit Identifier(std::string x);
     using std::string::string;
     using std::string::operator=;
 
   private:
-    IsReferenceParameterOptional IsReferenceParameter_;
-
     void parse(const rapidxml::xml_node<>& node);
   };
 } // namespace WS::EVENTING
 
 namespace WS::ADDRESSING
 {
-  class URIType : public std::string
+  struct URIType : public std::string
   {
-  public:
-    explicit URIType(const rapidxml::xml_node<>& node);
-    explicit URIType(const std::string& other);
-    explicit URIType(std::string&& other);
     URIType() = default;
+    explicit URIType(std::string other);
+    explicit URIType(const rapidxml::xml_node<>& node);
     using std::string::string;
   };
 
-  class RelationshipTypeOpenEnum : public std::string
-  {
-  public:
-  protected:
-  };
+  using RelationshipTypeOpenEnum = std::string;
 
-  class RelatesToType : public WS::ADDRESSING::URIType
+  struct RelatesToType : public WS::ADDRESSING::URIType
   {
-  public:
     using RelationshipTypeType = ::WS::ADDRESSING::RelationshipTypeOpenEnum;
     using RelationshipTypeOptional = std::optional<RelationshipTypeType>;
+    RelationshipTypeOptional RelationshipType;
 
-    explicit RelatesToType(const URIType& x);
-
-  private:
-    RelationshipTypeOptional RelationshipType_;
+    explicit RelatesToType(URIType x);
   };
 
-  class ReferenceParametersType
+  struct ReferenceParametersType
   {
-  public:
     using IdentifierType = WS::EVENTING::Identifier;
     using IdentifierOptional = std::optional<IdentifierType>;
-    const IdentifierOptional& Identifier() const;
-    IdentifierOptional& Identifier();
+    IdentifierOptional Identifier;
 
     explicit ReferenceParametersType(const IdentifierType& identifier);
-
-  private:
-    IdentifierOptional Identifier_;
   };
 
-  class EndpointReferenceType
+  struct EndpointReferenceType
   {
-  public:
     using AddressType = ::WS::ADDRESSING::URIType;
-    const AddressType& Address() const;
-    AddressType& Address();
+    AddressType Address;
 
     using ReferenceParametersType = WS::ADDRESSING::ReferenceParametersType;
     using ReferenceParametersOptional = std::optional<ReferenceParametersType>;
-    const ReferenceParametersOptional& ReferenceParameters() const;
-    ReferenceParametersOptional& ReferenceParameters();
+    ReferenceParametersOptional ReferenceParameters;
 
     explicit EndpointReferenceType(AddressType address);
     explicit EndpointReferenceType(const rapidxml::xml_node<>& node);
 
   private:
-    AddressType Address_;
-    ReferenceParametersOptional ReferenceParameters_;
-
     void parse(const rapidxml::xml_node<>& node);
   };
 } // namespace WS::ADDRESSING

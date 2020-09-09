@@ -6,329 +6,188 @@
 
 namespace WS::DISCOVERY
 {
-  class QName
+  struct QName
   {
-  public:
     using NameSpaceString = const char*;
-    QName(NameSpaceString ns, const std::string& name);
+    QName(NameSpaceString ns, std::string name);
 
-    NameSpaceString ns() const;
-
-    const std::string& name() const;
-    std::string& name();
-
-  protected:
-    NameSpaceString ns_;
-    std::string name_;
+    NameSpaceString ns;
+    std::string name;
   };
 
-  class QNameListType : public std::vector<QName>
+  struct QNameListType : public std::vector<QName>
   {
   public:
     QNameListType() = default;
     explicit QNameListType(const rapidxml::xml_node<>& node);
 
-  protected:
+  private:
     void parse(const rapidxml::xml_node<>& node);
   };
 
-  class UriListType : public std::vector<WS::ADDRESSING::URIType>
-  {
-  public:
-    UriListType() = default;
-  };
+  using UriListType = std::vector<WS::ADDRESSING::URIType>;
 
-  class ScopesType : public WS::DISCOVERY::UriListType
+  struct ScopesType : public WS::DISCOVERY::UriListType
   {
   public:
     using MatchByType = WS::ADDRESSING::URIType;
     using MatchByOptional = std::optional<MatchByType>;
-    const MatchByOptional& MatchBy() const;
-    MatchByOptional& MatchBy();
-
-  protected:
-    MatchByOptional MatchBy_;
+    MatchByOptional MatchBy;
   };
 
-  class AppSequenceType
+  struct AppSequenceType
   {
   public:
     AppSequenceType();
     AppSequenceType(const uint64_t& instanceId, const uint64_t& messageNumber);
-    AppSequenceType(const AppSequenceType& x);
     using InstanceIdType = unsigned int;
-    const InstanceIdType& InstanceId() const;
-    InstanceIdType& InstanceId();
+    InstanceIdType InstanceId;
 
     using SequenceIdType = WS::ADDRESSING::URIType;
     using SequenceIdOptional = std::optional<SequenceIdType>;
-    const SequenceIdOptional& SequenceId() const;
-    SequenceIdOptional& SequenceId();
+    SequenceIdOptional SequenceId;
 
     using MessageNumberType = unsigned int;
-    const MessageNumberType& MessageNumber() const;
-    MessageNumberType& MessageNumber();
-
-  protected:
-    InstanceIdType InstanceId_;
-    SequenceIdOptional SequenceId_;
-    MessageNumberType MessageNumber_;
+    MessageNumberType MessageNumber;
   };
 
-  class ByeType
+  struct ByeType
   {
-  public:
     using EndpointReferenceType = WS::ADDRESSING::EndpointReferenceType;
-    const EndpointReferenceType& EndpointReference() const;
-    EndpointReferenceType& EndpointReference();
+    EndpointReferenceType EndpointReference;
 
     using TypesType = WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    const TypesOptional& Types() const;
-    TypesOptional& Types();
+    TypesOptional Types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
-    const ScopesOptional& Scopes() const;
-    ScopesOptional& Scopes();
+    ScopesOptional Scopes;
 
     using XAddrsType = WS::DISCOVERY::UriListType;
     using XAddrsOptional = std::optional<XAddrsType>;
-    const XAddrsOptional& XAddrs() const;
-    XAddrsOptional& XAddrs();
+    XAddrsOptional XAddrs;
 
     using MetadataVersionType = unsigned int;
     using MetadataVersionOptional = std::optional<MetadataVersionType>;
-    const MetadataVersionOptional& MetadataVersion() const;
-    MetadataVersionOptional& MetadataVersion();
+    MetadataVersionOptional MetadataVersion;
 
-    ByeType(const EndpointReferenceType& epr);
-
-  protected:
-    EndpointReferenceType EndpointReference_;
-    TypesOptional Types_;
-    ScopesOptional Scopes_;
-    XAddrsOptional XAddrs_;
-    MetadataVersionOptional MetadataVersion_;
+    explicit ByeType(EndpointReferenceType epr);
   };
 
-  class HelloType
+  struct HelloType
   {
-  public:
-    // EndpointReference
-    //
     using EndpointReferenceType = ::WS::ADDRESSING::EndpointReferenceType;
-    const EndpointReferenceType& EndpointReference() const;
-    EndpointReferenceType& EndpointReference();
+    EndpointReferenceType EndpointReference;
 
-    // Types
-    //
     using TypesType = ::WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    const TypesOptional& Types() const;
-    TypesOptional& Types();
+    TypesOptional Types;
 
-    // Scopes
-    //
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
-    const ScopesOptional& Scopes() const;
-    ScopesOptional& Scopes();
+    ScopesOptional Scopes;
 
-    // XAddrs
-    //
     using XAddrsType = WS::DISCOVERY::UriListType;
     using XAddrsOptional = std::optional<XAddrsType>;
-    const XAddrsOptional& XAddrs() const;
-    XAddrsOptional& XAddrs();
+    XAddrsOptional XAddrs;
 
-    // MetadataVersion
-    //
     using MetadataVersionType = unsigned int;
-    const MetadataVersionType& MetadataVersion() const;
-    MetadataVersionType& MetadataVersion();
+    MetadataVersionType MetadataVersion;
 
-    HelloType(const EndpointReferenceType& epr, const MetadataVersionType& metadataVersion);
-    // HelloType(const HelloType& x);
-
-  protected:
-    EndpointReferenceType EndpointReference_;
-    TypesOptional Types_;
-    ScopesOptional Scopes_;
-    XAddrsOptional XAddrs_;
-    MetadataVersionType MetadataVersion_;
+    HelloType(EndpointReferenceType epr, MetadataVersionType metadataVersion);
   };
 
-  class ProbeType
+  struct ProbeType
   {
-  public:
-    ProbeType(const ProbeType& x);
     explicit ProbeType(const rapidxml::xml_node<>& node);
 
-    // Types
-    //
     using TypesType = ::WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    const TypesOptional& Types() const;
-    TypesOptional& Types();
+    TypesOptional Types;
 
-    // Scopes
-    //
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
-    const ScopesOptional& Scopes() const;
-    ScopesOptional& Scopes();
+    ScopesOptional Scopes;
 
-  protected:
-    TypesOptional Types_;
-    ScopesOptional Scopes_;
-
+  private:
     void parse(const rapidxml::xml_node<>& node);
   };
 
-  class ProbeMatchType
+  struct ProbeMatchType
   {
-  public:
-    // EndpointReference
-    //
     using EndpointReferenceType = ::WS::ADDRESSING::EndpointReferenceType;
-    const EndpointReferenceType& EndpointReference() const;
-    EndpointReferenceType& EndpointReference();
+    EndpointReferenceType EndpointReference;
 
-    // Types
-    //
     using TypesType = ::WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    const TypesOptional& Types() const;
-    TypesOptional& Types();
+    TypesOptional Types;
 
-    // Scopes
-    //
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
-    const ScopesOptional& Scopes() const;
-    ScopesOptional& Scopes();
+    ScopesOptional Scopes;
 
-    // XAddrs
-    //
     using XAddrsType = WS::DISCOVERY::UriListType;
     using XAddrsOptional = std::optional<XAddrsType>;
-    const XAddrsOptional& XAddrs() const;
-    XAddrsOptional& XAddrs();
+    XAddrsOptional XAddrs;
 
-    // MetadataVersion
-    //
     using MetadataVersionType = unsigned int;
-    const MetadataVersionType& MetadataVersion() const;
-    MetadataVersionType& MetadataVersion();
+    MetadataVersionType MetadataVersion;
 
-    ProbeMatchType(const ProbeMatchType& x);
-    ProbeMatchType(const EndpointReferenceType& epr, const MetadataVersionType& metadataVersion);
-
-  protected:
-    EndpointReferenceType EndpointReference_;
-    TypesOptional Types_;
-    ScopesOptional Scopes_;
-    XAddrsOptional XAddrs_;
-    MetadataVersionType MetadataVersion_;
+    ProbeMatchType(EndpointReferenceType epr, MetadataVersionType metadataVersion);
   };
 
-  class ProbeMatchesType
+  struct ProbeMatchesType
   {
-  public:
-    // ProbeMatch
-    //
     using ProbeMatchType = WS::DISCOVERY::ProbeMatchType;
     using ProbeMatchSequence = std::vector<ProbeMatchType>;
+    ProbeMatchSequence ProbeMatch;
 
-    const ProbeMatchSequence& ProbeMatch() const;
-    ProbeMatchSequence& ProbeMatch();
-
-    ProbeMatchesType(const ProbeMatchesType& x);
-    ProbeMatchesType(const ProbeMatchSequence& x);
-    ProbeMatchesType() = default;
-
-  protected:
-    ProbeMatchSequence ProbeMatch_;
+    explicit ProbeMatchesType(ProbeMatchSequence x);
   };
 
-  class ResolveType
+  struct ResolveType
   {
   public:
     explicit ResolveType(const rapidxml::xml_node<>& node);
 
-    // EndpointReference
-    //
     using EndpointReferenceType = ::WS::ADDRESSING::EndpointReferenceType;
-    const EndpointReferenceType& EndpointReference() const;
-    EndpointReferenceType& EndpointReference();
+    EndpointReferenceType EndpointReference;
 
-  protected:
-    EndpointReferenceType EndpointReference_;
-
+  private:
     void parse(const rapidxml::xml_node<>& node);
   };
-  class ResolveMatchType
-  {
-  public:
-    // EndpointReference
-    //
-    using EndpointReferenceType = ::WS::ADDRESSING::EndpointReferenceType;
-    const EndpointReferenceType& EndpointReference() const;
-    EndpointReferenceType& EndpointReference();
 
-    // Types
-    //
+  struct ResolveMatchType
+  {
+    using EndpointReferenceType = ::WS::ADDRESSING::EndpointReferenceType;
+    EndpointReferenceType EndpointReference;
+
     using TypesType = ::WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    const TypesOptional& Types() const;
-    TypesOptional& Types();
+    TypesOptional Types;
 
-    // Scopes
-    //
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
-    const ScopesOptional& Scopes() const;
-    ScopesOptional& Scopes();
+    ScopesOptional Scopes;
 
-    // XAddrs
-    //
     using XAddrsType = WS::DISCOVERY::UriListType;
     using XAddrsOptional = std::optional<XAddrsType>;
-    const XAddrsOptional& XAddrs() const;
-    XAddrsOptional& XAddrs();
+    XAddrsOptional XAddrs;
 
-    // MetadataVersion
-    //
     using MetadataVersionType = unsigned int;
-    const MetadataVersionType& MetadataVersion() const;
-    MetadataVersionType& MetadataVersion();
+    MetadataVersionType MetadataVersion;
 
-    ResolveMatchType(const ResolveMatchType& x);
-    ResolveMatchType(const EndpointReferenceType& epr, const MetadataVersionType& metadataVersion);
-
-  protected:
-    EndpointReferenceType EndpointReference_;
-    TypesOptional Types_;
-    ScopesOptional Scopes_;
-    XAddrsOptional XAddrs_;
-    MetadataVersionType MetadataVersion_;
+    ResolveMatchType(EndpointReferenceType epr, MetadataVersionType metadataVersion);
   };
-  class ResolveMatchesType
+
+  struct ResolveMatchesType
   {
   public:
-    // ResolveMatch
-    //
     using ResolveMatchType = WS::DISCOVERY::ResolveMatchType;
     using ResolveMatchSequence = std::vector<ResolveMatchType>;
-    const ResolveMatchSequence& ResolveMatch() const;
-    ResolveMatchSequence& ResolveMatch();
+    ResolveMatchSequence ResolveMatch;
 
-    ResolveMatchesType(const ResolveMatchesType& x);
-    ResolveMatchesType(const ResolveMatchSequence& x);
-    ResolveMatchesType() = default;
-
-  protected:
-    ResolveMatchSequence ResolveMatch_;
+    explicit ResolveMatchesType(ResolveMatchSequence x);
   };
 } // namespace WS::DISCOVERY

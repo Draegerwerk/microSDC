@@ -2,11 +2,11 @@
 
 #include "Casting.hpp"
 #include "Log.hpp"
+#include "MetadataProvider.hpp"
 #include "SDCConstants.hpp"
 #include "StateHandler.hpp"
 #include "SubscriptionManager.hpp"
 #include "datamodel/MDPWSConstants.hpp"
-#include "MetadataProvider.hpp"
 #include "networking/NetworkConfig.hpp"
 #include "services/DeviceService.hpp"
 #include "services/GetService.hpp"
@@ -57,7 +57,8 @@ void MicroSDC::startup()
   WS::DISCOVERY::UriListType xAddresses;
   std::string protocol = networkConfig_->useTLS() ? "https" : "http";
   std::string xaddress = protocol + "://" + networkConfig_->ipAddress() + ":" +
-                         std::to_string(networkConfig_->port()) + metadata->getDeviceServicePath();
+                         std::to_string(networkConfig_->port()) +
+                         MetadataProvider::getDeviceServicePath();
   xAddresses.emplace_back(xaddress);
 
   // fill discovery types

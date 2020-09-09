@@ -1,8 +1,8 @@
 #include "services/DeviceService.hpp"
 #include "Log.hpp"
+#include "MetadataProvider.hpp"
 #include "WebServer/Request.hpp"
 #include "datamodel/MDPWSConstants.hpp"
-#include "MetadataProvider.hpp"
 #include "services/SoapFault.hpp"
 
 static constexpr const char* TAG = "DeviceService";
@@ -14,18 +14,18 @@ DeviceService::DeviceService(std::shared_ptr<const MetadataProvider> metadata)
 
 std::string DeviceService::getURI() const
 {
-  return metadata_->getDeviceServicePath();
+  return MetadataProvider::getDeviceServicePath();
 }
 
 void DeviceService::handleRequest(std::unique_ptr<Request> req)
 {
   const auto requestEnvelope = req->getEnvelope();
-  const auto& soapAction = requestEnvelope.Header().Action();
+  const auto& soapAction = requestEnvelope.Header.Action;
   if (soapAction == MDPWS::WS_ACTION_GET)
   {
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_GET_RESPONSE);
+    responseEnvelope.Header.Action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_GET_RESPONSE);
     metadata_->fillDeviceMetadata(responseEnvelope);
     req->respond(responseEnvelope);
   }

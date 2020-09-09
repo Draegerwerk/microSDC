@@ -3,67 +3,47 @@
 #include "MDPWSConstants.hpp"
 #include <cstring>
 #include <sstream>
+#include <utility>
 
 namespace WS::EVENTING
 {
 
   // DeliveryType
   //
-  DeliveryType::DeliveryType(const NotifyToType& notifyTo)
-    : NotifyTo_(notifyTo)
+  DeliveryType::DeliveryType(NotifyToType notifyTo)
+    : NotifyTo(std::move(notifyTo))
   {
   }
   DeliveryType::DeliveryType(const rapidxml::xml_node<>& node)
-    : NotifyTo_(WS::ADDRESSING::URIType(""))
+    : NotifyTo(WS::ADDRESSING::URIType(""))
   {
     this->parse(node);
   }
   void DeliveryType::parse(const rapidxml::xml_node<>& node)
   {
-    auto nodeAttr = node.first_attribute("Mode");
-    if (nodeAttr == nullptr || strncmp(nodeAttr->value(), MDPWS::WS_EVENTING_DELIVERYMODE_PUSH,
-                                       nodeAttr->value_size()) == 0)
+    const auto* nodeAttr = node.first_attribute("Mode");
+    if (nodeAttr == nullptr || (nodeAttr->value() != nullptr &&
+                                strncmp(nodeAttr->value(), MDPWS::WS_EVENTING_DELIVERYMODE_PUSH,
+                                        nodeAttr->value_size()) == 0))
     {
-      Mode_ = ::MDPWS::WS_EVENTING_DELIVERYMODE_PUSH;
+      Mode = ::MDPWS::WS_EVENTING_DELIVERYMODE_PUSH;
     }
     for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
          entry = entry->next_sibling())
     {
-      if (strncmp(entry->name(), "NotifyTo", entry->name_size()) == 0 &&
+      if (entry->name() != nullptr && strncmp(entry->name(), "NotifyTo", entry->name_size()) == 0 &&
+          entry->xmlns() != nullptr &&
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        NotifyTo_ = NotifyToType(*entry);
+        NotifyTo = NotifyToType(*entry);
       }
     }
-  }
-  const DeliveryType::NotifyToType& DeliveryType::NotifyTo() const
-  {
-    return NotifyTo_;
-  }
-  DeliveryType::NotifyToType& DeliveryType::NotifyTo()
-  {
-    return NotifyTo_;
-  }
-  const DeliveryType::ModeOptional& DeliveryType::Mode() const
-  {
-    return Mode_;
-  }
-  DeliveryType::ModeOptional& DeliveryType::Mode()
-  {
-    return Mode_;
-  }
-
-  // DeliveryType
-  //
-  ExpirationType::ExpirationType(std::string expiration)
-    : std::string(expiration)
-  {
   }
 
   // FilterType
   //
-  FilterType::FilterType(const DialectType& dialect)
-    : Dialect_(dialect)
+  FilterType::FilterType(DialectType dialect)
+    : Dialect(std::move(dialect))
   {
   }
   FilterType::FilterType(const rapidxml::xml_node<>& node)
@@ -72,13 +52,14 @@ namespace WS::EVENTING
   }
   void FilterType::parse(const rapidxml::xml_node<>& node)
   {
-    auto dialectAttr = node.first_attribute("Dialect");
-    if (dialectAttr == nullptr || strncmp(dialectAttr->value(), MDPWS::WS_EVENTING_FILTER_ACTION,
-                                          dialectAttr->value_size()) != 0)
+    const auto* dialectAttr = node.first_attribute("Dialect");
+    if (dialectAttr == nullptr ||
+        (dialectAttr != nullptr && strncmp(dialectAttr->value(), MDPWS::WS_EVENTING_FILTER_ACTION,
+                                           dialectAttr->value_size()) != 0))
     {
       throw ExpectedElement("Dialect", MDPWS::WS_EVENTING_FILTER_ACTION);
     }
-    Dialect_ = MDPWS::WS_EVENTING_FILTER_ACTION;
+    Dialect = MDPWS::WS_EVENTING_FILTER_ACTION;
     if (node.value() != nullptr)
     {
       // extract white space delimited filters
@@ -90,23 +71,15 @@ namespace WS::EVENTING
       }
     }
   }
-  const FilterType::DialectType& FilterType::Dialect() const
-  {
-    return Dialect_;
-  }
-  FilterType::DialectType& FilterType::Dialect()
-  {
-    return Dialect_;
-  }
 
   // Subscribe
   //
-  Subscribe::Subscribe(const DeliveryType& delivery)
-    : Delivery_(delivery)
+  Subscribe::Subscribe(DeliveryType delivery)
+    : Delivery(std::move(delivery))
   {
   }
   Subscribe::Subscribe(const rapidxml::xml_node<>& node)
-    : Delivery_(WS::ADDRESSING::EndpointReferenceType(WS::ADDRESSING::URIType("")))
+    : Delivery(WS::ADDRESSING::EndpointReferenceType(WS::ADDRESSING::URIType("")))
   {
     this->parse(node);
   }
@@ -115,85 +88,41 @@ namespace WS::EVENTING
     for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
          entry = entry->next_sibling())
     {
+      if (entry->name() == nullptr || entry->xmlns() == nullptr)
+      {
+        continue;
+      }
       if (strncmp(entry->name(), "EndTo", entry->name_size()) == 0 &&
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        EndTo_ = std::make_optional<EndToType>(*entry);
+        EndTo = std::make_optional<EndToType>(*entry);
       }
       else if (strncmp(entry->name(), "Delivery", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        Delivery_ = DeliveryType(*entry);
+        Delivery = DeliveryType(*entry);
       }
       else if (strncmp(entry->name(), "Expires", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        Expires_ =
+        Expires =
             std::make_optional<ExpirationType>(std::string(entry->value(), entry->value_size()));
       }
       else if (strncmp(entry->name(), "Filter", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        Filter_ = std::make_optional<FilterType>(*entry);
+        Filter = std::make_optional<FilterType>(*entry);
       }
     }
-  }
-  const Subscribe::EndToOptional& Subscribe::EndTo() const
-  {
-    return EndTo_;
-  }
-  Subscribe::EndToOptional& Subscribe::EndTo()
-  {
-    return EndTo_;
-  }
-  const Subscribe::DeliveryType& Subscribe::Delivery() const
-  {
-    return Delivery_;
-  }
-  Subscribe::DeliveryType& Subscribe::Delivery()
-  {
-    return Delivery_;
-  }
-  const Subscribe::ExpiresOptional& Subscribe::Expires() const
-  {
-    return Expires_;
-  }
-  Subscribe::ExpiresOptional& Subscribe::Expires()
-  {
-    return Expires_;
-  }
-  const Subscribe::FilterOptional& Subscribe::Filter() const
-  {
-    return Filter_;
-  }
-  Subscribe::FilterOptional& Subscribe::Filter()
-  {
-    return Filter_;
   }
 
   // SubscribeResponse
   //
-  SubscribeResponse::SubscribeResponse(const SubscriptionManagerType& subscriptionManager,
-                                       const ExpiresType& expires)
-    : SubscriptionManager_(subscriptionManager)
-    , Expires_(expires)
+  SubscribeResponse::SubscribeResponse(SubscriptionManagerType subscriptionManager,
+                                       ExpiresType expires)
+    : SubscriptionManager(std::move(subscriptionManager))
+    , Expires(std::move(expires))
   {
-  }
-  const SubscribeResponse::SubscriptionManagerType& SubscribeResponse::SubscriptionManager() const
-  {
-    return SubscriptionManager_;
-  }
-  SubscribeResponse::SubscriptionManagerType& SubscribeResponse::SubscriptionManager()
-  {
-    return SubscriptionManager_;
-  }
-  const SubscribeResponse::ExpiresType& SubscribeResponse::Expires() const
-  {
-    return Expires_;
-  }
-  SubscribeResponse::ExpiresType& SubscribeResponse::Expires()
-  {
-    return Expires_;
   }
 
   // Renew
@@ -202,33 +131,14 @@ namespace WS::EVENTING
   {
     this->parse(node);
   }
-  const Renew::ExpiresOptional& Renew::Expires() const
-  {
-    return Expires_;
-  }
-  Renew::ExpiresOptional& Renew::Expires()
-  {
-    return Expires_;
-  }
 
   void Renew::parse(const rapidxml::xml_node<>& node)
   {
-    const auto expiresNode = node.first_node("Expires", MDPWS::WS_NS_EVENTING);
+    const auto* expiresNode = node.first_node("Expires", MDPWS::WS_NS_EVENTING);
     if (expiresNode != nullptr)
     {
-      Expires_ = ExpiresType(std::string(expiresNode->value(), expiresNode->value_size()));
+      Expires = ExpiresType(std::string(expiresNode->value(), expiresNode->value_size()));
     }
-  }
-
-  // RenewResponse
-  //
-  const RenewResponse::ExpiresOptional& RenewResponse::Expires() const
-  {
-    return Expires_;
-  }
-  RenewResponse::ExpiresOptional& RenewResponse::Expires()
-  {
-    return Expires_;
   }
 
   // Unsubscribe

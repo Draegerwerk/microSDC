@@ -21,69 +21,69 @@ SetService::SetService(const MicroSDC& microSDC, std::shared_ptr<const MetadataP
 
 std::string SetService::getURI() const
 {
-  return metadata_->getSetServicePath();
+  return MetadataProvider::getSetServicePath();
 }
 
 void SetService::handleRequest(std::unique_ptr<Request> req)
 {
   const auto requestEnvelope = req->getEnvelope();
-  const auto& soapAction = requestEnvelope.Header().Action();
+  const auto& soapAction = requestEnvelope.Header.Action;
   if (soapAction == MDPWS::WS_ACTION_GET_METADATA_REQUEST)
   {
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
     metadata_->fillSetServiceMetadata(responseEnvelope);
-    responseEnvelope.Header().Action() =
+    responseEnvelope.Header.Action =
         WS::ADDRESSING::URIType(MDPWS::WS_ACTION_GET_METADATA_RESPONSE);
     req->respond(responseEnvelope);
   }
   else if (soapAction == MDPWS::WS_ACTION_SUBSCRIBE)
   {
-    auto subscribeRequest = requestEnvelope.Body().Subscribe();
+    auto subscribeRequest = requestEnvelope.Body.Subscribe;
     auto response = subscriptionManager_->dispatch(subscribeRequest.value());
-    response.SubscriptionManager().Address() = metadata_->getSetServiceURI();
+    response.SubscriptionManager.Address = metadata_->getSetServiceURI();
 
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.Header().Action() =
+    responseEnvelope.Header.Action =
         WS::ADDRESSING::URIType(MDPWS::WS_ACTION_SUBSCRIBE_RESPONSE);
-    responseEnvelope.Body().SubscribeResponse() = response;
+    responseEnvelope.Body.SubscribeResponse = response;
     req->respond(responseEnvelope);
   }
   else if (soapAction == MDPWS::WS_ACTION_RENEW)
   {
-    auto renewRequest = requestEnvelope.Body().Renew().value();
-    if (!requestEnvelope.Header().Identifier().has_value())
+    auto renewRequest = requestEnvelope.Body.Renew.value();
+    if (!requestEnvelope.Header.Identifier.has_value())
     {
       throw ExpectedElement("Identifier", MDPWS::WS_NS_EVENTING);
     }
     auto response =
-        subscriptionManager_->dispatch(renewRequest, requestEnvelope.Header().Identifier().value());
+        subscriptionManager_->dispatch(renewRequest, requestEnvelope.Header.Identifier.value());
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.Header().Action() = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RENEW_RESPONSE);
-    responseEnvelope.Body().RenewResponse() = response;
+    responseEnvelope.Header.Action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RENEW_RESPONSE);
+    responseEnvelope.Body.RenewResponse = response;
     req->respond(responseEnvelope);
   }
   else if (soapAction == MDPWS::WS_ACTION_UNSUBSCRIBE)
   {
-    auto unsubscribeRequest = requestEnvelope.Body().Unsubscribe().value();
+    auto unsubscribeRequest = requestEnvelope.Body.Unsubscribe.value();
     subscriptionManager_->dispatch(unsubscribeRequest,
-                                   requestEnvelope.Header().Identifier().value());
+                                   requestEnvelope.Header.Identifier.value());
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.Header().Action() =
+    responseEnvelope.Header.Action =
         WS::ADDRESSING::URIType(MDPWS::WS_ACTION_UNSUBSCRIBE_RESPONSE);
     req->respond(responseEnvelope);
   }
   else if (soapAction == SDC::ACTION_SET_VALUE)
   {
-    auto setValueRequest = requestEnvelope.Body().SetValue().value();
+    auto setValueRequest = requestEnvelope.Body.SetValue.value();
     auto setValueResponse = this->dispatch(setValueRequest);
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.Header().Action() = WS::ADDRESSING::URIType(SDC::ACTION_SET_VALUE_RESPONSE);
-    responseEnvelope.Body().SetValueResponse() = setValueResponse;
+    responseEnvelope.Header.Action = WS::ADDRESSING::URIType(SDC::ACTION_SET_VALUE_RESPONSE);
+    responseEnvelope.Body.SetValueResponse = setValueResponse;
     req->respond(responseEnvelope);
   }
   else

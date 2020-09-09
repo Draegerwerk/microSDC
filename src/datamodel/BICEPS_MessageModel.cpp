@@ -109,14 +109,18 @@ namespace BICEPS::MM
     for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
          entry = entry->next_sibling())
     {
-      if (strncmp(entry->name(), "OperationHandleRef", entry->name_size()) == 0 &&
+      if (entry->name() != nullptr &&
+          strncmp(entry->name(), "OperationHandleRef", entry->name_size()) == 0 &&
+          entry->xmlns() != nullptr &&
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE, entry->xmlns_size()) ==
               0)
       {
         AbstractSet::OperationHandleRef() =
             OperationHandleRefType(std::string(entry->value(), entry->value_size()));
       }
-      else if (strncmp(entry->name(), "RequestedNumericValue", entry->name_size()) == 0 &&
+      else if (entry->name() != nullptr &&
+               strncmp(entry->name(), "RequestedNumericValue", entry->name_size()) == 0 &&
+               entry->xmlns() != nullptr &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE,
                        entry->xmlns_size()) == 0)
       {
