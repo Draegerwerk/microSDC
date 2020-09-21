@@ -377,7 +377,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   }
   else if (metadataSection.Location.has_value())
   {
-    auto locationNode = xmlDocument_->allocate_node(rapidxml::node_element, "mexocation");
+    auto locationNode = xmlDocument_->allocate_node(rapidxml::node_element, "mex:Location");
     locationNode->value(metadataSection.Location->c_str());
     metadataSectionNode->append_node(locationNode);
   }
