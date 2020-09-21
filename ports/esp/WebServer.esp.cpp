@@ -37,6 +37,7 @@ WebServerEsp32::WebServerEsp32(bool useTLS)
   // use the URI wildcard matching function
   config_.httpd.uri_match_fn = httpd_uri_match_wildcard;
   config_.httpd.lru_purge_enable = true;
+  config_.httpd.stack_size = 16384;
 }
 
 void WebServerEsp32::start()
