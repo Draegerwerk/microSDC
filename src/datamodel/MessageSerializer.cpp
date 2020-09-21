@@ -969,9 +969,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 
   subscribeResponseNode->append_node(subscriptionManagerNode);
 
-  auto expiresNode = xmlDocument_->allocate_node(rapidxml::node_element, "wse:Expires");
-  expiresNode->value(subscribeResponse.Expires.c_str());
-  subscribeResponseNode->append_node(expiresNode);
+  serialize(subscribeResponseNode, subscribeResponse.Expires);
 
   parent->append_node(subscribeResponseNode);
 }
@@ -997,9 +995,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto renewResponseNode = xmlDocument_->allocate_node(rapidxml::node_element, "wse:RenewResponse");
   if (renewResponse.Expires.has_value())
   {
-    auto expiresNode = xmlDocument_->allocate_node(rapidxml::node_element, "wse:Expires");
-    expiresNode->value(renewResponse.Expires.value().c_str());
-    renewResponseNode->append_node(expiresNode);
+    serialize(renewResponseNode, renewResponse.Expires.value());
   }
   parent->append_node(renewResponseNode);
 }
@@ -1130,6 +1126,15 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     operationNode->append_attribute(typeAttr);
   }
   parent->append_node(operationNode);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const WS::EVENTING::ExpirationType& expiration)
+{
+  const auto* expiresDuration = xmlDocument_->allocate_string(toString(expiration).c_str());
+  auto* expiresNode =
+      xmlDocument_->allocate_node(rapidxml::node_element, "wse:Expires", expiresDuration);
+  parent->append_node(expiresNode);
 }
 
 /*static*/ std::string
@@ -1294,4 +1299,23 @@ std::string MessageSerializer::toString(BICEPS::PM::ContextAssociation contextAs
   }
   assert(false && "Uncatched value in ContextAssociation");
   return "";
+}
+
+std::string MessageSerializer::toString(Duration duration)
+{
+  std::string out;
+  out += "P";
+  out += std::to_string(duration.years());
+  out += "Y";
+  out += std::to_string(duration.months());
+  out += "M";
+  out += std::to_string(duration.days());
+  out += "DT";
+  out += std::to_string(duration.hours());
+  out += "H";
+  out += std::to_string(duration.minutes());
+  out += "M";
+  out += std::to_string(duration.seconds());
+  out += "S";
+  return out;
 }

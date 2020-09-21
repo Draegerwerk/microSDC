@@ -1,35 +1,48 @@
+#pragma once
+
 #include <chrono>
 #include <string>
 
 class Duration
 {
 public:
+  static constexpr std::intmax_t secondsInAYear__ = 31556952;
+  using Years = std::chrono::duration<std::int64_t, std::ratio<secondsInAYear__>>;
+  static constexpr std::intmax_t secondsInAMonth__ = 2629746;
+  using Months = std::chrono::duration<std::int64_t, std::ratio<secondsInAMonth__>>;
+  static constexpr std::intmax_t secondsInADay__ = 86400;
+  using Days = std::chrono::duration<std::int64_t, std::ratio<secondsInADay__>>;
+  using Hours = std::chrono::hours;
+  using Minutes = std::chrono::minutes;
+  using Seconds = std::chrono::duration<float, std::chrono::seconds::period>;
+  using TimePoint = std::chrono::steady_clock::time_point;
+
   explicit Duration(const std::string& string);
-  Duration(bool isNegative, unsigned int years, unsigned int months, unsigned int days,
-           unsigned int hours, unsigned int minutes, double seconds);
+  Duration(Years years, Months months, Days days, Hours hours, Minutes minutes, Seconds seconds,
+           bool isNegative);
+  Duration(const Duration&) = default;
+  Duration(Duration&&) = default;
+  Duration& operator=(const Duration&) = default;
+  Duration& operator=(Duration&&) = default;
+  ~Duration() = default;
 
-  bool isNegative() const;
-  unsigned int years() const;
-  unsigned int months() const;
-  unsigned int days() const;
-  unsigned int hours() const;
-  unsigned int minutes() const;
-  double seconds() const;
+  TimePoint toExpirationTimePoint() const;
 
-  std::string str() const;
-
-  std::chrono::seconds toDurationSeconds() const;
-  std::chrono::system_clock::time_point toExpirationTimePoint() const;
-
-protected:
-  void parse(const std::string& string);
+  Years::rep years() const;
+  Months::rep months() const;
+  Days::rep days() const;
+  Hours::rep hours() const;
+  Minutes::rep minutes() const;
+  Seconds::rep seconds() const;
 
 private:
-  bool isNegative_{false};
-  unsigned int years_{0};
-  unsigned int months_{0};
-  unsigned int days_{0};
-  unsigned int hours_{0};
-  unsigned int minutes_{0};
-  double seconds_{0.0};
+  void parse(const std::string& string);
+
+  bool isNegative_{};
+  Years years_{};
+  Months months_{};
+  Days days_{};
+  Hours hours_{};
+  Minutes minutes_{};
+  Seconds seconds_{};
 };

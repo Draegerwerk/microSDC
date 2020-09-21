@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ws-addressing.hpp"
+#include "xs_duration.hpp"
 #include <memory>
 #include <optional>
 #include <string>
@@ -25,7 +26,11 @@ namespace WS::EVENTING
     void parse(const rapidxml::xml_node<>& node);
   };
 
-  using ExpirationType = std::string;
+  struct ExpirationType : public Duration
+  {
+    using Duration::Duration;
+    explicit ExpirationType(const Duration& duration);
+  };
 
   using ActionList = std::vector<std::string>;
 

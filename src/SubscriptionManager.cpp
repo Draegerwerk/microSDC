@@ -45,8 +45,8 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
           WS::ADDRESSING::URIType("To be filled by Soap Service")));
   subscriptionManager.ReferenceParameters =
       WS::ADDRESSING::ReferenceParametersType(WS::EVENTING::Identifier{identifier});
-  WS::EVENTING::SubscribeResponse subscribeResponse(subscriptionManager,
-                                                    WS::EVENTING::ExpirationType(duration.str()));
+  WS::EVENTING::SubscribeResponse subscribeResponse(
+      subscriptionManager, WS::EVENTING::SubscribeResponse::ExpiresType{duration});
   LOG(LogLevel::INFO, "Successfully created subscription for " << identifier);
   printSubscriptions();
   return subscribeResponse;
@@ -66,7 +66,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Renew& renewRequest,
   }
   subscriptionInfo->second.expirationTime = duration.toExpirationTimePoint();
   WS::EVENTING::RenewResponse renewResponse;
-  renewResponse.Expires = WS::EVENTING::ExpirationType(duration.str());
+  renewResponse.Expires = WS::EVENTING::RenewResponse::ExpiresType{duration};
   LOG(LogLevel::INFO, "Successfully renewed subscription for " << identifier);
   printSubscriptions();
   return renewResponse;
@@ -141,7 +141,7 @@ void SubscriptionManager::printSubscriptions() const
   {
     out << key << " : " << val.notifyTo.Address << " : "
         << std::chrono::duration_cast<std::chrono::seconds>(val.expirationTime -
-                                                            std::chrono::system_clock::now())
+                                                            std::chrono::steady_clock::now())
                .count()
         << "s : ";
     for (const auto& action : val.filter)

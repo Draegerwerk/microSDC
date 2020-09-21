@@ -40,6 +40,11 @@ namespace WS::EVENTING
     }
   }
 
+  ExpirationType::ExpirationType(const Duration& duration)
+    : Duration(duration)
+  {
+  }
+
   // FilterType
   //
   FilterType::FilterType(DialectType dialect)
@@ -137,7 +142,7 @@ namespace WS::EVENTING
     const auto* expiresNode = node.first_node("Expires", MDPWS::WS_NS_EVENTING);
     if (expiresNode != nullptr)
     {
-      Expires = ExpiresType(std::string(expiresNode->value(), expiresNode->value_size()));
+      Expires = ExpiresType(std::string{expiresNode->value(), expiresNode->value_size()});
     }
   }
 

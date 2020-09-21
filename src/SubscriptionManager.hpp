@@ -53,7 +53,7 @@ private:
     /// the ws eventing filter of this subscripiton
     const WS::EVENTING::FilterType filter;
     /// the time this subscription is valid for
-    std::chrono::system_clock::time_point expirationTime;
+    Duration::TimePoint expirationTime;
   };
 
   /// mutex protecting subscriptions_ map

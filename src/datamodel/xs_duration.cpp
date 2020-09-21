@@ -6,9 +6,8 @@ Duration::Duration(const std::string& string)
   parse(string);
 }
 
-Duration::Duration(const bool isNegative, const unsigned int years, const unsigned int months,
-                   const unsigned int days, const unsigned int hours, const unsigned int minutes,
-                   const double seconds)
+Duration::Duration(Years years, Months months, Days days, Hours hours, Minutes minutes,
+                   Seconds seconds, bool isNegative)
   : isNegative_(isNegative)
   , years_(years)
   , months_(months)
@@ -19,62 +18,41 @@ Duration::Duration(const bool isNegative, const unsigned int years, const unsign
 {
 }
 
-bool Duration::isNegative() const
+Duration::Years::rep Duration::years() const
 {
-  return isNegative_;
-}
-unsigned int Duration::years() const
-{
-  return years_;
-}
-unsigned int Duration::months() const
-{
-  return months_;
-}
-unsigned int Duration::days() const
-{
-  return days_;
-}
-unsigned int Duration::hours() const
-{
-  return hours_;
-}
-unsigned int Duration::minutes() const
-{
-  return minutes_;
-}
-double Duration::seconds() const
-{
-  return seconds_;
+  return years_.count();
 }
 
-std::string Duration::str() const
+Duration::Months::rep Duration::months() const
 {
-  std::ostringstream res;
-  res << "P" << years() << "Y" << months() << "M" << days() << "DT" << hours() << "H" << minutes()
-      << "M" << seconds() << "S";
-  return res.str();
+  return months_.count();
 }
 
-std::chrono::seconds Duration::toDurationSeconds() const
+Duration::Days::rep Duration::days() const
 {
-  // TODO rewrite using std::chrono
-  const auto now = std::time(nullptr);
-  auto localTime = *std::localtime(&now);
-  localTime.tm_year += years();
-  localTime.tm_mon += months();
-  localTime.tm_mday += days();
-  localTime.tm_hour += hours();
-  localTime.tm_min += minutes();
-  localTime.tm_sec += seconds();
-  const auto durationTime = std::mktime(&localTime);
-  return std::chrono::seconds(static_cast<long>(std::difftime(durationTime, now)));
+  return days_.count();
 }
 
-std::chrono::system_clock::time_point Duration::toExpirationTimePoint() const
+Duration::Hours::rep Duration::hours() const
 {
-  const auto durationSeconds = toDurationSeconds();
-  return std::chrono::system_clock::now() + durationSeconds;
+  return hours_.count();
+}
+
+Duration::Minutes::rep Duration::minutes() const
+{
+  return minutes_.count();
+}
+
+Duration::Seconds::rep Duration::seconds() const
+{
+  return seconds_.count();
+}
+
+Duration::TimePoint Duration::toExpirationTimePoint() const
+{
+  const auto duration = years_ + months_ + days_ + hours_ + minutes_ +
+                        std::chrono::duration_cast<std::chrono::steady_clock::duration>(seconds_);
+  return std::chrono::steady_clock::now() + duration * (isNegative_ ? -1 : 1);
 }
 
 void Duration::parse(const std::string& string)
@@ -87,26 +65,27 @@ void Duration::parse(const std::string& string)
   isNegative_ = match[1].matched;
   if (match[2].matched)
   {
-    years_ = std::atoi(match[2].str().c_str());
+    years_ = Years{std::stoi(match[2].str())};
   }
   if (match[3].matched)
   {
-    months_ = std::atoi(match[3].str().c_str());
+    months_ = Months{std::stoi(match[3].str())};
   }
   if (match[4].matched)
   {
-    days_ = std::atoi(match[4].str().c_str());
+    days_ = Days{std::stoi(match[4].str())};
   }
   if (match[5].matched)
   {
-    hours_ = std::atoi(match[5].str().c_str());
+    hours_ = std::chrono::hours{std::stoi(match[5].str())};
   }
   if (match[6].matched)
   {
-    minutes_ = std::atoi(match[6].str().c_str());
+    minutes_ = std::chrono::minutes{std::stoi(match[6].str())};
   }
   if (match[7].matched)
   {
-    seconds_ = std::atof(match[7].str().c_str());
+    seconds_ =
+        std::chrono::duration<float, std::chrono::seconds::period>{std::stof(match[7].str())};
   }
 }
