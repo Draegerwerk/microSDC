@@ -5,6 +5,7 @@
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <netinet/in.h>
+#include <stdexcept>
 #include <string>
 
 class NetworkInterface
