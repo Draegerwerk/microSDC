@@ -103,10 +103,7 @@ asio::ip::address_v4 DiscoveryService::addressFromString(const char* addressStri
 
 void DiscoveryService::handleUDPMessage(std::size_t bytesRecvd)
 {
-  std::array<char, 32> addressData{};
-  const auto addressBytes = senderEndpoint_.address().to_v4().to_bytes();
-  inet_ntop(AF_INET, &addressBytes, addressData.data(), addressData.size());
-  const std::string senderAddress{addressData.data()};
+  const auto senderAddress = senderEndpoint_.address().to_string();
   LOG(LogLevel::DEBUG, "Received " << bytesRecvd << " bytes from " << senderAddress << "\n"
                                    << receiveBuffer_->data());
 
