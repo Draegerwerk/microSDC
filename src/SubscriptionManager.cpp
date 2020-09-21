@@ -29,7 +29,9 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
   }
   const auto identifier = "uuid:" + UUIDGenerator{}().toString();
 
-  const Duration duration(subscribeRequest.Expires.value_or(WS::EVENTING::ExpirationType("PT1H")));
+  const Duration duration(subscribeRequest.Expires.value_or(WS::EVENTING::ExpirationType(
+      Duration(Duration::Years{0}, Duration::Months{0}, Duration::Days{0}, Duration::Hours{1},
+               Duration::Minutes{0}, Duration::Seconds{0}, false))));
   const auto expires = duration.toExpirationTimePoint();
   SubscriptionInformation info{subscribeRequest.Delivery.NotifyTo, subscribeRequest.Filter.value(),
                                expires};
