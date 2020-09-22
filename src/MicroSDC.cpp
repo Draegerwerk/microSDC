@@ -23,7 +23,7 @@
 MicroSDC::MicroSDC()
   : mdib_(std::make_unique<BICEPS::PM::Mdib>(WS::ADDRESSING::URIType("0")))
 {
-  mdib_->MdState() = BICEPS::PM::MdState();
+  mdib_->MdState = BICEPS::PM::MdState();
 }
 
 void MicroSDC::start()
@@ -70,9 +70,9 @@ void MicroSDC::startup()
 
   discoveryService_ = std::make_unique<DiscoveryService>(
       WS::ADDRESSING::EndpointReferenceType::AddressType(endpointReference_), types, xAddresses);
-  if (locationContextState_ != nullptr && locationContextState_->LocationDetail().has_value())
+  if (locationContextState_ != nullptr && locationContextState_->LocationDetail.has_value())
   {
-    discoveryService_->setLocation(locationContextState_->LocationDetail().value());
+    discoveryService_->setLocation(locationContextState_->LocationDetail.value());
   }
 
   // construct subscription manager
@@ -131,7 +131,7 @@ void MicroSDC::initializeMdStates()
         numericHandler != nullptr)
     {
       std::lock_guard<std::mutex> lock(mdibMutex_);
-      mdib_->MdState()->State().emplace_back(numericHandler->getInitialState());
+      mdib_->MdState->State.emplace_back(numericHandler->getInitialState());
     }
   }
 }
@@ -145,27 +145,27 @@ void MicroSDC::setLocation(const std::string& descriptorHandle,
   {
     locationContextState_ =
         std::make_shared<BICEPS::PM::LocationContextState>(descriptorHandle, descriptorHandle);
-    mdib_->MdState()->State().emplace_back(locationContextState_);
+    mdib_->MdState->State.emplace_back(locationContextState_);
   }
-  locationContextState_->LocationDetail() = locationDetail;
+  locationContextState_->LocationDetail = locationDetail;
 
   BICEPS::PM::InstanceIdentifier identification;
-  identification.Root() = WS::ADDRESSING::URIType("sdc.ctxt.loc.detail");
-  identification.Extension() = locationDetail.Facility().value() + "///" +
-                               locationDetail.PoC().value() + "//" + locationDetail.Bed().value();
-  locationContextState_->Identification().emplace_back(identification);
+  identification.Root = WS::ADDRESSING::URIType("sdc.ctxt.loc.detail");
+  identification.Extension = locationDetail.Facility.value() + "///" + locationDetail.PoC.value() +
+                             "//" + locationDetail.Bed.value();
+  locationContextState_->Identification.emplace_back(identification);
 
   BICEPS::PM::InstanceIdentifier validator;
-  identification.Root() = WS::ADDRESSING::URIType("Validator");
-  identification.Extension() = "System";
-  locationContextState_->Validator().emplace_back(validator);
+  identification.Root = WS::ADDRESSING::URIType("Validator");
+  identification.Extension = "System";
+  locationContextState_->Validator.emplace_back(validator);
 
-  locationContextState_->ContextAssociation() = BICEPS::PM::ContextAssociation::Assoc;
-  locationContextState_->BindingMdibVersion() = mdibVersion;
+  locationContextState_->ContextAssociation = BICEPS::PM::ContextAssociation::Assoc;
+  locationContextState_->BindingMdibVersion = mdibVersion;
 
-  if (discoveryService_ != nullptr && locationContextState_->LocationDetail().has_value())
+  if (discoveryService_ != nullptr && locationContextState_->LocationDetail.has_value())
   {
-    discoveryService_->setLocation(locationContextState_->LocationDetail().value());
+    discoveryService_->setLocation(locationContextState_->LocationDetail.value());
   }
 }
 
@@ -183,7 +183,7 @@ void MicroSDC::setMdDescription(const BICEPS::PM::MdDescription& mdDescription)
     throw std::runtime_error("MicroSDC has to be stopped to set MdDescription!");
   }
   std::lock_guard<std::mutex> lock(mdibMutex_);
-  mdib_->MdDescription() = mdDescription;
+  mdib_->MdDescription = mdDescription;
 }
 
 void MicroSDC::setDeviceCharacteristics(DeviceCharacteristics devChar)
@@ -253,16 +253,16 @@ std::shared_ptr<const T> MicroSDC::updateMdib(std::shared_ptr<T> newState)
 {
   incrementMdibVersion();
   std::lock_guard<std::mutex> lock(mdibMutex_);
-  for (auto& state : mdib_->MdState()->State())
+  for (auto& state : mdib_->MdState->State)
   {
-    if (newState->DescriptorHandle() == state->DescriptorHandle())
+    if (newState->DescriptorHandle == state->DescriptorHandle)
     {
-      newState->StateVersion() = state->StateVersion().value_or(0) + 1;
+      newState->StateVersion = state->StateVersion.value_or(0) + 1;
       state = newState;
       return newState;
     }
   }
-  throw std::runtime_error("Cannot find descriptor handle '" + newState->DescriptorHandle() +
+  throw std::runtime_error("Cannot find descriptor handle '" + newState->DescriptorHandle +
                            "'in mdib");
   return nullptr;
 }
@@ -270,13 +270,13 @@ std::shared_ptr<const T> MicroSDC::updateMdib(std::shared_ptr<T> newState)
 void MicroSDC::incrementMdibVersion()
 {
   std::lock_guard<std::mutex> lock(mdibMutex_);
-  mdib_->MdibVersion() = mdib_->MdibVersion().value_or(0) + 1;
+  mdib_->MdibVersion = mdib_->MdibVersion.value_or(0) + 1;
 }
 
 unsigned int MicroSDC::getMdibVersion() const
 {
   std::lock_guard<std::mutex> lock(mdibMutex_);
-  return mdib_->MdibVersion().value_or(0);
+  return mdib_->MdibVersion.value_or(0);
 }
 
 void MicroSDC::notifyEpisodicMetricReport(

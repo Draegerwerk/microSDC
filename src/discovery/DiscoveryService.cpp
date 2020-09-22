@@ -63,12 +63,12 @@ bool DiscoveryService::running() const
 void DiscoveryService::setLocation(const BICEPS::PM::LocationDetailType& locationDetail)
 {
   std::string ctxt = "sdc.ctxt.loc:/sdc.ctxt.loc.detail/?";
-  ctxt += "fac=" + locationDetail.Facility().value_or("");
-  ctxt += "&bldng=" + locationDetail.Building().value_or("");
-  ctxt += "&poc=" + locationDetail.PoC().value_or("");
-  ctxt += "&flr=" + locationDetail.Floor().value_or("");
-  ctxt += "&rm=" + locationDetail.Room().value_or("");
-  ctxt += "&bed=" + locationDetail.Bed().value_or("");
+  ctxt += "fac=" + locationDetail.Facility.value_or("");
+  ctxt += "&bldng=" + locationDetail.Building.value_or("");
+  ctxt += "&poc=" + locationDetail.PoC.value_or("");
+  ctxt += "&flr=" + locationDetail.Floor.value_or("");
+  ctxt += "&rm=" + locationDetail.Room.value_or("");
+  ctxt += "&bed=" + locationDetail.Bed.value_or("");
   scopes_.emplace_back(WS::ADDRESSING::URIType(ctxt));
 }
 

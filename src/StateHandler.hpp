@@ -92,10 +92,9 @@ public:
   std::shared_ptr<BICEPS::PM::NumericMetricState> getInitialState() const override
   {
     auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
-    BICEPS::PM::NumericMetricValue value{
-        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld}};
-    value.Value() = 0;
-    state->MetricValue() = value;
+    state->MetricValue = std::make_optional<BICEPS::PM::NumericMetricValue>(
+        BICEPS::PM::MetricQualityType{BICEPS::PM::MeasurementValidity::Vld});
+    state->MetricValue->Value = 0;
     return state;
   }
 
@@ -104,7 +103,7 @@ public:
   void setValue(double value)
   {
     auto state = getInitialState();
-    state->MetricValue()->Value() = value;
+    state->MetricValue->Value = value;
     updateState(state);
   }
 };

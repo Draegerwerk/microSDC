@@ -69,21 +69,16 @@ namespace BICEPS::PM
     NA
   };
 
-  class CodedValue
+  struct CodedValue
   {
-  public:
     using CodeType = std::string;
-    const CodeType& Code() const;
-    CodeType& Code();
+    CodeType Code;
 
     explicit CodedValue(CodeType code);
-
-  private:
-    CodeType Code_;
   };
-  class AbstractDescriptor
+
+  struct AbstractDescriptor
   {
-  public:
     enum class DescriptorKind
     {
       METRIC_DESCRIPTOR,
@@ -108,422 +103,352 @@ namespace BICEPS::PM
       LOCATION_CONTEXT_DESCRIPTOR,
       SYSTEM_CONTEXT_DESCRIPTOR,
       LAST_CONTEXT_DESCRIPTOR,
-
-
     };
-    // Type
-    //
-    using TypeType = CodedValue;
-    using TypeOptional = std::optional<TypeType>;
-    const TypeOptional& Type() const;
-    TypeOptional& Type();
-
-    // Handle
-    //
-    using HandleType = std::string;
-    const HandleType& Handle() const;
-    HandleType& Handle();
-
-    // DescriptorVersion
-    //
-    using DescriptorVersionType = unsigned int;
-    using DescriptorVersionOptional = std::optional<DescriptorVersionType>;
-    const DescriptorVersionOptional& DescriptorVersion() const;
-    DescriptorVersionOptional& DescriptorVersion();
-
-    // SafetyClassification
-    //
-    using SafetyClassificationType = ::BICEPS::PM::SafetyClassification;
-    using SafetyClassificationOptional = std::optional<SafetyClassificationType>;
-    const SafetyClassificationOptional& SafetyClassification() const;
-    SafetyClassificationOptional& SafetyClassification();
-
     DescriptorKind getKind() const;
 
+    using TypeType = CodedValue;
+    using TypeOptional = std::optional<TypeType>;
+    TypeOptional Type;
+
+    using HandleType = std::string;
+    HandleType Handle;
+
+    using DescriptorVersionType = unsigned int;
+    using DescriptorVersionOptional = std::optional<DescriptorVersionType>;
+    DescriptorVersionOptional DescriptorVersion;
+
+    using SafetyClassificationType = ::BICEPS::PM::SafetyClassification;
+    using SafetyClassificationOptional = std::optional<SafetyClassificationType>;
+    SafetyClassificationOptional SafetyClassification;
+
+    virtual ~AbstractDescriptor() = default;
+
   protected:
-    // Constructors.
-    //
     AbstractDescriptor(DescriptorKind kind, HandleType);
+    AbstractDescriptor(const AbstractDescriptor&) = default;
+    AbstractDescriptor(AbstractDescriptor&&) = default;
+    AbstractDescriptor& operator=(const AbstractDescriptor&) = default;
+    AbstractDescriptor& operator=(AbstractDescriptor&&) = default;
 
   private:
     DescriptorKind kind_;
-    TypeOptional Type_;
-    HandleType Handle_;
-    DescriptorVersionOptional DescriptorVersion_;
-    SafetyClassificationOptional SafetyClassification_;
   };
 
-  class AbstractOperationDescriptor : public AbstractDescriptor
+  struct AbstractOperationDescriptor : public AbstractDescriptor
   {
-  public:
     using OperationTargetType = std::string;
-    const OperationTargetType& OperationTarget() const;
-    OperationTargetType& OperationTarget();
+    OperationTargetType OperationTarget;
 
     static bool classof(const AbstractDescriptor* other);
+
+    ~AbstractOperationDescriptor() override = default;
 
   protected:
     AbstractOperationDescriptor(DescriptorKind kind, const HandleType& handle,
                                 OperationTargetType operationTarget);
-
-  private:
-    OperationTargetType OperationTarget_;
+    AbstractOperationDescriptor(const AbstractOperationDescriptor&) = default;
+    AbstractOperationDescriptor(AbstractOperationDescriptor&&) = default;
+    AbstractOperationDescriptor& operator=(const AbstractOperationDescriptor&) = default;
+    AbstractOperationDescriptor& operator=(AbstractOperationDescriptor&&) = default;
   };
 
-  class SetValueOperationDescriptor : public AbstractOperationDescriptor
+  struct SetValueOperationDescriptor : public AbstractOperationDescriptor
   {
-  public:
+    static bool classof(const AbstractDescriptor* other);
+
     SetValueOperationDescriptor(const HandleType& handle,
                                 const OperationTargetType& operationTarget);
-    static bool classof(const AbstractDescriptor* other);
+    SetValueOperationDescriptor(const SetValueOperationDescriptor&) = default;
+    SetValueOperationDescriptor(SetValueOperationDescriptor&&) = default;
+    SetValueOperationDescriptor& operator=(const SetValueOperationDescriptor&) = default;
+    SetValueOperationDescriptor& operator=(SetValueOperationDescriptor&&) = default;
+    ~SetValueOperationDescriptor() override = default;
   };
-  class AbstractDeviceComponentDescriptor : public AbstractDescriptor
+
+  struct AbstractDeviceComponentDescriptor : public AbstractDescriptor
   {
-  public:
     static bool classof(const AbstractDescriptor* other);
+    ~AbstractDeviceComponentDescriptor() override = default;
 
   protected:
     AbstractDeviceComponentDescriptor(DescriptorKind kind, const HandleType&);
+    AbstractDeviceComponentDescriptor(const AbstractDeviceComponentDescriptor&) = default;
+    AbstractDeviceComponentDescriptor(AbstractDeviceComponentDescriptor&&) = default;
+    AbstractDeviceComponentDescriptor&
+    operator=(const AbstractDeviceComponentDescriptor&) = default;
+    AbstractDeviceComponentDescriptor& operator=(AbstractDeviceComponentDescriptor&&) = default;
   };
-  class AbstractComplexDeviceComponentDescriptor : public AbstractDeviceComponentDescriptor
+
+  struct AbstractComplexDeviceComponentDescriptor : public AbstractDeviceComponentDescriptor
   {
-  public:
     static bool classof(const AbstractDescriptor* other);
+
+    ~AbstractComplexDeviceComponentDescriptor() override = default;
 
   protected:
     AbstractComplexDeviceComponentDescriptor(DescriptorKind kind, const HandleType&);
+    AbstractComplexDeviceComponentDescriptor(const AbstractComplexDeviceComponentDescriptor&) =
+        default;
+    AbstractComplexDeviceComponentDescriptor(AbstractComplexDeviceComponentDescriptor&&) = default;
+    AbstractComplexDeviceComponentDescriptor&
+    operator=(const AbstractComplexDeviceComponentDescriptor&) = default;
+    AbstractComplexDeviceComponentDescriptor&
+    operator=(AbstractComplexDeviceComponentDescriptor&&) = default;
   };
-  class Metadata
+
+  struct Metadata
   {
   public:
-    // Manufacturer
-    //
     using ManufacturerType = std::string;
     using ManufacturerSequence = std::vector<ManufacturerType>;
-    const ManufacturerSequence& Manufacturer() const;
-    ManufacturerSequence& Manufacturer();
+    ManufacturerSequence Manufacturer;
 
-    // ModelName
-    //
     using ModelNameType = std::string;
     using ModelNameSequence = std::vector<ModelNameType>;
-    const ModelNameSequence& ModelName() const;
-    ModelNameSequence& ModelName();
+    ModelNameSequence ModelName;
 
-    // ModelNumber
-    //
     using ModelNumberType = std::string;
     using ModelNumberOptional = std::optional<ModelNumberType>;
-    const ModelNumberOptional& ModelNumber() const;
-    ModelNumberOptional& ModelNumber();
+    ModelNumberOptional ModelNumber;
 
-    // SerialNumber
-    //
     using SerialNumberType = std::string;
     using SerialNumberSequence = std::vector<SerialNumberType>;
-    const SerialNumberSequence& SerialNumber() const;
-    SerialNumberSequence& SerialNumber();
-
-  private:
-    ManufacturerSequence Manufacturer_;
-    ModelNameSequence ModelName_;
-    ModelNumberOptional ModelNumber_;
-    SerialNumberSequence SerialNumber_;
+    SerialNumberSequence SerialNumber;
   };
-  class AbstractContextDescriptor : public AbstractDescriptor
+
+  struct AbstractContextDescriptor : public AbstractDescriptor
   {
-  public:
     static bool classof(const AbstractDescriptor* other);
+    ~AbstractContextDescriptor() override = default;
 
   protected:
     AbstractContextDescriptor(DescriptorKind kind, const HandleType&);
+    AbstractContextDescriptor(const AbstractContextDescriptor&) = default;
+    AbstractContextDescriptor(AbstractContextDescriptor&&) = default;
+    AbstractContextDescriptor& operator=(const AbstractContextDescriptor&) = default;
+    AbstractContextDescriptor& operator=(AbstractContextDescriptor&&) = default;
   };
-  class PatientContextDescriptor : public AbstractContextDescriptor
+
+  struct PatientContextDescriptor : public AbstractContextDescriptor
   {
-  public:
-    // Constructors
-    //
+    static bool classof(const AbstractDescriptor* other);
+
     explicit PatientContextDescriptor(const HandleType&);
-    static bool classof(const AbstractDescriptor* other);
+    PatientContextDescriptor(const PatientContextDescriptor&) = default;
+    PatientContextDescriptor(PatientContextDescriptor&&) = default;
+    PatientContextDescriptor& operator=(const PatientContextDescriptor&) = default;
+    PatientContextDescriptor& operator=(PatientContextDescriptor&&) = default;
+    ~PatientContextDescriptor() override = default;
   };
-  class LocationContextDescriptor : public AbstractContextDescriptor
+
+  struct LocationContextDescriptor : public AbstractContextDescriptor
   {
-  public:
-    // Constructors
-    //
+    static bool classof(const AbstractDescriptor* other);
+
     explicit LocationContextDescriptor(const HandleType&);
-    static bool classof(const AbstractDescriptor* other);
+    LocationContextDescriptor(const LocationContextDescriptor&) = default;
+    LocationContextDescriptor(LocationContextDescriptor&&) = default;
+    LocationContextDescriptor& operator=(const LocationContextDescriptor&) = default;
+    LocationContextDescriptor& operator=(LocationContextDescriptor&&) = default;
+    ~LocationContextDescriptor() override = default;
   };
-  class SystemContextDescriptor : public AbstractContextDescriptor
+
+  struct SystemContextDescriptor : public AbstractContextDescriptor
   {
-  public:
-    // PatientContext
-    //
     using PatientContextType = PatientContextDescriptor;
     using PatientContextOptional = std::optional<PatientContextType>;
-    const PatientContextOptional& PatientContext() const;
-    PatientContextOptional& PatientContext();
+    PatientContextOptional PatientContext;
 
-    // LocationContext
-    //
     using LocationContextType = LocationContextDescriptor;
     using LocationContextOptional = std::optional<LocationContextType>;
-    const LocationContextOptional& LocationContext() const;
-    LocationContextOptional& LocationContext();
+    LocationContextOptional LocationContext;
 
-    // Constructors
-    //
-    explicit SystemContextDescriptor(const HandleType&);
     static bool classof(const AbstractDescriptor* other);
 
-  private:
-    PatientContextOptional PatientContext_;
-    LocationContextOptional LocationContext_;
+    explicit SystemContextDescriptor(const HandleType&);
+    SystemContextDescriptor(const SystemContextDescriptor&) = default;
+    SystemContextDescriptor(SystemContextDescriptor&&) = default;
+    SystemContextDescriptor& operator=(const SystemContextDescriptor&) = default;
+    SystemContextDescriptor& operator=(SystemContextDescriptor&&) = default;
+    ~SystemContextDescriptor() override = default;
   };
-  class ClockDescriptor
+
+  struct ClockDescriptor
   {
   };
-  class BatteryDescriptor
+
+  struct BatteryDescriptor
   {
   };
-  class Range
+
+  struct Range
   {
-  public:
     using LowerType = int;
     using LowerOptional = std::optional<LowerType>;
-    const LowerOptional& Lower() const;
-    LowerOptional& Lower();
+    LowerOptional Lower;
 
     using UpperType = int;
     using UpperOptional = std::optional<UpperType>;
-    const UpperOptional& Upper() const;
-    UpperOptional& Upper();
+    UpperOptional Upper;
 
     using StepWidthType = int;
     using StepWidthOptional = std::optional<StepWidthType>;
-    const StepWidthOptional& StepWidth() const;
-    StepWidthOptional& StepWidth();
+    StepWidthOptional StepWidth;
 
     using RelativeAccuracyType = int;
     using RelativeAccuracyOptional = std::optional<RelativeAccuracyType>;
-    const RelativeAccuracyOptional& RelativeAccuracy() const;
-    RelativeAccuracyOptional& RelativeAccuracy();
+    RelativeAccuracyOptional RelativeAccuracy;
 
     using AbsoluteAccuracyType = int;
     using AbsoluteAccuracyOptional = std::optional<AbsoluteAccuracyType>;
-    const AbsoluteAccuracyOptional& AbsoluteAccuracy() const;
-    AbsoluteAccuracyOptional& AbsoluteAccuracy();
-
-  private:
-    LowerOptional Lower_;
-    UpperOptional Upper_;
-    StepWidthOptional StepWidth_;
-    RelativeAccuracyOptional RelativeAccuracy_;
-    AbsoluteAccuracyOptional AbsoluteAccuracy_;
+    AbsoluteAccuracyOptional AbsoluteAccuracy;
   };
-  class AbstractMetricDescriptor : public AbstractDescriptor
+
+  struct AbstractMetricDescriptor : public AbstractDescriptor
   {
-  public:
-    // Unit
-    //
     using UnitType = CodedValue;
-    const UnitType& Unit() const;
-    UnitType& Unit();
+    UnitType Unit;
 
-    // MetricCategory
-    //
     using MetricCategoryType = ::BICEPS::PM::MetricCategory;
-    const MetricCategoryType& MetricCategory() const;
-    MetricCategoryType& MetricCategory();
+    MetricCategoryType MetricCategory;
 
-    // MetricAvailability
-    //
     using MetricAvailabilityType = ::BICEPS::PM::MetricAvailability;
-    const MetricAvailabilityType& MetricAvailability() const;
-    MetricAvailabilityType& MetricAvailability();
+    MetricAvailabilityType MetricAvailability;
 
     static bool classof(const AbstractDescriptor* other);
 
-    AbstractMetricDescriptor(const AbstractMetricDescriptor&) = delete;
-    AbstractMetricDescriptor& operator=(const AbstractMetricDescriptor&) = delete;
+    ~AbstractMetricDescriptor() override = default;
 
   protected:
-    // Constructors.
-    //
     AbstractMetricDescriptor(DescriptorKind kind, const HandleType&, UnitType,
                              const MetricCategoryType&, const MetricAvailabilityType&);
     AbstractMetricDescriptor(AbstractMetricDescriptor&&) = default;
+    AbstractMetricDescriptor(const AbstractMetricDescriptor&) = default;
+    AbstractMetricDescriptor& operator=(const AbstractMetricDescriptor&) = default;
     AbstractMetricDescriptor& operator=(AbstractMetricDescriptor&&) = default;
-    virtual ~AbstractMetricDescriptor() = default;
-
-  private:
-    UnitType Unit_;
-    MetricCategoryType MetricCategory_;
-    MetricAvailabilityType MetricAvailability_;
   };
-  class NumericMetricDescriptor : public AbstractMetricDescriptor
+
+  struct NumericMetricDescriptor : public AbstractMetricDescriptor
   {
-  public:
     using TechnicalRangeType = Range;
     using TechnicalRangeSequence = std::vector<TechnicalRangeType>;
-    const TechnicalRangeSequence& TechnicalRange() const;
-    TechnicalRangeSequence& TechnicalRange();
+    TechnicalRangeSequence TechnicalRange;
 
     using ResolutionType = int;
-    const ResolutionType& Resolution() const;
-    ResolutionType& Resolution();
+    ResolutionType Resolution;
 
     using AveragingPeriodType = std::string;
     using AveragingPeriodOptional = std::optional<AveragingPeriodType>;
-    const AveragingPeriodOptional& AveragingPeriod() const;
-    AveragingPeriodOptional& AveragingPeriod();
+    AveragingPeriodOptional AveragingPeriod;
 
     static bool classof(const AbstractDescriptor* other);
 
-    // Constructors
-    //
     NumericMetricDescriptor(const HandleType&, const UnitType&, const MetricCategoryType&,
                             const MetricAvailabilityType&, const ResolutionType&);
-
-  private:
-    TechnicalRangeSequence TechnicalRange_;
-    ResolutionType Resolution_;
-    AveragingPeriodOptional AveragingPeriod_;
+    NumericMetricDescriptor(const NumericMetricDescriptor&) = default;
+    NumericMetricDescriptor(NumericMetricDescriptor&&) = default;
+    NumericMetricDescriptor& operator=(const NumericMetricDescriptor&) = default;
+    NumericMetricDescriptor& operator=(NumericMetricDescriptor&&) = default;
+    ~NumericMetricDescriptor() override = default;
   };
-  class ChannelDescriptor : public AbstractDeviceComponentDescriptor
+
+  struct ChannelDescriptor : public AbstractDeviceComponentDescriptor
   {
-  public:
-    // Metric
-    //
     using MetricType = std::shared_ptr<AbstractMetricDescriptor>;
     using MetricSequence = std::vector<MetricType>;
-    const MetricSequence& Metric() const;
-    MetricSequence& Metric();
-    // Constructors
-    //
-    explicit ChannelDescriptor(const HandleType&);
+    MetricSequence Metric;
+
     static bool classof(const AbstractDescriptor* other);
 
-  private:
-    MetricSequence Metric_;
+    explicit ChannelDescriptor(const HandleType&);
+    ChannelDescriptor(const ChannelDescriptor&) = default;
+    ChannelDescriptor(ChannelDescriptor&&) = default;
+    ChannelDescriptor& operator=(const ChannelDescriptor&) = default;
+    ChannelDescriptor& operator=(ChannelDescriptor&&) = default;
+    ~ChannelDescriptor() override = default;
   };
-  class ScoDescriptor : public AbstractDeviceComponentDescriptor
+
+  struct ScoDescriptor : public AbstractDeviceComponentDescriptor
   {
-  public:
     using OperationType = ::BICEPS::PM::AbstractOperationDescriptor;
     using OperationSequence = std::vector<std::shared_ptr<OperationType>>;
-    const OperationSequence& Operation() const;
-    OperationSequence& Operation();
+    OperationSequence Operation;
+
+    static bool classof(const AbstractDescriptor* other);
 
     explicit ScoDescriptor(const HandleType& handle);
-    static bool classof(const AbstractDescriptor* other);
-
-  private:
-    OperationSequence Operation_;
+    ScoDescriptor(const ScoDescriptor&) = default;
+    ScoDescriptor(ScoDescriptor&&) = default;
+    ScoDescriptor& operator=(const ScoDescriptor&) = default;
+    ScoDescriptor& operator=(ScoDescriptor&&) = default;
+    ~ScoDescriptor() override = default;
   };
-  class VmdDescriptor : public AbstractComplexDeviceComponentDescriptor
+
+  struct VmdDescriptor : public AbstractComplexDeviceComponentDescriptor
   {
-  public:
-    // Channel
-    //
     using ChannelType = ChannelDescriptor;
     using ChannelSequence = std::vector<ChannelType>;
-    const ChannelSequence& Channel() const;
-    ChannelSequence& Channel();
+    ChannelSequence Channel;
 
-    // Sco
-    //
     using ScoType = ::BICEPS::PM::ScoDescriptor;
     using ScoOptional = std::optional<ScoType>;
-    const ScoOptional& Sco() const;
-    ScoOptional& Sco();
+    ScoOptional Sco;
+
+    static bool classof(const AbstractDescriptor* other);
 
     explicit VmdDescriptor(const HandleType&);
-
-    static bool classof(const AbstractDescriptor* other);
-
-  private:
-    ChannelSequence Channel_;
-    ScoOptional Sco_;
+    VmdDescriptor(const VmdDescriptor&) = default;
+    VmdDescriptor(VmdDescriptor&&) = default;
+    VmdDescriptor& operator=(const VmdDescriptor&) = default;
+    VmdDescriptor& operator=(VmdDescriptor&&) = default;
+    ~VmdDescriptor() override = default;
   };
-  class MdsDescriptor : public AbstractComplexDeviceComponentDescriptor
+
+  struct MdsDescriptor : public AbstractComplexDeviceComponentDescriptor
   {
-  public:
-    // MetaData
-    //
     using MetaDataType = Metadata;
     using MetaDataOptional = std::optional<MetaDataType>;
-    const MetaDataOptional& MetaData() const;
-    MetaDataOptional& MetaData();
+    MetaDataOptional MetaData;
 
-    // SystemContext
-    //
     using SystemContextType = SystemContextDescriptor;
     using SystemContextOptional = std::optional<SystemContextType>;
-    const SystemContextOptional& SystemContext() const;
-    SystemContextOptional& SystemContext();
+    SystemContextOptional SystemContext;
 
-    // Clock
-    //
     using ClockType = ClockDescriptor;
     using ClockOptional = std::optional<ClockType>;
-    const ClockOptional& Clock() const;
-    ClockOptional& Clock();
+    ClockOptional Clock;
 
-    // Battery
-    //
     using BatteryType = BatteryDescriptor;
     using BatterySequence = std::vector<BatteryType>;
-    const BatterySequence& Battery() const;
-    BatterySequence& Battery();
+    BatterySequence Battery;
 
-    // Vmd
-    //
     using VmdType = VmdDescriptor;
     using VmdSequence = std::vector<VmdType>;
-    const VmdSequence& Vmd() const;
-    VmdSequence& Vmd();
+    VmdSequence Vmd;
 
-    // Constructors.
-    //
-    explicit MdsDescriptor(const HandleType&);
     static bool classof(const AbstractDescriptor* other);
 
-  private:
-    MetaDataOptional MetaData_;
-    SystemContextOptional SystemContext_;
-    ClockOptional Clock_;
-    BatterySequence Battery_;
-    VmdSequence Vmd_;
+    explicit MdsDescriptor(const HandleType&);
+    MdsDescriptor(const MdsDescriptor&) = default;
+    MdsDescriptor(MdsDescriptor&&) = default;
+    MdsDescriptor& operator=(const MdsDescriptor&) = default;
+    MdsDescriptor& operator=(MdsDescriptor&&) = default;
+    ~MdsDescriptor() override = default;
   };
-  class MdDescription
+
+  struct MdDescription
   {
-  public:
-    // Mds
-    //
     using MdsType = MdsDescriptor;
     using MdsSequence = std::vector<MdsType>;
-    const MdsSequence& Mds() const;
-    MdsSequence& Mds();
+    MdsSequence Mds;
 
-    // DescriptionVersion
-    //
     using DescriptionVersionType = unsigned int;
     using DescriptionVersionOptional = std::optional<DescriptionVersionType>;
-    const DescriptionVersionOptional& DescriptionVersion() const;
-    DescriptionVersionOptional& DescriptionVersion();
-
-    // Constructors.
-    //
-    MdDescription() = default;
-
-  private:
-    MdsSequence Mds_;
-    DescriptionVersionOptional DescriptionVersion_;
+    DescriptionVersionOptional DescriptionVersion;
   };
-  class AbstractState
+
+  struct AbstractState
   {
-  public:
     enum class StateKind
     {
       MULTI_STATE,
@@ -540,363 +465,311 @@ namespace BICEPS::PM
       NUMERIC_METRIC_STATE,
       LAST_METRIC_STATE,
     };
-    // StateVersion
-    //
-    using StateVersionType = unsigned int;
-    using StateVersionOptional = std::optional<StateVersionType>;
-    const StateVersionOptional& StateVersion() const;
-    StateVersionOptional& StateVersion();
-
-    // DescriptorHandle
-    //
-    using DescriptorHandleType = std::string;
-    const DescriptorHandleType& DescriptorHandle() const;
-    DescriptorHandleType& DescriptorHandle();
-
     StateKind getKind() const;
 
+    using StateVersionType = unsigned int;
+    using StateVersionOptional = std::optional<StateVersionType>;
+    StateVersionOptional StateVersion;
+
+    using DescriptorHandleType = std::string;
+    DescriptorHandleType DescriptorHandle;
+
+    virtual ~AbstractState() = default;
+
   protected:
-    // Constructors.
-    //
     AbstractState(StateKind kind, DescriptorHandleType);
+    AbstractState(const AbstractState&) = default;
+    AbstractState(AbstractState&&) = default;
+    AbstractState& operator=(const AbstractState&) = default;
+    AbstractState& operator=(AbstractState&&) = default;
 
   private:
     StateKind kind_;
-    StateVersionOptional StateVersion_;
-    DescriptorHandleType DescriptorHandle_;
   };
-  class AbstractMultiState : public AbstractState
+
+  struct AbstractMultiState : public AbstractState
   {
-  public:
     using CategoryType = CodedValue;
     using CategoryOptional = std::optional<CategoryType>;
+    CategoryOptional Category;
 
     using HandleType = std::string;
-    const HandleType& Handle() const;
-    HandleType& Handle();
+    HandleType Handle;
 
-    AbstractMultiState(StateKind kind, const DescriptorHandleType&, HandleType);
     static bool classof(const AbstractState* other);
 
-  private:
-    CategoryOptional Category_;
-    HandleType Handle_;
+    AbstractMultiState(StateKind kind, const DescriptorHandleType&, HandleType);
+    AbstractMultiState(const AbstractMultiState&) = default;
+    AbstractMultiState(AbstractMultiState&&) = default;
+    AbstractMultiState& operator=(const AbstractMultiState&) = default;
+    AbstractMultiState& operator=(AbstractMultiState&&) = default;
+    ~AbstractMultiState() override = default;
   };
-  class InstanceIdentifier
+
+  struct InstanceIdentifier
   {
-  public:
     using ExtensionType = std::string;
     using ExtensionOptional = std::optional<ExtensionType>;
-    const ExtensionOptional& Extension() const;
-    ExtensionOptional& Extension();
+    ExtensionOptional Extension;
 
     using RootType = WS::ADDRESSING::URIType;
     using RootOptional = std::optional<RootType>;
-    const RootOptional& Root() const;
-    RootOptional& Root();
-
-  private:
-    ExtensionOptional Extension_;
-    RootOptional Root_;
+    RootOptional Root;
   };
-  class AbstractContextState : public AbstractMultiState
+
+  struct AbstractContextState : public AbstractMultiState
   {
-  public:
     using BindingMdibVersionType = unsigned int;
     using BindingMdibVersionOptional = std::optional<BindingMdibVersionType>;
-    const BindingMdibVersionOptional& BindingMdibVersion() const;
-    BindingMdibVersionOptional& BindingMdibVersion();
+    BindingMdibVersionOptional BindingMdibVersion;
 
     using ContextAssociationType = ::BICEPS::PM::ContextAssociation;
     using ContextAssociationOptional = std::optional<ContextAssociationType>;
-    const ContextAssociationOptional& ContextAssociation() const;
-    ContextAssociationOptional& ContextAssociation();
+    ContextAssociationOptional ContextAssociation;
 
     using ValidatorType = InstanceIdentifier;
     using ValidatorSequence = std::vector<ValidatorType>;
-    const ValidatorSequence& Validator() const;
-    ValidatorSequence& Validator();
+    ValidatorSequence Validator;
 
     using IdentificationType = InstanceIdentifier;
     using IdentificationSequence = std::vector<IdentificationType>;
-    const IdentificationSequence& Identification() const;
-    IdentificationSequence& Identification();
+    IdentificationSequence Identification;
 
-    AbstractContextState(StateKind kind, const DescriptorHandleType&, const HandleType&);
     static bool classof(const AbstractState* other);
 
-  private:
-    BindingMdibVersionOptional BindingMdibVersion_;
-    ContextAssociationOptional ContextAssociation_;
-    ValidatorSequence Validator_;
-    IdentificationSequence Identification_;
+    AbstractContextState(StateKind kind, const DescriptorHandleType&, const HandleType&);
+    AbstractContextState(const AbstractContextState&) = default;
+    AbstractContextState(AbstractContextState&&) = default;
+    AbstractContextState& operator=(const AbstractContextState&) = default;
+    AbstractContextState& operator=(AbstractContextState&&) = default;
+    ~AbstractContextState() override = default;
   };
-  class LocationDetailType
+
+  struct LocationDetailType
   {
-  public:
     using PoCType = std::string;
     using PoCOptional = std::optional<PoCType>;
-    const PoCOptional& PoC() const;
-    PoCOptional& PoC();
+    PoCOptional PoC;
 
     using RoomType = std::string;
     using RoomOptional = std::optional<RoomType>;
-    const RoomOptional& Room() const;
-    RoomOptional& Room();
+    RoomOptional Room;
 
     using BedType = std::string;
     using BedOptional = std::optional<PoCType>;
-    const BedOptional& Bed() const;
-    BedOptional& Bed();
+    BedOptional Bed;
 
     using FacilityType = std::string;
     using FacilityOptional = std::optional<FacilityType>;
-    const FacilityOptional& Facility() const;
-    FacilityOptional& Facility();
+    FacilityOptional Facility;
 
     using BuildingType = std::string;
     using BuildingOptional = std::optional<PoCType>;
-    const BuildingOptional& Building() const;
-    BuildingOptional& Building();
+    BuildingOptional Building;
 
     using FloorType = std::string;
     using FloorOptional = std::optional<PoCType>;
-    const FloorOptional& Floor() const;
-    FloorOptional& Floor();
-
-  private:
-    PoCOptional PoC_;
-    RoomOptional Room_;
-    BedOptional Bed_;
-    FacilityOptional Facility_;
-    BuildingOptional Building_;
-    FloorOptional Floor_;
+    FloorOptional Floor;
   };
-  class LocationContextState : public AbstractContextState
+
+  struct LocationContextState : public AbstractContextState
   {
-  public:
     using LocationDetailOptional = std::optional<LocationDetailType>;
-    const LocationDetailOptional& LocationDetail() const;
-    LocationDetailOptional& LocationDetail();
+    LocationDetailOptional LocationDetail;
+
+    static bool classof(const AbstractState* other);
 
     LocationContextState(const DescriptorHandleType&, const HandleType&);
+    LocationContextState(const LocationContextState&) = default;
+    LocationContextState(LocationContextState&&) = default;
+    LocationContextState& operator=(const LocationContextState&) = default;
+    LocationContextState& operator=(LocationContextState&&) = default;
+    ~LocationContextState() override = default;
+  };
+
+  struct AbstractOperationState : public AbstractState
+  {
+    using OperatingModeType = ::BICEPS::PM::OperatingMode;
+    OperatingModeType OperatingMode;
+
     static bool classof(const AbstractState* other);
 
-  private:
-    LocationDetailOptional LocationDetail_;
-  };
-  class AbstractOperationState : public AbstractState
-  {
-  public:
-    using OperatingModeType = ::BICEPS::PM::OperatingMode;
-    const OperatingModeType& OperatingMode() const;
-    OperatingModeType& OperatingMode();
-    static bool classof(const AbstractState* other);
+    ~AbstractOperationState() override = default;
 
   protected:
     AbstractOperationState(StateKind kind, const DescriptorHandleType& descriptorHandle,
                            const OperatingModeType& operatingMode);
-
-  private:
-    OperatingModeType OperatingMode_;
+    AbstractOperationState(const AbstractOperationState&) = default;
+    AbstractOperationState(AbstractOperationState&&) = default;
+    AbstractOperationState& operator=(const AbstractOperationState&) = default;
+    AbstractOperationState& operator=(AbstractOperationState&&) = default;
   };
-  class SetValueOperationState : public AbstractOperationState
+
+  struct SetValueOperationState : public AbstractOperationState
   {
-  public:
+    static bool classof(const AbstractState* other);
+
     SetValueOperationState(const DescriptorHandleType& descriptorHandle,
                            const OperatingModeType& operatingMode);
-    static bool classof(const AbstractState* other);
+    SetValueOperationState(const SetValueOperationState&) = default;
+    SetValueOperationState(SetValueOperationState&&) = default;
+    SetValueOperationState& operator=(const SetValueOperationState&) = default;
+    SetValueOperationState& operator=(SetValueOperationState&&) = default;
+    ~SetValueOperationState() override = default;
   };
-  class MetricQuality
+
+  struct MetricQualityType
   {
-  public:
     using ValidityType = MeasurementValidity;
-    const ValidityType& Validity() const;
-    ValidityType& Validity();
+    ValidityType Validity;
 
     using ModeType = GenerationMode;
     using ModeOptional = std::optional<ModeType>;
+    ModeOptional Mode;
 
     using QiType = int;
     using QiOptional = std::optional<QiType>;
+    QiOptional Qi;
 
-    explicit MetricQuality(const ValidityType& validity);
-
-  private:
-    ValidityType Validity_;
-    ModeOptional Mode_;
-    QiOptional Qi_;
+    explicit MetricQualityType(const ValidityType& validity);
   };
-  class Annotation
-  {
-  public:
-    using TypeType = CodedValue;
 
-  private:
-    TypeType Type_;
+  struct AnnotationType
+  {
+    using TypeType = CodedValue;
+    TypeType Type;
   };
 
   using Timestamp = unsigned int;
 
-  class AbstractMetricValue
+  struct AbstractMetricValue
   {
-  public:
     enum class MetricKind
     {
       NUMERIC_METRIC,
     };
-    using MetricQualityType = MetricQuality;
-    const MetricQualityType& Quality() const;
-    MetricQualityType& Quality();
+    MetricKind getKind() const;
 
-    using AnnotationType = Annotation;
+    MetricQualityType MetricQuality;
+
     using AnnotationSequence = std::vector<AnnotationType>;
+    AnnotationSequence Annotation;
 
     using StartTimeType = Timestamp;
     using StartTimeOptional = std::optional<StartTimeType>;
+    StartTimeOptional StartTime;
 
     using StopTimeType = Timestamp;
     using StopTimeOptional = std::optional<StopTimeType>;
+    StopTimeOptional StopTime;
 
     using DeterminationTimeType = Timestamp;
     using DeterminationTimeOptional = std::optional<DeterminationTimeType>;
+    DeterminationTimeOptional DeterminationTime;
 
-    MetricKind getKind() const;
-
-  private:
-    MetricKind kind_;
+    virtual ~AbstractMetricValue() = default;
 
   protected:
     explicit AbstractMetricValue(MetricKind kind, const MetricQualityType& metricQuality);
+    AbstractMetricValue(const AbstractMetricValue&) = default;
+    AbstractMetricValue(AbstractMetricValue&&) = default;
+    AbstractMetricValue& operator=(const AbstractMetricValue&) = default;
+    AbstractMetricValue& operator=(AbstractMetricValue&&) = default;
 
   private:
-    MetricQualityType MetricQuality_;
-    AnnotationSequence Annotation_;
-    StartTimeOptional StartTime_;
-    StopTimeOptional StopTime_;
-    DeterminationTimeOptional DeterminationTime_;
+    MetricKind kind_;
   };
-  class NumericMetricValue : public AbstractMetricValue
+
+  struct NumericMetricValue : public AbstractMetricValue
   {
-  public:
     using ValueType = double;
     using ValueOptional = std::optional<ValueType>;
-    const ValueOptional& Value() const;
-    ValueOptional& Value();
+    ValueOptional Value;
 
-    explicit NumericMetricValue(const MetricQualityType& metricQuality);
     static bool classof(const AbstractMetricValue* other);
 
-  private:
-    ValueOptional Value_;
+    explicit NumericMetricValue(const MetricQualityType& metricQuality);
+    NumericMetricValue(const NumericMetricValue&) = default;
+    NumericMetricValue(NumericMetricValue&&) = default;
+    NumericMetricValue& operator=(const NumericMetricValue&) = default;
+    NumericMetricValue& operator=(NumericMetricValue&&) = default;
+    ~NumericMetricValue() override = default;
   };
-  class AbstractMetricState : public AbstractState
+
+  struct AbstractMetricState : public AbstractState
   {
-  public:
     using ActivationStateType = ComponentActivation;
     using ActivationStateOptional = std::optional<ActivationStateType>;
+    ActivationStateOptional ActivationState;
+
     static bool classof(const AbstractState* other);
 
-  protected:
-    // Constructors
-    //
-    AbstractMetricState(StateKind kind, DescriptorHandleType handle);
+    ~AbstractMetricState() override = default;
 
-  private:
-    ActivationStateOptional ActivationState_;
+  protected:
+    AbstractMetricState(StateKind kind, DescriptorHandleType handle);
+    AbstractMetricState(const AbstractMetricState&) = default;
+    AbstractMetricState(AbstractMetricState&&) = default;
+    AbstractMetricState& operator=(const AbstractMetricState&) = default;
+    AbstractMetricState& operator=(AbstractMetricState&&) = default;
   };
-  class NumericMetricState : public AbstractMetricState
+
+  struct NumericMetricState : public AbstractMetricState
   {
-  public:
     using MetricValueType = NumericMetricValue;
     using MetricValueOptional = std::optional<MetricValueType>;
-    const MetricValueOptional& MetricValue() const;
-    MetricValueOptional& MetricValue();
+    MetricValueOptional MetricValue;
 
     using PhysiologicalRangeType = Range;
     using PhysiologicalRangeSequence = std::vector<PhysiologicalRangeType>;
+    PhysiologicalRangeSequence PhysiologicalRange;
 
     using ActiveAveragingPeriodType = std::string;
     using ActiveAveragingPeriodOptional = std::optional<ActiveAveragingPeriodType>;
+    ActiveAveragingPeriodOptional ActiveAveragingPeriod;
 
     static bool classof(const AbstractState* other);
 
-    // Constructors
-    //
     explicit NumericMetricState(DescriptorHandleType handle);
-
-  private:
-    MetricValueOptional MetricValue_;
-    PhysiologicalRangeSequence PhysiologicalRange_;
-    ActiveAveragingPeriodOptional ActiveAveragingPeriod_;
+    NumericMetricState(const NumericMetricState&) = default;
+    NumericMetricState(NumericMetricState&&) = default;
+    NumericMetricState& operator=(const NumericMetricState&) = default;
+    NumericMetricState& operator=(NumericMetricState&&) = default;
+    ~NumericMetricState() override = default;
   };
-  class MdState
+
+  struct MdState
   {
-  public:
-    // State
-    //
     using StateType = std::shared_ptr<AbstractState>;
     using StateSequence = std::vector<StateType>;
-    const StateSequence& State() const;
-    StateSequence& State();
+    StateSequence State;
 
-    // StateVersion
-    //
     using StateVersionType = unsigned int;
     using StateVersionOptional = std::optional<StateVersionType>;
-    const StateVersionOptional& StateVersion() const;
-    StateVersionOptional& StateVersion();
-
-  private:
-    StateSequence State_;
-    StateVersionOptional StateVersion_;
+    StateVersionOptional StateVersion;
   };
-  class Mdib
+
+  struct Mdib
   {
-  public:
-    // MdDescription
-    //
     using MdDescriptionType = ::BICEPS::PM::MdDescription;
     using MdDescriptionOptional = std::optional<MdDescriptionType>;
-    const MdDescriptionOptional& MdDescription() const;
-    MdDescriptionOptional& MdDescription();
+    MdDescriptionOptional MdDescription;
 
-    // MdState
-    //
     using MdStateType = ::BICEPS::PM::MdState;
     using MdStateOptional = std::optional<MdStateType>;
-    const MdStateOptional& MdState() const;
-    MdStateOptional& MdState();
+    MdStateOptional MdState;
 
-    // MdibVersion
-    //
     using MdibVersionType = unsigned int;
     using MdibVersionOptional = std::optional<MdibVersionType>;
-    const MdibVersionOptional& MdibVersion() const;
-    MdibVersionOptional& MdibVersion();
+    MdibVersionOptional MdibVersion;
 
-    // SequenceId
-    //
     using SequenceIdType = WS::ADDRESSING::URIType;
-    const SequenceIdType& SequenceId() const;
-    SequenceIdType& SequenceId();
+    SequenceIdType SequenceId;
 
-    // InstanceId
-    //
     using InstanceIdType = unsigned int;
     using InstanceIdOptional = std::optional<InstanceIdType>;
-    const InstanceIdOptional& InstanceId() const;
-    InstanceIdOptional& InstanceId();
+    InstanceIdOptional InstanceId;
 
-    // Constructors.
-    //
     explicit Mdib(SequenceIdType sequenceIdType);
-
-  private:
-    MdDescriptionOptional MdDescription_;
-    MdStateOptional MdState_;
-    MdibVersionOptional MdibVersion_;
-    SequenceIdType SequenceId_;
-    InstanceIdOptional InstanceId_;
   };
 } // namespace BICEPS::PM
