@@ -99,7 +99,7 @@ BICEPS::MM::SetValueResponse SetService::dispatch(const BICEPS::MM::SetValue& se
   WS::ADDRESSING::URIType sequenceId("uuid:" + UUIDGenerator{}().toString());
   unsigned int transactionId = 0;
   BICEPS::MM::InvocationInfo invocationInfo(transactionId, BICEPS::MM::InvocationState::Fin);
-  invocationInfo.InvocationErrorMessage() = BICEPS::MM::InvocationErrorMessage("MicroSDC rocks!");
+  invocationInfo.InvocationErrorMessage = BICEPS::MM::InvocationErrorMessage("MicroSDC rocks!");
   BICEPS::MM::SetValueResponse setValueResponse(sequenceId, invocationInfo);
   return setValueResponse;
 }
