@@ -38,7 +38,6 @@ namespace WS::DISCOVERY
   struct AppSequenceType
   {
   public:
-    AppSequenceType();
     AppSequenceType(const uint64_t& instanceId, const uint64_t& messageNumber);
     using InstanceIdType = unsigned int;
     InstanceIdType InstanceId;
