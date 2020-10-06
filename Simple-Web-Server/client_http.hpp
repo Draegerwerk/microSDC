@@ -54,7 +54,8 @@ namespace SimpleWeb {
 namespace boost {
 #endif
   namespace asio {
-    template <> struct is_match_condition<SimpleWeb::HeaderEndMatch> : public std::true_type {};
+    template <>
+    struct is_match_condition<SimpleWeb::HeaderEndMatch> : public std::true_type {};
   } // namespace asio
 #ifndef USE_STANDALONE_ASIO
 } // namespace boost
@@ -173,7 +174,7 @@ namespace SimpleWeb {
           timer = nullptr;
           return;
         }
-        timer = std::unique_ptr<asio::steady_timer>(new asio::steady_timer(get_socket_executor(*socket), std::chrono::seconds(seconds)));
+        timer = make_steady_timer(*socket, std::chrono::seconds(seconds));
         std::weak_ptr<Connection> self_weak(this->shared_from_this()); // To avoid keeping Connection instance alive longer than needed
         timer->async_wait([self_weak](const error_code &ec) {
           if(!ec) {

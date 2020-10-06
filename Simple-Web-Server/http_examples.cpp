@@ -214,7 +214,8 @@ int main() {
       server_port.set_value(port);
     });
   });
-  cout << "Server listening on port " << server_port.get_future().get() << endl << endl;
+  cout << "Server listening on port " << server_port.get_future().get() << endl
+       << endl;
 
   // Client examples
   string json_string = "{\"firstName\": \"John\",\"lastName\": \"Smith\",\"age\": 25}";
@@ -225,11 +226,13 @@ int main() {
     try {
       cout << "Example GET request to http://localhost:8080/match/123" << endl;
       auto r1 = client.request("GET", "/match/123");
-      cout << "Response content: " << r1->content.rdbuf() << endl << endl; // Alternatively, use the convenience function r1->content.string()
+      cout << "Response content: " << r1->content.rdbuf() << endl // Alternatively, use the convenience function r1->content.string()
+           << endl;
 
       cout << "Example POST request to http://localhost:8080/string" << endl;
       auto r2 = client.request("POST", "/string", json_string);
-      cout << "Response content: " << r2->content.rdbuf() << endl << endl;
+      cout << "Response content: " << r2->content.rdbuf() << endl
+           << endl;
     }
     catch(const SimpleWeb::system_error &e) {
       cerr << "Client request error: " << e.what() << endl;
