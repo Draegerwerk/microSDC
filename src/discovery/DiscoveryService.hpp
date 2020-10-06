@@ -27,10 +27,8 @@ public:
   /// @brief listens on udp multicast socket for discovery messages
   void start();
 
-
   /// @brief stop the discovery service
   void stop();
-
 
   /// @brief Returns whether this discovery service is running
   /// @return whether this host runs
