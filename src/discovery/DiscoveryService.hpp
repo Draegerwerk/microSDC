@@ -34,6 +34,10 @@ public:
   /// @return whether this host runs
   bool running() const;
 
+  /// @brief Configure a discovery proxy to operate in MANAGED mode and reduce multicast traffic
+  /// @param proxyAddress the ip address of the discovery proxy to report to
+  void configureProxy(const std::string& proxyAddress);
+
   /// @brief sets a new location of this instance
   /// @param locationDetail the location state information
   void setLocation(const BICEPS::PM::LocationDetailType& locationDetail);
@@ -49,6 +53,8 @@ private:
   asio::ip::udp::socket socket_;
   /// multicast endpoint 239.255.255.250:3702
   asio::ip::udp::endpoint multicastEndpoint_;
+  /// endpoint of the discovery proxy, empty, if no proxy is configured
+  std::optional<asio::ip::udp::endpoint> discoveryProxyEndpoint_;
   /// buffer for receving udp data
   std::unique_ptr<std::array<char, MDPWS::MAX_ENVELOPE_SIZE + 1>> receiveBuffer_;
   /// sending endpoint of a received packet

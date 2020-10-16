@@ -60,6 +60,16 @@ bool DiscoveryService::running() const
   return running_.load();
 }
 
+void DiscoveryService::configureProxy(const std::string& proxyAddress)
+{
+  discoveryProxyEndpoint_ = {addressFromString(proxyAddress.c_str()),
+                             MDPWS::UDP_MULTICAST_DISCOVERY_PORT};
+  if (running())
+  {
+    sendHello();
+  }
+}
+
 void DiscoveryService::setLocation(const BICEPS::PM::LocationDetailType& locationDetail)
 {
   std::string ctxt = "sdc.ctxt.loc:/sdc.ctxt.loc.detail/?";
@@ -186,7 +196,7 @@ void DiscoveryService::sendHello()
   auto msg = std::make_shared<std::string>(serializer.str());
   LOG(LogLevel::INFO, "Sending hello message...");
   socket_.async_send_to(
-      asio::buffer(*msg), multicastEndpoint_,
+      asio::buffer(*msg), discoveryProxyEndpoint_.value_or(multicastEndpoint_),
       [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
         if (ec)
         {
@@ -232,7 +242,7 @@ void DiscoveryService::sendBye()
   serializer.serialize(*message);
   auto msg = std::make_shared<std::string>(serializer.str());
   LOG(LogLevel::INFO, "Sending bye message...");
-  socket_.async_send_to(asio::buffer(*msg), multicastEndpoint_,
+  socket_.async_send_to(asio::buffer(*msg), discoveryProxyEndpoint_.value_or(multicastEndpoint_),
                         [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
                           if (ec)
                           {
