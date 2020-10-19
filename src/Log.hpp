@@ -60,7 +60,7 @@ private:
   }
 
   /// @brief list termination for the None LogData
-  static inline void output(std::ostream& os, None /*unused*/) {}
+  static inline void output(std::ostream& /*os*/, None /*unused*/) {}
 
   /// the lowest log level this logger is writing to the output
   static LogLevel logLevel__;
