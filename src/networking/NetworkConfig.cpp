@@ -7,6 +7,15 @@ NetworkConfig::NetworkConfig(bool useTLS, std::string ipAddress, std::uint16_t p
 {
 }
 
+NetworkConfig::NetworkConfig(bool useTLS, std::string ipAddress, std::uint16_t port,
+                             const std::string& discoveryProxy)
+  : useTLS_(useTLS)
+  , ipAddress_(std::move(ipAddress))
+  , port_(port)
+  , discoveryProxy_(discoveryProxy)
+{
+}
+
 bool NetworkConfig::useTLS() const
 {
   return useTLS_;
@@ -20,4 +29,9 @@ const std::string& NetworkConfig::ipAddress() const
 std::uint16_t NetworkConfig::port() const
 {
   return port_;
+}
+
+const std::optional<std::string>& NetworkConfig::discoveryProxy() const
+{
+  return discoveryProxy_;
 }

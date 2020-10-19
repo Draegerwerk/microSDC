@@ -74,6 +74,10 @@ void MicroSDC::startup()
   {
     discoveryService_->setLocation(locationContextState_->LocationDetail.value());
   }
+  if (networkConfig_->discoveryProxy().has_value())
+  {
+    discoveryService_->configureProxy(networkConfig_->discoveryProxy().value());
+  }
 
   // construct subscription manager
   subscriptionManager_ = std::make_shared<SubscriptionManager>();
