@@ -23,8 +23,9 @@ int main()
 
   auto microSDC = std::make_unique<MicroSDC>();
 
+  const auto sdcPort = 8080;
   microSDC->setNetworkConfig(std::make_unique<NetworkConfig>(
-      true, NetworkInterface::getDefaultInterface().address(), 8080));
+      true, NetworkInterface::getDefaultInterface().address(), sdcPort));
 
   DeviceCharacteristics deviceCharacteristics;
   deviceCharacteristics.setFriendlyName("MicroSDC on Linux");
