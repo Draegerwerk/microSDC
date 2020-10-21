@@ -56,8 +56,13 @@ private:
   asio::ip::udp::socket socket_;
   /// multicast endpoint 239.255.255.250:3702
   asio::ip::udp::endpoint multicastEndpoint_;
-  /// endpoint of the discovery proxy, empty, if no proxy is configured
-  std::optional<asio::ip::udp::endpoint> discoveryProxyEndpoint_;
+  /// endpoint of the discovery proxy for udp, is empty, if no proxy is configured
+  std::optional<asio::ip::udp::endpoint> discoveryProxyUdpEndpoint_;
+  /// endpoint of the discovery proxy for protocol types HTTP and HTTPS
+  std::string discoveryProxyHttpEndpoint_;
+  /// the protocol type of the discoveryProxy
+  NetworkConfig::DiscoveryProxyProtocol discoveryProxyProtocol_{
+      NetworkConfig::DiscoveryProxyProtocol::UDP};
   /// buffer for receving udp data
   std::unique_ptr<std::array<char, MDPWS::MAX_ENVELOPE_SIZE + 1>> receiveBuffer_;
   /// sending endpoint of a received packet

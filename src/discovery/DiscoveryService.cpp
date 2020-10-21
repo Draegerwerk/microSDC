@@ -1,4 +1,5 @@
 #include "DiscoveryService.hpp"
+#include "ClientSession/ClientSession.hpp"
 #include "Log.hpp"
 #include "MicroSDC.hpp"
 #include "datamodel/ExpectedElement.hpp"
@@ -63,10 +64,15 @@ bool DiscoveryService::running() const
 void DiscoveryService::configureProxy(const NetworkConfig::DiscoveryProxyProtocol proxyProtocol,
                                       const std::string& proxyAddress)
 {
-  if (proxyProtocol == NetworkConfig::DiscoveryProxyProtocol::UDP)
+  discoveryProxyProtocol_ = proxyProtocol;
+  if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP)
   {
-    discoveryProxyEndpoint_ = {addressFromString(proxyAddress.c_str()),
-                               MDPWS::UDP_MULTICAST_DISCOVERY_PORT};
+    discoveryProxyUdpEndpoint_ = {addressFromString(proxyAddress.c_str()),
+                                  MDPWS::UDP_MULTICAST_DISCOVERY_PORT};
+  }
+  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
+  {
+    discoveryProxyHttpEndpoint_ = proxyAddress;
   }
   else
   {
@@ -203,17 +209,29 @@ void DiscoveryService::sendHello()
   serializer.serialize(*message);
   auto msg = std::make_shared<std::string>(serializer.str());
   LOG(LogLevel::INFO, "Sending hello message...");
-  socket_.async_send_to(
-      asio::buffer(*msg), discoveryProxyEndpoint_.value_or(multicastEndpoint_),
-      [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
-        if (ec)
-        {
-          LOG(LogLevel::ERROR,
-              "Error while sending Hello: ec " << ec.value() << ": " << ec.message());
-          return;
-        }
-        LOG(LogLevel::DEBUG, "Sent hello msg (" << bytesTransferred << " bytes): \n" << *msg);
-      });
+  if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP)
+  {
+    socket_.async_send_to(
+        asio::buffer(*msg), discoveryProxyUdpEndpoint_.value_or(multicastEndpoint_),
+        [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
+          if (ec)
+          {
+            LOG(LogLevel::ERROR,
+                "Error while sending Hello: ec " << ec.value() << ": " << ec.message());
+            return;
+          }
+          LOG(LogLevel::DEBUG, "Sent hello msg (" << bytesTransferred << " bytes): \n" << *msg);
+        });
+  }
+  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
+  {
+    auto session = ClientSessionFactory::produce(discoveryProxyHttpEndpoint_, false);
+    session->send(*msg);
+  }
+  else
+  {
+    throw std::runtime_error("Configured DiscoveryProxyProtocol not implemented!");
+  }
 }
 
 void DiscoveryService::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
@@ -250,7 +268,7 @@ void DiscoveryService::sendBye()
   serializer.serialize(*message);
   auto msg = std::make_shared<std::string>(serializer.str());
   LOG(LogLevel::INFO, "Sending bye message...");
-  socket_.async_send_to(asio::buffer(*msg), discoveryProxyEndpoint_.value_or(multicastEndpoint_),
+  socket_.async_send_to(asio::buffer(*msg), discoveryProxyUdpEndpoint_.value_or(multicastEndpoint_),
                         [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
                           if (ec)
                           {
