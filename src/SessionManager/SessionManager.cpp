@@ -1,6 +1,11 @@
 #include "SessionManager.hpp"
 #include "Log.hpp"
 
+SessionManager::SessionManager(const bool useTls)
+  : useTls_(useTls)
+{
+}
+
 void SessionManager::createSession(const std::string& notifyTo)
 {
   if (sessions_.count(notifyTo) != 0)
@@ -8,7 +13,7 @@ void SessionManager::createSession(const std::string& notifyTo)
     LOG(LogLevel::INFO, "Client session already exists");
     return;
   }
-  sessions_.emplace(notifyTo, ClientSessionFactory::produce(notifyTo));
+  sessions_.emplace(notifyTo, ClientSessionFactory::produce(notifyTo, useTls_));
 }
 
 void SessionManager::sendToSession(const std::string& notifyTo, const std::string& message)

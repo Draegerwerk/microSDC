@@ -80,7 +80,7 @@ void MicroSDC::startup()
   }
 
   // construct subscription manager
-  subscriptionManager_ = std::make_shared<SubscriptionManager>();
+  subscriptionManager_ = std::make_shared<SubscriptionManager>(networkConfig_->isUsingTLS());
 
   // construct web services
   auto deviceService = std::make_shared<DeviceService>(metadata);

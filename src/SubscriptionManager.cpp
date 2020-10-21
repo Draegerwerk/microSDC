@@ -12,6 +12,11 @@
 
 static constexpr const char* TAG = "SubscriptionManager";
 
+SubscriptionManager::SubscriptionManager(const bool useTls)
+  : sessionManager_(useTls)
+{
+}
+
 WS::EVENTING::SubscribeResponse
 SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
 {

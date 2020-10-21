@@ -3,24 +3,28 @@
 
 #include "esp_http_client.h"
 
-std::unique_ptr<ClientSessionInterface> ClientSessionFactory::produce(const std::string& address)
+std::unique_ptr<ClientSessionInterface> ClientSessionFactory::produce(const std::string& address,
+                                                                      const bool useTls)
 {
-  return std::make_unique<ClientSessionEsp32>(address);
+  return std::make_unique<ClientSessionEsp32>(address, useTls);
 }
 
-ClientSessionEsp32::ClientSessionEsp32(std::string notifyTo)
+ClientSessionEsp32::ClientSessionEsp32(std::string notifyTo, const bool useTls)
   : notifyTo_(std::move(notifyTo))
 {
   extern const char serverCrtStart[] asm("_binary_server_crt_start");
   extern const char serverKeyStart[] asm("_binary_server_key_start");
   esp_http_client_config_t config{};
   config.url = notifyTo_.c_str();
-  config.client_cert_pem = serverCrtStart;
-  config.client_key_pem = serverKeyStart;
+  if (useTls)
+  {
+    config.client_cert_pem = serverCrtStart;
+    config.client_key_pem = serverKeyStart;
+    config.use_global_ca_store = true;
+    config.skip_cert_common_name_check = true;
+  }
   config.method = HTTP_METHOD_POST;
   config.transport_type = HTTP_TRANSPORT_OVER_TCP;
-  config.use_global_ca_store = true;
-  config.skip_cert_common_name_check = true;
   session_ = esp_http_client_init(&config);
 }
 

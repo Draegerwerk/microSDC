@@ -24,6 +24,9 @@ public:
 class SessionManager
 {
 public:
+  /// @brief constructs a new SessionManager
+  /// @param useTls whether to use TLS for communication
+  explicit SessionManager(bool useTls);
   /// @brief creates a new session for a given client address
   /// @param notifyTo the address of the client
   void createSession(const std::string& notifyTo);
@@ -38,11 +41,14 @@ public:
   void deleteSession(const std::string& notifyTo);
 
 private:
+  /// whether to use TLS encrypted communication
+  const bool useTls_;
+  /// the map of all sessions this manager manages, address->session
   std::map<std::string, std::shared_ptr<ClientSessionInterface>> sessions_;
 };
 
 class ClientSessionFactory
 {
 public:
-  static std::unique_ptr<ClientSessionInterface> produce(const std::string& address);
+  static std::unique_ptr<ClientSessionInterface> produce(const std::string& address, bool useTls);
 };

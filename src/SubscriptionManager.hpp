@@ -20,6 +20,9 @@ namespace BICEPS::MM
 class SubscriptionManager
 {
 public:
+  /// @brief Constructs a new SubscriptionManager
+  /// @param useTls whether to use TLS encrypted communication
+  explicit SubscriptionManager(bool useTls);
   /// @brief dispatches a subscribe request, registers the new subscriber and creates a client
   /// session
   /// @param subscribeRequest the request the client send to subscribe
