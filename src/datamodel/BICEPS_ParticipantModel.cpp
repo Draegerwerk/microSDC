@@ -11,8 +11,8 @@ namespace BICEPS::PM
   }
 
   AbstractDescriptor::AbstractDescriptor(const DescriptorKind kind, HandleType handle)
-    : kind_(kind)
-    , Handle(std::move(handle))
+    : Handle(std::move(handle))
+    , kind_(kind)
   {
   }
 
@@ -192,8 +192,8 @@ namespace BICEPS::PM
 
   AbstractMetricValue::AbstractMetricValue(const MetricKind kind,
                                            const MetricQualityType& metricQuality)
-    : kind_(kind)
-    , MetricQuality(metricQuality)
+    : MetricQuality(metricQuality)
+    , kind_(kind)
   {
   }
 
@@ -213,8 +213,8 @@ namespace BICEPS::PM
   }
 
   AbstractState::AbstractState(const StateKind kind, DescriptorHandleType handle)
-    : kind_(kind)
-    , DescriptorHandle(std::move(handle))
+    : DescriptorHandle(std::move(handle))
+    , kind_(kind)
   {
   }
 
