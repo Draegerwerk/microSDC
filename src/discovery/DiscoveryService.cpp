@@ -60,10 +60,18 @@ bool DiscoveryService::running() const
   return running_.load();
 }
 
-void DiscoveryService::configureProxy(const std::string& proxyAddress)
+void DiscoveryService::configureProxy(const NetworkConfig::DiscoveryProxyProtocol proxyProtocol,
+                                      const std::string& proxyAddress)
 {
-  discoveryProxyEndpoint_ = {addressFromString(proxyAddress.c_str()),
-                             MDPWS::UDP_MULTICAST_DISCOVERY_PORT};
+  if (proxyProtocol == NetworkConfig::DiscoveryProxyProtocol::UDP)
+  {
+    discoveryProxyEndpoint_ = {addressFromString(proxyAddress.c_str()),
+                               MDPWS::UDP_MULTICAST_DISCOVERY_PORT};
+  }
+  else
+  {
+    throw std::runtime_error("Configured DiscoveryProxyProtocol not implemented!");
+  }
   if (running())
   {
     sendHello();

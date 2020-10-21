@@ -76,7 +76,8 @@ void MicroSDC::startup()
   }
   if (networkConfig_->discoveryProxy().has_value())
   {
-    discoveryService_->configureProxy(networkConfig_->discoveryProxy().value());
+    discoveryService_->configureProxy(NetworkConfig::DiscoveryProxyProtocol::UDP,
+                                      networkConfig_->discoveryProxy().value());
   }
 
   // construct subscription manager

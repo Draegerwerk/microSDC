@@ -8,11 +8,13 @@ NetworkConfig::NetworkConfig(bool useTLS, std::string ipAddress, std::uint16_t p
 }
 
 NetworkConfig::NetworkConfig(bool useTLS, std::string ipAddress, std::uint16_t port,
+                             DiscoveryProxyProtocol proxyProtocol,
                              const std::string& discoveryProxy)
   : useTLS_(useTLS)
   , ipAddress_(std::move(ipAddress))
   , port_(port)
   , discoveryProxy_(discoveryProxy)
+  , discoveryProxyProtocol_(proxyProtocol)
 {
 }
 

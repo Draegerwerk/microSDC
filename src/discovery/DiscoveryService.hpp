@@ -3,6 +3,7 @@
 #include "MessagingContext.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
+#include "networking/NetworkConfig.hpp"
 #include <array>
 #include <asio.hpp>
 #include <atomic>
@@ -35,8 +36,10 @@ public:
   bool running() const;
 
   /// @brief Configure a discovery proxy to operate in MANAGED mode and reduce multicast traffic
+  /// @param proxyProtocol the protocol the discovery proxy should operate on
   /// @param proxyAddress the ip address of the discovery proxy to report to
-  void configureProxy(const std::string& proxyAddress);
+  void configureProxy(NetworkConfig::DiscoveryProxyProtocol proxyProtocol,
+                      const std::string& proxyAddress);
 
   /// @brief sets a new location of this instance
   /// @param locationDetail the location state information
