@@ -1,5 +1,4 @@
 #include "BICEPS_ParticipantModel.hpp"
-
 #include <utility>
 
 namespace BICEPS::PM
