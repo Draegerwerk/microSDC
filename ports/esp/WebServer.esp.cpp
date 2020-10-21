@@ -14,7 +14,7 @@
 std::unique_ptr<WebServerInterface>
 WebServerFactory::produce(const std::shared_ptr<const NetworkConfig>& networkConfig)
 {
-  return std::make_unique<WebServerEsp32>(networkConfig->useTLS());
+  return std::make_unique<WebServerEsp32>(networkConfig->isUsingTLS());
 }
 
 WebServerEsp32::WebServerEsp32(bool useTLS)

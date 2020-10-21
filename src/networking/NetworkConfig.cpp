@@ -16,7 +16,7 @@ NetworkConfig::NetworkConfig(bool useTLS, std::string ipAddress, std::uint16_t p
 {
 }
 
-bool NetworkConfig::useTLS() const
+bool NetworkConfig::isUsingTLS() const
 {
   return useTLS_;
 }

@@ -55,7 +55,7 @@ void MicroSDC::startup()
 
   // construct xAddresses containing reference to the service
   WS::DISCOVERY::UriListType xAddresses;
-  std::string protocol = networkConfig_->useTLS() ? "https" : "http";
+  std::string protocol = networkConfig_->isUsingTLS() ? "https" : "http";
   std::string xaddress = protocol + "://" + networkConfig_->ipAddress() + ":" +
                          std::to_string(networkConfig_->port()) +
                          MetadataProvider::getDeviceServicePath();

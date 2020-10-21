@@ -4,7 +4,7 @@
 std::unique_ptr<WebServerInterface>
 WebServerFactory::produce(const std::shared_ptr<const NetworkConfig>& networkConfig)
 {
-  if (networkConfig->useTLS())
+  if (networkConfig->isUsingTLS())
   {
     return std::make_unique<WebServerSimple<SimpleWeb::HTTPS>>();
   }

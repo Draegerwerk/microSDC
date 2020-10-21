@@ -22,7 +22,7 @@ public:
 
   /// @brief returns whether to use TLS for communication
   /// @return wether TLS is enabled
-  bool useTLS() const;
+  bool isUsingTLS() const;
 
   /// @brief gets a reference to the ip address of this configuration
   /// @return the ip address string
