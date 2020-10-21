@@ -2,6 +2,7 @@ Checks: >
     *,
     -fuchsia-default-arguments-calls,
     -fuchsia-default-arguments-declarations,
+    -fuchsia-overloaded-operator,
     -google-readability-todo,
     -google-runtime-references,
     -hicpp-uppercase-literal-suffix,
