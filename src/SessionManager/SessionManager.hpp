@@ -8,7 +8,11 @@
 class ClientSessionInterface
 {
 public:
-  // TODO copy constructors etc
+  ClientSessionInterface() = default;
+  ClientSessionInterface(const ClientSessionInterface&) = default;
+  ClientSessionInterface(ClientSessionInterface&&) = default;
+  ClientSessionInterface& operator=(const ClientSessionInterface&) = default;
+  ClientSessionInterface& operator=(ClientSessionInterface&&) = default;
   virtual ~ClientSessionInterface() = default;
   /// @brief sends a given data message string the this client
   /// @param message the message to send
