@@ -1,7 +1,7 @@
 #pragma once
 
+#include "ClientSession/SessionManager.hpp"
 #include "SDCConstants.hpp"
-#include "SessionManager/SessionManager.hpp"
 #include "datamodel/ws-addressing.hpp"
 #include "datamodel/ws-eventing.hpp"
 #include <chrono>

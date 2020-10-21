@@ -45,7 +45,8 @@ set(HEADERS
     "WebServer/Request.hpp"
     "WebServer/WebServer.hpp"
 
-    "SessionManager/SessionManager.hpp"
+    "ClientSession/ClientSession.hpp"
+    "ClientSession/SessionManager.hpp"
     )
 
 
@@ -86,7 +87,7 @@ set(SOURCES
 
     "WebServer/Request.cpp"
 
-    "SessionManager/SessionManager.cpp"
+    "ClientSession/SessionManager.cpp"
     )
 
 add_library(microSDC_common OBJECT ${SOURCES} ${HEADERS})

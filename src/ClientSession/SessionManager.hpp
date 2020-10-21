@@ -1,23 +1,9 @@
 #pragma once
 
+#include "ClientSession.hpp"
 #include <map>
 #include <memory>
 #include <string>
-
-/// @brief ClientSessionInterface defines an interface to a client session
-class ClientSessionInterface
-{
-public:
-  ClientSessionInterface() = default;
-  ClientSessionInterface(const ClientSessionInterface&) = default;
-  ClientSessionInterface(ClientSessionInterface&&) = default;
-  ClientSessionInterface& operator=(const ClientSessionInterface&) = default;
-  ClientSessionInterface& operator=(ClientSessionInterface&&) = default;
-  virtual ~ClientSessionInterface() = default;
-  /// @brief sends a given data message string the this client
-  /// @param message the message to send
-  virtual void send(const std::string& message) = 0;
-};
 
 /// @brief SessionManager defines an interface to client sessions for eventing
 /// notifications
@@ -45,10 +31,4 @@ private:
   const bool useTls_;
   /// the map of all sessions this manager manages, address->session
   std::map<std::string, std::shared_ptr<ClientSessionInterface>> sessions_;
-};
-
-class ClientSessionFactory
-{
-public:
-  static std::unique_ptr<ClientSessionInterface> produce(const std::string& address, bool useTls);
 };

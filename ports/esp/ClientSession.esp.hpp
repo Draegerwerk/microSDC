@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SessionManager/SessionManager.hpp"
+#include "ClientSession/SessionManager.hpp"
 
 struct esp_http_client;
 
