@@ -211,26 +211,30 @@ void DiscoveryService::sendHello()
   serializer.serialize(*message);
   auto msg = std::make_shared<std::string>(serializer.str());
   LOG(LogLevel::INFO, "Sending hello message...");
-  if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP)
+  const auto asyncCallback = [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
+    if (ec)
+    {
+      LOG(LogLevel::ERROR, "Error while sending Hello: ec " << ec.value() << ": " << ec.message());
+      return;
+    }
+    LOG(LogLevel::DEBUG, "Sent hello msg (" << bytesTransferred << " bytes): \n" << *msg);
+  };
+
+  // alwayas send hello to multicast group
+  socket_.async_send_to(asio::buffer(*msg), multicastEndpoint_, asyncCallback);
+
+  // handle configured discovery proxy
+  if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP &&
+      discoveryProxyUdpEndpoint_.has_value())
   {
-    socket_.async_send_to(
-        asio::buffer(*msg), discoveryProxyUdpEndpoint_.value_or(multicastEndpoint_),
-        [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
-          if (ec)
-          {
-            LOG(LogLevel::ERROR,
-                "Error while sending Hello: ec " << ec.value() << ": " << ec.message());
-            return;
-          }
-          LOG(LogLevel::DEBUG, "Sent hello msg (" << bytesTransferred << " bytes): \n" << *msg);
-        });
+    socket_.async_send_to(asio::buffer(*msg), discoveryProxyUdpEndpoint_.value(), asyncCallback);
   }
   else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
   {
     auto session = ClientSessionFactory::produce(discoveryProxyHttpEndpoint_, false);
     session->send(*msg);
   }
-  else
+  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
   {
     throw std::runtime_error("Configured DiscoveryProxyProtocol not implemented!");
   }
@@ -270,26 +274,30 @@ void DiscoveryService::sendBye()
   serializer.serialize(*message);
   auto msg = std::make_shared<std::string>(serializer.str());
   LOG(LogLevel::INFO, "Sending bye message...");
-  if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP)
+  const auto asyncCallback = [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
+    if (ec)
+    {
+      LOG(LogLevel::ERROR, "Error while sending Bye: ec " << ec.value() << ": " << ec.message());
+      return;
+    }
+    LOG(LogLevel::DEBUG, "Sent bye msg (" << bytesTransferred << " bytes): \n" << *msg);
+  };
+
+  // alwayas send bye to multicast group
+  socket_.async_send_to(asio::buffer(*msg), multicastEndpoint_, asyncCallback);
+
+  // handle configured discovery proxy
+  if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP &&
+      discoveryProxyUdpEndpoint_.has_value())
   {
-    socket_.async_send_to(
-        asio::buffer(*msg), discoveryProxyUdpEndpoint_.value_or(multicastEndpoint_),
-        [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
-          if (ec)
-          {
-            LOG(LogLevel::ERROR,
-                "Error while sending Bye: ec " << ec.value() << ": " << ec.message());
-            return;
-          }
-          LOG(LogLevel::DEBUG, "Sent bye msg (" << bytesTransferred << " bytes): \n" << *msg);
-        });
+    socket_.async_send_to(asio::buffer(*msg), discoveryProxyUdpEndpoint_.value(), asyncCallback);
   }
   else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
   {
     auto session = ClientSessionFactory::produce(discoveryProxyHttpEndpoint_, false);
     session->send(*msg);
   }
-  else
+  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
   {
     throw std::runtime_error("Configured DiscoveryProxyProtocol not implemented!");
   }
