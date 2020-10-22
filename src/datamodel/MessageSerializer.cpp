@@ -700,7 +700,7 @@ void MessageSerializer::serialize(
     metricNode->append_attribute(safetyClassificationAttr);
   }
 
-  auto* unitNode = xmlDocument_->allocate_node(rapidxml::node_element, "Unit");
+  auto* unitNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Unit");
   auto* unitCodeAttr =
       xmlDocument_->allocate_attribute("Code", abstractMetricDescriptor.Unit.Code.c_str());
   unitNode->append_attribute(unitCodeAttr);
