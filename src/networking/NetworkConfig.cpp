@@ -37,3 +37,8 @@ const std::optional<std::string>& NetworkConfig::discoveryProxy() const
 {
   return discoveryProxy_;
 }
+
+NetworkConfig::DiscoveryProxyProtocol NetworkConfig::discoveryProxyProtocol() const
+{
+  return discoveryProxyProtocol_;
+}

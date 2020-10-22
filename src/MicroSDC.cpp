@@ -76,7 +76,7 @@ void MicroSDC::startup()
   }
   if (networkConfig_->discoveryProxy().has_value())
   {
-    discoveryService_->configureProxy(NetworkConfig::DiscoveryProxyProtocol::UDP,
+    discoveryService_->configureProxy(networkConfig_->discoveryProxyProtocol(),
                                       networkConfig_->discoveryProxy().value());
   }
 

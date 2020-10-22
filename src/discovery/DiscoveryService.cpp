@@ -270,17 +270,29 @@ void DiscoveryService::sendBye()
   serializer.serialize(*message);
   auto msg = std::make_shared<std::string>(serializer.str());
   LOG(LogLevel::INFO, "Sending bye message...");
-  socket_.async_send_to(asio::buffer(*msg), discoveryProxyUdpEndpoint_.value_or(multicastEndpoint_),
-                        [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
-                          if (ec)
-                          {
-                            LOG(LogLevel::ERROR, "Error while sending Bye: ec "
-                                                     << ec.value() << ": " << ec.message());
-                            return;
-                          }
-                          LOG(LogLevel::DEBUG, "Sent bye msg (" << bytesTransferred << " bytes): \n"
-                                                                << *msg);
-                        });
+  if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP)
+  {
+    socket_.async_send_to(
+        asio::buffer(*msg), discoveryProxyUdpEndpoint_.value_or(multicastEndpoint_),
+        [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
+          if (ec)
+          {
+            LOG(LogLevel::ERROR,
+                "Error while sending Bye: ec " << ec.value() << ": " << ec.message());
+            return;
+          }
+          LOG(LogLevel::DEBUG, "Sent bye msg (" << bytesTransferred << " bytes): \n" << *msg);
+        });
+  }
+  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
+  {
+    auto session = ClientSessionFactory::produce(discoveryProxyHttpEndpoint_, false);
+    session->send(*msg);
+  }
+  else
+  {
+    throw std::runtime_error("Configured DiscoveryProxyProtocol not implemented!");
+  }
 }
 
 void DiscoveryService::buildByeMessage(MESSAGEMODEL::Envelope& envelope)
