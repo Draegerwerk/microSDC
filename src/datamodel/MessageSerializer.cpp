@@ -417,6 +417,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     auto* friendlyNameNode =
         xmlDocument_->allocate_node(rapidxml::node_element, "dpws:FriendlyName");
     friendlyNameNode->value(friendlyName.c_str());
+    thisDeviceNode->append_node(friendlyNameNode);
   }
   parent->append_node(thisDeviceNode);
 }
