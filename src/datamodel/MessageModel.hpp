@@ -102,7 +102,7 @@ namespace MESSAGEMODEL
     using GetMdibOptional = std::optional<GetMdibType>;
     GetMdibOptional GetMdib;
 
-    using GetMdibResponseType = BICEPS::PM::Mdib;
+    using GetMdibResponseType = BICEPS::MM::GetMdibResponse;
     using GetMdibResponseOptional = std::optional<GetMdibResponseType>;
     GetMdibResponseOptional GetMdibResponse;
 
