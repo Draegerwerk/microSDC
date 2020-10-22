@@ -156,7 +156,9 @@ void DiscoveryService::handleUDPMessage(std::size_t bytesRecvd)
   }
   catch (ExpectedElement& e)
   {
-    LOG(LogLevel::ERROR, "ExpectedElement " << e.ns() << ":" << e.name() << " not encountered");
+    LOG(LogLevel::WARNING, "In Message from " << senderAddress << ": ExpectedElement " << e.ns()
+                                              << ":" << e.name() << " not encountered: \n"
+                                              << receiveBuffer_->data());
     return;
   }
 
