@@ -13,11 +13,11 @@ class StateHandler;
 class SubscriptionManager;
 namespace BICEPS::PM
 {
-  class LocationContextState;
-  class LocationDetailType;
-  class MdDescription;
-  class Mdib;
-  class NumericMetricState;
+  struct LocationContextState;
+  struct LocationDetailType;
+  struct MdDescription;
+  struct Mdib;
+  struct NumericMetricState;
 } // namespace BICEPS::PM
 
 /// @brief MicroSDC implements the central SDC instance with an interface to any SDC utility
