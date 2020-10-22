@@ -826,10 +826,6 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   if (const auto* locationContextState = dyn_cast<BICEPS::PM::LocationContextState>(&state);
       locationContextState != nullptr)
   {
-    if (locationContextState->LocationDetail.has_value())
-    {
-      serialize(stateNode, locationContextState->LocationDetail.value());
-    }
     for (const auto& validator : locationContextState->Validator)
     {
       auto* node = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Validator");
@@ -841,6 +837,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
       auto* node = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Identification");
       serialize(node, identifier);
       stateNode->append_node(node);
+    }
+    if (locationContextState->LocationDetail.has_value())
+    {
+      serialize(stateNode, locationContextState->LocationDetail.value());
     }
     if (locationContextState->BindingMdibVersion.has_value())
     {
