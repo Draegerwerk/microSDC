@@ -106,8 +106,8 @@ MetadataProvider::Host MetadataProvider::createHostMetadata() const
   Host host(WS::ADDRESSING::EndpointReferenceType(
       WS::ADDRESSING::URIType(deviceCharacteristics_.getEndpointReference())));
   host.Types = Host::TypesType();
-  host.Types->emplace_back(MDPWS::WS_NS_DPWS, "Device");
-  host.Types->emplace_back(MDPWS::NS_MDPWS, "MedicalDevice");
+  host.Types->emplace_back(MDPWS::WS_NS_DPWS_PREFIX, "Device");
+  host.Types->emplace_back(MDPWS::NS_MDPWS_PREFIX, "MedicalDevice");
   return host;
 }
 
