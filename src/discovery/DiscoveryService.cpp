@@ -70,13 +70,10 @@ void DiscoveryService::configureProxy(const NetworkConfig::DiscoveryProxyProtoco
     discoveryProxyUdpEndpoint_ = {addressFromString(proxyAddress.c_str()),
                                   MDPWS::UDP_MULTICAST_DISCOVERY_PORT};
   }
-  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
+  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP ||
+           discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
   {
     discoveryProxyHttpEndpoint_ = proxyAddress;
-  }
-  else
-  {
-    throw std::runtime_error("Configured DiscoveryProxyProtocol not implemented!");
   }
   if (running())
   {
@@ -236,7 +233,8 @@ void DiscoveryService::sendHello()
   }
   else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
   {
-    throw std::runtime_error("Configured DiscoveryProxyProtocol not implemented!");
+    auto session = ClientSessionFactory::produce(discoveryProxyHttpEndpoint_, true);
+    session->send(*msg);
   }
 }
 
@@ -299,7 +297,8 @@ void DiscoveryService::sendBye()
   }
   else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
   {
-    throw std::runtime_error("Configured DiscoveryProxyProtocol not implemented!");
+    auto session = ClientSessionFactory::produce(discoveryProxyHttpEndpoint_, true);
+    session->send(*msg);
   }
 }
 
