@@ -18,18 +18,18 @@ namespace WS::MEX
       if (strncmp(entry->name(), "Dialect", entry->name_size()) == 0 &&
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE, entry->xmlns_size()) == 0)
       {
-        Dialect = std::make_optional<DialectType>(entry->value(), entry->value_size());
+        dialect = std::make_optional<DialectType>(entry->value(), entry->value_size());
       }
       else if (strncmp(entry->name(), "Identifier", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE, entry->xmlns_size()) == 0)
       {
-        Identifier = std::make_optional<IdentifierType>(entry->value(), entry->value_size());
+        identifier = std::make_optional<IdentifierType>(entry->value(), entry->value_size());
       }
     }
   }
 
   MetadataSection::MetadataSection(DialectType dialect)
-    : Dialect(std::move(dialect))
+    : dialect(std::move(dialect))
   {
   }
 } // namespace WS::MEX

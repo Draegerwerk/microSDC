@@ -13,13 +13,13 @@ namespace WS::MEX
     //
     using DialectType = WS::ADDRESSING::URIType;
     using DialectOptional = std::optional<DialectType>;
-    DialectOptional Dialect;
+    DialectOptional dialect;
 
     // Identifier
     //
     using IdentifierType = WS::ADDRESSING::URIType;
     using IdentifierOptional = std::optional<IdentifierType>;
-    IdentifierOptional Identifier;
+    IdentifierOptional identifier;
 
     explicit GetMetadata(const rapidxml::xml_node<>& node);
 
@@ -38,42 +38,42 @@ namespace WS::MEX
     //
     using MetadataReferenceType = WS::MEX::MetadataReference;
     using MetadataReferenceOptional = std::optional<MetadataReferenceType>;
-    MetadataReferenceOptional MetadataReference;
+    MetadataReferenceOptional metadataReference;
 
     // Location
     //
     using LocationType = WS::ADDRESSING::URIType;
     using LocationOptional = std::optional<LocationType>;
-    LocationOptional Location;
+    LocationOptional location;
 
     // ThisModel
     //
     using ThisModelType = WS::DPWS::ThisModelType;
     using ThisModelOptional = std::optional<ThisModelType>;
-    ThisModelOptional ThisModel;
+    ThisModelOptional thisModel;
 
     // ThisDevice
     //
     using ThisDeviceType = WS::DPWS::ThisDeviceType;
     using ThisDeviceOptional = std::optional<ThisDeviceType>;
-    ThisDeviceOptional ThisDevice;
+    ThisDeviceOptional thisDevice;
 
     // Relationship
     //
     using RelationshipType = WS::DPWS::Relationship;
     using RelationshipOptional = std::optional<RelationshipType>;
-    RelationshipOptional Relationship;
+    RelationshipOptional relationship;
 
     // Dialect
     //
     using DialectType = WS::ADDRESSING::URIType;
-    DialectType Dialect;
+    DialectType dialect;
 
     // Identifier
     //
     using IdentifierType = WS::ADDRESSING::URIType;
     using IdentifierOptional = std::optional<IdentifierType>;
-    IdentifierOptional Identifier;
+    IdentifierOptional identifier;
 
     explicit MetadataSection(DialectType dialect);
   };
@@ -82,6 +82,6 @@ namespace WS::MEX
   {
     using MetadataSectionType = WS::MEX::MetadataSection;
     using MetadataSectionSequence = std::vector<MetadataSectionType>;
-    MetadataSectionSequence MetadataSection;
+    MetadataSectionSequence metadataSection;
   };
 } // namespace WS::MEX

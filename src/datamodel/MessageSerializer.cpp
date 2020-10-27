@@ -350,7 +350,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const WS::MEX::Metadata& metadata)
 {
   auto* metadataNode = xmlDocument_->allocate_node(rapidxml::node_element, "mex:Metadata");
-  for (const auto& metadataSection : metadata.MetadataSection)
+  for (const auto& metadataSection : metadata.metadataSection)
   {
     serialize(metadataNode, metadataSection);
   }
@@ -362,24 +362,24 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* metadataSectionNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "mex:MetadataSection");
-  auto* dialectAttr = xmlDocument_->allocate_attribute("Dialect", metadataSection.Dialect.c_str());
+  auto* dialectAttr = xmlDocument_->allocate_attribute("Dialect", metadataSection.dialect.c_str());
   metadataSectionNode->append_attribute(dialectAttr);
-  if (metadataSection.ThisModel.has_value())
+  if (metadataSection.thisModel.has_value())
   {
-    serialize(metadataSectionNode, metadataSection.ThisModel.value());
+    serialize(metadataSectionNode, metadataSection.thisModel.value());
   }
-  else if (metadataSection.ThisDevice.has_value())
+  else if (metadataSection.thisDevice.has_value())
   {
-    serialize(metadataSectionNode, metadataSection.ThisDevice.value());
+    serialize(metadataSectionNode, metadataSection.thisDevice.value());
   }
-  else if (metadataSection.Relationship.has_value())
+  else if (metadataSection.relationship.has_value())
   {
-    serialize(metadataSectionNode, metadataSection.Relationship.value());
+    serialize(metadataSectionNode, metadataSection.relationship.value());
   }
-  else if (metadataSection.Location.has_value())
+  else if (metadataSection.location.has_value())
   {
     auto* locationNode = xmlDocument_->allocate_node(rapidxml::node_element, "mex:Location");
-    locationNode->value(metadataSection.Location->c_str());
+    locationNode->value(metadataSection.location->c_str());
     metadataSectionNode->append_node(locationNode);
   }
   parent->append_node(metadataSectionNode);
