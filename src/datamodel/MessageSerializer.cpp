@@ -390,7 +390,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* thisModelNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:ThisModel");
   // Manufacturer
-  for (const auto& manufacturer : thisModel.Manufacturer)
+  for (const auto& manufacturer : thisModel.manufacturer)
   {
     auto* manufacturerNode =
         xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Manufacturer");
@@ -398,7 +398,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     thisModelNode->append_node(manufacturerNode);
   }
   // ModelName
-  for (const auto& modelName : thisModel.ModelName)
+  for (const auto& modelName : thisModel.modelName)
   {
     auto* modelNameNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:ModelName");
     modelNameNode->value(modelName.c_str());
@@ -412,7 +412,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* thisDeviceNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:ThisDevice");
   // FriendlyName
-  for (const auto& friendlyName : thisDevice.FriendlyName)
+  for (const auto& friendlyName : thisDevice.friendlyName)
   {
     auto* friendlyNameNode =
         xmlDocument_->allocate_node(rapidxml::node_element, "dpws:FriendlyName");
@@ -426,11 +426,11 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DPWS::Relationship& relationship)
 {
   auto* relationshipNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Relationship");
-  auto* typeAttr = xmlDocument_->allocate_attribute("Type", relationship.Type.c_str());
+  auto* typeAttr = xmlDocument_->allocate_attribute("Type", relationship.type.c_str());
   relationshipNode->append_attribute(typeAttr);
 
-  serialize(relationshipNode, relationship.Host);
-  for (const auto& hosted : relationship.Hosted)
+  serialize(relationshipNode, relationship.host);
+  for (const auto& hosted : relationship.hosted)
   {
     serialize(relationshipNode, hosted);
   }
@@ -441,11 +441,11 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DPWS::HostServiceType& host)
 {
   auto* hostNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Host");
-  serialize(hostNode, host.EndpointReference);
-  if (host.Types.has_value())
+  serialize(hostNode, host.endpointReference);
+  if (host.types.has_value())
   {
     auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Types");
-    auto* typesStr = xmlDocument_->allocate_string(toString(host.Types.value()).c_str());
+    auto* typesStr = xmlDocument_->allocate_string(toString(host.types.value()).c_str());
     typesNode->value(typesStr);
     hostNode->append_node(typesNode);
   }
@@ -456,18 +456,18 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DPWS::HostedServiceType& hosted)
 {
   auto* hostedNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Hosted");
-  for (const auto& epr : hosted.EndpointReference)
+  for (const auto& epr : hosted.endpointReference)
   {
     serialize(hostedNode, epr);
   }
   // Types
   auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Types");
-  auto* typesStr = xmlDocument_->allocate_string(toString(hosted.Types).c_str());
+  auto* typesStr = xmlDocument_->allocate_string(toString(hosted.types).c_str());
   typesNode->value(typesStr);
   hostedNode->append_node(typesNode);
   // ServiceId
   auto* serviceIdNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:ServiceId");
-  serviceIdNode->value(hosted.ServiceId.c_str());
+  serviceIdNode->value(hosted.serviceId.c_str());
   hostedNode->append_node(serviceIdNode);
   parent->append_node(hostedNode);
 }

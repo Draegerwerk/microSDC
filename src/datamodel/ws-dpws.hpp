@@ -13,37 +13,37 @@ namespace WS::DPWS
     //
     using ManufacturerType = std::string;
     using ManufacturerSequence = std::vector<ManufacturerType>;
-    ManufacturerSequence Manufacturer;
+    ManufacturerSequence manufacturer;
 
     // ManufacturerUrl
     //
     using ManufacturerUrlType = WS::ADDRESSING::URIType;
     using ManufacturerUrlOptional = std::optional<ManufacturerUrlType>;
-    ManufacturerUrlOptional ManufacturerUrl;
+    ManufacturerUrlOptional manufacturerUrl;
 
     // ModelName
     //
     using ModelNameType = std::string;
     using ModelNameSequence = std::vector<ModelNameType>;
-    ModelNameSequence ModelName;
+    ModelNameSequence modelName;
 
     // ModelNumber
     //
     using ModelNumberType = std::string;
     using ModelNumberOptional = std::optional<ModelNumberType>;
-    ModelNumberOptional ModelNumber;
+    ModelNumberOptional modelNumber;
 
     // ModelUrl
     //
     using ModelUrlType = WS::ADDRESSING::URIType;
     using ModelUrlOptional = std::optional<ModelUrlType>;
-    ModelUrlOptional ModelUrl;
+    ModelUrlOptional modelUrl;
 
     // PresentationUrl
     //
     using PresentationUrlType = WS::ADDRESSING::URIType;
     using PresentationUrlOptional = std::optional<PresentationUrlType>;
-    PresentationUrlOptional PresentationUrl;
+    PresentationUrlOptional presentationUrl;
   };
 
   struct ThisDeviceType
@@ -52,32 +52,32 @@ namespace WS::DPWS
     //
     using FriendlyNameType = std::string;
     using FriendlyNameSequence = std::vector<FriendlyNameType>;
-    FriendlyNameSequence FriendlyName;
+    FriendlyNameSequence friendlyName;
 
     // FirmwareVersion
     //
     using FirmwareVersionType = std::string;
     using FirmwareVersionOptional = std::optional<FirmwareVersionType>;
-    FirmwareVersionOptional FirmwareVersion;
+    FirmwareVersionOptional firmwareVersion;
 
     // SerialNumber
     //
     using SerialNumberType = std::string;
     using SerialNumberOptional = std::optional<SerialNumberType>;
-    SerialNumberOptional SerialNumber;
+    SerialNumberOptional serialNumber;
   };
   struct HostServiceType
   {
     // EndpointReference
     //
     using EndpointReferenceType = WS::ADDRESSING::EndpointReferenceType;
-    EndpointReferenceType EndpointReference;
+    EndpointReferenceType endpointReference;
 
     // Types
     //
     using TypesType = WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    TypesOptional Types;
+    TypesOptional types;
 
     explicit HostServiceType(EndpointReferenceType epr);
   };
@@ -87,17 +87,17 @@ namespace WS::DPWS
     //
     using EndpointReferenceType = WS::ADDRESSING::EndpointReferenceType;
     using EndpointReferenceSequence = std::vector<EndpointReferenceType>;
-    EndpointReferenceSequence EndpointReference;
+    EndpointReferenceSequence endpointReference;
 
     // Types
     //
     using TypesType = WS::DISCOVERY::QNameListType;
-    TypesType Types;
+    TypesType types;
 
     // ServiceId
     //
     using ServiceIdType = WS::ADDRESSING::URIType;
-    ServiceIdType ServiceId;
+    ServiceIdType serviceId;
 
     HostedServiceType(EndpointReferenceSequence epr, TypesType types, ServiceIdType serviceId);
   };
@@ -106,18 +106,18 @@ namespace WS::DPWS
     // Host
     //
     using HostType = WS::DPWS::HostServiceType;
-    HostType Host;
+    HostType host;
 
     // Hosted
     //
     using HostedType = WS::DPWS::HostedServiceType;
     using HostedSequence = std::vector<HostedType>;
-    HostedSequence Hosted;
+    HostedSequence hosted;
 
     // Type
     //
     using TypeType = std::string;
-    TypeType Type;
+    TypeType type;
 
     Relationship(HostType host, HostedSequence hosted, TypeType type);
   };

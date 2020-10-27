@@ -87,8 +87,8 @@ MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionThisMod
   MetadataSection metadata = MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_MODEL));
   auto& thisModel = metadata.ThisModel = WS::DPWS::ThisModelType();
   WS::DPWS::ThisModelType::ManufacturerType manufacturer(deviceCharacteristics_.getManufacturer());
-  thisModel->Manufacturer.emplace_back(manufacturer);
-  thisModel->ModelName.emplace_back(deviceCharacteristics_.getModelName());
+  thisModel->manufacturer.emplace_back(manufacturer);
+  thisModel->modelName.emplace_back(deviceCharacteristics_.getModelName());
   return metadata;
 }
 
@@ -97,7 +97,7 @@ MetadataProvider::MetadataSection MetadataProvider::createMetadataSectionThisDev
   MetadataSection metadata = MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_DEVICE));
   auto& thisDevice = metadata.ThisDevice = WS::DPWS::ThisDeviceType();
   auto friendlyName = deviceCharacteristics_.getFriendlyName();
-  thisDevice->FriendlyName.emplace_back(friendlyName);
+  thisDevice->friendlyName.emplace_back(friendlyName);
   return metadata;
 }
 
@@ -105,9 +105,9 @@ MetadataProvider::Host MetadataProvider::createHostMetadata() const
 {
   Host host(WS::ADDRESSING::EndpointReferenceType(
       WS::ADDRESSING::URIType(deviceCharacteristics_.getEndpointReference())));
-  host.Types = Host::TypesType();
-  host.Types->emplace_back(MDPWS::WS_NS_DPWS_PREFIX, "Device");
-  host.Types->emplace_back(MDPWS::NS_MDPWS_PREFIX, "MedicalDevice");
+  host.types = Host::TypesType();
+  host.types->emplace_back(MDPWS::WS_NS_DPWS_PREFIX, "Device");
+  host.types->emplace_back(MDPWS::NS_MDPWS_PREFIX, "MedicalDevice");
   return host;
 }
 
