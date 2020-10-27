@@ -882,7 +882,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::PM::LocationDetailType& locationDetail)
+                                  const BICEPS::PM::LocationDetail& locationDetail)
 {
   auto* locationDetailNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "pm:LocationDetail");
@@ -943,7 +943,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::PM::MetricQualityType& quality)
+                                  const BICEPS::PM::MetricQuality& quality)
 {
   auto* metricQualityNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MetricQuality");
   auto* validity = xmlDocument_->allocate_string(toString(quality.validity).c_str());

@@ -279,7 +279,7 @@ extern "C" void app_main()
   mdDescription.mds.emplace_back(deviceDescriptor);
   sdc->setMdDescription(mdDescription);
 
-  BICEPS::PM::LocationDetailType locationDetail;
+  BICEPS::PM::LocationDetail locationDetail;
   locationDetail.poC = "PoC-A";
   locationDetail.room = "Room-A";
   locationDetail.bed = "Bed-A";

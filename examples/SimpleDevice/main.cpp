@@ -66,7 +66,7 @@ int main()
   microSDC->setMdDescription(mdDescription);
 
   // set location detail
-  BICEPS::PM::LocationDetailType locationDetail;
+  BICEPS::PM::LocationDetail locationDetail;
   locationDetail.poC = "PoC-A";
   locationDetail.room = "Room-A";
   locationDetail.bed = "Bed-A";

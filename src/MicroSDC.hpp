@@ -14,7 +14,7 @@ class SubscriptionManager;
 namespace BICEPS::PM
 {
   struct LocationContextState;
-  struct LocationDetailType;
+  struct LocationDetail;
   struct MdDescription;
   struct Mdib;
   struct NumericMetricState;
@@ -85,7 +85,7 @@ public:
   /// @param descriptorHandle the descriptor of the location state descriptor
   /// @param locationDetail the location information to set
   void setLocation(const std::string& descriptorHandle,
-                   const BICEPS::PM::LocationDetailType& locationDetail);
+                   const BICEPS::PM::LocationDetail& locationDetail);
 
 private:
   /// a pointer to the location context state holding location descriptor of this instance

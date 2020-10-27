@@ -59,10 +59,9 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Range& range);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& mdState);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractState& state);
-  void serialize(rapidxml::xml_node<>* parent,
-                 const BICEPS::PM::LocationDetailType& locationDetail);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::LocationDetail& locationDetail);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractMetricValue& metricValue);
-  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MetricQualityType& quality);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MetricQuality& quality);
 
   void serialize(rapidxml::xml_node<>* parent,
                  const WS::EVENTING::SubscribeResponse& subscribeResponse);

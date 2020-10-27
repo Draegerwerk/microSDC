@@ -81,7 +81,7 @@ void DiscoveryService::configureProxy(const NetworkConfig::DiscoveryProxyProtoco
   }
 }
 
-void DiscoveryService::setLocation(const BICEPS::PM::LocationDetailType& locationDetail)
+void DiscoveryService::setLocation(const BICEPS::PM::LocationDetail& locationDetail)
 {
   std::string ctxt = "sdc.ctxt.loc:/sdc.ctxt.loc.detail/?";
   ctxt += "fac=" + locationDetail.facility.value_or("");

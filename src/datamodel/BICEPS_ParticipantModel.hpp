@@ -458,7 +458,7 @@ namespace BICEPS::PM
     AbstractContextState(StateKind kind, const DescriptorHandleType&, const HandleType&);
   };
 
-  struct LocationDetailType
+  struct LocationDetail
   {
     using PoCType = std::string;
     using PoCOptional = std::optional<PoCType>;
@@ -487,7 +487,7 @@ namespace BICEPS::PM
 
   struct LocationContextState : public AbstractContextState
   {
-    using LocationDetailOptional = std::optional<LocationDetailType>;
+    using LocationDetailOptional = std::optional<LocationDetail>;
     LocationDetailOptional locationDetail;
 
     static bool classof(const AbstractState* other);
@@ -515,7 +515,7 @@ namespace BICEPS::PM
                            const OperatingModeType& operatingMode);
   };
 
-  struct MetricQualityType
+  struct MetricQuality
   {
     using ValidityType = MeasurementValidity;
     ValidityType validity;
@@ -528,10 +528,10 @@ namespace BICEPS::PM
     using QiOptional = std::optional<QiType>;
     QiOptional qi;
 
-    explicit MetricQualityType(const ValidityType& validity);
+    explicit MetricQuality(const ValidityType& validity);
   };
 
-  struct AnnotationType
+  struct Annotation
   {
     using TypeType = CodedValue;
     TypeType type;
@@ -547,9 +547,9 @@ namespace BICEPS::PM
     };
     MetricKind getKind() const;
 
-    MetricQualityType metricQuality;
+    MetricQuality metricQuality;
 
-    using AnnotationSequence = std::vector<AnnotationType>;
+    using AnnotationSequence = std::vector<Annotation>;
     AnnotationSequence annotation;
 
     using StartTimeType = Timestamp;
@@ -567,7 +567,7 @@ namespace BICEPS::PM
     virtual ~AbstractMetricValue() = default;
 
   protected:
-    explicit AbstractMetricValue(MetricKind kind, const MetricQualityType& metricQuality);
+    explicit AbstractMetricValue(MetricKind kind, const MetricQuality& metricQuality);
     AbstractMetricValue(const AbstractMetricValue&) = default;
     AbstractMetricValue(AbstractMetricValue&&) = default;
     AbstractMetricValue& operator=(const AbstractMetricValue&) = default;
@@ -585,7 +585,7 @@ namespace BICEPS::PM
 
     static bool classof(const AbstractMetricValue* other);
 
-    explicit NumericMetricValue(const MetricQualityType& metricQuality);
+    explicit NumericMetricValue(const MetricQuality& metricQuality);
   };
 
   struct AbstractMetricState : public AbstractState

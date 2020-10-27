@@ -142,7 +142,7 @@ void MicroSDC::initializeMdStates()
 }
 
 void MicroSDC::setLocation(const std::string& descriptorHandle,
-                           const BICEPS::PM::LocationDetailType& locationDetail)
+                           const BICEPS::PM::LocationDetail& locationDetail)
 {
   auto mdibVersion = getMdibVersion();
   std::lock_guard<std::mutex> lock(mdibMutex_);

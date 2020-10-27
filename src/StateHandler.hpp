@@ -93,7 +93,7 @@ public:
   {
     auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
     state->metricValue = std::make_optional<BICEPS::PM::NumericMetricValue>(
-        BICEPS::PM::MetricQualityType{BICEPS::PM::MeasurementValidity::Vld});
+        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld});
     state->metricValue->value = 0;
     return state;
   }

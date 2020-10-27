@@ -184,13 +184,13 @@ namespace BICEPS::PM
     return other->getKind() == DescriptorKind::MDS_DESCRIPTOR;
   }
 
-  MetricQualityType::MetricQualityType(const ValidityType& validity)
+  MetricQuality::MetricQuality(const ValidityType& validity)
     : validity(validity)
   {
   }
 
   AbstractMetricValue::AbstractMetricValue(const MetricKind kind,
-                                           const MetricQualityType& metricQuality)
+                                           const MetricQuality& metricQuality)
     : metricQuality(metricQuality)
     , kind_(kind)
   {
@@ -201,7 +201,7 @@ namespace BICEPS::PM
     return kind_;
   }
 
-  NumericMetricValue::NumericMetricValue(const MetricQualityType& metricQuality)
+  NumericMetricValue::NumericMetricValue(const MetricQuality& metricQuality)
     : AbstractMetricValue(MetricKind::NUMERIC_METRIC, metricQuality)
   {
   }

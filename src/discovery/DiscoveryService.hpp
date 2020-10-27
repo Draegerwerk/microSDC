@@ -43,7 +43,7 @@ public:
 
   /// @brief sets a new location of this instance
   /// @param locationDetail the location state information
-  void setLocation(const BICEPS::PM::LocationDetailType& locationDetail);
+  void setLocation(const BICEPS::PM::LocationDetail& locationDetail);
 
 private:
   /// whether this discovery service runs
