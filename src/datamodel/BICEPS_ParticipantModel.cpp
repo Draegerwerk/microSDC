@@ -258,6 +258,23 @@ namespace BICEPS::PM
     return other->getKind() == StateKind::LOCATION_CONTEXT_STATE;
   }
 
+  AbstractDeviceComponentState::AbstractDeviceComponentState(StateKind kind,
+                                                             DescriptorHandleType handle)
+    : AbstractState(kind, std::move(handle))
+  {
+  }
+
+  AbstractComplexDeviceComponentState::AbstractComplexDeviceComponentState(
+      StateKind kind, DescriptorHandleType handle)
+    : AbstractDeviceComponentState(kind, std::move(handle))
+  {
+  }
+
+  MdsState::MdsState(DescriptorHandleType handle)
+    : AbstractComplexDeviceComponentState(StateKind::MDS_STATE, std::move(handle))
+  {
+  }
+
   AbstractOperationState::AbstractOperationState(const StateKind kind,
                                                  const DescriptorHandleType& descriptorHandle,
                                                  const OperatingModeType& operatingMode)

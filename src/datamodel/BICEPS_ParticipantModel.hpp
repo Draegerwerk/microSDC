@@ -69,6 +69,23 @@ namespace BICEPS::PM
     NA
   };
 
+  enum class CalibrationState
+  {
+    No,
+    Req,
+    Run,
+    Cal,
+    Oth
+  };
+
+  enum class CalibrationType
+  {
+    Offset,
+    Gain,
+    TP,
+    Unspec
+  };
+
   struct CodedValue
   {
     using CodeType = std::string;
@@ -380,6 +397,12 @@ namespace BICEPS::PM
       LAST_CONTEXT_STATE,
       LAST_MULTI_STATE,
 
+      DEVICE_COMPONENT_STATE,
+      COMPLEX_DEVICE_COMPONENT_STATE,
+      MDS_STATE,
+      LAST_COMPLEX_DEVICE_COMPONENT_STATE,
+      LAST_DEVICE_COMPONENT_STATE,
+
       OPERATION_STATE,
       SET_VALUE_OPERATION_STATE,
       LAST_OPERATION_STATE,
@@ -495,6 +518,133 @@ namespace BICEPS::PM
     LocationContextState(const DescriptorHandleType&, const HandleType&);
   };
 
+  using Timestamp = unsigned int;
+
+  struct CalibrationInfo
+  {
+    using ComponentCalibrationStateType = CalibrationState;
+    using ComponentCalibrationStateOptional = std::optional<ComponentCalibrationStateType>;
+    ComponentCalibrationStateOptional componentCalibrationState;
+
+    using TypeType = CalibrationType;
+    using TypeOptional = std::optional<TypeType>;
+    TypeOptional type;
+
+    using TimeType = Timestamp;
+    using TimeOptional = std::optional<TimeType>;
+    TimeOptional time;
+  };
+
+  enum class LocalizedTextWidth
+  {
+    xs,
+    s,
+    m,
+    l,
+    xl,
+    xxl
+  };
+
+  using LocalizedTextRef = std::string;
+
+  struct LocalizedText
+  {
+    using RefType = LocalizedTextRef;
+    using RefOptional = std::optional<RefType>;
+    RefOptional ref;
+
+    using LangType = std::string;
+    using LangOptional = std::optional<LangType>;
+    LangOptional lang;
+
+    using VersionType = unsigned int;
+    using VersionOptional = std::optional<VersionType>;
+    VersionOptional version;
+
+    using TextWidthType = LocalizedTextWidth;
+    using TextWidthOptional = std::optional<TextWidthType>;
+    TextWidthOptional textWidth;
+  };
+
+  struct PhysicalConnectorInfo
+  {
+    using NumberType = int;
+    using NumberOptional = std::optional<NumberType>;
+    NumberOptional number;
+
+    using LabelSequence = std::vector<LocalizedText>;
+    LabelSequence label;
+  };
+
+  struct AbstractDeviceComponentState : public AbstractState
+  {
+    using ActivationStateType = ComponentActivation;
+    using ActivationStateOptional = std::optional<ActivationStateType>;
+    ActivationStateOptional activationState;
+
+    using OperatingHoursType = unsigned int;
+    using OperatingHoursOptional = std::optional<OperatingHoursType>;
+    OperatingHoursOptional operatingHours;
+
+    using OperatingCyclesType = int;
+    using OperatingCyclesOptional = std::optional<OperatingCyclesType>;
+    OperatingCyclesOptional operatingCycles;
+
+    using CalibrationInfoType = struct CalibrationInfo;
+    using CalibrationInfoOptional = std::optional<CalibrationInfoType>;
+    CalibrationInfoOptional calibrationInfo;
+
+    using NextCalibrationType = struct CalibrationInfo;
+    using NextCalibrationOptional = std::optional<NextCalibrationType>;
+    CalibrationInfoOptional nextCalibration;
+
+    using PhysicalConnectorType = PhysicalConnectorInfo;
+    using PhysicalConnectorOptional = std::optional<PhysicalConnectorType>;
+    PhysicalConnectorOptional physicalConnector;
+
+  protected:
+    AbstractDeviceComponentState(StateKind kind, DescriptorHandleType handle);
+  };
+
+  struct AbstractComplexDeviceComponentState : public AbstractDeviceComponentState
+  {
+  protected:
+    AbstractComplexDeviceComponentState(StateKind kind, DescriptorHandleType handle);
+  };
+
+  enum class MdsOperatingMode
+  {
+    /// Normal
+    Nml,
+    /// Demo
+    Dmo,
+    /// Service
+    Srv,
+    /// Maintenance
+    Mtn
+  };
+
+  struct OperatingJurisdiction : public InstanceIdentifier
+  {
+  };
+
+  struct MdsState : public AbstractComplexDeviceComponentState
+  {
+    using LangType = std::string;
+    using LangOptional = std::optional<LangType>;
+    LangOptional lang;
+
+    using OperatingModeType = MdsOperatingMode;
+    using OperatingModeOptional = std::optional<OperatingModeType>;
+    OperatingModeOptional operatingMode;
+
+    using OperatingJurisdictionType = OperatingJurisdiction;
+    using OperatingJurisdictionOptional = std::optional<OperatingJurisdictionType>;
+    OperatingJurisdictionOptional operatingJurisdiction;
+
+    explicit MdsState(DescriptorHandleType handle);
+  };
+
   struct AbstractOperationState : public AbstractState
   {
     using OperatingModeType = ::BICEPS::PM::OperatingMode;
@@ -536,8 +686,6 @@ namespace BICEPS::PM
     using TypeType = CodedValue;
     TypeType type;
   };
-
-  using Timestamp = unsigned int;
 
   struct AbstractMetricValue
   {
