@@ -132,12 +132,8 @@ void MicroSDC::initializeMdStates()
 {
   for (const auto& handler : stateHandlers_)
   {
-    if (const auto numericHandler = dyn_cast<NumericStateHandler>(handler);
-        numericHandler != nullptr)
-    {
-      std::lock_guard<std::mutex> lock(mdibMutex_);
-      mdib_->mdState->state.emplace_back(numericHandler->getInitialState());
-    }
+    std::lock_guard<std::mutex> lock(mdibMutex_);
+    mdib_->mdState->state.emplace_back(handler->getInitialState());
   }
 }
 
@@ -242,7 +238,7 @@ void MicroSDC::addMdState(std::shared_ptr<StateHandler> stateHandler)
   stateHandlers_.emplace_back(std::move(stateHandler));
 }
 
-void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state)
+void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::AbstractState>& state)
 {
   std::lock_guard<std::mutex> lock(runningMutex_);
   if (!running_)
@@ -250,11 +246,15 @@ void MicroSDC::updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>
     return;
   }
   auto newState = updateMdib(state);
-  notifyEpisodicMetricReport(newState);
+  if (const auto metricState = dyn_cast<const BICEPS::PM::AbstractMetricState>(newState);
+      metricState != nullptr)
+  {
+    notifyEpisodicMetricReport(metricState);
+  }
 }
 
-template <class T>
-std::shared_ptr<const T> MicroSDC::updateMdib(std::shared_ptr<T> newState)
+std::shared_ptr<const BICEPS::PM::AbstractState>
+MicroSDC::updateMdib(std::shared_ptr<BICEPS::PM::AbstractState> newState)
 {
   incrementMdibVersion();
   std::lock_guard<std::mutex> lock(mdibMutex_);
@@ -285,7 +285,7 @@ unsigned int MicroSDC::getMdibVersion() const
 }
 
 void MicroSDC::notifyEpisodicMetricReport(
-    std::shared_ptr<const BICEPS::PM::NumericMetricState> state)
+    std::shared_ptr<const BICEPS::PM::AbstractMetricState> state)
 {
   BICEPS::MM::MetricReportPart reportPart;
   reportPart.metricState.emplace_back(std::move(state));

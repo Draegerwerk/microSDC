@@ -5,6 +5,36 @@
 #include "networking/NetworkConfig.hpp"
 #include <thread>
 
+/// @brief Implements a MdStateHandler for NumericStates
+class NumericStateHandler : public StateHandler
+{
+public:
+  /// @brief constructs a new NumericStateHandler attached to a given descriptor state handle
+  /// @param descriptorHandle the handle of the state's descriptor
+  explicit NumericStateHandler(const std::string& descriptorHandle)
+    : StateHandler(descriptorHandle)
+  {
+  }
+
+  std::shared_ptr<BICEPS::PM::AbstractState> getInitialState() const override
+  {
+    auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
+    state->metricValue = std::make_optional<BICEPS::PM::NumericMetricValue>(
+        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld});
+    state->metricValue->value = 0;
+    return state;
+  }
+
+  /// @param sets a new numeric value to the state handled by this handler and updates the mdib
+  /// @param value the new value to set
+  void setValue(double value)
+  {
+    auto state = dyn_cast<BICEPS::PM::NumericMetricState>(getInitialState());
+    state->metricValue->value = value;
+    updateState(state);
+  }
+};
+
 static volatile std::atomic_bool keepRunning = true;
 static std::condition_variable cvRunning;
 static std::mutex runningMutex;
@@ -26,8 +56,7 @@ int main()
   const auto sdcPort = 8080;
   const auto defaultAddress = NetworkInterface::getDefaultInterface().address();
   LOG(LogLevel::INFO, "Setting local ip address " << defaultAddress);
-  microSDC->setNetworkConfig(std::make_unique<NetworkConfig>(
-      true, defaultAddress, sdcPort));
+  microSDC->setNetworkConfig(std::make_unique<NetworkConfig>(true, defaultAddress, sdcPort));
 
   DeviceCharacteristics deviceCharacteristics;
   deviceCharacteristics.setFriendlyName("MicroSDC on Linux");

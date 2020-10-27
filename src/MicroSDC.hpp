@@ -79,7 +79,7 @@ public:
 
   /// @brief updates a given state in the mdib representation
   /// @param state the state to update
-  void updateState(const std::shared_ptr<BICEPS::PM::NumericMetricState>& state);
+  void updateState(const std::shared_ptr<BICEPS::PM::AbstractState>& state);
 
   /// @brief sets the location of this instance
   /// @param descriptorHandle the descriptor of the location state descriptor
@@ -125,8 +125,8 @@ private:
   /// @brief updates the internal mdib representation with a given state
   /// @tparam infered state type of the state to update
   /// @param state the new state to update in the mdib
-  template <class T>
-  std::shared_ptr<const T> updateMdib(std::shared_ptr<T> state);
+  std::shared_ptr<const BICEPS::PM::AbstractState>
+  updateMdib(std::shared_ptr<BICEPS::PM::AbstractState> state);
 
   /// @brief update the version attribute of the mdib. Will be called everytime the mdib changes
   void incrementMdibVersion();
@@ -140,5 +140,5 @@ private:
 
   /// @brief sends a notification to subscriber about a changed numeric metric state
   /// @param state a pointer to the state which was updated
-  void notifyEpisodicMetricReport(std::shared_ptr<const BICEPS::PM::NumericMetricState> state);
+  void notifyEpisodicMetricReport(std::shared_ptr<const BICEPS::PM::AbstractMetricState> state);
 };

@@ -1,14 +1,18 @@
 #include "StateHandler.hpp"
 
-StateHandler::StateHandler(const StateHandlerKind k, std::string descriptorHandle)
-  : kind_(k)
-  , descriptorHandle_(std::move(descriptorHandle))
+StateHandler::StateHandler(std::string descriptorHandle)
+  : descriptorHandle_(std::move(descriptorHandle))
 {
 }
 
-StateHandler::StateHandlerKind StateHandler::getKind() const
+void StateHandler::updateState(const std::shared_ptr<BICEPS::PM::AbstractState>& state)
 {
-  return kind_;
+  if (microSDC_ == nullptr)
+  {
+    LOG(LogLevel::ERROR, "Cannot update state of unassigned state! Use addMdState!");
+    return;
+  }
+  microSDC_->updateState(state);
 }
 
 const std::string& StateHandler::getDescriptorHandle() const
