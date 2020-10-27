@@ -26,13 +26,13 @@ std::string GetService::getURI() const
 void GetService::handleRequest(std::unique_ptr<Request> req)
 {
   const auto& requestEnvelope = req->getEnvelope();
-  const auto& soapAction = requestEnvelope.Header.Action;
+  const auto& soapAction = requestEnvelope.header.action;
   if (soapAction == MDPWS::WS_ACTION_GET_METADATA_REQUEST)
   {
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
     metadata_->fillGetServiceMetadata(responseEnvelope);
-    responseEnvelope.Header.Action =
+    responseEnvelope.header.action =
         WS::ADDRESSING::URIType(MDPWS::WS_ACTION_GET_METADATA_RESPONSE);
     req->respond(responseEnvelope);
   }
@@ -40,8 +40,8 @@ void GetService::handleRequest(std::unique_ptr<Request> req)
   {
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.Header.Action = WS::ADDRESSING::URIType(SDC::ACTION_GET_MDIB_RESPONSE);
-    responseEnvelope.Body.GetMdibResponse =
+    responseEnvelope.header.action = WS::ADDRESSING::URIType(SDC::ACTION_GET_MDIB_RESPONSE);
+    responseEnvelope.body.getMdibResponse =
         std::make_optional<MESSAGEMODEL::Body::GetMdibResponseType>(microSDC_.getMdib());
     req->respond(responseEnvelope);
   }

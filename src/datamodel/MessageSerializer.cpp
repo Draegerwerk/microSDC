@@ -58,8 +58,8 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   envelope->append_attribute(xmlnsExt);
   envelope->append_attribute(xmlnsXsi);
 
-  serialize(envelope, message.Header);
-  serialize(envelope, message.Body);
+  serialize(envelope, message.header);
+  serialize(envelope, message.body);
 
   parent->append_node(envelope);
 }
@@ -69,28 +69,28 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   auto* headerNode = xmlDocument_->allocate_node(rapidxml::node_element, "soap:Header");
   // Mandatory action element
   auto* actionNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Action");
-  actionNode->value(header.Action.c_str());
+  actionNode->value(header.action.c_str());
   headerNode->append_node(actionNode);
   // optionals
-  if (header.MessageID.has_value())
+  if (header.messageID.has_value())
   {
     auto* messageIdNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:MessageID");
-    messageIdNode->value(header.MessageID->c_str());
+    messageIdNode->value(header.messageID->c_str());
     headerNode->append_node(messageIdNode);
   }
-  if (header.To.has_value())
+  if (header.to.has_value())
   {
     auto* toNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:To");
-    toNode->value(header.To->c_str());
+    toNode->value(header.to->c_str());
     headerNode->append_node(toNode);
   }
-  if (header.AppSequence.has_value())
+  if (header.appSequence.has_value())
   {
-    serialize(headerNode, header.AppSequence.value());
+    serialize(headerNode, header.appSequence.value());
   }
-  if (header.RelatesTo.has_value())
+  if (header.relatesTo.has_value())
   {
-    serialize(headerNode, header.RelatesTo.value());
+    serialize(headerNode, header.relatesTo.value());
   }
   parent->append_node(headerNode);
 }
@@ -98,45 +98,45 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMODEL::Body& body)
 {
   auto* bodyNode = xmlDocument_->allocate_node(rapidxml::node_element, "soap:Body");
-  if (body.Hello.has_value())
+  if (body.hello.has_value())
   {
-    serialize(bodyNode, body.Hello.value());
+    serialize(bodyNode, body.hello.value());
   }
-  else if (body.Bye.has_value())
+  else if (body.bye.has_value())
   {
-    serialize(bodyNode, body.Bye.value());
+    serialize(bodyNode, body.bye.value());
   }
-  else if (body.ProbeMatches.has_value())
+  else if (body.probeMatches.has_value())
   {
-    serialize(bodyNode, body.ProbeMatches.value());
+    serialize(bodyNode, body.probeMatches.value());
   }
-  else if (body.ResolveMatches.has_value())
+  else if (body.resolveMatches.has_value())
   {
-    serialize(bodyNode, body.ResolveMatches.value());
+    serialize(bodyNode, body.resolveMatches.value());
   }
-  else if (body.Metadata.has_value())
+  else if (body.metadata.has_value())
   {
-    serialize(bodyNode, body.Metadata.value());
+    serialize(bodyNode, body.metadata.value());
   }
-  else if (body.GetMdibResponse.has_value())
+  else if (body.getMdibResponse.has_value())
   {
-    serialize(bodyNode, body.GetMdibResponse.value());
+    serialize(bodyNode, body.getMdibResponse.value());
   }
-  else if (body.SubscribeResponse.has_value())
+  else if (body.subscribeResponse.has_value())
   {
-    serialize(bodyNode, body.SubscribeResponse.value());
+    serialize(bodyNode, body.subscribeResponse.value());
   }
-  else if (body.RenewResponse.has_value())
+  else if (body.renewResponse.has_value())
   {
-    serialize(bodyNode, body.RenewResponse.value());
+    serialize(bodyNode, body.renewResponse.value());
   }
-  else if (body.EpisodicMetricReport.has_value())
+  else if (body.episodicMetricReport.has_value())
   {
-    serialize(bodyNode, body.EpisodicMetricReport.value());
+    serialize(bodyNode, body.episodicMetricReport.value());
   }
-  else if (body.SetValueResponse.has_value())
+  else if (body.setValueResponse.has_value())
   {
-    serialize(bodyNode, body.SetValueResponse.value());
+    serialize(bodyNode, body.setValueResponse.value());
   }
   parent->append_node(bodyNode);
 }

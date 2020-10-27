@@ -25,7 +25,7 @@ namespace MESSAGEMODEL
     {
       throw ExpectedElement("Action", MDPWS::WS_NS_ADDRESSING);
     }
-    Action = ActionType(*actionNode);
+    action = ActionType(*actionNode);
 
     for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
          entry = entry->next_sibling())
@@ -48,7 +48,7 @@ namespace MESSAGEMODEL
       else if (strncmp(entry->name(), "MessageID", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
-        MessageID = std::make_optional<MessageIDType>(*entry);
+        messageID = std::make_optional<MessageIDType>(*entry);
       }
       else if (strncmp(entry->name(), "ReferenceParameters", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
@@ -63,17 +63,17 @@ namespace MESSAGEMODEL
       else if (strncmp(entry->name(), "ReplyTo", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
-        ReplyTo = std::make_optional<ReplyToType>(*entry);
+        replyTo = std::make_optional<ReplyToType>(*entry);
       }
       else if (strncmp(entry->name(), "To", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
-        To = std::make_optional<ToType>(*entry);
+        to = std::make_optional<ToType>(*entry);
       }
       else if (strncmp(entry->name(), "Identifier", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        Identifier = std::make_optional<IdentifierType>(*entry);
+        identifier = std::make_optional<IdentifierType>(*entry);
       }
     }
   }
@@ -97,39 +97,39 @@ namespace MESSAGEMODEL
     if (strncmp(bodyContent->name(), "Probe", bodyContent->name_size()) == 0 &&
         strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY, bodyContent->xmlns_size()) == 0)
     {
-      Probe = std::make_optional<ProbeType>(*bodyContent);
+      probe = std::make_optional<ProbeType>(*bodyContent);
     }
     else if (strncmp(bodyContent->name(), "Resolve", bodyContent->name_size()) == 0 &&
              strncmp(bodyContent->xmlns(), MDPWS::WS_NS_DISCOVERY, bodyContent->xmlns_size()) == 0)
     {
-      Resolve = std::make_optional<ResolveType>(*bodyContent);
+      resolve = std::make_optional<ResolveType>(*bodyContent);
     }
     else if (strncmp(bodyContent->name(), "GetMetadata", bodyContent->name_size()) == 0 &&
              strncmp(bodyContent->xmlns(), MDPWS::WS_NS_METADATA_EXCHANGE,
                      bodyContent->xmlns_size()) == 0)
     {
-      GetMetadata = std::make_optional<GetMetadataType>(*bodyContent);
+      getMetadata = std::make_optional<GetMetadataType>(*bodyContent);
     }
     else if (strncmp(bodyContent->name(), "Subscribe", bodyContent->name_size()) == 0 &&
              strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
     {
-      Subscribe = std::make_optional<SubscribeType>(*bodyContent);
+      subscribe = std::make_optional<SubscribeType>(*bodyContent);
     }
     else if (strncmp(bodyContent->name(), "Renew", bodyContent->name_size()) == 0 &&
              strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
     {
-      Renew = std::make_optional<RenewType>(*bodyContent);
+      renew = std::make_optional<RenewType>(*bodyContent);
     }
     else if (strncmp(bodyContent->name(), "Unsubscribe", bodyContent->name_size()) == 0 &&
              strncmp(bodyContent->xmlns(), MDPWS::WS_NS_EVENTING, bodyContent->xmlns_size()) == 0)
     {
-      Unsubscribe = std::make_optional<UnsubscribeType>(*bodyContent);
+      unsubscribe = std::make_optional<UnsubscribeType>(*bodyContent);
     }
     else if (strncmp(bodyContent->name(), "SetValue", bodyContent->name_size()) == 0 &&
              strncmp(bodyContent->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL,
                      bodyContent->xmlns_size()) == 0)
     {
-      SetValue = std::make_optional<SetValueType>(*bodyContent);
+      setValue = std::make_optional<SetValueType>(*bodyContent);
     }
   }
 
@@ -146,13 +146,13 @@ namespace MESSAGEMODEL
     {
       throw ExpectedElement("Header", MDPWS::WS_NS_SOAP_ENVELOPE);
     }
-    Header = HeaderType(*headerNode);
+    header = HeaderType(*headerNode);
 
     auto bodyNode = node.first_node("Body", MDPWS::WS_NS_SOAP_ENVELOPE);
     if (bodyNode == nullptr)
     {
       throw ExpectedElement("Body", MDPWS::WS_NS_SOAP_ENVELOPE);
     }
-    Body = BodyType(*bodyNode);
+    body = BodyType(*bodyNode);
   }
 } // namespace MESSAGEMODEL

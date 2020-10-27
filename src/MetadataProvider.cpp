@@ -50,7 +50,7 @@ WS::ADDRESSING::URIType MetadataProvider::getStateEventServiceURI() const
 
 void MetadataProvider::fillDeviceMetadata(MESSAGEMODEL::Envelope& envelope) const
 {
-  auto& metadata = envelope.Body.Metadata = WS::MEX::Metadata();
+  auto& metadata = envelope.body.metadata = WS::MEX::Metadata();
   metadata->MetadataSection.emplace_back(createMetadataSectionThisModel());
   metadata->MetadataSection.emplace_back(createMetadataSectionThisDevice());
   metadata->MetadataSection.emplace_back(createMetadataSectionRelationship(
@@ -60,7 +60,7 @@ void MetadataProvider::fillDeviceMetadata(MESSAGEMODEL::Envelope& envelope) cons
 
 void MetadataProvider::fillGetServiceMetadata(MESSAGEMODEL::Envelope& envelope) const
 {
-  auto& metadata = envelope.Body.Metadata = WS::MEX::Metadata();
+  auto& metadata = envelope.body.metadata = WS::MEX::Metadata();
   metadata->MetadataSection.emplace_back(createMetadataSectionWSDLGetService());
   metadata->MetadataSection.emplace_back(
       createMetadataSectionRelationship(createHostMetadata(), {createHostedGetService()}));
@@ -68,7 +68,7 @@ void MetadataProvider::fillGetServiceMetadata(MESSAGEMODEL::Envelope& envelope) 
 
 void MetadataProvider::fillSetServiceMetadata(MESSAGEMODEL::Envelope& envelope) const
 {
-  auto& metadata = envelope.Body.Metadata = WS::MEX::Metadata();
+  auto& metadata = envelope.body.metadata = WS::MEX::Metadata();
   metadata->MetadataSection.emplace_back(createMetadataSectionWSDLSetService());
   metadata->MetadataSection.emplace_back(
       createMetadataSectionRelationship(createHostMetadata(), {createHostedSetService()}));
@@ -76,7 +76,7 @@ void MetadataProvider::fillSetServiceMetadata(MESSAGEMODEL::Envelope& envelope) 
 
 void MetadataProvider::fillStateEventServiceMetadata(MESSAGEMODEL::Envelope& envelope) const
 {
-  auto& metadata = envelope.Body.Metadata = WS::MEX::Metadata();
+  auto& metadata = envelope.body.metadata = WS::MEX::Metadata();
   metadata->MetadataSection.emplace_back(createMetadataSectionWSDLStateEventService());
   metadata->MetadataSection.emplace_back(
       createMetadataSectionRelationship(createHostMetadata(), {createHostedStateEventService()}));

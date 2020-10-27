@@ -120,15 +120,15 @@ void SubscriptionManager::fireEvent(const BICEPS::MM::EpisodicMetricReport& repo
     return;
   }
   MESSAGEMODEL::Header header;
-  header.MessageID = MESSAGEMODEL::Header::MessageIDType(MicroSDC::calculateMessageID());
-  header.Action = WS::ADDRESSING::URIType(SDC::ACTION_EPISODIC_METRIC_REPORT);
+  header.messageID = MESSAGEMODEL::Header::MessageIDType(MicroSDC::calculateMessageID());
+  header.action = WS::ADDRESSING::URIType(SDC::ACTION_EPISODIC_METRIC_REPORT);
 
   MESSAGEMODEL::Body body;
-  body.EpisodicMetricReport = report;
+  body.episodicMetricReport = report;
 
   MESSAGEMODEL::Envelope notifyEnvelope;
-  notifyEnvelope.Header = std::move(header);
-  notifyEnvelope.Body = std::move(body);
+  notifyEnvelope.header = std::move(header);
+  notifyEnvelope.body = std::move(body);
 
   MessageSerializer serializer;
   serializer.serialize(notifyEnvelope);

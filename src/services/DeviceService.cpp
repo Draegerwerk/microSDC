@@ -20,12 +20,12 @@ std::string DeviceService::getURI() const
 void DeviceService::handleRequest(std::unique_ptr<Request> req)
 {
   const auto requestEnvelope = req->getEnvelope();
-  const auto& soapAction = requestEnvelope.Header.Action;
+  const auto& soapAction = requestEnvelope.header.action;
   if (soapAction == MDPWS::WS_ACTION_GET)
   {
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.Header.Action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_GET_RESPONSE);
+    responseEnvelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_GET_RESPONSE);
     metadata_->fillDeviceMetadata(responseEnvelope);
     req->respond(responseEnvelope);
   }
