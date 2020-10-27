@@ -10,7 +10,7 @@ namespace WS::EVENTING
   {
     using IsReferenceParameterType = bool;
     using IsReferenceParameterOptional = std::optional<IsReferenceParameterType>;
-    IsReferenceParameterOptional IsReferenceParameter;
+    IsReferenceParameterOptional isReferenceParameter;
 
     explicit Identifier(const rapidxml::xml_node<>& node);
     explicit Identifier(std::string x);
@@ -38,7 +38,7 @@ namespace WS::ADDRESSING
   {
     using RelationshipTypeType = ::WS::ADDRESSING::RelationshipTypeOpenEnum;
     using RelationshipTypeOptional = std::optional<RelationshipTypeType>;
-    RelationshipTypeOptional RelationshipType;
+    RelationshipTypeOptional relationshipType;
 
     explicit RelatesToType(URIType x);
   };
@@ -47,7 +47,7 @@ namespace WS::ADDRESSING
   {
     using IdentifierType = WS::EVENTING::Identifier;
     using IdentifierOptional = std::optional<IdentifierType>;
-    IdentifierOptional Identifier;
+    IdentifierOptional identifier;
 
     explicit ReferenceParametersType(const IdentifierType& identifier);
   };
@@ -55,11 +55,11 @@ namespace WS::ADDRESSING
   struct EndpointReferenceType
   {
     using AddressType = ::WS::ADDRESSING::URIType;
-    AddressType Address;
+    AddressType address;
 
     using ReferenceParametersType = WS::ADDRESSING::ReferenceParametersType;
     using ReferenceParametersOptional = std::optional<ReferenceParametersType>;
-    ReferenceParametersOptional ReferenceParameters;
+    ReferenceParametersOptional referenceParameters;
 
     explicit EndpointReferenceType(AddressType address);
     explicit EndpointReferenceType(const rapidxml::xml_node<>& node);

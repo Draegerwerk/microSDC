@@ -180,7 +180,7 @@ void DiscoveryService::handleUDPMessage(std::size_t bytesRecvd)
   {
     LOG(LogLevel::INFO, "Received WS-Discovery Resolve message from "
                             << senderAddress << " asking for EndpointReference "
-                            << envelope->body.resolve->EndpointReference.Address);
+                            << envelope->body.resolve->EndpointReference.address);
     handleResolve(*envelope);
   }
   else if (envelope->body.resolveMatches.has_value())
@@ -346,7 +346,7 @@ void DiscoveryService::handleProbe(const MESSAGEMODEL::Envelope& envelope)
 
 void DiscoveryService::handleResolve(const MESSAGEMODEL::Envelope& envelope)
 {
-  if (envelope.body.resolve->EndpointReference.Address != endpointReference_)
+  if (envelope.body.resolve->EndpointReference.address != endpointReference_)
   {
     return;
   }
@@ -393,7 +393,7 @@ void DiscoveryService::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_PROBE_MATCHES);
   if (request.header.replyTo.has_value())
   {
-    envelope.header.to = request.header.replyTo->Address;
+    envelope.header.to = request.header.replyTo->address;
   }
   else
   {
@@ -428,7 +428,7 @@ void DiscoveryService::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RESOLVE_MATCHES);
   if (request.header.replyTo.has_value())
   {
-    envelope.header.to = request.header.replyTo->Address;
+    envelope.header.to = request.header.replyTo->address;
   }
   else
   {

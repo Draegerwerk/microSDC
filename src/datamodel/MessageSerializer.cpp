@@ -154,7 +154,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* eprNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:EndpointReference");
   auto* addressNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Address");
-  addressNode->value(endpointReference.Address.c_str());
+  addressNode->value(endpointReference.address.c_str());
   eprNode->append_node(addressNode);
   parent->append_node(eprNode);
 }
@@ -962,11 +962,11 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
       xmlDocument_->allocate_node(rapidxml::node_element, "wse:SubscriptionManager");
 
   auto* addressNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Address");
-  addressNode->value(subscribeResponse.SubscriptionManager.Address.c_str());
+  addressNode->value(subscribeResponse.SubscriptionManager.address.c_str());
   subscriptionManagerNode->append_node(addressNode);
 
   serialize(subscriptionManagerNode,
-            subscribeResponse.SubscriptionManager.ReferenceParameters.value());
+            subscribeResponse.SubscriptionManager.referenceParameters.value());
 
   subscribeResponseNode->append_node(subscriptionManagerNode);
 
@@ -981,10 +981,10 @@ void MessageSerializer::serialize(
 {
   auto* referenceParametersNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "wsa:ReferenceParameters");
-  if (referenceParameters.Identifier.has_value())
+  if (referenceParameters.identifier.has_value())
   {
     auto* identifierNode = xmlDocument_->allocate_node(rapidxml::node_element, "wse:Identifier");
-    identifierNode->value(referenceParameters.Identifier.value().c_str());
+    identifierNode->value(referenceParameters.identifier.value().c_str());
     referenceParametersNode->append_node(identifierNode);
   }
   parent->append_node(referenceParametersNode);

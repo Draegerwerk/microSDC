@@ -45,12 +45,12 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
     std::lock_guard<std::mutex> lock(subscriptionMutex_);
     subscriptions_.emplace(identifier, info);
   }
-  sessionManager_.createSession(info.notifyTo.Address);
+  sessionManager_.createSession(info.notifyTo.address);
 
   WS::EVENTING::SubscribeResponse::SubscriptionManagerType subscriptionManager(
       WS::ADDRESSING::EndpointReferenceType(
           WS::ADDRESSING::URIType("To be filled by Soap Service")));
-  subscriptionManager.ReferenceParameters =
+  subscriptionManager.referenceParameters =
       WS::ADDRESSING::ReferenceParametersType(WS::EVENTING::Identifier{identifier});
   WS::EVENTING::SubscribeResponse subscribeResponse(
       subscriptionManager, WS::EVENTING::SubscribeResponse::ExpiresType{duration});
@@ -89,10 +89,10 @@ void SubscriptionManager::dispatch(const WS::EVENTING::Unsubscribe& /*unsubscrib
     throw std::runtime_error("Could not find subscription corresponding to Renew Identifier " +
                              identifier);
   }
-  const auto& notifyTo = subscriptionInfo->second.notifyTo.Address;
+  const auto& notifyTo = subscriptionInfo->second.notifyTo.address;
   const auto numSameClient =
       std::count_if(subscriptions_.begin(), subscriptions_.end(),
-                    [&](const auto& it) { return it.second.notifyTo.Address == notifyTo; });
+                    [&](const auto& it) { return it.second.notifyTo.address == notifyTo; });
 
   if (numSameClient == 1)
   {
@@ -136,7 +136,7 @@ void SubscriptionManager::fireEvent(const BICEPS::MM::EpisodicMetricReport& repo
   LOG(LogLevel::DEBUG, "SENDING: " << messageStr);
   for (const auto* const info : subscriber)
   {
-    sessionManager_.sendToSession(info->notifyTo.Address, messageStr);
+    sessionManager_.sendToSession(info->notifyTo.address, messageStr);
   }
 }
 
@@ -146,7 +146,7 @@ void SubscriptionManager::printSubscriptions() const
   out << "Subscriptions:\n";
   for (const auto& [key, val] : subscriptions_)
   {
-    out << key << " : " << val.notifyTo.Address << " : "
+    out << key << " : " << val.notifyTo.address << " : "
         << std::chrono::duration_cast<std::chrono::seconds>(val.expirationTime -
                                                             std::chrono::steady_clock::now())
                .count()

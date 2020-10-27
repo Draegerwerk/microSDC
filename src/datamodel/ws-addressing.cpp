@@ -26,12 +26,12 @@ namespace WS::EVENTING
       if (strncmp(isReferenceParameterNode->value(), "true",
                   isReferenceParameterNode->name_size()) == 0)
       {
-        IsReferenceParameter = true;
+        isReferenceParameter = true;
       }
       else if (strncmp(isReferenceParameterNode->value(), "false",
                        isReferenceParameterNode->name_size()) == 0)
       {
-        IsReferenceParameter = false;
+        isReferenceParameter = false;
       }
     }
   }
@@ -53,7 +53,7 @@ namespace WS::ADDRESSING
   // EndpointReferenceType
   //
   EndpointReferenceType::EndpointReferenceType(AddressType address)
-    : Address(std::move(address))
+    : address(std::move(address))
   {
   }
   EndpointReferenceType::EndpointReferenceType(const rapidxml::xml_node<>& node)
@@ -67,7 +67,7 @@ namespace WS::ADDRESSING
     {
       throw ExpectedElement("Address", MDPWS::WS_NS_ADDRESSING);
     }
-    Address = URIType{addressNode->value(), addressNode->value_size()};
+    address = URIType{addressNode->value(), addressNode->value_size()};
   }
 
   // RelatesToType
@@ -80,7 +80,7 @@ namespace WS::ADDRESSING
   // ReferenceParametersType
   //
   ReferenceParametersType::ReferenceParametersType(const IdentifierType& identifier)
-    : Identifier(identifier)
+    : identifier(identifier)
   {
   }
 

@@ -41,7 +41,7 @@ void SetService::handleRequest(std::unique_ptr<Request> req)
   {
     auto subscribeRequest = requestEnvelope.body.subscribe;
     auto response = subscriptionManager_->dispatch(subscribeRequest.value());
-    response.SubscriptionManager.Address = metadata_->getSetServiceURI();
+    response.SubscriptionManager.address = metadata_->getSetServiceURI();
 
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
