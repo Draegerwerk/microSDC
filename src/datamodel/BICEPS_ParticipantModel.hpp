@@ -72,7 +72,7 @@ namespace BICEPS::PM
   struct CodedValue
   {
     using CodeType = std::string;
-    CodeType Code;
+    CodeType code;
 
     explicit CodedValue(CodeType code);
   };
@@ -108,18 +108,18 @@ namespace BICEPS::PM
 
     using TypeType = CodedValue;
     using TypeOptional = std::optional<TypeType>;
-    TypeOptional Type;
+    TypeOptional type;
 
     using HandleType = std::string;
-    HandleType Handle;
+    HandleType handle;
 
     using DescriptorVersionType = unsigned int;
     using DescriptorVersionOptional = std::optional<DescriptorVersionType>;
-    DescriptorVersionOptional DescriptorVersion;
+    DescriptorVersionOptional descriptorVersion;
 
     using SafetyClassificationType = ::BICEPS::PM::SafetyClassification;
     using SafetyClassificationOptional = std::optional<SafetyClassificationType>;
-    SafetyClassificationOptional SafetyClassification;
+    SafetyClassificationOptional safetyClassification;
 
     virtual ~AbstractDescriptor() = default;
 
@@ -137,7 +137,7 @@ namespace BICEPS::PM
   struct AbstractOperationDescriptor : public AbstractDescriptor
   {
     using OperationTargetType = std::string;
-    OperationTargetType OperationTarget;
+    OperationTargetType operationTarget;
 
     static bool classof(const AbstractDescriptor* other);
 
@@ -175,19 +175,19 @@ namespace BICEPS::PM
   public:
     using ManufacturerType = std::string;
     using ManufacturerSequence = std::vector<ManufacturerType>;
-    ManufacturerSequence Manufacturer;
+    ManufacturerSequence manufacturer;
 
     using ModelNameType = std::string;
     using ModelNameSequence = std::vector<ModelNameType>;
-    ModelNameSequence ModelName;
+    ModelNameSequence modelName;
 
     using ModelNumberType = std::string;
     using ModelNumberOptional = std::optional<ModelNumberType>;
-    ModelNumberOptional ModelNumber;
+    ModelNumberOptional modelNumber;
 
     using SerialNumberType = std::string;
     using SerialNumberSequence = std::vector<SerialNumberType>;
-    SerialNumberSequence SerialNumber;
+    SerialNumberSequence serialNumber;
   };
 
   struct AbstractContextDescriptor : public AbstractDescriptor
@@ -216,11 +216,11 @@ namespace BICEPS::PM
   {
     using PatientContextType = PatientContextDescriptor;
     using PatientContextOptional = std::optional<PatientContextType>;
-    PatientContextOptional PatientContext;
+    PatientContextOptional patientContext;
 
     using LocationContextType = LocationContextDescriptor;
     using LocationContextOptional = std::optional<LocationContextType>;
-    LocationContextOptional LocationContext;
+    LocationContextOptional locationContext;
 
     static bool classof(const AbstractDescriptor* other);
 
@@ -239,35 +239,35 @@ namespace BICEPS::PM
   {
     using LowerType = int;
     using LowerOptional = std::optional<LowerType>;
-    LowerOptional Lower;
+    LowerOptional lower;
 
     using UpperType = int;
     using UpperOptional = std::optional<UpperType>;
-    UpperOptional Upper;
+    UpperOptional upper;
 
     using StepWidthType = int;
     using StepWidthOptional = std::optional<StepWidthType>;
-    StepWidthOptional StepWidth;
+    StepWidthOptional stepWidth;
 
     using RelativeAccuracyType = int;
     using RelativeAccuracyOptional = std::optional<RelativeAccuracyType>;
-    RelativeAccuracyOptional RelativeAccuracy;
+    RelativeAccuracyOptional relativeAccuracy;
 
     using AbsoluteAccuracyType = int;
     using AbsoluteAccuracyOptional = std::optional<AbsoluteAccuracyType>;
-    AbsoluteAccuracyOptional AbsoluteAccuracy;
+    AbsoluteAccuracyOptional absoluteAccuracy;
   };
 
   struct AbstractMetricDescriptor : public AbstractDescriptor
   {
     using UnitType = CodedValue;
-    UnitType Unit;
+    UnitType unit;
 
     using MetricCategoryType = ::BICEPS::PM::MetricCategory;
-    MetricCategoryType MetricCategory;
+    MetricCategoryType metricCategory;
 
     using MetricAvailabilityType = ::BICEPS::PM::MetricAvailability;
-    MetricAvailabilityType MetricAvailability;
+    MetricAvailabilityType metricAvailability;
 
     static bool classof(const AbstractDescriptor* other);
 
@@ -280,14 +280,14 @@ namespace BICEPS::PM
   {
     using TechnicalRangeType = Range;
     using TechnicalRangeSequence = std::vector<TechnicalRangeType>;
-    TechnicalRangeSequence TechnicalRange;
+    TechnicalRangeSequence technicalRange;
 
     using ResolutionType = int;
-    ResolutionType Resolution;
+    ResolutionType resolution;
 
     using AveragingPeriodType = std::string;
     using AveragingPeriodOptional = std::optional<AveragingPeriodType>;
-    AveragingPeriodOptional AveragingPeriod;
+    AveragingPeriodOptional averagingPeriod;
 
     static bool classof(const AbstractDescriptor* other);
 
@@ -299,7 +299,7 @@ namespace BICEPS::PM
   {
     using MetricType = std::shared_ptr<AbstractMetricDescriptor>;
     using MetricSequence = std::vector<MetricType>;
-    MetricSequence Metric;
+    MetricSequence metric;
 
     static bool classof(const AbstractDescriptor* other);
 
@@ -310,7 +310,7 @@ namespace BICEPS::PM
   {
     using OperationType = ::BICEPS::PM::AbstractOperationDescriptor;
     using OperationSequence = std::vector<std::shared_ptr<OperationType>>;
-    OperationSequence Operation;
+    OperationSequence operation;
 
     static bool classof(const AbstractDescriptor* other);
 
@@ -321,11 +321,11 @@ namespace BICEPS::PM
   {
     using ChannelType = ChannelDescriptor;
     using ChannelSequence = std::vector<ChannelType>;
-    ChannelSequence Channel;
+    ChannelSequence channel;
 
     using ScoType = ::BICEPS::PM::ScoDescriptor;
     using ScoOptional = std::optional<ScoType>;
-    ScoOptional Sco;
+    ScoOptional sco;
 
     static bool classof(const AbstractDescriptor* other);
 
@@ -336,23 +336,23 @@ namespace BICEPS::PM
   {
     using MetaDataType = Metadata;
     using MetaDataOptional = std::optional<MetaDataType>;
-    MetaDataOptional MetaData;
+    MetaDataOptional metaData;
 
     using SystemContextType = SystemContextDescriptor;
     using SystemContextOptional = std::optional<SystemContextType>;
-    SystemContextOptional SystemContext;
+    SystemContextOptional systemContext;
 
     using ClockType = ClockDescriptor;
     using ClockOptional = std::optional<ClockType>;
-    ClockOptional Clock;
+    ClockOptional clock;
 
     using BatteryType = BatteryDescriptor;
     using BatterySequence = std::vector<BatteryType>;
-    BatterySequence Battery;
+    BatterySequence battery;
 
     using VmdType = VmdDescriptor;
     using VmdSequence = std::vector<VmdType>;
-    VmdSequence Vmd;
+    VmdSequence vmd;
 
     static bool classof(const AbstractDescriptor* other);
 
@@ -363,11 +363,11 @@ namespace BICEPS::PM
   {
     using MdsType = MdsDescriptor;
     using MdsSequence = std::vector<MdsType>;
-    MdsSequence Mds;
+    MdsSequence mds;
 
     using DescriptionVersionType = unsigned int;
     using DescriptionVersionOptional = std::optional<DescriptionVersionType>;
-    DescriptionVersionOptional DescriptionVersion;
+    DescriptionVersionOptional descriptionVersion;
   };
 
   struct AbstractState
@@ -392,10 +392,10 @@ namespace BICEPS::PM
 
     using StateVersionType = unsigned int;
     using StateVersionOptional = std::optional<StateVersionType>;
-    StateVersionOptional StateVersion;
+    StateVersionOptional stateVersion;
 
     using DescriptorHandleType = std::string;
-    DescriptorHandleType DescriptorHandle;
+    DescriptorHandleType descriptorHandle;
 
     virtual ~AbstractState() = default;
 
@@ -414,10 +414,10 @@ namespace BICEPS::PM
   {
     using CategoryType = CodedValue;
     using CategoryOptional = std::optional<CategoryType>;
-    CategoryOptional Category;
+    CategoryOptional category;
 
     using HandleType = std::string;
-    HandleType Handle;
+    HandleType handle;
 
     static bool classof(const AbstractState* other);
 
@@ -428,30 +428,30 @@ namespace BICEPS::PM
   {
     using ExtensionType = std::string;
     using ExtensionOptional = std::optional<ExtensionType>;
-    ExtensionOptional Extension;
+    ExtensionOptional extension;
 
     using RootType = WS::ADDRESSING::URIType;
     using RootOptional = std::optional<RootType>;
-    RootOptional Root;
+    RootOptional root;
   };
 
   struct AbstractContextState : public AbstractMultiState
   {
     using BindingMdibVersionType = unsigned int;
     using BindingMdibVersionOptional = std::optional<BindingMdibVersionType>;
-    BindingMdibVersionOptional BindingMdibVersion;
+    BindingMdibVersionOptional bindingMdibVersion;
 
     using ContextAssociationType = ::BICEPS::PM::ContextAssociation;
     using ContextAssociationOptional = std::optional<ContextAssociationType>;
-    ContextAssociationOptional ContextAssociation;
+    ContextAssociationOptional contextAssociation;
 
     using ValidatorType = InstanceIdentifier;
     using ValidatorSequence = std::vector<ValidatorType>;
-    ValidatorSequence Validator;
+    ValidatorSequence validator;
 
     using IdentificationType = InstanceIdentifier;
     using IdentificationSequence = std::vector<IdentificationType>;
-    IdentificationSequence Identification;
+    IdentificationSequence identification;
 
     static bool classof(const AbstractState* other);
 
@@ -462,33 +462,33 @@ namespace BICEPS::PM
   {
     using PoCType = std::string;
     using PoCOptional = std::optional<PoCType>;
-    PoCOptional PoC;
+    PoCOptional poC;
 
     using RoomType = std::string;
     using RoomOptional = std::optional<RoomType>;
-    RoomOptional Room;
+    RoomOptional room;
 
     using BedType = std::string;
     using BedOptional = std::optional<PoCType>;
-    BedOptional Bed;
+    BedOptional bed;
 
     using FacilityType = std::string;
     using FacilityOptional = std::optional<FacilityType>;
-    FacilityOptional Facility;
+    FacilityOptional facility;
 
     using BuildingType = std::string;
     using BuildingOptional = std::optional<PoCType>;
-    BuildingOptional Building;
+    BuildingOptional building;
 
     using FloorType = std::string;
     using FloorOptional = std::optional<PoCType>;
-    FloorOptional Floor;
+    FloorOptional floor;
   };
 
   struct LocationContextState : public AbstractContextState
   {
     using LocationDetailOptional = std::optional<LocationDetailType>;
-    LocationDetailOptional LocationDetail;
+    LocationDetailOptional locationDetail;
 
     static bool classof(const AbstractState* other);
 
@@ -498,7 +498,7 @@ namespace BICEPS::PM
   struct AbstractOperationState : public AbstractState
   {
     using OperatingModeType = ::BICEPS::PM::OperatingMode;
-    OperatingModeType OperatingMode;
+    OperatingModeType operatingMode;
 
     static bool classof(const AbstractState* other);
 
@@ -518,15 +518,15 @@ namespace BICEPS::PM
   struct MetricQualityType
   {
     using ValidityType = MeasurementValidity;
-    ValidityType Validity;
+    ValidityType validity;
 
     using ModeType = GenerationMode;
     using ModeOptional = std::optional<ModeType>;
-    ModeOptional Mode;
+    ModeOptional mode;
 
     using QiType = int;
     using QiOptional = std::optional<QiType>;
-    QiOptional Qi;
+    QiOptional qi;
 
     explicit MetricQualityType(const ValidityType& validity);
   };
@@ -534,7 +534,7 @@ namespace BICEPS::PM
   struct AnnotationType
   {
     using TypeType = CodedValue;
-    TypeType Type;
+    TypeType type;
   };
 
   using Timestamp = unsigned int;
@@ -547,22 +547,22 @@ namespace BICEPS::PM
     };
     MetricKind getKind() const;
 
-    MetricQualityType MetricQuality;
+    MetricQualityType metricQuality;
 
     using AnnotationSequence = std::vector<AnnotationType>;
-    AnnotationSequence Annotation;
+    AnnotationSequence annotation;
 
     using StartTimeType = Timestamp;
     using StartTimeOptional = std::optional<StartTimeType>;
-    StartTimeOptional StartTime;
+    StartTimeOptional startTime;
 
     using StopTimeType = Timestamp;
     using StopTimeOptional = std::optional<StopTimeType>;
-    StopTimeOptional StopTime;
+    StopTimeOptional stopTime;
 
     using DeterminationTimeType = Timestamp;
     using DeterminationTimeOptional = std::optional<DeterminationTimeType>;
-    DeterminationTimeOptional DeterminationTime;
+    DeterminationTimeOptional determinationTime;
 
     virtual ~AbstractMetricValue() = default;
 
@@ -581,7 +581,7 @@ namespace BICEPS::PM
   {
     using ValueType = double;
     using ValueOptional = std::optional<ValueType>;
-    ValueOptional Value;
+    ValueOptional value;
 
     static bool classof(const AbstractMetricValue* other);
 
@@ -592,7 +592,7 @@ namespace BICEPS::PM
   {
     using ActivationStateType = ComponentActivation;
     using ActivationStateOptional = std::optional<ActivationStateType>;
-    ActivationStateOptional ActivationState;
+    ActivationStateOptional activationState;
 
     static bool classof(const AbstractState* other);
 
@@ -604,15 +604,15 @@ namespace BICEPS::PM
   {
     using MetricValueType = NumericMetricValue;
     using MetricValueOptional = std::optional<MetricValueType>;
-    MetricValueOptional MetricValue;
+    MetricValueOptional metricValue;
 
     using PhysiologicalRangeType = Range;
     using PhysiologicalRangeSequence = std::vector<PhysiologicalRangeType>;
-    PhysiologicalRangeSequence PhysiologicalRange;
+    PhysiologicalRangeSequence physiologicalRange;
 
     using ActiveAveragingPeriodType = std::string;
     using ActiveAveragingPeriodOptional = std::optional<ActiveAveragingPeriodType>;
-    ActiveAveragingPeriodOptional ActiveAveragingPeriod;
+    ActiveAveragingPeriodOptional activeAveragingPeriod;
 
     static bool classof(const AbstractState* other);
 
@@ -623,33 +623,33 @@ namespace BICEPS::PM
   {
     using StateType = std::shared_ptr<AbstractState>;
     using StateSequence = std::vector<StateType>;
-    StateSequence State;
+    StateSequence state;
 
     using StateVersionType = unsigned int;
     using StateVersionOptional = std::optional<StateVersionType>;
-    StateVersionOptional StateVersion;
+    StateVersionOptional stateVersion;
   };
 
   struct Mdib
   {
     using MdDescriptionType = ::BICEPS::PM::MdDescription;
     using MdDescriptionOptional = std::optional<MdDescriptionType>;
-    MdDescriptionOptional MdDescription;
+    MdDescriptionOptional mdDescription;
 
     using MdStateType = ::BICEPS::PM::MdState;
     using MdStateOptional = std::optional<MdStateType>;
-    MdStateOptional MdState;
+    MdStateOptional mdState;
 
     using MdibVersionType = unsigned int;
     using MdibVersionOptional = std::optional<MdibVersionType>;
-    MdibVersionOptional MdibVersion;
+    MdibVersionOptional mdibVersion;
 
     using SequenceIdType = WS::ADDRESSING::URIType;
-    SequenceIdType SequenceId;
+    SequenceIdType sequenceId;
 
     using InstanceIdType = unsigned int;
     using InstanceIdOptional = std::optional<InstanceIdType>;
-    InstanceIdOptional InstanceId;
+    InstanceIdOptional instanceId;
 
     explicit Mdib(SequenceIdType sequenceIdType);
   };

@@ -223,69 +223,69 @@ extern "C" void app_main()
   sdc->setDeviceCharacteristics(deviceCharacteristics);
 
   BICEPS::PM::Metadata metadata;
-  metadata.Manufacturer.emplace_back("Draeger");
-  metadata.ModelName.emplace_back("MicroSDC_Device01");
-  metadata.ModelNumber.emplace("1");
-  metadata.SerialNumber.emplace_back("2345-6789");
+  metadata.manufacturer.emplace_back("Draeger");
+  metadata.modelName.emplace_back("MicroSDC_Device01");
+  metadata.modelNumber.emplace("1");
+  metadata.serialNumber.emplace_back("2345-6789");
 
   BICEPS::PM::SystemContextDescriptor systemContext("system_context");
-  systemContext.PatientContext = BICEPS::PM::PatientContextDescriptor("patient_context");
-  systemContext.LocationContext = BICEPS::PM::LocationContextDescriptor("location_context");
+  systemContext.patientContext = BICEPS::PM::PatientContextDescriptor("patient_context");
+  systemContext.locationContext = BICEPS::PM::LocationContextDescriptor("location_context");
 
   // States for measured values
   auto pressureState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "pressureState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  pressureState->SafetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  pressureState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   auto temperatureState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "temperatureState_handle", BICEPS::PM::CodedValue("6048"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  temperatureState->SafetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  temperatureState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   auto humidityState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "humidityState_handle", BICEPS::PM::CodedValue("262688"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  humidityState->SafetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  humidityState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   // Dummy settable state
   auto settableState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "settableState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  settableState->SafetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  settableState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   BICEPS::PM::ChannelDescriptor deviceChannel("device_channel");
-  deviceChannel.Metric.emplace_back(pressureState);
-  deviceChannel.Metric.emplace_back(temperatureState);
-  deviceChannel.Metric.emplace_back(humidityState);
-  deviceChannel.Metric.emplace_back(settableState);
+  deviceChannel.metric.emplace_back(pressureState);
+  deviceChannel.metric.emplace_back(temperatureState);
+  deviceChannel.metric.emplace_back(humidityState);
+  deviceChannel.metric.emplace_back(settableState);
 
   BICEPS::PM::ScoDescriptor deviceSco("sco_handle");
   auto setValueOperation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
       "setValueOperation_handle", "settableState_handle");
-  deviceSco.Operation.emplace_back(setValueOperation);
+  deviceSco.operation.emplace_back(setValueOperation);
 
-  deviceChannel.SafetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  deviceChannel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
   BICEPS::PM::VmdDescriptor deviceModule("device_vmd");
-  deviceModule.Channel.emplace_back(deviceChannel);
-  deviceModule.Sco = deviceSco;
+  deviceModule.channel.emplace_back(deviceChannel);
+  deviceModule.sco = deviceSco;
 
   BICEPS::PM::MdsDescriptor deviceDescriptor("MedicalDevices");
-  deviceDescriptor.MetaData = metadata;
-  deviceDescriptor.SystemContext = systemContext;
-  deviceDescriptor.Vmd.emplace_back(deviceModule);
+  deviceDescriptor.metaData = metadata;
+  deviceDescriptor.systemContext = systemContext;
+  deviceDescriptor.vmd.emplace_back(deviceModule);
 
   BICEPS::PM::MdDescription mdDescription;
-  mdDescription.Mds.emplace_back(deviceDescriptor);
+  mdDescription.mds.emplace_back(deviceDescriptor);
   sdc->setMdDescription(mdDescription);
 
   BICEPS::PM::LocationDetailType locationDetail;
-  locationDetail.PoC = "PoC-A";
-  locationDetail.Room = "Room-A";
-  locationDetail.Bed = "Bed-A";
-  locationDetail.Facility = "Facility-A";
-  locationDetail.Building = "Building-A";
-  locationDetail.Floor = "Floor-A";
+  locationDetail.poC = "PoC-A";
+  locationDetail.room = "Room-A";
+  locationDetail.bed = "Bed-A";
+  locationDetail.facility = "Facility-A";
+  locationDetail.building = "Building-A";
+  locationDetail.floor = "Floor-A";
   sdc->setLocation("location_context", locationDetail);
 
   auto pressureStateHandler = std::make_shared<NumericStateHandler>("pressureState_handle");

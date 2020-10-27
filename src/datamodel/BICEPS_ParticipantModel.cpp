@@ -5,12 +5,12 @@ namespace BICEPS::PM
 {
 
   CodedValue::CodedValue(CodeType code)
-    : Code(std::move(code))
+    : code(std::move(code))
   {
   }
 
   AbstractDescriptor::AbstractDescriptor(const DescriptorKind kind, HandleType handle)
-    : Handle(std::move(handle))
+    : handle(std::move(handle))
     , kind_(kind)
   {
   }
@@ -24,7 +24,7 @@ namespace BICEPS::PM
                                                            const HandleType& handle,
                                                            OperationTargetType operationTarget)
     : AbstractDescriptor(kind, handle)
-    , OperationTarget(std::move(operationTarget))
+    , operationTarget(std::move(operationTarget))
   {
   }
 
@@ -104,9 +104,9 @@ namespace BICEPS::PM
       const DescriptorKind kind, const HandleType& handle, UnitType unit,
       const MetricCategoryType& metricCategory, const MetricAvailabilityType& metricAvailability)
     : AbstractDescriptor(kind, handle)
-    , Unit(std::move(unit))
-    , MetricCategory(metricCategory)
-    , MetricAvailability(metricAvailability)
+    , unit(std::move(unit))
+    , metricCategory(metricCategory)
+    , metricAvailability(metricAvailability)
   {
   }
 
@@ -122,7 +122,7 @@ namespace BICEPS::PM
                                                    const ResolutionType& resolution)
     : AbstractMetricDescriptor(DescriptorKind::NUMERIC_METRIC_DESCRIPTOR, handle, unit,
                                metricCategory, metricAvailability)
-    , Resolution(resolution)
+    , resolution(resolution)
   {
   }
 
@@ -185,13 +185,13 @@ namespace BICEPS::PM
   }
 
   MetricQualityType::MetricQualityType(const ValidityType& validity)
-    : Validity(validity)
+    : validity(validity)
   {
   }
 
   AbstractMetricValue::AbstractMetricValue(const MetricKind kind,
                                            const MetricQualityType& metricQuality)
-    : MetricQuality(metricQuality)
+    : metricQuality(metricQuality)
     , kind_(kind)
   {
   }
@@ -212,7 +212,7 @@ namespace BICEPS::PM
   }
 
   AbstractState::AbstractState(const StateKind kind, DescriptorHandleType handle)
-    : DescriptorHandle(std::move(handle))
+    : descriptorHandle(std::move(handle))
     , kind_(kind)
   {
   }
@@ -226,7 +226,7 @@ namespace BICEPS::PM
                                          const DescriptorHandleType& descriptorHandle,
                                          HandleType handle)
     : AbstractState(kind, descriptorHandle)
-    , Handle(std::move(handle))
+    , handle(std::move(handle))
   {
   }
   bool AbstractMultiState::classof(const AbstractState* other)
@@ -262,7 +262,7 @@ namespace BICEPS::PM
                                                  const DescriptorHandleType& descriptorHandle,
                                                  const OperatingModeType& operatingMode)
     : AbstractState(kind, descriptorHandle)
-    , OperatingMode(operatingMode)
+    , operatingMode(operatingMode)
   {
   }
 
@@ -305,7 +305,7 @@ namespace BICEPS::PM
   }
 
   Mdib::Mdib(SequenceIdType sequenceIdType)
-    : SequenceId(std::move(sequenceIdType))
+    : sequenceId(std::move(sequenceIdType))
   {
   }
 } // namespace BICEPS::PM

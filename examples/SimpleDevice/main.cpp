@@ -39,40 +39,40 @@ int main()
 
   // Construct MdDescription
   BICEPS::PM::SystemContextDescriptor systemContext("system_context");
-  systemContext.PatientContext = BICEPS::PM::PatientContextDescriptor("patient_context");
-  systemContext.LocationContext = BICEPS::PM::LocationContextDescriptor("location_context");
+  systemContext.patientContext = BICEPS::PM::PatientContextDescriptor("patient_context");
+  systemContext.locationContext = BICEPS::PM::LocationContextDescriptor("location_context");
 
   BICEPS::PM::MdsDescriptor deviceDescriptor("MedicalDevices");
-  deviceDescriptor.SystemContext = systemContext;
+  deviceDescriptor.systemContext = systemContext;
 
   // Dummy state
   auto state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  state->SafetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   BICEPS::PM::ChannelDescriptor deviceChannel("device_channel");
-  deviceChannel.Metric.emplace_back(state);
-  deviceChannel.SafetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  deviceChannel.metric.emplace_back(state);
+  deviceChannel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   BICEPS::PM::VmdDescriptor deviceModule("device_vmd");
-  deviceModule.Channel.emplace_back(deviceChannel);
+  deviceModule.channel.emplace_back(deviceChannel);
 
-  deviceDescriptor.Vmd.emplace_back(deviceModule);
+  deviceDescriptor.vmd.emplace_back(deviceModule);
 
   BICEPS::PM::MdDescription mdDescription;
-  mdDescription.Mds.emplace_back(deviceDescriptor);
+  mdDescription.mds.emplace_back(deviceDescriptor);
 
   microSDC->setMdDescription(mdDescription);
 
   // set location detail
   BICEPS::PM::LocationDetailType locationDetail;
-  locationDetail.PoC = "PoC-A";
-  locationDetail.Room = "Room-A";
-  locationDetail.Bed = "Bed-A";
-  locationDetail.Facility = "Facility-A";
-  locationDetail.Building = "Building-A";
-  locationDetail.Floor = "Floor-A";
+  locationDetail.poC = "PoC-A";
+  locationDetail.room = "Room-A";
+  locationDetail.bed = "Bed-A";
+  locationDetail.facility = "Facility-A";
+  locationDetail.building = "Building-A";
+  locationDetail.floor = "Floor-A";
   microSDC->setLocation("location_context", locationDetail);
 
   auto stateHandler = std::make_shared<NumericStateHandler>("state_handle");
