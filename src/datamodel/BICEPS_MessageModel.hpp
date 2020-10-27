@@ -33,7 +33,7 @@ namespace BICEPS::MM
   struct GetMdibResponse
   {
     using MdibType = BICEPS::PM::Mdib;
-    MdibType Mdib;
+    MdibType mdib;
 
     explicit GetMdibResponse(MdibType mdib);
   };
@@ -42,14 +42,14 @@ namespace BICEPS::MM
   {
     using MdibVersionType = unsigned int;
     using MdibVersionOptional = std::optional<MdibVersionType>;
-    MdibVersionOptional MdibVersion;
+    MdibVersionOptional mdibVersion;
 
     using SequenceIdType = WS::ADDRESSING::URIType;
-    SequenceIdType SequenceId;
+    SequenceIdType sequenceId;
 
     using InstanceIdType = unsigned int;
     using InstanceIdOptional = std::optional<InstanceIdType>;
-    InstanceIdOptional InstanceId;
+    InstanceIdOptional instanceId;
 
   protected:
     explicit AbstractReport(WS::ADDRESSING::URIType sequenceId);
@@ -59,7 +59,7 @@ namespace BICEPS::MM
   {
     using SourceMdsType = std::string;
     using SourceMdsOptional = std::optional<SourceMdsType>;
-    SourceMdsOptional SourceMds;
+    SourceMdsOptional sourceMds;
 
   protected:
     AbstractReportPart() = default;
@@ -69,14 +69,14 @@ namespace BICEPS::MM
   {
     using MetricStateType = std::shared_ptr<const PM::AbstractMetricState>;
     using MetricStateSequence = std::vector<MetricStateType>;
-    MetricStateSequence MetricState;
+    MetricStateSequence metricState;
   };
 
   struct AbstractMetricReport : public AbstractReport
   {
     using ReportPartType = MetricReportPart;
     using ReportPartSequence = std::vector<ReportPartType>;
-    ReportPartSequence ReportPart;
+    ReportPartSequence reportPart;
 
   protected:
     explicit AbstractMetricReport(const SequenceIdType& sequenceId);
@@ -96,13 +96,13 @@ namespace BICEPS::MM
   struct AbstractSet
   {
     using OperationHandleRefType = ::BICEPS::MM::OperationHandleRef;
-    OperationHandleRefType OperationHandleRef;
+    OperationHandleRefType operationHandleRef;
   };
 
   struct SetValue : public AbstractSet
   {
     using RequestedNumericValueType = double;
-    RequestedNumericValueType RequestedNumericValue{0.0};
+    RequestedNumericValueType requestedNumericValue{0.0};
 
     explicit SetValue(const rapidxml::xml_node<>& node);
 
@@ -118,18 +118,18 @@ namespace BICEPS::MM
   struct InvocationInfo
   {
     using TransactionIdType = unsigned int;
-    TransactionIdType TransactionId;
+    TransactionIdType transactionId;
 
     using InvocationStateType = ::BICEPS::MM::InvocationState;
-    InvocationStateType InvocationState;
+    InvocationStateType invocationState;
 
     using InvocationErrorType = ::BICEPS::MM::InvocationError;
     using InvocationErrorOptional = std::optional<InvocationErrorType>;
-    InvocationErrorOptional InvocationError;
+    InvocationErrorOptional invocationError;
 
     using InvocationErrorMessageType = ::BICEPS::MM::InvocationErrorMessage;
     using InvocationErrorMessageOptional = std::optional<InvocationErrorMessageType>;
-    InvocationErrorMessageOptional InvocationErrorMessage;
+    InvocationErrorMessageOptional invocationErrorMessage;
 
     InvocationInfo(TransactionIdType transactionId, InvocationStateType invocationState);
   };
@@ -138,17 +138,17 @@ namespace BICEPS::MM
   {
     using MdibVersionType = unsigned int;
     using MdibVersionOptional = std::optional<MdibVersionType>;
-    MdibVersionOptional MdibVersion;
+    MdibVersionOptional mdibVersion;
 
     using SequenceIdType = WS::ADDRESSING::URIType;
-    SequenceIdType SequenceId;
+    SequenceIdType sequenceId;
 
     using InstanceIdType = unsigned int;
     using InstanceIdOptional = std::optional<InstanceIdType>;
-    InstanceIdOptional InstanceId;
+    InstanceIdOptional instanceId;
 
     using InvocationInfoType = ::BICEPS::MM::InvocationInfo;
-    InvocationInfoType InvocationInfo;
+    InvocationInfoType invocationInfo;
 
     AbstractSetResponse(SequenceIdType sequenceId, InvocationInfoType invocationInfo);
   };
@@ -169,17 +169,17 @@ namespace BICEPS::MM
   struct ReportPart
   {
     using OperationHandleRefType = ::BICEPS::MM::OperationHandleRef;
-    OperationHandleRefType OperationHandleRef;
+    OperationHandleRefType operationHandleRef;
 
     using OperationTargetType = ::BICEPS::MM::OperationTarget;
     using OperationTargetOptional = std::optional<OperationTargetType>;
-    OperationTargetOptional OperationTarget;
+    OperationTargetOptional operationTarget;
 
     using InvocationInfoType = ::BICEPS::MM::InvocationInfo;
-    InvocationInfoType InvocationInfo;
+    InvocationInfoType invocationInfo;
 
     using InvocationSourceType = ::BICEPS::MM::InvocationSource;
-    InvocationSourceType InvocationSource;
+    InvocationSourceType invocationSource;
 
     ReportPart(OperationHandleRefType operationHandleRef, InvocationInfoType invocationInfo,
                InvocationSourceType invocationSource);
@@ -188,7 +188,7 @@ namespace BICEPS::MM
   struct OperationInvokedReport : public AbstractReport
   {
     using ReportPartType = ::BICEPS::MM::ReportPart;
-    ReportPartType ReportPart;
+    ReportPartType reportPart;
 
     OperationInvokedReport(const SequenceIdType& sequenceId, ReportPartType reportPart);
   };

@@ -9,12 +9,12 @@ namespace BICEPS::MM
   // GetMdibResponse
   //
   GetMdibResponse::GetMdibResponse(MdibType mdib)
-    : Mdib(std::move(mdib))
+    : mdib(std::move(mdib))
   {
   }
 
   AbstractReport::AbstractReport(WS::ADDRESSING::URIType sequenceId)
-    : SequenceId(std::move(sequenceId))
+    : sequenceId(std::move(sequenceId))
   {
   }
 
@@ -43,7 +43,7 @@ namespace BICEPS::MM
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE, entry->xmlns_size()) ==
               0)
       {
-        AbstractSet::OperationHandleRef = std::string(entry->value(), entry->value_size());
+        AbstractSet::operationHandleRef = std::string(entry->value(), entry->value_size());
       }
       else if (entry->name() != nullptr &&
                strncmp(entry->name(), "RequestedNumericValue", entry->name_size()) == 0 &&
@@ -51,7 +51,7 @@ namespace BICEPS::MM
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE,
                        entry->xmlns_size()) == 0)
       {
-        RequestedNumericValue = std::stod(std::string(entry->value(), entry->value_size()));
+        requestedNumericValue = std::stod(std::string(entry->value(), entry->value_size()));
       }
     }
   }
@@ -63,30 +63,30 @@ namespace BICEPS::MM
 
   InvocationInfo::InvocationInfo(TransactionIdType transactionId,
                                  InvocationStateType invocationState)
-    : TransactionId(transactionId)
-    , InvocationState(invocationState)
+    : transactionId(transactionId)
+    , invocationState(invocationState)
   {
   }
 
   AbstractSetResponse::AbstractSetResponse(SequenceIdType sequenceId,
                                            InvocationInfoType invocationInfo)
-    : SequenceId(std::move(sequenceId))
-    , InvocationInfo(std::move(invocationInfo))
+    : sequenceId(std::move(sequenceId))
+    , invocationInfo(std::move(invocationInfo))
   {
   }
 
   ReportPart::ReportPart(OperationHandleRefType operationHandleRef,
                          InvocationInfoType invocationInfo, InvocationSourceType invocationSource)
-    : OperationHandleRef(std::move(operationHandleRef))
-    , InvocationInfo(std::move(invocationInfo))
-    , InvocationSource(invocationSource)
+    : operationHandleRef(std::move(operationHandleRef))
+    , invocationInfo(std::move(invocationInfo))
+    , invocationSource(invocationSource)
   {
   }
 
   OperationInvokedReport::OperationInvokedReport(const SequenceIdType& sequenceId,
                                                  ReportPartType reportPart)
     : AbstractReport(sequenceId)
-    , ReportPart(std::move(reportPart))
+    , reportPart(std::move(reportPart))
   {
   }
 } // namespace BICEPS::MM
