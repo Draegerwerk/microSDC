@@ -24,19 +24,19 @@ namespace WS::DISCOVERY
   }
 
   AppSequenceType::AppSequenceType(const uint64_t& instanceId, const uint64_t& messageNumber)
-    : InstanceId(instanceId)
-    , MessageNumber(messageNumber)
+    : instanceId(instanceId)
+    , messageNumber(messageNumber)
   {
   }
 
   ByeType::ByeType(EndpointReferenceType epr)
-    : EndpointReference(std::move(epr))
+    : endpointReference(std::move(epr))
   {
   }
 
   HelloType::HelloType(EndpointReferenceType epr, MetadataVersionType metadataVersion)
-    : EndpointReference(std::move(epr))
-    , MetadataVersion(metadataVersion)
+    : endpointReference(std::move(epr))
+    , metadataVersion(metadataVersion)
   {
   }
 
@@ -52,18 +52,18 @@ namespace WS::DISCOVERY
 
 
   ProbeMatchType::ProbeMatchType(EndpointReferenceType epr, MetadataVersionType metadataVersion)
-    : EndpointReference(std::move(epr))
-    , MetadataVersion(metadataVersion)
+    : endpointReference(std::move(epr))
+    , metadataVersion(metadataVersion)
   {
   }
 
   ProbeMatchesType::ProbeMatchesType(ProbeMatchSequence x)
-    : ProbeMatch(std::move(x))
+    : probeMatch(std::move(x))
   {
   }
 
   ResolveType::ResolveType(const rapidxml::xml_node<>& node)
-    : EndpointReference(WS::ADDRESSING::URIType(""))
+    : endpointReference(WS::ADDRESSING::URIType(""))
   {
     this->parse(node);
   }
@@ -75,17 +75,17 @@ namespace WS::DISCOVERY
     {
       throw ExpectedElement("EndpointReference", MDPWS::WS_NS_ADDRESSING);
     }
-    EndpointReference = EndpointReferenceType(*eprNode);
+    endpointReference = EndpointReferenceType(*eprNode);
   }
 
   ResolveMatchType::ResolveMatchType(EndpointReferenceType epr, MetadataVersionType metadataVersion)
-    : EndpointReference(std::move(epr))
-    , MetadataVersion(metadataVersion)
+    : endpointReference(std::move(epr))
+    , metadataVersion(metadataVersion)
   {
   }
 
   ResolveMatchesType::ResolveMatchesType(ResolveMatchSequence x)
-    : ResolveMatch(std::move(x))
+    : resolveMatch(std::move(x))
   {
   }
 

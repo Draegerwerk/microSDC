@@ -180,7 +180,7 @@ void DiscoveryService::handleUDPMessage(std::size_t bytesRecvd)
   {
     LOG(LogLevel::INFO, "Received WS-Discovery Resolve message from "
                             << senderAddress << " asking for EndpointReference "
-                            << envelope->body.resolve->EndpointReference.address);
+                            << envelope->body.resolve->endpointReference.address);
     handleResolve(*envelope);
   }
   else if (envelope->body.resolveMatches.has_value())
@@ -247,15 +247,15 @@ void DiscoveryService::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
       WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
   if (!scopes_.empty())
   {
-    hello->Scopes = scopes_;
+    hello->scopes = scopes_;
   }
   if (!types_.empty())
   {
-    hello->Types = types_;
+    hello->types = types_;
   }
   if (!xAddresses_.empty())
   {
-    hello->XAddrs = xAddresses_;
+    hello->xAddrs = xAddresses_;
   }
 }
 
@@ -311,15 +311,15 @@ void DiscoveryService::buildByeMessage(MESSAGEMODEL::Envelope& envelope)
       WS::DISCOVERY::ByeType(WS::ADDRESSING::EndpointReferenceType(endpointReference_));
   if (!scopes_.empty())
   {
-    bye->Scopes = scopes_;
+    bye->scopes = scopes_;
   }
   if (!types_.empty())
   {
-    bye->Types = types_;
+    bye->types = types_;
   }
   if (!xAddresses_.empty())
   {
-    bye->XAddrs = xAddresses_;
+    bye->xAddrs = xAddresses_;
   }
 }
 
@@ -346,7 +346,7 @@ void DiscoveryService::handleProbe(const MESSAGEMODEL::Envelope& envelope)
 
 void DiscoveryService::handleResolve(const MESSAGEMODEL::Envelope& envelope)
 {
-  if (envelope.body.resolve->EndpointReference.address != endpointReference_)
+  if (envelope.body.resolve->endpointReference.address != endpointReference_)
   {
     return;
   }
@@ -375,19 +375,19 @@ void DiscoveryService::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
 {
   auto& probeMatches = envelope.body.probeMatches = WS::DISCOVERY::ProbeMatchesType({});
   // TODO: check for match
-  auto& match = probeMatches->ProbeMatch.emplace_back(
+  auto& match = probeMatches->probeMatch.emplace_back(
       WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
   if (!scopes_.empty())
   {
-    match.Scopes = scopes_;
+    match.scopes = scopes_;
   }
   if (!types_.empty())
   {
-    match.Types = types_;
+    match.types = types_;
   }
   if (!xAddresses_.empty())
   {
-    match.XAddrs = xAddresses_;
+    match.xAddrs = xAddresses_;
   }
 
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_PROBE_MATCHES);
@@ -410,19 +410,19 @@ void DiscoveryService::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope
                                                 const MESSAGEMODEL::Envelope& request)
 {
   auto& resolveMatches = envelope.body.resolveMatches = WS::DISCOVERY::ResolveMatchesType({});
-  auto& match = resolveMatches->ResolveMatch.emplace_back(
+  auto& match = resolveMatches->resolveMatch.emplace_back(
       WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
   if (!scopes_.empty())
   {
-    match.Scopes = scopes_;
+    match.scopes = scopes_;
   }
   if (!types_.empty())
   {
-    match.Types = types_;
+    match.types = types_;
   }
   if (!xAddresses_.empty())
   {
-    match.XAddrs = xAddresses_;
+    match.xAddrs = xAddresses_;
   }
 
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RESOLVE_MATCHES);

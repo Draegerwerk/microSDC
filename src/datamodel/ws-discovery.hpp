@@ -32,7 +32,7 @@ namespace WS::DISCOVERY
   public:
     using MatchByType = WS::ADDRESSING::URIType;
     using MatchByOptional = std::optional<MatchByType>;
-    MatchByOptional MatchBy;
+    MatchByOptional matchBy;
   };
 
   struct AppSequenceType
@@ -40,36 +40,36 @@ namespace WS::DISCOVERY
   public:
     AppSequenceType(const uint64_t& instanceId, const uint64_t& messageNumber);
     using InstanceIdType = unsigned int;
-    InstanceIdType InstanceId;
+    InstanceIdType instanceId;
 
     using SequenceIdType = WS::ADDRESSING::URIType;
     using SequenceIdOptional = std::optional<SequenceIdType>;
-    SequenceIdOptional SequenceId;
+    SequenceIdOptional sequenceId;
 
     using MessageNumberType = unsigned int;
-    MessageNumberType MessageNumber;
+    MessageNumberType messageNumber;
   };
 
   struct ByeType
   {
     using EndpointReferenceType = WS::ADDRESSING::EndpointReferenceType;
-    EndpointReferenceType EndpointReference;
+    EndpointReferenceType endpointReference;
 
     using TypesType = WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    TypesOptional Types;
+    TypesOptional types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
-    ScopesOptional Scopes;
+    ScopesOptional scopes;
 
     using XAddrsType = WS::DISCOVERY::UriListType;
     using XAddrsOptional = std::optional<XAddrsType>;
-    XAddrsOptional XAddrs;
+    XAddrsOptional xAddrs;
 
     using MetadataVersionType = unsigned int;
     using MetadataVersionOptional = std::optional<MetadataVersionType>;
-    MetadataVersionOptional MetadataVersion;
+    MetadataVersionOptional metadataVersion;
 
     explicit ByeType(EndpointReferenceType epr);
   };
@@ -77,22 +77,22 @@ namespace WS::DISCOVERY
   struct HelloType
   {
     using EndpointReferenceType = ::WS::ADDRESSING::EndpointReferenceType;
-    EndpointReferenceType EndpointReference;
+    EndpointReferenceType endpointReference;
 
     using TypesType = ::WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    TypesOptional Types;
+    TypesOptional types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
-    ScopesOptional Scopes;
+    ScopesOptional scopes;
 
     using XAddrsType = WS::DISCOVERY::UriListType;
     using XAddrsOptional = std::optional<XAddrsType>;
-    XAddrsOptional XAddrs;
+    XAddrsOptional xAddrs;
 
     using MetadataVersionType = unsigned int;
-    MetadataVersionType MetadataVersion;
+    MetadataVersionType metadataVersion;
 
     HelloType(EndpointReferenceType epr, MetadataVersionType metadataVersion);
   };
@@ -103,11 +103,11 @@ namespace WS::DISCOVERY
 
     using TypesType = ::WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    TypesOptional Types;
+    TypesOptional types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
-    ScopesOptional Scopes;
+    ScopesOptional scopes;
 
   private:
     void parse(const rapidxml::xml_node<>& node);
@@ -116,22 +116,22 @@ namespace WS::DISCOVERY
   struct ProbeMatchType
   {
     using EndpointReferenceType = ::WS::ADDRESSING::EndpointReferenceType;
-    EndpointReferenceType EndpointReference;
+    EndpointReferenceType endpointReference;
 
     using TypesType = ::WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    TypesOptional Types;
+    TypesOptional types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
-    ScopesOptional Scopes;
+    ScopesOptional scopes;
 
     using XAddrsType = WS::DISCOVERY::UriListType;
     using XAddrsOptional = std::optional<XAddrsType>;
-    XAddrsOptional XAddrs;
+    XAddrsOptional xAddrs;
 
     using MetadataVersionType = unsigned int;
-    MetadataVersionType MetadataVersion;
+    MetadataVersionType metadataVersion;
 
     ProbeMatchType(EndpointReferenceType epr, MetadataVersionType metadataVersion);
   };
@@ -140,7 +140,7 @@ namespace WS::DISCOVERY
   {
     using ProbeMatchType = WS::DISCOVERY::ProbeMatchType;
     using ProbeMatchSequence = std::vector<ProbeMatchType>;
-    ProbeMatchSequence ProbeMatch;
+    ProbeMatchSequence probeMatch;
 
     explicit ProbeMatchesType(ProbeMatchSequence x);
   };
@@ -151,7 +151,7 @@ namespace WS::DISCOVERY
     explicit ResolveType(const rapidxml::xml_node<>& node);
 
     using EndpointReferenceType = ::WS::ADDRESSING::EndpointReferenceType;
-    EndpointReferenceType EndpointReference;
+    EndpointReferenceType endpointReference;
 
   private:
     void parse(const rapidxml::xml_node<>& node);
@@ -160,22 +160,22 @@ namespace WS::DISCOVERY
   struct ResolveMatchType
   {
     using EndpointReferenceType = ::WS::ADDRESSING::EndpointReferenceType;
-    EndpointReferenceType EndpointReference;
+    EndpointReferenceType endpointReference;
 
     using TypesType = ::WS::DISCOVERY::QNameListType;
     using TypesOptional = std::optional<TypesType>;
-    TypesOptional Types;
+    TypesOptional types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
     using ScopesOptional = std::optional<ScopesType>;
-    ScopesOptional Scopes;
+    ScopesOptional scopes;
 
     using XAddrsType = WS::DISCOVERY::UriListType;
     using XAddrsOptional = std::optional<XAddrsType>;
-    XAddrsOptional XAddrs;
+    XAddrsOptional xAddrs;
 
     using MetadataVersionType = unsigned int;
-    MetadataVersionType MetadataVersion;
+    MetadataVersionType metadataVersion;
 
     ResolveMatchType(EndpointReferenceType epr, MetadataVersionType metadataVersion);
   };
@@ -185,7 +185,7 @@ namespace WS::DISCOVERY
   public:
     using ResolveMatchType = WS::DISCOVERY::ResolveMatchType;
     using ResolveMatchSequence = std::vector<ResolveMatchType>;
-    ResolveMatchSequence ResolveMatch;
+    ResolveMatchSequence resolveMatch;
 
     explicit ResolveMatchesType(ResolveMatchSequence x);
   };

@@ -163,17 +163,17 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::AppSequenceType& appSequence)
 {
   auto* appSequenceNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:AppSequence");
-  const auto instanceIdStr = std::to_string(appSequence.InstanceId);
+  const auto instanceIdStr = std::to_string(appSequence.instanceId);
   auto* instanceId = xmlDocument_->allocate_string(instanceIdStr.c_str());
   auto* instanceIdAttr = xmlDocument_->allocate_attribute("InstanceId", instanceId);
   appSequenceNode->append_attribute(instanceIdAttr);
-  if (appSequence.SequenceId.has_value())
+  if (appSequence.sequenceId.has_value())
   {
-    auto* sequenceId = xmlDocument_->allocate_string(appSequence.SequenceId->c_str());
+    auto* sequenceId = xmlDocument_->allocate_string(appSequence.sequenceId->c_str());
     auto* sequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", sequenceId);
     appSequenceNode->append_attribute(sequenceIdAttr);
   }
-  auto messageNumberStr = std::to_string(appSequence.MessageNumber);
+  auto messageNumberStr = std::to_string(appSequence.messageNumber);
   auto* messageNumber = xmlDocument_->allocate_string(messageNumberStr.c_str());
   auto* messageNumberAttr = xmlDocument_->allocate_attribute("MessageNumber", messageNumber);
   appSequenceNode->append_attribute(messageNumberAttr);
@@ -184,9 +184,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::ScopesType& scopes)
 {
   auto* scopesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Scopes");
-  if (scopes.MatchBy.has_value())
+  if (scopes.matchBy.has_value())
   {
-    auto* matchByAttr = xmlDocument_->allocate_attribute("MatchBy", scopes.MatchBy->c_str());
+    auto* matchByAttr = xmlDocument_->allocate_attribute("MatchBy", scopes.matchBy->c_str());
     scopesNode->append_attribute(matchByAttr);
   }
   const auto scopesStr = toString(scopes);
@@ -199,29 +199,29 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::HelloType& hello)
 {
   auto* helloNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Hello");
-  serialize(helloNode, hello.EndpointReference);
-  if (hello.Types.has_value())
+  serialize(helloNode, hello.endpointReference);
+  if (hello.types.has_value())
   {
     auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Types");
-    auto* typesStr = xmlDocument_->allocate_string(toString(hello.Types.value()).c_str());
+    auto* typesStr = xmlDocument_->allocate_string(toString(hello.types.value()).c_str());
     typesNode->value(typesStr);
     helloNode->append_node(typesNode);
   }
-  if (hello.Scopes.has_value())
+  if (hello.scopes.has_value())
   {
-    serialize(helloNode, hello.Scopes.value());
+    serialize(helloNode, hello.scopes.value());
   }
-  if (hello.XAddrs.has_value())
+  if (hello.xAddrs.has_value())
   {
     auto* xAddrsNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
-    auto* xAddrsStr = xmlDocument_->allocate_string(toString(hello.XAddrs.value()).c_str());
+    auto* xAddrsStr = xmlDocument_->allocate_string(toString(hello.xAddrs.value()).c_str());
     xAddrsNode->value(xAddrsStr);
     helloNode->append_node(xAddrsNode);
   }
   auto* metadataVersionNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
   auto* metadataVersion =
-      xmlDocument_->allocate_string(std::to_string(hello.MetadataVersion).c_str());
+      xmlDocument_->allocate_string(std::to_string(hello.metadataVersion).c_str());
   metadataVersionNode->value(metadataVersion);
   parent->append_node(helloNode);
 }
@@ -229,31 +229,31 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::ByeType& bye)
 {
   auto* byeNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:bye");
-  serialize(byeNode, bye.EndpointReference);
-  if (bye.Types.has_value())
+  serialize(byeNode, bye.endpointReference);
+  if (bye.types.has_value())
   {
     auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Types");
-    auto* typesStr = xmlDocument_->allocate_string(toString(bye.Types.value()).c_str());
+    auto* typesStr = xmlDocument_->allocate_string(toString(bye.types.value()).c_str());
     typesNode->value(typesStr);
     byeNode->append_node(typesNode);
   }
-  if (bye.Scopes.has_value())
+  if (bye.scopes.has_value())
   {
-    serialize(byeNode, bye.Scopes.value());
+    serialize(byeNode, bye.scopes.value());
   }
-  if (bye.XAddrs.has_value())
+  if (bye.xAddrs.has_value())
   {
     auto* xAddrsNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
-    auto* xAddrsStr = xmlDocument_->allocate_string(toString(bye.XAddrs.value()).c_str());
+    auto* xAddrsStr = xmlDocument_->allocate_string(toString(bye.xAddrs.value()).c_str());
     xAddrsNode->value(xAddrsStr);
     byeNode->append_node(xAddrsNode);
   }
-  if (bye.MetadataVersion.has_value())
+  if (bye.metadataVersion.has_value())
   {
     auto* metadataVersionNode =
         xmlDocument_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
     auto* metadataVersion =
-        xmlDocument_->allocate_string(std::to_string(bye.MetadataVersion.value()).c_str());
+        xmlDocument_->allocate_string(std::to_string(bye.metadataVersion.value()).c_str());
     metadataVersionNode->value(metadataVersion);
   }
   parent->append_node(byeNode);
@@ -263,29 +263,29 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::ProbeMatchType& probeMatch)
 {
   auto* probeMatchNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:ProbeMatch");
-  serialize(probeMatchNode, probeMatch.EndpointReference);
-  if (probeMatch.Types.has_value())
+  serialize(probeMatchNode, probeMatch.endpointReference);
+  if (probeMatch.types.has_value())
   {
     auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Types");
-    auto* typesStr = xmlDocument_->allocate_string(toString(probeMatch.Types.value()).c_str());
+    auto* typesStr = xmlDocument_->allocate_string(toString(probeMatch.types.value()).c_str());
     typesNode->value(typesStr);
     probeMatchNode->append_node(typesNode);
   }
-  if (probeMatch.Scopes.has_value())
+  if (probeMatch.scopes.has_value())
   {
-    serialize(probeMatchNode, probeMatch.Scopes.value());
+    serialize(probeMatchNode, probeMatch.scopes.value());
   }
-  if (probeMatch.XAddrs.has_value())
+  if (probeMatch.xAddrs.has_value())
   {
     auto* xAddrsNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
-    auto* xAddrsStr = xmlDocument_->allocate_string(toString(probeMatch.XAddrs.value()).c_str());
+    auto* xAddrsStr = xmlDocument_->allocate_string(toString(probeMatch.xAddrs.value()).c_str());
     xAddrsNode->value(xAddrsStr);
     probeMatchNode->append_node(xAddrsNode);
   }
   auto* metadataVersionNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
   auto* metadataVersion =
-      xmlDocument_->allocate_string(std::to_string(probeMatch.MetadataVersion).c_str());
+      xmlDocument_->allocate_string(std::to_string(probeMatch.metadataVersion).c_str());
   metadataVersionNode->value(metadataVersion);
   probeMatchNode->append_node(metadataVersionNode);
   parent->append_node(probeMatchNode);
@@ -295,7 +295,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::ProbeMatchesType& probeMatches)
 {
   auto* probeMatchesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:ProbeMatches");
-  for (const auto& probeMatch : probeMatches.ProbeMatch)
+  for (const auto& probeMatch : probeMatches.probeMatch)
   {
     serialize(probeMatchesNode, probeMatch);
   }
@@ -307,29 +307,29 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* resolveMatchNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "wsd:ResolveMatches");
-  serialize(resolveMatchNode, resolveMatch.EndpointReference);
-  if (resolveMatch.Types.has_value())
+  serialize(resolveMatchNode, resolveMatch.endpointReference);
+  if (resolveMatch.types.has_value())
   {
     auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Types");
-    auto* typesStr = xmlDocument_->allocate_string(toString(resolveMatch.Types.value()).c_str());
+    auto* typesStr = xmlDocument_->allocate_string(toString(resolveMatch.types.value()).c_str());
     typesNode->value(typesStr);
     resolveMatchNode->append_node(typesNode);
   }
-  if (resolveMatch.Scopes.has_value())
+  if (resolveMatch.scopes.has_value())
   {
-    serialize(resolveMatchNode, resolveMatch.Scopes.value());
+    serialize(resolveMatchNode, resolveMatch.scopes.value());
   }
-  if (resolveMatch.XAddrs.has_value())
+  if (resolveMatch.xAddrs.has_value())
   {
     auto* xAddrsNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
-    auto* xAddrsStr = xmlDocument_->allocate_string(toString(resolveMatch.XAddrs.value()).c_str());
+    auto* xAddrsStr = xmlDocument_->allocate_string(toString(resolveMatch.xAddrs.value()).c_str());
     xAddrsNode->value(xAddrsStr);
     resolveMatchNode->append_node(xAddrsNode);
   }
   auto* metadataVersionNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
   auto* metadataVersion =
-      xmlDocument_->allocate_string(std::to_string(resolveMatch.MetadataVersion).c_str());
+      xmlDocument_->allocate_string(std::to_string(resolveMatch.metadataVersion).c_str());
   metadataVersionNode->value(metadataVersion);
   resolveMatchNode->append_node(metadataVersionNode);
   parent->append_node(resolveMatchNode);
@@ -340,7 +340,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* resolveMatchesNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "wsd:ResolveMatches");
-  for (const auto& resolveMatch : resolveMatches.ResolveMatch)
+  for (const auto& resolveMatch : resolveMatches.resolveMatch)
   {
     serialize(resolveMatchesNode, resolveMatch);
   }
