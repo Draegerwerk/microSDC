@@ -962,15 +962,15 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
       xmlDocument_->allocate_node(rapidxml::node_element, "wse:SubscriptionManager");
 
   auto* addressNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Address");
-  addressNode->value(subscribeResponse.SubscriptionManager.address.c_str());
+  addressNode->value(subscribeResponse.subscriptionManager.address.c_str());
   subscriptionManagerNode->append_node(addressNode);
 
   serialize(subscriptionManagerNode,
-            subscribeResponse.SubscriptionManager.referenceParameters.value());
+            subscribeResponse.subscriptionManager.referenceParameters.value());
 
   subscribeResponseNode->append_node(subscriptionManagerNode);
 
-  serialize(subscribeResponseNode, subscribeResponse.Expires);
+  serialize(subscribeResponseNode, subscribeResponse.expires);
 
   parent->append_node(subscribeResponseNode);
 }
@@ -995,9 +995,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* renewResponseNode =
       xmlDocument_->allocate_node(rapidxml::node_element, "wse:RenewResponse");
-  if (renewResponse.Expires.has_value())
+  if (renewResponse.expires.has_value())
   {
-    serialize(renewResponseNode, renewResponse.Expires.value());
+    serialize(renewResponseNode, renewResponse.expires.value());
   }
   parent->append_node(renewResponseNode);
 }

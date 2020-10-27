@@ -11,11 +11,11 @@ namespace WS::EVENTING
   // DeliveryType
   //
   DeliveryType::DeliveryType(NotifyToType notifyTo)
-    : NotifyTo(std::move(notifyTo))
+    : notifyTo(std::move(notifyTo))
   {
   }
   DeliveryType::DeliveryType(const rapidxml::xml_node<>& node)
-    : NotifyTo(WS::ADDRESSING::URIType(""))
+    : notifyTo(WS::ADDRESSING::URIType(""))
   {
     this->parse(node);
   }
@@ -26,7 +26,7 @@ namespace WS::EVENTING
                                 strncmp(nodeAttr->value(), MDPWS::WS_EVENTING_DELIVERYMODE_PUSH,
                                         nodeAttr->value_size()) == 0))
     {
-      Mode = ::MDPWS::WS_EVENTING_DELIVERYMODE_PUSH;
+      mode = ::MDPWS::WS_EVENTING_DELIVERYMODE_PUSH;
     }
     for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
          entry = entry->next_sibling())
@@ -35,7 +35,7 @@ namespace WS::EVENTING
           entry->xmlns() != nullptr &&
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        NotifyTo = NotifyToType(*entry);
+        notifyTo = NotifyToType(*entry);
       }
     }
   }
@@ -48,7 +48,7 @@ namespace WS::EVENTING
   // FilterType
   //
   FilterType::FilterType(DialectType dialect)
-    : Dialect(std::move(dialect))
+    : dialect(std::move(dialect))
   {
   }
   FilterType::FilterType(const rapidxml::xml_node<>& node)
@@ -64,7 +64,7 @@ namespace WS::EVENTING
     {
       throw ExpectedElement("Dialect", MDPWS::WS_EVENTING_FILTER_ACTION);
     }
-    Dialect = MDPWS::WS_EVENTING_FILTER_ACTION;
+    dialect = MDPWS::WS_EVENTING_FILTER_ACTION;
     if (node.value() != nullptr)
     {
       // extract white space delimited filters
@@ -80,11 +80,11 @@ namespace WS::EVENTING
   // Subscribe
   //
   Subscribe::Subscribe(DeliveryType delivery)
-    : Delivery(std::move(delivery))
+    : delivery(std::move(delivery))
   {
   }
   Subscribe::Subscribe(const rapidxml::xml_node<>& node)
-    : Delivery(WS::ADDRESSING::EndpointReferenceType(WS::ADDRESSING::URIType("")))
+    : delivery(WS::ADDRESSING::EndpointReferenceType(WS::ADDRESSING::URIType("")))
   {
     this->parse(node);
   }
@@ -100,23 +100,23 @@ namespace WS::EVENTING
       if (strncmp(entry->name(), "EndTo", entry->name_size()) == 0 &&
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        EndTo = std::make_optional<EndToType>(*entry);
+        endTo = std::make_optional<EndToType>(*entry);
       }
       else if (strncmp(entry->name(), "Delivery", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        Delivery = DeliveryType(*entry);
+        delivery = DeliveryType(*entry);
       }
       else if (strncmp(entry->name(), "Expires", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        Expires =
+        expires =
             std::make_optional<ExpirationType>(std::string(entry->value(), entry->value_size()));
       }
       else if (strncmp(entry->name(), "Filter", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        Filter = std::make_optional<FilterType>(*entry);
+        filter = std::make_optional<FilterType>(*entry);
       }
     }
   }
@@ -125,8 +125,8 @@ namespace WS::EVENTING
   //
   SubscribeResponse::SubscribeResponse(SubscriptionManagerType subscriptionManager,
                                        ExpiresType expires)
-    : SubscriptionManager(std::move(subscriptionManager))
-    , Expires(std::move(expires))
+    : subscriptionManager(std::move(subscriptionManager))
+    , expires(std::move(expires))
   {
   }
 
@@ -142,7 +142,7 @@ namespace WS::EVENTING
     const auto* expiresNode = node.first_node("Expires", MDPWS::WS_NS_EVENTING);
     if (expiresNode != nullptr)
     {
-      Expires = ExpiresType(std::string{expiresNode->value(), expiresNode->value_size()});
+      expires = ExpiresType(std::string{expiresNode->value(), expiresNode->value_size()});
     }
   }
 

@@ -40,7 +40,7 @@ void StateEventService::handleRequest(std::unique_ptr<Request> req)
   {
     auto subscribeRequest = requestEnvelope.body.subscribe;
     auto response = subscriptionManager_->dispatch(subscribeRequest.value());
-    response.SubscriptionManager.address = metadata_->getStateEventServiceURI();
+    response.subscriptionManager.address = metadata_->getStateEventServiceURI();
 
     MESSAGEMODEL::Envelope responseEnvelope;
     fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);

@@ -13,11 +13,11 @@ namespace WS::EVENTING
   {
   public:
     using NotifyToType = WS::ADDRESSING::EndpointReferenceType;
-    NotifyToType NotifyTo;
+    NotifyToType notifyTo;
 
     using ModeType = std::string;
     using ModeOptional = std::optional<ModeType>;
-    ModeOptional Mode;
+    ModeOptional mode;
 
     explicit DeliveryType(NotifyToType notifyTo);
     explicit DeliveryType(const rapidxml::xml_node<>& node);
@@ -38,7 +38,7 @@ namespace WS::EVENTING
   {
   public:
     using DialectType = std::string;
-    DialectType Dialect;
+    DialectType dialect;
 
     explicit FilterType(DialectType dialect);
     explicit FilterType(const rapidxml::xml_node<>& node);
@@ -52,18 +52,18 @@ namespace WS::EVENTING
   public:
     using EndToType = WS::ADDRESSING::EndpointReferenceType;
     using EndToOptional = std::optional<EndToType>;
-    EndToOptional EndTo;
+    EndToOptional endTo;
 
     using DeliveryType = WS::EVENTING::DeliveryType;
-    DeliveryType Delivery;
+    DeliveryType delivery;
 
     using ExpirationType = WS::EVENTING::ExpirationType;
     using ExpiresOptional = std::optional<ExpirationType>;
-    ExpiresOptional Expires;
+    ExpiresOptional expires;
 
     using FilterType = WS::EVENTING::FilterType;
     using FilterOptional = std::optional<FilterType>;
-    FilterOptional Filter;
+    FilterOptional filter;
 
     explicit Subscribe(DeliveryType delivery);
     explicit Subscribe(const rapidxml::xml_node<>& node);
@@ -76,10 +76,10 @@ namespace WS::EVENTING
   {
   public:
     using SubscriptionManagerType = WS::ADDRESSING::EndpointReferenceType;
-    SubscriptionManagerType SubscriptionManager;
+    SubscriptionManagerType subscriptionManager;
 
     using ExpiresType = ExpirationType;
-    ExpiresType Expires;
+    ExpiresType expires;
 
     SubscribeResponse(SubscriptionManagerType subscriptionManager, ExpiresType expires);
   };
@@ -89,7 +89,7 @@ namespace WS::EVENTING
   public:
     using ExpiresType = WS::EVENTING::ExpirationType;
     using ExpiresOptional = std::optional<ExpiresType>;
-    ExpiresOptional Expires;
+    ExpiresOptional expires;
 
     explicit Renew(const rapidxml::xml_node<>& node);
 
@@ -101,7 +101,7 @@ namespace WS::EVENTING
   {
     using ExpiresType = WS::EVENTING::ExpirationType;
     using ExpiresOptional = std::optional<ExpiresType>;
-    ExpiresOptional Expires;
+    ExpiresOptional expires;
   };
 
   struct Unsubscribe

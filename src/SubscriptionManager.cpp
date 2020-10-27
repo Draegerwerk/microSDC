@@ -20,11 +20,11 @@ SubscriptionManager::SubscriptionManager(const bool useTls)
 WS::EVENTING::SubscribeResponse
 SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
 {
-  if (!subscribeRequest.Filter.has_value())
+  if (!subscribeRequest.filter.has_value())
   {
     throw std::runtime_error("No filter specified");
   }
-  for (const auto& filterAction : subscribeRequest.Filter.value())
+  for (const auto& filterAction : subscribeRequest.filter.value())
   {
     if (std::find(allowedSubscriptionEventActions_.begin(), allowedSubscriptionEventActions_.end(),
                   filterAction) == allowedSubscriptionEventActions_.end())
@@ -34,11 +34,11 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribeRequest)
   }
   const auto identifier = "uuid:" + UUIDGenerator{}().toString();
 
-  const Duration duration(subscribeRequest.Expires.value_or(WS::EVENTING::ExpirationType(
+  const Duration duration(subscribeRequest.expires.value_or(WS::EVENTING::ExpirationType(
       Duration(Duration::Years{0}, Duration::Months{0}, Duration::Days{0}, Duration::Hours{1},
                Duration::Minutes{0}, Duration::Seconds{0}, false))));
   const auto expires = duration.toExpirationTimePoint();
-  SubscriptionInformation info{subscribeRequest.Delivery.NotifyTo, subscribeRequest.Filter.value(),
+  SubscriptionInformation info{subscribeRequest.delivery.notifyTo, subscribeRequest.filter.value(),
                                expires};
 
   {
@@ -64,7 +64,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Renew& renewRequest,
                               const WS::EVENTING::Identifier& identifier)
 {
   std::lock_guard<std::mutex> lock(subscriptionMutex_);
-  const Duration duration(renewRequest.Expires.value_or(WS::EVENTING::ExpirationType("PT1H")));
+  const Duration duration(renewRequest.expires.value_or(WS::EVENTING::ExpirationType("PT1H")));
   auto subscriptionInfo = subscriptions_.find(identifier);
   if (subscriptionInfo == subscriptions_.end())
   {
@@ -73,7 +73,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Renew& renewRequest,
   }
   subscriptionInfo->second.expirationTime = duration.toExpirationTimePoint();
   WS::EVENTING::RenewResponse renewResponse;
-  renewResponse.Expires = WS::EVENTING::RenewResponse::ExpiresType{duration};
+  renewResponse.expires = WS::EVENTING::RenewResponse::ExpiresType{duration};
   LOG(LogLevel::INFO, "Successfully renewed subscription for " << identifier);
   printSubscriptions();
   return renewResponse;
