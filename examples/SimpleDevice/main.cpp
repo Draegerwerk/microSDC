@@ -59,7 +59,7 @@ int main()
   auto microSDC = std::make_unique<MicroSDC>();
 
   const auto sdcPort = 8080;
-  const auto defaultAddress = NetworkInterface::getDefaultInterface().address();
+  const auto defaultAddress = NetworkInterface::findDefaultInterface().address();
   LOG(LogLevel::INFO, "Setting local ip address " << defaultAddress);
   microSDC->setNetworkConfig(std::make_unique<NetworkConfig>(true, defaultAddress, sdcPort));
 

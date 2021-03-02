@@ -11,6 +11,13 @@
 class NetworkInterface
 {
 public:
+  enum class IPFamily
+  {
+    V4,
+    V6,
+    NONE,
+  };
+
   explicit NetworkInterface(const ifaddrs* interface)
   {
     if (interface->ifa_addr->sa_family == AF_INET)
@@ -29,16 +36,33 @@ public:
     }
   }
 
-  static NetworkInterface getDefaultInterface()
+  static NetworkInterface findDefaultInterface()
+  {
+    return findInterface(IPFamily::NONE, "");
+  }
+
+  static NetworkInterface findInterface(const IPFamily family, const std::string& name)
   {
     ifaddrs* ifAddrStruct = nullptr;
     getifaddrs(&ifAddrStruct);
 
     for (auto* ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next)
     {
+      // filter by type
       if ((ifa->ifa_flags & IFF_LOOPBACK) != 0 || (ifa->ifa_flags & IFF_UP) == 0 ||
           (ifa->ifa_flags & IFF_RUNNING) == 0 || ifa->ifa_addr == nullptr ||
           (ifa->ifa_addr->sa_family != AF_INET && ifa->ifa_addr->sa_family != AF_INET6))
+      {
+        continue;
+      }
+      // filter by ip family
+      if (family == IPFamily::V4 && ifa->ifa_addr->sa_family != AF_INET ||
+          family == IPFamily::V6 && ifa->ifa_addr->sa_family != AF_INET6)
+      {
+        continue;
+      }
+      // filter by name
+      if (!name.empty() && name != ifa->ifa_name)
       {
         continue;
       }
