@@ -259,18 +259,18 @@ MicroSDC::updateMdib(std::shared_ptr<BICEPS::PM::AbstractState> newState)
 {
   incrementMdibVersion();
   std::lock_guard<std::mutex> lock(mdibMutex_);
-  for (auto& state : mdib_->mdState->state)
+  const auto state = std::find_if(
+      mdib_->mdState->state.begin(), mdib_->mdState->state.end(),
+      [&](const auto& state) { return newState->descriptorHandle == state->descriptorHandle; });
+  if (state == mdib_->mdState->state.end())
   {
-    if (newState->descriptorHandle == state->descriptorHandle)
-    {
-      newState->stateVersion = state->stateVersion.value_or(0) + 1;
-      state = newState;
-      return newState;
-    }
+    throw std::runtime_error("Cannot find descriptor handle '" + newState->descriptorHandle +
+                             "'in mdib");
+    return nullptr;
   }
-  throw std::runtime_error("Cannot find descriptor handle '" + newState->descriptorHandle +
-                           "'in mdib");
-  return nullptr;
+  newState->stateVersion = (*state)->stateVersion.value_or(0) + 1;
+  *state = newState;
+  return *state;
 }
 
 void MicroSDC::incrementMdibVersion()
