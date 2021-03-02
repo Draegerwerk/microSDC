@@ -1,5 +1,6 @@
 Checks: >
     *,
+    -cppcoreguidelines-pro-type-union-access,
     -fuchsia-default-arguments-calls,
     -fuchsia-default-arguments-declarations,
     -fuchsia-overloaded-operator,
@@ -7,6 +8,8 @@ Checks: >
     -google-runtime-references,
     -hicpp-uppercase-literal-suffix,
     -llvm-header-guard,
+    -llvmlibc-callee-namespace,
+    -llvmlibc-restrict-system-libc-headers,
     -modernize-use-nodiscard,
     -modernize-use-trailing-return-type,
     -readibility-uppercase-literal-suffix
