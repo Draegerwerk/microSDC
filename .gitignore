@@ -6,6 +6,7 @@ compile_commands.json
 
 # clangd index
 .clangd
+.cache
 
 # vim configuration
 .vim/
