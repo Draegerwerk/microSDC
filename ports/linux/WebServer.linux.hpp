@@ -32,7 +32,7 @@ void WebServerSimple<SocketType>::start()
   std::promise<std::uint16_t> serverPort;
   serverThread_ = std::thread([this, &serverPort]() {
     // Start server
-    server_->start([this, &serverPort](unsigned short port) { serverPort.set_value(port); });
+    server_->start([&serverPort](unsigned short port) { serverPort.set_value(port); });
   });
   LOG(LogLevel::INFO, "Server listening on port " << serverPort.get_future().get());
 }
