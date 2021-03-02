@@ -76,7 +76,8 @@ void MicroSDC::startup()
   }
   if (networkConfig_->discoveryProxy().has_value())
   {
-    LOG(LogLevel::INFO, "Configuring discovery Proxy: " << networkConfig_->discoveryProxy().value());
+    LOG(LogLevel::INFO,
+        "Configuring discovery Proxy: " << networkConfig_->discoveryProxy().value());
     discoveryService_->configureProxy(networkConfig_->discoveryProxyProtocol(),
                                       networkConfig_->discoveryProxy().value());
   }
