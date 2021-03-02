@@ -92,7 +92,7 @@ namespace WS::DISCOVERY
     XAddrsOptional xAddrs;
 
     using MetadataVersionType = unsigned int;
-    MetadataVersionType metadataVersion;
+    MetadataVersionType metadataVersion{0};
 
     HelloType(EndpointReferenceType epr, MetadataVersionType metadataVersion);
   };
@@ -131,7 +131,7 @@ namespace WS::DISCOVERY
     XAddrsOptional xAddrs;
 
     using MetadataVersionType = unsigned int;
-    MetadataVersionType metadataVersion;
+    MetadataVersionType metadataVersion{0};
 
     ProbeMatchType(EndpointReferenceType epr, MetadataVersionType metadataVersion);
   };
@@ -175,7 +175,7 @@ namespace WS::DISCOVERY
     XAddrsOptional xAddrs;
 
     using MetadataVersionType = unsigned int;
-    MetadataVersionType metadataVersion;
+    MetadataVersionType metadataVersion{0};
 
     ResolveMatchType(EndpointReferenceType epr, MetadataVersionType metadataVersion);
   };
