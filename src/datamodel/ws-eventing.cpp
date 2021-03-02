@@ -58,9 +58,8 @@ namespace WS::EVENTING
   void FilterType::parse(const rapidxml::xml_node<>& node)
   {
     const auto* dialectAttr = node.first_attribute("Dialect");
-    if (dialectAttr == nullptr ||
-        (dialectAttr != nullptr && strncmp(dialectAttr->value(), MDPWS::WS_EVENTING_FILTER_ACTION,
-                                           dialectAttr->value_size()) != 0))
+    if (dialectAttr == nullptr || strncmp(dialectAttr->value(), MDPWS::WS_EVENTING_FILTER_ACTION,
+                                          dialectAttr->value_size()) != 0)
     {
       throw ExpectedElement("Dialect", MDPWS::WS_EVENTING_FILTER_ACTION);
     }
