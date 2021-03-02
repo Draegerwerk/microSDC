@@ -14,6 +14,11 @@ public:
   /// @brief Constructs a new StateHandler referring to a descriptor
   /// @param descriptorHandle the handle of the associated descriptor
   explicit StateHandler(std::string descriptorHandle);
+  StateHandler(const StateHandler&) = delete;
+  StateHandler(StateHandler&&) = delete;
+  StateHandler& operator=(const StateHandler&) = delete;
+  StateHandler& operator=(StateHandler&&) = delete;
+  virtual ~StateHandler() = default;
 
   /// @brief gets the handle of the associated descriptor
   /// @return the descriptor's handle of this state
