@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS "main.cpp"
+    SRCS "main.cpp" "SimpleDevice.cpp"
     )
 
 option(BUILD_EXAMPLES OFF)

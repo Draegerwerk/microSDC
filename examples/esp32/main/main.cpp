@@ -1,7 +1,4 @@
-#include "BME280.hpp"
-#include "DeviceCharacteristics.hpp"
-#include "MicroSDC.hpp"
-#include "StateHandler.hpp"
+#include "SimpleDevice.hpp"
 #include "networking/NetworkConfig.hpp"
 #include <chrono>
 #include <pthread.h>
@@ -46,10 +43,10 @@ static void ipEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t e
       ipAddress += ".";
       ipAddress += std::to_string(esp_ip4_addr4_16(&event->ip_info.ip));
       // startup MicroSDC
-      auto* sdc = static_cast<MicroSDC*>(arg);
+      auto* device = static_cast<SimpleDevice*>(arg);
       constexpr auto sdcPort = 443;
-      sdc->setNetworkConfig(std::make_unique<NetworkConfig>(true, ipAddress, sdcPort));
-      sdc->start();
+      device->setNetworkConfig(std::make_unique<NetworkConfig>(true, ipAddress, sdcPort));
+      device->startSDC();
       break;
     }
     default:
@@ -146,10 +143,13 @@ void initWifi()
                                   {},                   // listen_interval
                                   {},                   // sort_method
                                   {},                   // threshold
-                                  {}                    // pmf_cfg
+                                  {},                   // pmf_cfg
+                                  {},                   // rm_enabled
+                                  {},                   // btm_enabled
+                                  {},                   // reserved
                               }};
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-  ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig));
+  ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
   ESP_ERROR_CHECK(esp_wifi_start());
 }
 
@@ -213,93 +213,11 @@ extern "C" void app_main()
   ESP_ERROR_CHECK(esp_tls_set_global_ca_store(ca_crt_start, ca_cert_len));
 
   // create MicroSDC instance
-  auto* sdc = new MicroSDC();
-  sdc->setEndpointReference("urn:uuid:MicroSDC-provider-on-esp32");
+  auto* device = new SimpleDevice();
 
-  DeviceCharacteristics deviceCharacteristics;
-  deviceCharacteristics.setFriendlyName("MicroSDC on ESP32");
-  deviceCharacteristics.setManufacturer("Draeger");
-  deviceCharacteristics.setModelName("MicroSDC_Device01");
-  sdc->setDeviceCharacteristics(deviceCharacteristics);
-
-  BICEPS::PM::Metadata metadata;
-  metadata.manufacturer.emplace_back("Draeger");
-  metadata.modelName.emplace_back("MicroSDC_Device01");
-  metadata.modelNumber.emplace("1");
-  metadata.serialNumber.emplace_back("2345-6789");
-
-  BICEPS::PM::SystemContextDescriptor systemContext("system_context");
-  systemContext.patientContext = BICEPS::PM::PatientContextDescriptor("patient_context");
-  systemContext.locationContext = BICEPS::PM::LocationContextDescriptor("location_context");
-
-  // States for measured values
-  auto pressureState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "pressureState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
-      BICEPS::PM::MetricAvailability::Cont, 1);
-  pressureState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
-
-  auto temperatureState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "temperatureState_handle", BICEPS::PM::CodedValue("6048"), BICEPS::PM::MetricCategory::Msrmt,
-      BICEPS::PM::MetricAvailability::Cont, 1);
-  temperatureState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
-
-  auto humidityState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "humidityState_handle", BICEPS::PM::CodedValue("262688"), BICEPS::PM::MetricCategory::Msrmt,
-      BICEPS::PM::MetricAvailability::Cont, 1);
-  humidityState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
-
-  // Dummy settable state
-  auto settableState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "settableState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
-      BICEPS::PM::MetricAvailability::Cont, 1);
-  settableState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
-
-  BICEPS::PM::ChannelDescriptor deviceChannel("device_channel");
-  deviceChannel.metric.emplace_back(pressureState);
-  deviceChannel.metric.emplace_back(temperatureState);
-  deviceChannel.metric.emplace_back(humidityState);
-  deviceChannel.metric.emplace_back(settableState);
-
-  BICEPS::PM::ScoDescriptor deviceSco("sco_handle");
-  auto setValueOperation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
-      "setValueOperation_handle", "settableState_handle");
-  deviceSco.operation.emplace_back(setValueOperation);
-
-  deviceChannel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
-  BICEPS::PM::VmdDescriptor deviceModule("device_vmd");
-  deviceModule.channel.emplace_back(deviceChannel);
-  deviceModule.sco = deviceSco;
-
-  BICEPS::PM::MdsDescriptor deviceDescriptor("MedicalDevices");
-  deviceDescriptor.metaData = metadata;
-  deviceDescriptor.systemContext = systemContext;
-  deviceDescriptor.vmd.emplace_back(deviceModule);
-
-  BICEPS::PM::MdDescription mdDescription;
-  mdDescription.mds.emplace_back(deviceDescriptor);
-  sdc->setMdDescription(mdDescription);
-
-  BICEPS::PM::LocationDetail locationDetail;
-  locationDetail.poC = "PoC-A";
-  locationDetail.room = "Room-A";
-  locationDetail.bed = "Bed-A";
-  locationDetail.facility = "Facility-A";
-  locationDetail.building = "Building-A";
-  locationDetail.floor = "Floor-A";
-  sdc->setLocation("location_context", locationDetail);
-
-  auto pressureStateHandler = std::make_shared<NumericStateHandler>("pressureState_handle");
-  auto temperatureStateHandler = std::make_shared<NumericStateHandler>("temperatureState_handle");
-  auto humidityStateHandler = std::make_shared<NumericStateHandler>("humidityState_handle");
-  auto settableStateHandler = std::make_shared<NumericStateHandler>("settableState_handle");
-  sdc->addMdState(pressureStateHandler);
-  sdc->addMdState(temperatureStateHandler);
-  sdc->addMdState(humidityStateHandler);
-  sdc->addMdState(settableStateHandler);
-
-  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ipEventHandler, sdc));
-  ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, sdc));
-  ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &ethEventHandler, sdc));
+  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ipEventHandler, device));
+  ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, device));
+  ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &ethEventHandler, device));
   LOG(LogLevel::INFO, "Connecting...");
 #if CONFIG_CONNECT_ETHERNET
   initEthernet();
@@ -307,19 +225,7 @@ extern "C" void app_main()
   initWifi();
 #endif
 
-  std::thread updateThread([=]() {
-    BME280 bme280(I2C_NUM_0, 0x76u, static_cast<gpio_num_t>(13), static_cast<gpio_num_t>(16));
-    while (true)
-    {
-      const auto sensorData = bme280.getSensorData();
-      LOG(LogLevel::INFO, "pressure: " << sensorData.pressure << " temp: " << sensorData.temperature
-                                       << " humidity: " << sensorData.humidity);
-      pressureStateHandler->setValue(sensorData.pressure);
-      temperatureStateHandler->setValue(sensorData.temperature);
-      humidityStateHandler->setValue(sensorData.humidity);
-      vTaskDelay(2000 / portTICK_PERIOD_MS);
-    }
-  });
-  updateThread.join();
+  device->run();
+
   vTaskDelete(nullptr);
 }
