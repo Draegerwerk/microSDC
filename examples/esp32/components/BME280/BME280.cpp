@@ -3,7 +3,7 @@
 BME280::BME280(i2c_port_t i2cPort, std::uint8_t deviceAddress, gpio_num_t sdaPin, gpio_num_t sclPin)
   : i2cPort_(i2cPort)
 {
-  i2c_config_t i2cConfig;
+  i2c_config_t i2cConfig{};
   i2cConfig.mode = I2C_MODE_MASTER;
   i2cConfig.sda_io_num = sdaPin;
   i2cConfig.sda_pullup_en = GPIO_PULLUP_ENABLE;
