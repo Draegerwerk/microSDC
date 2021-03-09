@@ -91,6 +91,7 @@ public:
   static std::string to_string(BICEPS::MM::InvocationState invocation_state);
   static std::string to_string(BICEPS::MM::InvocationError invocation_error);
   static std::string to_string(BICEPS::PM::ContextAssociation context_association);
+  static std::string to_string(BICEPS::PM::OperatingMode operating_mode);
   static std::string to_string(Duration duration);
 
 private:

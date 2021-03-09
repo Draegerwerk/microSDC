@@ -873,6 +873,19 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
         xml_document_->allocate_attribute("Handle", location_context_state->handle.c_str());
     state_node->append_attribute(handle_attr);
   }
+  else if (const auto* set_value_operation_state =
+               dyn_cast<BICEPS::PM::SetValueOperationState>(&state);
+           set_value_operation_state != nullptr)
+  {
+    auto* operating_mode_str =
+        xml_document_->allocate_string(to_string(set_value_operation_state->operatingMode).c_str());
+    auto* operating_mode_attr =
+        xml_document_->allocate_attribute("OperatingMode", operating_mode_str);
+    state_node->append_attribute(operating_mode_attr);
+
+    auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:SetValueOperationState");
+    state_node->append_attribute(type_attr);
+  }
   parent->append_node(state_node);
 }
 
@@ -1314,6 +1327,21 @@ std::string MessageSerializer::to_string(BICEPS::PM::ContextAssociation context_
       return "Assoc";
     case BICEPS::PM::ContextAssociation::Dis:
       return "Dis";
+  }
+  assert(false && "Uncatched value in ContextAssociation");
+  return "";
+}
+
+std::string MessageSerializer::to_string(BICEPS::PM::OperatingMode operating_mode)
+{
+  switch (operating_mode)
+  {
+    case BICEPS::PM::OperatingMode::Dis:
+      return "Dis";
+    case BICEPS::PM::OperatingMode::En:
+      return "En";
+    case BICEPS::PM::OperatingMode::NA:
+      return "NA";
   }
   assert(false && "Uncatched value in ContextAssociation");
   return "";

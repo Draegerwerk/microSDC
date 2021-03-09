@@ -81,16 +81,28 @@ int main()
 
   // Dummy state
   auto state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
+      "numeric_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
+      BICEPS::PM::MetricAvailability::Cont, 1);
+  state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  // settable
+  auto settable_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "settable_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Set,
       BICEPS::PM::MetricAvailability::Cont, 1);
   state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   BICEPS::PM::ChannelDescriptor device_channel("device_channel");
   device_channel.metric.emplace_back(state);
+  device_channel.metric.emplace_back(settable_state);
   device_channel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+
+  BICEPS::PM::ScoDescriptor device_sco("sco_handle");
+  auto set_value_operation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
+      "set_value_operation_handle", "settable_state_handle");
+  device_sco.operation.emplace_back(set_value_operation);
 
   BICEPS::PM::VmdDescriptor device_module("device_vmd");
   device_module.channel.emplace_back(device_channel);
+  device_module.sco = device_sco;
 
   device_descriptor.vmd.emplace_back(device_module);
 
@@ -109,16 +121,20 @@ int main()
   location_detail.floor = "Floor-A";
   micro_sdc->set_location("location_context", location_detail);
 
-  auto state_handler = std::make_shared<NumericStateHandler>("state_handle");
-  micro_sdc->add_md_state(state_handler);
+  auto numeric_state_handler = std::make_shared<NumericStateHandler>("numeric_state_handle");
+  auto settable_state_handler = std::make_shared<NumericStateHandler>("settable_state_handle");
+  auto set_value_operation_state = std::make_shared<BICEPS::PM::SetValueOperationState>(
+      "set_value_operation_handle", BICEPS::PM::OperatingMode::En);
+  micro_sdc->add_md_state(numeric_state_handler);
+  micro_sdc->add_md_state(settable_state_handler);
 
   micro_sdc->start();
 
-  auto value_thread = std::thread([state_handler]() {
+  auto value_thread = std::thread([numeric_state_handler]() {
     double i = 0.0;
     while (keep_running)
     {
-      state_handler->set_value(i++);
+      numeric_state_handler->set_value(i++);
       std::unique_lock<std::mutex> lock(running_mutex);
       cv_running.wait_for(lock, std::chrono::seconds(1));
     }

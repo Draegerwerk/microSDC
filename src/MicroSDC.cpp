@@ -132,10 +132,29 @@ bool MicroSDC::is_running() const
 
 void MicroSDC::initialize_md_states()
 {
+  std::lock_guard<std::mutex> lock(mdib_mutex_);
   for (const auto& handler : state_handlers_)
   {
-    std::lock_guard<std::mutex> lock(mdib_mutex_);
     mdib_->mdState->state.emplace_back(handler->get_initial_state());
+  }
+  for (const auto& md : mdib_->mdDescription->mds)
+  {
+    for (const auto& vmd : md.vmd)
+    {
+      if (!vmd.sco.has_value())
+      {
+        continue;
+      }
+      for (const auto& operation : vmd.sco.value().operation)
+      {
+        if (const auto descriptor = dyn_cast<BICEPS::PM::SetValueOperationDescriptor>(operation);
+            descriptor != nullptr)
+        {
+          mdib_->mdState->state.emplace_back(std::make_shared<BICEPS::PM::SetValueOperationState>(
+              descriptor->handle, BICEPS::PM::OperatingMode::NA));
+        }
+      }
+    }
   }
 }
 
