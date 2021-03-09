@@ -98,6 +98,7 @@ namespace BICEPS::MM
     enum class SetKind
     {
       SET_VALUE,
+      SET_STRING
     };
     SetKind get_kind() const;
 
@@ -120,6 +121,18 @@ namespace BICEPS::MM
     RequestedNumericValueType requestedNumericValue{0.0};
 
     explicit SetValue(const rapidxml::xml_node<>& node);
+    static bool classof(const AbstractSet* other);
+
+  private:
+    void parse(const rapidxml::xml_node<>& node);
+  };
+
+  struct SetString : public AbstractSet
+  {
+    using RequestedStringValueType = std::string;
+    RequestedStringValueType requestedStringValue;
+
+    explicit SetString(const rapidxml::xml_node<>& node);
     static bool classof(const AbstractSet* other);
 
   private:
@@ -170,6 +183,11 @@ namespace BICEPS::MM
   };
 
   struct SetValueResponse : public AbstractSetResponse
+  {
+    using AbstractSetResponse::AbstractSetResponse;
+  };
+
+  struct SetStringResponse : public AbstractSetResponse
   {
     using AbstractSetResponse::AbstractSetResponse;
   };

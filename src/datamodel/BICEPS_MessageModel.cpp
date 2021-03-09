@@ -81,6 +81,30 @@ namespace BICEPS::MM
     }
   }
 
+  SetString::SetString(const rapidxml::xml_node<>& node)
+    : AbstractSet(SetKind::SET_STRING, node)
+  {
+    this->parse(node);
+  }
+  bool SetString::classof(const AbstractSet* other)
+  {
+    return other->get_kind() == SetKind::SET_STRING;
+  }
+  void SetString::parse(const rapidxml::xml_node<>& node)
+  {
+    for (const rapidxml::xml_node<>* entry = node.first_node(); entry != nullptr;
+         entry = entry->next_sibling())
+    {
+      if (entry->name() != nullptr &&
+          strncmp(entry->name(), "RequestedStringValue", entry->name_size()) == 0 &&
+          entry->xmlns() != nullptr &&
+          strncmp(entry->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL, entry->xmlns_size()) == 0)
+      {
+        requestedStringValue = std::string(entry->value(), entry->value_size());
+      }
+    }
+  }
+
   InvocationErrorMessage::InvocationErrorMessage(std::string invocationError)
     : std::string(std::move(invocationError))
   {

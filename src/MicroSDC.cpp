@@ -153,6 +153,13 @@ void MicroSDC::initialize_md_states()
           mdib_->mdState->state.emplace_back(std::make_shared<BICEPS::PM::SetValueOperationState>(
               descriptor->handle, BICEPS::PM::OperatingMode::NA));
         }
+        else if (const auto descriptor =
+                     dyn_cast<BICEPS::PM::SetStringOperationDescriptor>(operation);
+                 descriptor != nullptr)
+        {
+          mdib_->mdState->state.emplace_back(std::make_shared<BICEPS::PM::SetStringOperationState>(
+              descriptor->handle, BICEPS::PM::OperatingMode::NA));
+        }
       }
     }
   }

@@ -100,10 +100,13 @@ namespace BICEPS::PM
     {
       METRIC_DESCRIPTOR,
       NUMERIC_METRIC_DESCRIPTOR,
+      STRING_METRIC_DESCRIPTOR,
+      ENUM_STRING_METRIC_DESCRIPTOR,
       LAST_METRIC_DESCRIPTOR,
 
       OPERATION_DESCRIPTOR,
       SET_VALUE_OPERATION_DESCRIPTOR,
+      SET_STRING_OPERATION_DESCRIPTOR,
       LAST_OPERATION_DESCRIPTOR,
 
       DEVICE_COMPONENT_DESCRIPTOR,
@@ -163,12 +166,24 @@ namespace BICEPS::PM
                                 OperationTargetType operationTarget);
   };
 
+  struct SetStringOperationDescriptor : public AbstractOperationDescriptor
+  {
+    using MaxLengthType = std::uint64_t;
+    using MaxLengthOptional = std::optional<MaxLengthType>;
+    MaxLengthOptional maxLength;
+
+    static bool classof(const AbstractDescriptor* other);
+
+    SetStringOperationDescriptor(const HandleType& handle,
+                                 const OperationTargetType& operationTarget);
+  };
+
   struct SetValueOperationDescriptor : public AbstractOperationDescriptor
   {
     static bool classof(const AbstractDescriptor* other);
 
     SetValueOperationDescriptor(const HandleType& handle,
-                                const OperationTargetType& operationTarget);
+                                const OperationTargetType& operation_target);
   };
 
   struct AbstractDeviceComponentDescriptor : public AbstractDescriptor
@@ -275,6 +290,17 @@ namespace BICEPS::PM
     AbsoluteAccuracyOptional absoluteAccuracy;
   };
 
+  struct InstanceIdentifier
+  {
+    using ExtensionType = std::string;
+    using ExtensionOptional = std::optional<ExtensionType>;
+    ExtensionOptional extension;
+
+    using RootType = WS::ADDRESSING::URIType;
+    using RootOptional = std::optional<RootType>;
+    RootOptional root;
+  };
+
   struct AbstractMetricDescriptor : public AbstractDescriptor
   {
     using UnitType = CodedValue;
@@ -310,6 +336,60 @@ namespace BICEPS::PM
 
     NumericMetricDescriptor(const HandleType&, const UnitType&, const MetricCategoryType&,
                             const MetricAvailabilityType&, const ResolutionType&);
+  };
+
+  struct StringMetricDescriptor : public AbstractMetricDescriptor
+  {
+    static bool classof(const AbstractDescriptor* other);
+
+    StringMetricDescriptor(const HandleType& handle, const UnitType& unit,
+                           const MetricCategoryType& metric_category,
+                           const MetricAvailabilityType& metric_availability);
+  };
+
+  struct Measurement
+  {
+    using MeasuredValueType = double;
+    MeasuredValueType measuredValue;
+
+    using MeasurementUnitType = CodedValue;
+    MeasurementUnitType measurementUnit;
+
+    Measurement(MeasuredValueType measured_value, MeasurementUnitType measurement_unit);
+  };
+
+  struct AllowedValue
+  {
+    using ValueType = std::string;
+    ValueType value;
+
+    using TypeType = CodedValue;
+    using TypeOptional = std::optional<TypeType>;
+    TypeOptional type;
+
+    using IdentificationType = InstanceIdentifier;
+    using IdentificationOptional = std::optional<IdentificationType>;
+    IdentificationOptional identification;
+
+    using CharacteristicType = Measurement;
+    using CharacteristicOptional = std::optional<CharacteristicType>;
+    CharacteristicOptional characteristic;
+
+    explicit AllowedValue(ValueType value);
+  };
+
+  struct EnumStringMetricDescriptor : public AbstractMetricDescriptor
+  {
+    static bool classof(const AbstractDescriptor* other);
+
+    using AllowedValueType = AllowedValue;
+    using AllowedValueSequence = std::vector<AllowedValueType>;
+    AllowedValueSequence allowedValue;
+
+    EnumStringMetricDescriptor(const HandleType& handle, const UnitType& unit,
+                               const MetricCategoryType& metric_category,
+                               const MetricAvailabilityType& metric_availability,
+                               AllowedValueSequence allowed_value);
   };
 
   struct ChannelDescriptor : public AbstractDeviceComponentDescriptor
@@ -405,10 +485,12 @@ namespace BICEPS::PM
 
       OPERATION_STATE,
       SET_VALUE_OPERATION_STATE,
+      SET_STRING_OPERATION_STATE,
       LAST_OPERATION_STATE,
 
       METRIC_STATE,
       NUMERIC_METRIC_STATE,
+      STRING_METRIC_STATE,
       LAST_METRIC_STATE,
     };
     StateKind getKind() const;
@@ -445,17 +527,6 @@ namespace BICEPS::PM
     static bool classof(const AbstractState* other);
 
     AbstractMultiState(StateKind kind, const DescriptorHandleType&, HandleType);
-  };
-
-  struct InstanceIdentifier
-  {
-    using ExtensionType = std::string;
-    using ExtensionOptional = std::optional<ExtensionType>;
-    ExtensionOptional extension;
-
-    using RootType = WS::ADDRESSING::URIType;
-    using RootOptional = std::optional<RootType>;
-    RootOptional root;
   };
 
   struct AbstractContextState : public AbstractMultiState
@@ -657,6 +728,18 @@ namespace BICEPS::PM
                            const OperatingModeType& operatingMode);
   };
 
+  struct SetStringOperationState : public AbstractOperationState
+  {
+    using AllowedValuesType = std::string;
+    using AllowedValuesSequence = std::vector<AllowedValuesType>;
+    AllowedValuesSequence allowedValues;
+
+    static bool classof(const AbstractState* other);
+
+    SetStringOperationState(const DescriptorHandleType& descriptor_handle,
+                            const OperatingModeType& operating_mode);
+  };
+
   struct SetValueOperationState : public AbstractOperationState
   {
     static bool classof(const AbstractState* other);
@@ -692,6 +775,7 @@ namespace BICEPS::PM
     enum class MetricKind
     {
       NUMERIC_METRIC,
+      STRING_METRIC
     };
     MetricKind getKind() const;
 
@@ -765,6 +849,28 @@ namespace BICEPS::PM
     static bool classof(const AbstractState* other);
 
     explicit NumericMetricState(DescriptorHandleType handle);
+  };
+
+  struct StringMetricValue : public AbstractMetricValue
+  {
+    using ValueType = std::string;
+    using ValueOptional = std::optional<ValueType>;
+    ValueOptional value;
+
+    static bool classof(const AbstractMetricValue* other);
+
+    explicit StringMetricValue(const MetricQuality& metric_quality);
+  };
+
+  struct StringMetricState : public AbstractMetricState
+  {
+    using MetricValueType = StringMetricValue;
+    using MetricValueOptional = std::optional<MetricValueType>;
+    MetricValueOptional metricValue;
+
+    static bool classof(const AbstractState* other);
+
+    explicit StringMetricState(DescriptorHandleType handle);
   };
 
   struct MdState

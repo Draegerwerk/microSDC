@@ -126,6 +126,14 @@ namespace MESSAGEMODEL
     using UnsubscribeOptional = std::optional<UnsubscribeType>;
     UnsubscribeOptional unsubscribe;
 
+    using SetStringType = BICEPS::MM::SetString;
+    using SetStringOptional = std::optional<SetStringType>;
+    SetStringOptional setString;
+
+    using SetStringResponseType = BICEPS::MM::SetStringResponse;
+    using SetStringResponseOptional = std::optional<SetStringResponseType>;
+    SetStringResponseOptional setStringResponse;
+
     using SetValueType = BICEPS::MM::SetValue;
     using SetValueOptional = std::optional<SetValueType>;
     SetValueOptional setValue;

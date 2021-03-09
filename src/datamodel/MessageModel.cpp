@@ -125,6 +125,12 @@ namespace MESSAGEMODEL
     {
       unsubscribe = std::make_optional<UnsubscribeType>(*bodyContent);
     }
+    else if (strncmp(bodyContent->name(), "SetString", bodyContent->name_size()) == 0 &&
+             strncmp(bodyContent->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL,
+                     bodyContent->xmlns_size()) == 0)
+    {
+      setString = std::make_optional<SetStringType>(*bodyContent);
+    }
     else if (strncmp(bodyContent->name(), "SetValue", bodyContent->name_size()) == 0 &&
              strncmp(bodyContent->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL,
                      bodyContent->xmlns_size()) == 0)

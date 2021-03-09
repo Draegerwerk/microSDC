@@ -138,6 +138,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   {
     serialize(body_node, body.setValueResponse.value());
   }
+  else if (body.setStringResponse.has_value())
+  {
+    serialize(body_node, body.setStringResponse.value());
+  }
   parent->append_node(body_node);
 }
 
@@ -755,6 +759,13 @@ void MessageSerializer::serialize(
       metric_node->append_attribute(averaging_period_attr);
     }
   }
+  else if (const auto* const string_descriptor =
+               dyn_cast<BICEPS::PM::StringMetricDescriptor>(&abstract_metric_descriptor);
+           string_descriptor != nullptr)
+  {
+    auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:StringMetricDescriptor");
+    metric_node->append_attribute(type_attr);
+  }
 
   parent->append_node(metric_node);
 }
@@ -834,6 +845,16 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:NumericMetricState");
     state_node->append_attribute(type_attr);
   }
+  else if (const auto* string_metric_state = dyn_cast<BICEPS::PM::StringMetricState>(&state);
+           string_metric_state != nullptr)
+  {
+    if (string_metric_state->metricValue.has_value())
+    {
+      serialize(state_node, string_metric_state->metricValue.value());
+    }
+    auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:StringMetricState");
+    state_node->append_attribute(type_attr);
+  }
   else if (const auto* location_context_state = dyn_cast<BICEPS::PM::LocationContextState>(&state);
            location_context_state != nullptr)
   {
@@ -873,18 +894,36 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
         xml_document_->allocate_attribute("Handle", location_context_state->handle.c_str());
     state_node->append_attribute(handle_attr);
   }
-  else if (const auto* set_value_operation_state =
-               dyn_cast<BICEPS::PM::SetValueOperationState>(&state);
-           set_value_operation_state != nullptr)
+  else if (const auto* operation_state = dyn_cast<BICEPS::PM::AbstractOperationState>(&state);
+           operation_state != nullptr)
   {
     auto* operating_mode_str =
-        xml_document_->allocate_string(to_string(set_value_operation_state->operatingMode).c_str());
+        xml_document_->allocate_string(to_string(operation_state->operatingMode).c_str());
     auto* operating_mode_attr =
         xml_document_->allocate_attribute("OperatingMode", operating_mode_str);
     state_node->append_attribute(operating_mode_attr);
 
-    auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:SetValueOperationState");
-    state_node->append_attribute(type_attr);
+    if (const auto* set_value_operation_state =
+            dyn_cast<BICEPS::PM::SetValueOperationState>(&state);
+        set_value_operation_state != nullptr)
+    {
+      auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:SetValueOperationState");
+      state_node->append_attribute(type_attr);
+    }
+    else if (const auto* set_string_operation_state =
+                 dyn_cast<BICEPS::PM::SetStringOperationState>(&state);
+             set_string_operation_state != nullptr)
+    {
+      auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:SetStringOperationState");
+      state_node->append_attribute(type_attr);
+      for (const auto& allowed : set_string_operation_state->allowedValues)
+      {
+        auto* allowed_value_str = xml_document_->allocate_string(allowed.c_str());
+        auto* allowed_value_node = xml_document_->allocate_node(rapidxml::node_element, "pm:Value");
+        allowed_value_node->value(allowed_value_str);
+        state_node->append_node(allowed_value_node);
+      }
+    }
   }
   parent->append_node(state_node);
 }
@@ -964,6 +1003,16 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
       value_node->append_attribute(value_attr);
     }
   }
+  else if (const auto* string_value = dyn_cast<BICEPS::PM::StringMetricValue>(&value);
+           string_value != nullptr)
+  {
+    if (string_value->value.has_value())
+    {
+      auto* val = xml_document_->allocate_string(string_value->value->c_str());
+      auto* value_attr = xml_document_->allocate_attribute("Value", val);
+      value_node->append_attribute(value_attr);
+    }
+  }
 
   parent->append_node(value_node);
 }
@@ -1030,31 +1079,31 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::MM::SetValueResponse& set_value_response)
+                                  const BICEPS::MM::AbstractSetResponse& set_response)
 {
   auto* set_value_response_node =
       xml_document_->allocate_node(rapidxml::node_element, "msg:SetValueResponse");
   auto* xmlns_biceps_message =
       xml_document_->allocate_attribute("xmlns:msg", SDC::NS_BICEPS_MESSAGE_MODEL);
   set_value_response_node->append_attribute(xmlns_biceps_message);
-  if (set_value_response.mdibVersion.has_value())
+  if (set_response.mdibVersion.has_value())
   {
-    auto* mdib_version = xml_document_->allocate_string(
-        std::to_string(set_value_response.mdibVersion.value()).c_str());
+    auto* mdib_version =
+        xml_document_->allocate_string(std::to_string(set_response.mdibVersion.value()).c_str());
     auto* mdib_version_attr = xml_document_->allocate_attribute("MdibVersion", mdib_version);
     set_value_response_node->append_attribute(mdib_version_attr);
   }
-  auto* sequence_id = xml_document_->allocate_string(set_value_response.sequenceId.c_str());
+  auto* sequence_id = xml_document_->allocate_string(set_response.sequenceId.c_str());
   auto* sequence_id_attr = xml_document_->allocate_attribute("SequenceId", sequence_id);
   set_value_response_node->append_attribute(sequence_id_attr);
-  if (set_value_response.instanceId.has_value())
+  if (set_response.instanceId.has_value())
   {
-    auto* instance_id = xml_document_->allocate_string(
-        std::to_string(set_value_response.instanceId.value()).c_str());
+    auto* instance_id =
+        xml_document_->allocate_string(std::to_string(set_response.instanceId.value()).c_str());
     auto* instance_id_attr = xml_document_->allocate_attribute("SequenceId", instance_id);
     set_value_response_node->append_attribute(instance_id_attr);
   }
-  serialize(set_value_response_node, set_value_response.invocationInfo);
+  serialize(set_value_response_node, set_response.invocationInfo);
   parent->append_node(set_value_response_node);
 }
 
@@ -1156,7 +1205,27 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
         xml_document_->allocate_attribute("xsi:type", "pm:SetValueOperationDescriptor");
     operation_node->append_attribute(type_attr);
   }
+  else if (const auto* set_string = dyn_cast<BICEPS::PM::SetStringOperationDescriptor>(&operation);
+           set_string != nullptr)
+  {
+    auto* type_attr =
+        xml_document_->allocate_attribute("xsi:type", "pm:SetStringOperationDescriptor");
+    operation_node->append_attribute(type_attr);
+    if (set_string->maxLength.has_value())
+    {
+      auto* max_length_str =
+          xml_document_->allocate_string(std::to_string(set_string->maxLength.value()).c_str());
+      auto* max_length_attr = xml_document_->allocate_attribute("MaxLength", max_length_str);
+      operation_node->append_attribute(max_length_attr);
+    }
+  }
   parent->append_node(operation_node);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::AllowedValue& allowed_value)
+{
+  // TODO
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,

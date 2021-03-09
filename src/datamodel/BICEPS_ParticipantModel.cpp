@@ -34,13 +34,23 @@ namespace BICEPS::PM
            other->getKind() < DescriptorKind::LAST_OPERATION_DESCRIPTOR;
   }
 
-  SetValueOperationDescriptor::SetValueOperationDescriptor(
+  SetStringOperationDescriptor::SetStringOperationDescriptor(
       const HandleType& handle, const OperationTargetType& operationTarget)
-    : AbstractOperationDescriptor(DescriptorKind::SET_VALUE_OPERATION_DESCRIPTOR, handle,
+    : AbstractOperationDescriptor(DescriptorKind::SET_STRING_OPERATION_DESCRIPTOR, handle,
                                   operationTarget)
   {
   }
+  bool SetStringOperationDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() == DescriptorKind::SET_STRING_OPERATION_DESCRIPTOR;
+  }
 
+  SetValueOperationDescriptor::SetValueOperationDescriptor(
+      const HandleType& handle, const OperationTargetType& operation_target)
+    : AbstractOperationDescriptor(DescriptorKind::SET_VALUE_OPERATION_DESCRIPTOR, handle,
+                                  operation_target)
+  {
+  }
   bool SetValueOperationDescriptor::classof(const AbstractDescriptor* other)
   {
     return other->getKind() == DescriptorKind::SET_VALUE_OPERATION_DESCRIPTOR;
@@ -129,6 +139,42 @@ namespace BICEPS::PM
   bool NumericMetricDescriptor::classof(const AbstractDescriptor* other)
   {
     return other->getKind() == DescriptorKind::NUMERIC_METRIC_DESCRIPTOR;
+  }
+
+  bool StringMetricDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() == DescriptorKind::STRING_METRIC_DESCRIPTOR;
+  }
+  StringMetricDescriptor::StringMetricDescriptor(const HandleType& handle, const UnitType& unit,
+                                                 const MetricCategoryType& metric_category,
+                                                 const MetricAvailabilityType& metric_availability)
+    : AbstractMetricDescriptor(DescriptorKind::STRING_METRIC_DESCRIPTOR, handle, unit,
+                               metric_category, metric_availability)
+  {
+  }
+
+  Measurement::Measurement(MeasuredValueType measured_value, MeasurementUnitType measurement_unit)
+    : measuredValue(measured_value)
+    , measurementUnit(std::move(measurement_unit))
+  {
+  }
+
+  AllowedValue::AllowedValue(ValueType value)
+    : value(std::move(value))
+  {
+  }
+
+  bool EnumStringMetricDescriptor::classof(const AbstractDescriptor* other)
+  {
+    return other->getKind() == DescriptorKind::ENUM_STRING_METRIC_DESCRIPTOR;
+  }
+  EnumStringMetricDescriptor::EnumStringMetricDescriptor(
+      const HandleType& handle, const UnitType& unit, const MetricCategoryType& metric_category,
+      const MetricAvailabilityType& metric_availability, AllowedValueSequence allowed_value)
+    : AbstractMetricDescriptor(DescriptorKind::ENUM_STRING_METRIC_DESCRIPTOR, handle, unit,
+                               metric_category, metric_availability)
+    , allowedValue(std::move(allowed_value))
+  {
   }
 
   ChannelDescriptor::ChannelDescriptor(const HandleType& handle)
@@ -289,12 +335,22 @@ namespace BICEPS::PM
            other->getKind() < StateKind::LAST_OPERATION_STATE;
   }
 
+  SetStringOperationState::SetStringOperationState(const DescriptorHandleType& descriptor_handle,
+                                                   const OperatingModeType& operating_mode)
+    : AbstractOperationState(StateKind::SET_STRING_OPERATION_STATE, descriptor_handle,
+                             operating_mode)
+  {
+  }
+  bool SetStringOperationState::classof(const AbstractState* other)
+  {
+    return other->getKind() == StateKind::SET_STRING_OPERATION_STATE;
+  }
+
   SetValueOperationState::SetValueOperationState(const DescriptorHandleType& descriptorHandle,
                                                  const OperatingModeType& operatingMode)
     : AbstractOperationState(StateKind::SET_VALUE_OPERATION_STATE, descriptorHandle, operatingMode)
   {
   }
-
   bool SetValueOperationState::classof(const AbstractState* other)
   {
     return other->getKind() == StateKind::SET_VALUE_OPERATION_STATE;
@@ -315,10 +371,27 @@ namespace BICEPS::PM
     : AbstractMetricState(StateKind::NUMERIC_METRIC_STATE, std::move(handle))
   {
   }
-
   bool NumericMetricState::classof(const AbstractState* other)
   {
     return other->getKind() == StateKind::NUMERIC_METRIC_STATE;
+  }
+
+  bool StringMetricValue::classof(const AbstractMetricValue* other)
+  {
+    return other->getKind() == MetricKind::STRING_METRIC;
+  }
+  StringMetricValue::StringMetricValue(const MetricQuality& metric_quality)
+    : AbstractMetricValue(MetricKind::STRING_METRIC, metric_quality)
+  {
+  }
+
+  bool StringMetricState::classof(const AbstractState* other)
+  {
+    return other->getKind() == StateKind::STRING_METRIC_STATE;
+  }
+  StringMetricState::StringMetricState(DescriptorHandleType handle)
+    : AbstractMetricState(StateKind::STRING_METRIC_STATE, std::move(handle))
+  {
   }
 
   Mdib::Mdib(SequenceIdType sequenceIdType)

@@ -86,11 +86,31 @@ void SetService::handle_request(std::unique_ptr<Request> req)
     response_envelope.body.setValueResponse = set_value_response;
     req->respond(response_envelope);
   }
+  else if (soap_action == SDC::ACTION_SET_STRING)
+  {
+    auto set_string_request = request_envelope.body.setString.value();
+    auto set_string_response = this->dispatch(set_string_request);
+    MESSAGEMODEL::Envelope response_envelope;
+    fill_response_message_from_request_message(response_envelope, request_envelope);
+    response_envelope.header.action = WS::ADDRESSING::URIType(SDC::ACTION_SET_VALUE_RESPONSE);
+    response_envelope.body.setStringResponse = set_string_response;
+    req->respond(response_envelope);
+  }
   else
   {
     LOG(LogLevel::ERROR, "Unknown soap action " << soap_action);
     req->respond(SoapFault().envelope());
   }
+}
+
+BICEPS::MM::SetStringResponse SetService::dispatch(const BICEPS::MM::SetString& set_string_request)
+{
+  const auto invocation_state = micro_sdc_->request_state_change(set_string_request);
+  WS::ADDRESSING::URIType sequence_id("uuid:" + UUIDGenerator{}().to_string());
+  unsigned int transaction_id = 0;
+  BICEPS::MM::InvocationInfo invocation_info(transaction_id, invocation_state);
+  BICEPS::MM::SetStringResponse set_string_response(sequence_id, invocation_info);
+  return set_string_response;
 }
 
 BICEPS::MM::SetValueResponse SetService::dispatch(const BICEPS::MM::SetValue& set_value_request)

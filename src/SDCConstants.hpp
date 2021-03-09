@@ -27,6 +27,10 @@ namespace SDC
       "http://standards.ieee.org/downloads/11073/11073-20701-2018/SetService/"
       "OperationInvokedReport";
 
+  SDCConstant ACTION_SET_STRING =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/SetService/SetString";
+  SDCConstant ACTION_SET_STRING_RESPONSE =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/SetService/SetStringResponse";
   SDCConstant ACTION_SET_VALUE =
       "http://standards.ieee.org/downloads/11073/11073-20701-2018/SetService/SetValue";
   SDCConstant ACTION_SET_VALUE_RESPONSE =

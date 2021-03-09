@@ -52,6 +52,52 @@ public:
   }
 };
 
+class StringStateHandler : public StateHandler
+{
+public:
+  /// @brief constructs a new NumericStateHandler attached to a given descriptor state handle
+  /// @param descriptorHandle the handle of the state's descriptor
+  explicit StringStateHandler(const std::string& descriptor_handle)
+    : StateHandler(descriptor_handle)
+  {
+  }
+  StringStateHandler(const StringStateHandler&) = delete;
+  StringStateHandler(StringStateHandler&&) = delete;
+  StringStateHandler& operator=(const StringStateHandler&) = delete;
+  StringStateHandler& operator=(StringStateHandler&&) = delete;
+  ~StringStateHandler() override = default;
+
+  std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override
+  {
+    auto state = std::make_shared<BICEPS::PM::StringMetricState>(get_descriptor_handle());
+    state->metricValue = std::make_optional<BICEPS::PM::StringMetricValue>(
+        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld});
+    state->metricValue->value = "Hello Esp32!";
+    return state;
+  }
+
+  BICEPS::MM::InvocationState request_state_change(const BICEPS::MM::AbstractSet& set) override
+  {
+    const auto* const set_string = dyn_cast<const BICEPS::MM::SetString>(&set);
+    if (set_string == nullptr)
+    {
+      LOG(LogLevel::ERROR, "Cannot cast to SetString!");
+      return BICEPS::MM::InvocationState::Fail;
+    }
+    this->set_value(set_string->requestedStringValue);
+    return BICEPS::MM::InvocationState::Fin;
+  }
+
+  /// @param sets a new numeric value to the state handled by this handler and updates the mdib
+  /// @param value the new value to set
+  void set_value(std::string value)
+  {
+    auto state = dyn_cast<BICEPS::PM::StringMetricState>(get_initial_state());
+    state->metricValue->value = value;
+    update_state(state);
+  }
+};
+
 static volatile std::atomic_bool keep_running = true;
 static std::condition_variable cv_running;
 static std::mutex running_mutex;
@@ -91,26 +137,35 @@ int main()
   BICEPS::PM::MdsDescriptor device_descriptor("MedicalDevices");
   device_descriptor.systemContext = system_context;
 
-  // Dummy state
-  auto state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+  // Dummy numeric state
+  auto numeric_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "numeric_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
-  // settable
+  numeric_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  // dummy string tate
+  auto string_state = std::make_shared<BICEPS::PM::StringMetricDescriptor>(
+      "string_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Set,
+      BICEPS::PM::MetricAvailability::Cont);
+  string_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  // settable numeric
   auto settable_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "settable_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Set,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  numeric_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   BICEPS::PM::ChannelDescriptor device_channel("device_channel");
-  device_channel.metric.emplace_back(state);
+  device_channel.metric.emplace_back(numeric_state);
   device_channel.metric.emplace_back(settable_state);
+  device_channel.metric.emplace_back(string_state);
   device_channel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   BICEPS::PM::ScoDescriptor device_sco("sco_handle");
   auto set_value_operation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
       "set_value_operation_handle", "settable_state_handle");
+  auto set_string_operation = std::make_shared<BICEPS::PM::SetStringOperationDescriptor>(
+      "set_string_operation_handle", "string_state_handle");
   device_sco.operation.emplace_back(set_value_operation);
+  device_sco.operation.emplace_back(set_string_operation);
 
   BICEPS::PM::VmdDescriptor device_module("device_vmd");
   device_module.channel.emplace_back(device_channel);
@@ -135,10 +190,10 @@ int main()
 
   auto numeric_state_handler = std::make_shared<NumericStateHandler>("numeric_state_handle");
   auto settable_state_handler = std::make_shared<NumericStateHandler>("settable_state_handle");
-  auto set_value_operation_state = std::make_shared<BICEPS::PM::SetValueOperationState>(
-      "set_value_operation_handle", BICEPS::PM::OperatingMode::En);
+  auto string_state_handler = std::make_shared<StringStateHandler>("string_state_handle");
   micro_sdc->add_md_state(numeric_state_handler);
   micro_sdc->add_md_state(settable_state_handler);
+  micro_sdc->add_md_state(string_state_handler);
 
   micro_sdc->start();
 

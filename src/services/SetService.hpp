@@ -37,5 +37,6 @@ private:
   /// @brief dispatches an incoming request to the respective handlers and processes it
   /// @param setValueRequest the SetValue request to dispatch
   /// @return the response to the request after processing completed
+  BICEPS::MM::SetStringResponse dispatch(const BICEPS::MM::SetString& set_string_request);
   BICEPS::MM::SetValueResponse dispatch(const BICEPS::MM::SetValue& set_value_request);
 };
