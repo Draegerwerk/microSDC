@@ -4,59 +4,59 @@
 #include "rapidxml_print.hpp"
 
 MessageSerializer::MessageSerializer()
-  : xmlDocument_(std::make_unique<rapidxml::xml_document<>>())
+  : xml_document_(std::make_unique<rapidxml::xml_document<>>())
 {
-  auto* declaration = xmlDocument_->allocate_node(rapidxml::node_declaration);
-  auto* version = xmlDocument_->allocate_attribute("version", "1.0");
-  auto* encoding = xmlDocument_->allocate_attribute("encoding", "utf-8");
+  auto* declaration = xml_document_->allocate_node(rapidxml::node_declaration);
+  auto* version = xml_document_->allocate_attribute("version", "1.0");
+  auto* encoding = xml_document_->allocate_attribute("encoding", "utf-8");
   declaration->append_attribute(version);
   declaration->append_attribute(encoding);
-  xmlDocument_->append_node(declaration);
+  xml_document_->append_node(declaration);
 }
 
 std::string MessageSerializer::str() const
 {
   std::string out;
-  rapidxml::print(std::back_inserter(out), *xmlDocument_, rapidxml::print_no_indenting);
+  rapidxml::print(std::back_inserter(out), *xml_document_, rapidxml::print_no_indenting);
   return out;
 }
 
 void MessageSerializer::serialize(const MESSAGEMODEL::Envelope& message)
 {
-  serialize(&*xmlDocument_, message);
+  serialize(&*xml_document_, message);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const MESSAGEMODEL::Envelope& message)
 {
-  auto* envelope = xmlDocument_->allocate_node(rapidxml::node_element, "soap:Envelope");
+  auto* envelope = xml_document_->allocate_node(rapidxml::node_element, "soap:Envelope");
 
-  auto* xmlnsSoap = xmlDocument_->allocate_attribute("xmlns:soap", MDPWS::WS_NS_SOAP_ENVELOPE);
-  auto* xmlnsWsd = xmlDocument_->allocate_attribute("xmlns:wsd", MDPWS::WS_NS_DISCOVERY);
-  auto* xmlnsWsa = xmlDocument_->allocate_attribute("xmlns:wsa", MDPWS::WS_NS_ADDRESSING);
-  auto* xmlnsWse = xmlDocument_->allocate_attribute("xmlns:wse", MDPWS::WS_NS_EVENTING);
-  auto* xmlnsDpws = xmlDocument_->allocate_attribute("xmlns:dpws", MDPWS::WS_NS_DPWS);
-  auto* xmlnsMdpws = xmlDocument_->allocate_attribute("xmlns:mdpws", MDPWS::NS_MDPWS);
-  auto* xmlnsMex = xmlDocument_->allocate_attribute("xmlns:mex", MDPWS::WS_NS_METADATA_EXCHANGE);
-  auto* xmlnsGlue = xmlDocument_->allocate_attribute("xmlns:glue", SDC::NS_GLUE);
-  auto* xmlnsMm = xmlDocument_->allocate_attribute("xmlns:mm", SDC::NS_BICEPS_MESSAGE_MODEL);
-  auto* xmlnsPm = xmlDocument_->allocate_attribute("xmlns:pm", SDC::NS_BICEPS_PARTICIPANT_MODEL);
-  auto* xmlnsExt = xmlDocument_->allocate_attribute("xmlns:ext", SDC::NS_BICEPS_EXTENSION);
-  auto* xmlnsXsi =
-      xmlDocument_->allocate_attribute("xmlns:xsi", MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE);
+  auto* xmlns_soap = xml_document_->allocate_attribute("xmlns:soap", MDPWS::WS_NS_SOAP_ENVELOPE);
+  auto* xmlns_wsd = xml_document_->allocate_attribute("xmlns:wsd", MDPWS::WS_NS_DISCOVERY);
+  auto* xmlns_wsa = xml_document_->allocate_attribute("xmlns:wsa", MDPWS::WS_NS_ADDRESSING);
+  auto* xmlns_wse = xml_document_->allocate_attribute("xmlns:wse", MDPWS::WS_NS_EVENTING);
+  auto* xmlns_dpws = xml_document_->allocate_attribute("xmlns:dpws", MDPWS::WS_NS_DPWS);
+  auto* xmlns_mdpws = xml_document_->allocate_attribute("xmlns:mdpws", MDPWS::NS_MDPWS);
+  auto* xmlns_mex = xml_document_->allocate_attribute("xmlns:mex", MDPWS::WS_NS_METADATA_EXCHANGE);
+  auto* xmlns_glue = xml_document_->allocate_attribute("xmlns:glue", SDC::NS_GLUE);
+  auto* xmlns_mm = xml_document_->allocate_attribute("xmlns:mm", SDC::NS_BICEPS_MESSAGE_MODEL);
+  auto* xmlns_pm = xml_document_->allocate_attribute("xmlns:pm", SDC::NS_BICEPS_PARTICIPANT_MODEL);
+  auto* xmlns_ext = xml_document_->allocate_attribute("xmlns:ext", SDC::NS_BICEPS_EXTENSION);
+  auto* xmlns_xsi =
+      xml_document_->allocate_attribute("xmlns:xsi", MDPWS::WS_NS_WSDL_XML_SCHEMA_INSTANCE);
 
-  envelope->append_attribute(xmlnsSoap);
-  envelope->append_attribute(xmlnsWsd);
-  envelope->append_attribute(xmlnsWsa);
-  envelope->append_attribute(xmlnsWse);
-  envelope->append_attribute(xmlnsDpws);
-  envelope->append_attribute(xmlnsMdpws);
-  envelope->append_attribute(xmlnsMex);
-  envelope->append_attribute(xmlnsGlue);
-  envelope->append_attribute(xmlnsMm);
-  envelope->append_attribute(xmlnsPm);
-  envelope->append_attribute(xmlnsExt);
-  envelope->append_attribute(xmlnsXsi);
+  envelope->append_attribute(xmlns_soap);
+  envelope->append_attribute(xmlns_wsd);
+  envelope->append_attribute(xmlns_wsa);
+  envelope->append_attribute(xmlns_wse);
+  envelope->append_attribute(xmlns_dpws);
+  envelope->append_attribute(xmlns_mdpws);
+  envelope->append_attribute(xmlns_mex);
+  envelope->append_attribute(xmlns_glue);
+  envelope->append_attribute(xmlns_mm);
+  envelope->append_attribute(xmlns_pm);
+  envelope->append_attribute(xmlns_ext);
+  envelope->append_attribute(xmlns_xsi);
 
   serialize(envelope, message.header);
   serialize(envelope, message.body);
@@ -66,803 +66,814 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMODEL::Header& header)
 {
-  auto* headerNode = xmlDocument_->allocate_node(rapidxml::node_element, "soap:Header");
+  auto* header_node = xml_document_->allocate_node(rapidxml::node_element, "soap:Header");
   // Mandatory action element
-  auto* actionNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Action");
-  actionNode->value(header.action.c_str());
-  headerNode->append_node(actionNode);
+  auto* action_node = xml_document_->allocate_node(rapidxml::node_element, "wsa:Action");
+  action_node->value(header.action.c_str());
+  header_node->append_node(action_node);
   // optionals
   if (header.messageID.has_value())
   {
-    auto* messageIdNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:MessageID");
-    messageIdNode->value(header.messageID->c_str());
-    headerNode->append_node(messageIdNode);
+    auto* message_id_node = xml_document_->allocate_node(rapidxml::node_element, "wsa:MessageID");
+    message_id_node->value(header.messageID->c_str());
+    header_node->append_node(message_id_node);
   }
   if (header.to.has_value())
   {
-    auto* toNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:To");
-    toNode->value(header.to->c_str());
-    headerNode->append_node(toNode);
+    auto* to_node = xml_document_->allocate_node(rapidxml::node_element, "wsa:To");
+    to_node->value(header.to->c_str());
+    header_node->append_node(to_node);
   }
   if (header.appSequence.has_value())
   {
-    serialize(headerNode, header.appSequence.value());
+    serialize(header_node, header.appSequence.value());
   }
   if (header.relatesTo.has_value())
   {
-    serialize(headerNode, header.relatesTo.value());
+    serialize(header_node, header.relatesTo.value());
   }
-  parent->append_node(headerNode);
+  parent->append_node(header_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMODEL::Body& body)
 {
-  auto* bodyNode = xmlDocument_->allocate_node(rapidxml::node_element, "soap:Body");
+  auto* body_node = xml_document_->allocate_node(rapidxml::node_element, "soap:Body");
   if (body.hello.has_value())
   {
-    serialize(bodyNode, body.hello.value());
+    serialize(body_node, body.hello.value());
   }
   else if (body.bye.has_value())
   {
-    serialize(bodyNode, body.bye.value());
+    serialize(body_node, body.bye.value());
   }
   else if (body.probeMatches.has_value())
   {
-    serialize(bodyNode, body.probeMatches.value());
+    serialize(body_node, body.probeMatches.value());
   }
   else if (body.resolveMatches.has_value())
   {
-    serialize(bodyNode, body.resolveMatches.value());
+    serialize(body_node, body.resolveMatches.value());
   }
   else if (body.metadata.has_value())
   {
-    serialize(bodyNode, body.metadata.value());
+    serialize(body_node, body.metadata.value());
   }
   else if (body.getMdibResponse.has_value())
   {
-    serialize(bodyNode, body.getMdibResponse.value());
+    serialize(body_node, body.getMdibResponse.value());
   }
   else if (body.subscribeResponse.has_value())
   {
-    serialize(bodyNode, body.subscribeResponse.value());
+    serialize(body_node, body.subscribeResponse.value());
   }
   else if (body.renewResponse.has_value())
   {
-    serialize(bodyNode, body.renewResponse.value());
+    serialize(body_node, body.renewResponse.value());
   }
   else if (body.episodicMetricReport.has_value())
   {
-    serialize(bodyNode, body.episodicMetricReport.value());
+    serialize(body_node, body.episodicMetricReport.value());
   }
   else if (body.setValueResponse.has_value())
   {
-    serialize(bodyNode, body.setValueResponse.value());
+    serialize(body_node, body.setValueResponse.value());
   }
-  parent->append_node(bodyNode);
+  parent->append_node(body_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::ADDRESSING::RelatesToType& relatesTo)
+                                  const WS::ADDRESSING::RelatesToType& relates_to)
 {
-  auto* relatesToNode = xmlDocument_->allocate_node(rapidxml::node_element, "mdpws:RelatesTo");
-  relatesToNode->value(relatesTo.c_str());
-  parent->append_node(relatesToNode);
+  auto* relates_to_node = xml_document_->allocate_node(rapidxml::node_element, "mdpws:RelatesTo");
+  relates_to_node->value(relates_to.c_str());
+  parent->append_node(relates_to_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::ADDRESSING::EndpointReferenceType& endpointReference)
+                                  const WS::ADDRESSING::EndpointReferenceType& endpoint_reference)
 {
-  auto* eprNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:EndpointReference");
-  auto* addressNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Address");
-  addressNode->value(endpointReference.address.c_str());
-  eprNode->append_node(addressNode);
-  parent->append_node(eprNode);
+  auto* epr_node = xml_document_->allocate_node(rapidxml::node_element, "wsa:EndpointReference");
+  auto* address_node = xml_document_->allocate_node(rapidxml::node_element, "wsa:Address");
+  address_node->value(endpoint_reference.address.c_str());
+  epr_node->append_node(address_node);
+  parent->append_node(epr_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::DISCOVERY::AppSequenceType& appSequence)
+                                  const WS::DISCOVERY::AppSequenceType& app_sequence)
 {
-  auto* appSequenceNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:AppSequence");
-  const auto instanceIdStr = std::to_string(appSequence.instanceId);
-  auto* instanceId = xmlDocument_->allocate_string(instanceIdStr.c_str());
-  auto* instanceIdAttr = xmlDocument_->allocate_attribute("InstanceId", instanceId);
-  appSequenceNode->append_attribute(instanceIdAttr);
-  if (appSequence.sequenceId.has_value())
+  auto* app_sequence_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:AppSequence");
+  const auto instance_id_str = std::to_string(app_sequence.instanceId);
+  auto* instance_id = xml_document_->allocate_string(instance_id_str.c_str());
+  auto* instance_id_attr = xml_document_->allocate_attribute("InstanceId", instance_id);
+  app_sequence_node->append_attribute(instance_id_attr);
+  if (app_sequence.sequenceId.has_value())
   {
-    auto* sequenceId = xmlDocument_->allocate_string(appSequence.sequenceId->c_str());
-    auto* sequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", sequenceId);
-    appSequenceNode->append_attribute(sequenceIdAttr);
+    auto* sequence_id = xml_document_->allocate_string(app_sequence.sequenceId->c_str());
+    auto* sequence_id_attr = xml_document_->allocate_attribute("SequenceId", sequence_id);
+    app_sequence_node->append_attribute(sequence_id_attr);
   }
-  auto messageNumberStr = std::to_string(appSequence.messageNumber);
-  auto* messageNumber = xmlDocument_->allocate_string(messageNumberStr.c_str());
-  auto* messageNumberAttr = xmlDocument_->allocate_attribute("MessageNumber", messageNumber);
-  appSequenceNode->append_attribute(messageNumberAttr);
-  parent->append_node(appSequenceNode);
+  auto message_number_str = std::to_string(app_sequence.messageNumber);
+  auto* message_number = xml_document_->allocate_string(message_number_str.c_str());
+  auto* message_number_attr = xml_document_->allocate_attribute("MessageNumber", message_number);
+  app_sequence_node->append_attribute(message_number_attr);
+  parent->append_node(app_sequence_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::ScopesType& scopes)
 {
-  auto* scopesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Scopes");
+  auto* scopes_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Scopes");
   if (scopes.matchBy.has_value())
   {
-    auto* matchByAttr = xmlDocument_->allocate_attribute("MatchBy", scopes.matchBy->c_str());
-    scopesNode->append_attribute(matchByAttr);
+    auto* match_by_attr = xml_document_->allocate_attribute("MatchBy", scopes.matchBy->c_str());
+    scopes_node->append_attribute(match_by_attr);
   }
-  const auto scopesStr = toString(scopes);
-  auto* uriList = xmlDocument_->allocate_string(scopesStr.c_str());
-  scopesNode->value(uriList);
-  parent->append_node(scopesNode);
+  const auto scopes_str = to_string(scopes);
+  auto* uri_list = xml_document_->allocate_string(scopes_str.c_str());
+  scopes_node->value(uri_list);
+  parent->append_node(scopes_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::HelloType& hello)
 {
-  auto* helloNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Hello");
-  serialize(helloNode, hello.endpointReference);
+  auto* hello_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Hello");
+  serialize(hello_node, hello.endpointReference);
   if (hello.types.has_value())
   {
-    auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Types");
-    auto* typesStr = xmlDocument_->allocate_string(toString(hello.types.value()).c_str());
-    typesNode->value(typesStr);
-    helloNode->append_node(typesNode);
+    auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Types");
+    auto* types_str = xml_document_->allocate_string(to_string(hello.types.value()).c_str());
+    types_node->value(types_str);
+    hello_node->append_node(types_node);
   }
   if (hello.scopes.has_value())
   {
-    serialize(helloNode, hello.scopes.value());
+    serialize(hello_node, hello.scopes.value());
   }
   if (hello.xAddrs.has_value())
   {
-    auto* xAddrsNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
-    auto* xAddrsStr = xmlDocument_->allocate_string(toString(hello.xAddrs.value()).c_str());
-    xAddrsNode->value(xAddrsStr);
-    helloNode->append_node(xAddrsNode);
+    auto* x_addrs_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
+    auto* x_addrs_str = xml_document_->allocate_string(to_string(hello.xAddrs.value()).c_str());
+    x_addrs_node->value(x_addrs_str);
+    hello_node->append_node(x_addrs_node);
   }
-  auto* metadataVersionNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
-  auto* metadataVersion =
-      xmlDocument_->allocate_string(std::to_string(hello.metadataVersion).c_str());
-  metadataVersionNode->value(metadataVersion);
-  parent->append_node(helloNode);
+  auto* metadata_version_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
+  auto* metadata_version =
+      xml_document_->allocate_string(std::to_string(hello.metadataVersion).c_str());
+  metadata_version_node->value(metadata_version);
+  parent->append_node(hello_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::ByeType& bye)
 {
-  auto* byeNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:bye");
-  serialize(byeNode, bye.endpointReference);
+  auto* bye_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:bye");
+  serialize(bye_node, bye.endpointReference);
   if (bye.types.has_value())
   {
-    auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Types");
-    auto* typesStr = xmlDocument_->allocate_string(toString(bye.types.value()).c_str());
-    typesNode->value(typesStr);
-    byeNode->append_node(typesNode);
+    auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Types");
+    auto* types_str = xml_document_->allocate_string(to_string(bye.types.value()).c_str());
+    types_node->value(types_str);
+    bye_node->append_node(types_node);
   }
   if (bye.scopes.has_value())
   {
-    serialize(byeNode, bye.scopes.value());
+    serialize(bye_node, bye.scopes.value());
   }
   if (bye.xAddrs.has_value())
   {
-    auto* xAddrsNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
-    auto* xAddrsStr = xmlDocument_->allocate_string(toString(bye.xAddrs.value()).c_str());
-    xAddrsNode->value(xAddrsStr);
-    byeNode->append_node(xAddrsNode);
+    auto* x_addrs_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
+    auto* x_addrs_str = xml_document_->allocate_string(to_string(bye.xAddrs.value()).c_str());
+    x_addrs_node->value(x_addrs_str);
+    bye_node->append_node(x_addrs_node);
   }
   if (bye.metadataVersion.has_value())
   {
-    auto* metadataVersionNode =
-        xmlDocument_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
-    auto* metadataVersion =
-        xmlDocument_->allocate_string(std::to_string(bye.metadataVersion.value()).c_str());
-    metadataVersionNode->value(metadataVersion);
+    auto* metadata_version_node =
+        xml_document_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
+    auto* metadata_version =
+        xml_document_->allocate_string(std::to_string(bye.metadataVersion.value()).c_str());
+    metadata_version_node->value(metadata_version);
   }
-  parent->append_node(byeNode);
+  parent->append_node(bye_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::DISCOVERY::ProbeMatchType& probeMatch)
+                                  const WS::DISCOVERY::ProbeMatchType& probe_match)
 {
-  auto* probeMatchNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:ProbeMatch");
-  serialize(probeMatchNode, probeMatch.endpointReference);
-  if (probeMatch.types.has_value())
+  auto* probe_match_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:ProbeMatch");
+  serialize(probe_match_node, probe_match.endpointReference);
+  if (probe_match.types.has_value())
   {
-    auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Types");
-    auto* typesStr = xmlDocument_->allocate_string(toString(probeMatch.types.value()).c_str());
-    typesNode->value(typesStr);
-    probeMatchNode->append_node(typesNode);
+    auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Types");
+    auto* types_str = xml_document_->allocate_string(to_string(probe_match.types.value()).c_str());
+    types_node->value(types_str);
+    probe_match_node->append_node(types_node);
   }
-  if (probeMatch.scopes.has_value())
+  if (probe_match.scopes.has_value())
   {
-    serialize(probeMatchNode, probeMatch.scopes.value());
+    serialize(probe_match_node, probe_match.scopes.value());
   }
-  if (probeMatch.xAddrs.has_value())
+  if (probe_match.xAddrs.has_value())
   {
-    auto* xAddrsNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
-    auto* xAddrsStr = xmlDocument_->allocate_string(toString(probeMatch.xAddrs.value()).c_str());
-    xAddrsNode->value(xAddrsStr);
-    probeMatchNode->append_node(xAddrsNode);
+    auto* x_addrs_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
+    auto* x_addrs_str =
+        xml_document_->allocate_string(to_string(probe_match.xAddrs.value()).c_str());
+    x_addrs_node->value(x_addrs_str);
+    probe_match_node->append_node(x_addrs_node);
   }
-  auto* metadataVersionNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
-  auto* metadataVersion =
-      xmlDocument_->allocate_string(std::to_string(probeMatch.metadataVersion).c_str());
-  metadataVersionNode->value(metadataVersion);
-  probeMatchNode->append_node(metadataVersionNode);
-  parent->append_node(probeMatchNode);
+  auto* metadata_version_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
+  auto* metadata_version =
+      xml_document_->allocate_string(std::to_string(probe_match.metadataVersion).c_str());
+  metadata_version_node->value(metadata_version);
+  probe_match_node->append_node(metadata_version_node);
+  parent->append_node(probe_match_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::DISCOVERY::ProbeMatchesType& probeMatches)
+                                  const WS::DISCOVERY::ProbeMatchesType& probe_matches)
 {
-  auto* probeMatchesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:ProbeMatches");
-  for (const auto& probeMatch : probeMatches.probeMatch)
+  auto* probe_matches_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wsd:ProbeMatches");
+  for (const auto& probe_match : probe_matches.probeMatch)
   {
-    serialize(probeMatchesNode, probeMatch);
+    serialize(probe_matches_node, probe_match);
   }
-  parent->append_node(probeMatchesNode);
+  parent->append_node(probe_matches_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::DISCOVERY::ResolveMatchType& resolveMatch)
+                                  const WS::DISCOVERY::ResolveMatchType& resolve_match)
 {
-  auto* resolveMatchNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "wsd:ResolveMatches");
-  serialize(resolveMatchNode, resolveMatch.endpointReference);
-  if (resolveMatch.types.has_value())
+  auto* resolve_match_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wsd:ResolveMatches");
+  serialize(resolve_match_node, resolve_match.endpointReference);
+  if (resolve_match.types.has_value())
   {
-    auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:Types");
-    auto* typesStr = xmlDocument_->allocate_string(toString(resolveMatch.types.value()).c_str());
-    typesNode->value(typesStr);
-    resolveMatchNode->append_node(typesNode);
+    auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Types");
+    auto* types_str =
+        xml_document_->allocate_string(to_string(resolve_match.types.value()).c_str());
+    types_node->value(types_str);
+    resolve_match_node->append_node(types_node);
   }
-  if (resolveMatch.scopes.has_value())
+  if (resolve_match.scopes.has_value())
   {
-    serialize(resolveMatchNode, resolveMatch.scopes.value());
+    serialize(resolve_match_node, resolve_match.scopes.value());
   }
-  if (resolveMatch.xAddrs.has_value())
+  if (resolve_match.xAddrs.has_value())
   {
-    auto* xAddrsNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
-    auto* xAddrsStr = xmlDocument_->allocate_string(toString(resolveMatch.xAddrs.value()).c_str());
-    xAddrsNode->value(xAddrsStr);
-    resolveMatchNode->append_node(xAddrsNode);
+    auto* x_addrs_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
+    auto* x_addrs_str =
+        xml_document_->allocate_string(to_string(resolve_match.xAddrs.value()).c_str());
+    x_addrs_node->value(x_addrs_str);
+    resolve_match_node->append_node(x_addrs_node);
   }
-  auto* metadataVersionNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
-  auto* metadataVersion =
-      xmlDocument_->allocate_string(std::to_string(resolveMatch.metadataVersion).c_str());
-  metadataVersionNode->value(metadataVersion);
-  resolveMatchNode->append_node(metadataVersionNode);
-  parent->append_node(resolveMatchNode);
+  auto* metadata_version_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
+  auto* metadata_version =
+      xml_document_->allocate_string(std::to_string(resolve_match.metadataVersion).c_str());
+  metadata_version_node->value(metadata_version);
+  resolve_match_node->append_node(metadata_version_node);
+  parent->append_node(resolve_match_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::DISCOVERY::ResolveMatchesType& resolveMatches)
+                                  const WS::DISCOVERY::ResolveMatchesType& resolve_matches)
 {
-  auto* resolveMatchesNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "wsd:ResolveMatches");
-  for (const auto& resolveMatch : resolveMatches.resolveMatch)
+  auto* resolve_matches_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wsd:ResolveMatches");
+  for (const auto& resolve_match : resolve_matches.resolveMatch)
   {
-    serialize(resolveMatchesNode, resolveMatch);
+    serialize(resolve_matches_node, resolve_match);
   }
-  parent->append_node(resolveMatchesNode);
+  parent->append_node(resolve_matches_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const WS::MEX::Metadata& metadata)
 {
-  auto* metadataNode = xmlDocument_->allocate_node(rapidxml::node_element, "mex:Metadata");
-  for (const auto& metadataSection : metadata.metadataSection)
+  auto* metadata_node = xml_document_->allocate_node(rapidxml::node_element, "mex:Metadata");
+  for (const auto& metadata_section : metadata.metadataSection)
   {
-    serialize(metadataNode, metadataSection);
+    serialize(metadata_node, metadata_section);
   }
-  parent->append_node(metadataNode);
+  parent->append_node(metadata_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::MEX::MetadataSection& metadataSection)
+                                  const WS::MEX::MetadataSection& metadata_section)
 {
-  auto* metadataSectionNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "mex:MetadataSection");
-  auto* dialectAttr = xmlDocument_->allocate_attribute("Dialect", metadataSection.dialect.c_str());
-  metadataSectionNode->append_attribute(dialectAttr);
-  if (metadataSection.thisModel.has_value())
+  auto* metadata_section_node =
+      xml_document_->allocate_node(rapidxml::node_element, "mex:MetadataSection");
+  auto* dialect_attr =
+      xml_document_->allocate_attribute("Dialect", metadata_section.dialect.c_str());
+  metadata_section_node->append_attribute(dialect_attr);
+  if (metadata_section.thisModel.has_value())
   {
-    serialize(metadataSectionNode, metadataSection.thisModel.value());
+    serialize(metadata_section_node, metadata_section.thisModel.value());
   }
-  else if (metadataSection.thisDevice.has_value())
+  else if (metadata_section.thisDevice.has_value())
   {
-    serialize(metadataSectionNode, metadataSection.thisDevice.value());
+    serialize(metadata_section_node, metadata_section.thisDevice.value());
   }
-  else if (metadataSection.relationship.has_value())
+  else if (metadata_section.relationship.has_value())
   {
-    serialize(metadataSectionNode, metadataSection.relationship.value());
+    serialize(metadata_section_node, metadata_section.relationship.value());
   }
-  else if (metadataSection.location.has_value())
+  else if (metadata_section.location.has_value())
   {
-    auto* locationNode = xmlDocument_->allocate_node(rapidxml::node_element, "mex:Location");
-    locationNode->value(metadataSection.location->c_str());
-    metadataSectionNode->append_node(locationNode);
+    auto* location_node = xml_document_->allocate_node(rapidxml::node_element, "mex:Location");
+    location_node->value(metadata_section.location->c_str());
+    metadata_section_node->append_node(location_node);
   }
-  parent->append_node(metadataSectionNode);
+  parent->append_node(metadata_section_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::DPWS::ThisModelType& thisModel)
+                                  const WS::DPWS::ThisModelType& this_model)
 {
-  auto* thisModelNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:ThisModel");
+  auto* this_model_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:ThisModel");
   // Manufacturer
-  for (const auto& manufacturer : thisModel.manufacturer)
+  for (const auto& manufacturer : this_model.manufacturer)
   {
-    auto* manufacturerNode =
-        xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Manufacturer");
-    manufacturerNode->value(manufacturer.c_str());
-    thisModelNode->append_node(manufacturerNode);
+    auto* manufacturer_node =
+        xml_document_->allocate_node(rapidxml::node_element, "dpws:Manufacturer");
+    manufacturer_node->value(manufacturer.c_str());
+    this_model_node->append_node(manufacturer_node);
   }
   // ModelName
-  for (const auto& modelName : thisModel.modelName)
+  for (const auto& model_name : this_model.modelName)
   {
-    auto* modelNameNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:ModelName");
-    modelNameNode->value(modelName.c_str());
-    thisModelNode->append_node(modelNameNode);
+    auto* model_name_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:ModelName");
+    model_name_node->value(model_name.c_str());
+    this_model_node->append_node(model_name_node);
   }
-  parent->append_node(thisModelNode);
+  parent->append_node(this_model_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::DPWS::ThisDeviceType& thisDevice)
+                                  const WS::DPWS::ThisDeviceType& this_device)
 {
-  auto* thisDeviceNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:ThisDevice");
+  auto* this_device_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:ThisDevice");
   // FriendlyName
-  for (const auto& friendlyName : thisDevice.friendlyName)
+  for (const auto& friendly_name : this_device.friendlyName)
   {
-    auto* friendlyNameNode =
-        xmlDocument_->allocate_node(rapidxml::node_element, "dpws:FriendlyName");
-    friendlyNameNode->value(friendlyName.c_str());
-    thisDeviceNode->append_node(friendlyNameNode);
+    auto* friendly_name_node =
+        xml_document_->allocate_node(rapidxml::node_element, "dpws:FriendlyName");
+    friendly_name_node->value(friendly_name.c_str());
+    this_device_node->append_node(friendly_name_node);
   }
-  parent->append_node(thisDeviceNode);
+  parent->append_node(this_device_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DPWS::Relationship& relationship)
 {
-  auto* relationshipNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Relationship");
-  auto* typeAttr = xmlDocument_->allocate_attribute("Type", relationship.type.c_str());
-  relationshipNode->append_attribute(typeAttr);
+  auto* relationship_node =
+      xml_document_->allocate_node(rapidxml::node_element, "dpws:Relationship");
+  auto* type_attr = xml_document_->allocate_attribute("Type", relationship.type.c_str());
+  relationship_node->append_attribute(type_attr);
 
-  serialize(relationshipNode, relationship.host);
+  serialize(relationship_node, relationship.host);
   for (const auto& hosted : relationship.hosted)
   {
-    serialize(relationshipNode, hosted);
+    serialize(relationship_node, hosted);
   }
-  parent->append_node(relationshipNode);
+  parent->append_node(relationship_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DPWS::HostServiceType& host)
 {
-  auto* hostNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Host");
-  serialize(hostNode, host.endpointReference);
+  auto* host_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:Host");
+  serialize(host_node, host.endpointReference);
   if (host.types.has_value())
   {
-    auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Types");
-    auto* typesStr = xmlDocument_->allocate_string(toString(host.types.value()).c_str());
-    typesNode->value(typesStr);
-    hostNode->append_node(typesNode);
+    auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:Types");
+    auto* types_str = xml_document_->allocate_string(to_string(host.types.value()).c_str());
+    types_node->value(types_str);
+    host_node->append_node(types_node);
   }
-  parent->append_node(hostNode);
+  parent->append_node(host_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DPWS::HostedServiceType& hosted)
 {
-  auto* hostedNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Hosted");
+  auto* hosted_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:Hosted");
   for (const auto& epr : hosted.endpointReference)
   {
-    serialize(hostedNode, epr);
+    serialize(hosted_node, epr);
   }
   // Types
-  auto* typesNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:Types");
-  auto* typesStr = xmlDocument_->allocate_string(toString(hosted.types).c_str());
-  typesNode->value(typesStr);
-  hostedNode->append_node(typesNode);
+  auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:Types");
+  auto* types_str = xml_document_->allocate_string(to_string(hosted.types).c_str());
+  types_node->value(types_str);
+  hosted_node->append_node(types_node);
   // ServiceId
-  auto* serviceIdNode = xmlDocument_->allocate_node(rapidxml::node_element, "dpws:ServiceId");
-  serviceIdNode->value(hosted.serviceId.c_str());
-  hostedNode->append_node(serviceIdNode);
-  parent->append_node(hostedNode);
+  auto* service_id_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:ServiceId");
+  service_id_node->value(hosted.serviceId.c_str());
+  hosted_node->append_node(service_id_node);
+  parent->append_node(hosted_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::MM::GetMdibResponse& getMdibResponse)
+                                  const BICEPS::MM::GetMdibResponse& get_mdib_response)
 {
-  auto* getMdibResponseNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "mm:GetMdibResponse");
-  auto* sequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", "0");
-  getMdibResponseNode->append_attribute(sequenceIdAttr);
-  serialize(getMdibResponseNode, getMdibResponse.mdib);
-  parent->append_node(getMdibResponseNode);
+  auto* get_mdib_response_node =
+      xml_document_->allocate_node(rapidxml::node_element, "mm:GetMdibResponse");
+  auto* sequence_id_attr = xml_document_->allocate_attribute("SequenceId", "0");
+  get_mdib_response_node->append_attribute(sequence_id_attr);
+  serialize(get_mdib_response_node, get_mdib_response.mdib);
+  parent->append_node(get_mdib_response_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Mdib& mdib)
 {
-  auto* mdibNode = xmlDocument_->allocate_node(rapidxml::node_element, "mm:Mdib");
-  auto* sequenceId = xmlDocument_->allocate_string(mdib.sequenceId.c_str());
-  auto* sequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", sequenceId);
-  mdibNode->append_attribute(sequenceIdAttr);
-  auto* mdibVersion =
-      xmlDocument_->allocate_string(std::to_string(mdib.mdibVersion.value_or(0)).c_str());
-  auto* mdibVersionAttr = xmlDocument_->allocate_attribute(mdibVersion);
-  mdibNode->append_attribute(mdibVersionAttr);
+  auto* mdib_node = xml_document_->allocate_node(rapidxml::node_element, "mm:Mdib");
+  auto* sequence_id = xml_document_->allocate_string(mdib.sequenceId.c_str());
+  auto* sequence_id_attr = xml_document_->allocate_attribute("SequenceId", sequence_id);
+  mdib_node->append_attribute(sequence_id_attr);
+  auto* mdib_version =
+      xml_document_->allocate_string(std::to_string(mdib.mdibVersion.value_or(0)).c_str());
+  auto* mdib_version_attr = xml_document_->allocate_attribute(mdib_version);
+  mdib_node->append_attribute(mdib_version_attr);
   if (mdib.mdDescription.has_value())
   {
-    serialize(mdibNode, mdib.mdDescription.value());
+    serialize(mdib_node, mdib.mdDescription.value());
   }
   if (mdib.mdState.has_value())
   {
-    serialize(mdibNode, mdib.mdState.value());
+    serialize(mdib_node, mdib.mdState.value());
   }
-  parent->append_node(mdibNode);
+  parent->append_node(mdib_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::PM::MdDescription& mdDescription)
+                                  const BICEPS::PM::MdDescription& md_description)
 {
-  auto* mdDescriptionNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MdDescription");
-  for (const auto& md : mdDescription.mds)
+  auto* md_description_node =
+      xml_document_->allocate_node(rapidxml::node_element, "pm:MdDescription");
+  for (const auto& md : md_description.mds)
   {
-    serialize(mdDescriptionNode, md);
+    serialize(md_description_node, md);
   }
-  parent->append_node(mdDescriptionNode);
+  parent->append_node(md_description_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::PM::MdsDescriptor& mdsDescriptor)
+                                  const BICEPS::PM::MdsDescriptor& mds_descriptor)
 {
-  auto* mdsDescriptorNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Mds");
-  auto* handleAttr = xmlDocument_->allocate_attribute("Handle", mdsDescriptor.handle.c_str());
-  mdsDescriptorNode->append_attribute(handleAttr);
-  if (mdsDescriptor.metaData.has_value())
+  auto* mds_descriptor_node = xml_document_->allocate_node(rapidxml::node_element, "pm:Mds");
+  auto* handle_attr = xml_document_->allocate_attribute("Handle", mds_descriptor.handle.c_str());
+  mds_descriptor_node->append_attribute(handle_attr);
+  if (mds_descriptor.metaData.has_value())
   {
-    serialize(mdsDescriptorNode, mdsDescriptor.metaData.value());
+    serialize(mds_descriptor_node, mds_descriptor.metaData.value());
   }
-  if (mdsDescriptor.systemContext.has_value())
+  if (mds_descriptor.systemContext.has_value())
   {
-    serialize(mdsDescriptorNode, mdsDescriptor.systemContext.value());
+    serialize(mds_descriptor_node, mds_descriptor.systemContext.value());
   }
-  for (const auto& vmd : mdsDescriptor.vmd)
+  for (const auto& vmd : mds_descriptor.vmd)
   {
-    serialize(mdsDescriptorNode, vmd);
+    serialize(mds_descriptor_node, vmd);
   }
-  parent->append_node(mdsDescriptorNode);
+  parent->append_node(mds_descriptor_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::Metadata& metadata)
 {
-  auto* metaDataNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MetaData");
+  auto* meta_data_node = xml_document_->allocate_node(rapidxml::node_element, "pm:MetaData");
 
-  for (const auto& modelName : metadata.modelName)
+  for (const auto& model_name : metadata.modelName)
   {
-    auto* modelNameNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:ModelName");
-    auto* refAttr = xmlDocument_->allocate_attribute("Ref", modelName.c_str());
-    modelNameNode->append_attribute(refAttr);
-    metaDataNode->append_node(modelNameNode);
+    auto* model_name_node = xml_document_->allocate_node(rapidxml::node_element, "pm:ModelName");
+    auto* ref_attr = xml_document_->allocate_attribute("Ref", model_name.c_str());
+    model_name_node->append_attribute(ref_attr);
+    meta_data_node->append_node(model_name_node);
   }
   if (metadata.modelNumber.has_value())
   {
-    auto* modelNumberNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:ModelNumber");
-    modelNumberNode->value(metadata.modelNumber.value().c_str());
-    metaDataNode->append_node(modelNumberNode);
+    auto* model_number_node =
+        xml_document_->allocate_node(rapidxml::node_element, "pm:ModelNumber");
+    model_number_node->value(metadata.modelNumber.value().c_str());
+    meta_data_node->append_node(model_number_node);
   }
-  for (const auto& serialNumber : metadata.serialNumber)
+  for (const auto& serial_number : metadata.serialNumber)
   {
-    auto* serialNumberNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:SerialNumber");
-    serialNumberNode->value(serialNumber.c_str());
-    metaDataNode->append_node(serialNumberNode);
+    auto* serial_number_node =
+        xml_document_->allocate_node(rapidxml::node_element, "pm:SerialNumber");
+    serial_number_node->value(serial_number.c_str());
+    meta_data_node->append_node(serial_number_node);
   }
   for (const auto& manufacturer : metadata.manufacturer)
   {
-    auto* manufacturerNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Manufacturer");
-    auto* refAttr = xmlDocument_->allocate_attribute("Ref", manufacturer.c_str());
-    manufacturerNode->append_attribute(refAttr);
-    metaDataNode->append_node(manufacturerNode);
+    auto* manufacturer_node =
+        xml_document_->allocate_node(rapidxml::node_element, "pm:Manufacturer");
+    auto* ref_attr = xml_document_->allocate_attribute("Ref", manufacturer.c_str());
+    manufacturer_node->append_attribute(ref_attr);
+    meta_data_node->append_node(manufacturer_node);
   }
-  parent->append_node(metaDataNode);
+  parent->append_node(meta_data_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::PM::SystemContextDescriptor& systemContext)
+                                  const BICEPS::PM::SystemContextDescriptor& system_context)
 {
-  auto* systemContextNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:SystemContext");
-  auto* handleAttr = xmlDocument_->allocate_attribute("Handle", systemContext.handle.c_str());
-  systemContextNode->append_attribute(handleAttr);
-  if (systemContext.patientContext.has_value())
+  auto* system_context_node =
+      xml_document_->allocate_node(rapidxml::node_element, "pm:SystemContext");
+  auto* handle_attr = xml_document_->allocate_attribute("Handle", system_context.handle.c_str());
+  system_context_node->append_attribute(handle_attr);
+  if (system_context.patientContext.has_value())
   {
-    serialize(systemContextNode, systemContext.patientContext.value());
+    serialize(system_context_node, system_context.patientContext.value());
   }
-  if (systemContext.locationContext.has_value())
+  if (system_context.locationContext.has_value())
   {
-    serialize(systemContextNode, systemContext.locationContext.value());
+    serialize(system_context_node, system_context.locationContext.value());
   }
-  parent->append_node(systemContextNode);
+  parent->append_node(system_context_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::PM::PatientContextDescriptor& patientContext)
+                                  const BICEPS::PM::PatientContextDescriptor& patient_context)
 {
-  auto* patientContextNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "pm:PatientContext");
-  auto* handleAttr = xmlDocument_->allocate_attribute("Handle", patientContext.handle.c_str());
-  patientContextNode->append_attribute(handleAttr);
-  if (patientContext.safetyClassification.has_value())
+  auto* patient_context_node =
+      xml_document_->allocate_node(rapidxml::node_element, "pm:PatientContext");
+  auto* handle_attr = xml_document_->allocate_attribute("Handle", patient_context.handle.c_str());
+  patient_context_node->append_attribute(handle_attr);
+  if (patient_context.safetyClassification.has_value())
   {
-    auto* safetyClassification = xmlDocument_->allocate_string(
-        toString(patientContext.safetyClassification.value()).c_str());
-    auto* safetyClassificationAttr =
-        xmlDocument_->allocate_attribute("SafetyClassification", safetyClassification);
-    patientContextNode->append_attribute(safetyClassificationAttr);
+    auto* safety_classification = xml_document_->allocate_string(
+        to_string(patient_context.safetyClassification.value()).c_str());
+    auto* safety_classification_attr =
+        xml_document_->allocate_attribute("SafetyClassification", safety_classification);
+    patient_context_node->append_attribute(safety_classification_attr);
   }
-  parent->append_node(patientContextNode);
+  parent->append_node(patient_context_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::PM::LocationContextDescriptor& locationContext)
+                                  const BICEPS::PM::LocationContextDescriptor& location_context)
 {
-  auto* patientContextNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "pm:LocationContext");
-  auto* handleAttr = xmlDocument_->allocate_attribute("Handle", locationContext.handle.c_str());
-  patientContextNode->append_attribute(handleAttr);
-  if (locationContext.safetyClassification.has_value())
+  auto* patient_context_node =
+      xml_document_->allocate_node(rapidxml::node_element, "pm:LocationContext");
+  auto* handle_attr = xml_document_->allocate_attribute("Handle", location_context.handle.c_str());
+  patient_context_node->append_attribute(handle_attr);
+  if (location_context.safetyClassification.has_value())
   {
-    auto* safetyClassification = xmlDocument_->allocate_string(
-        toString(locationContext.safetyClassification.value()).c_str());
-    auto* safetyClassificationAttr =
-        xmlDocument_->allocate_attribute("SafetyClassification", safetyClassification);
-    patientContextNode->append_attribute(safetyClassificationAttr);
+    auto* safety_classification = xml_document_->allocate_string(
+        to_string(location_context.safetyClassification.value()).c_str());
+    auto* safety_classification_attr =
+        xml_document_->allocate_attribute("SafetyClassification", safety_classification);
+    patient_context_node->append_attribute(safety_classification_attr);
   }
-  parent->append_node(patientContextNode);
+  parent->append_node(patient_context_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::VmdDescriptor& vmd)
 {
-  auto* vmdNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Vmd");
-  auto* handleAttr = xmlDocument_->allocate_attribute("Handle", vmd.handle.c_str());
-  vmdNode->append_attribute(handleAttr);
+  auto* vmd_node = xml_document_->allocate_node(rapidxml::node_element, "pm:Vmd");
+  auto* handle_attr = xml_document_->allocate_attribute("Handle", vmd.handle.c_str());
+  vmd_node->append_attribute(handle_attr);
   for (const auto& channel : vmd.channel)
   {
-    serialize(vmdNode, channel);
+    serialize(vmd_node, channel);
   }
   if (vmd.sco.has_value())
   {
-    serialize(vmdNode, vmd.sco.value());
+    serialize(vmd_node, vmd.sco.value());
   }
-  parent->append_node(vmdNode);
+  parent->append_node(vmd_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::ChannelDescriptor& channel)
 {
-  auto* channelNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Channel");
-  auto* handleAttr = xmlDocument_->allocate_attribute("Handle", channel.handle.c_str());
-  channelNode->append_attribute(handleAttr);
+  auto* channel_node = xml_document_->allocate_node(rapidxml::node_element, "pm:Channel");
+  auto* handle_attr = xml_document_->allocate_attribute("Handle", channel.handle.c_str());
+  channel_node->append_attribute(handle_attr);
   if (channel.descriptorVersion.has_value())
   {
-    auto* descriptorVersion =
-        xmlDocument_->allocate_string(std::to_string(channel.descriptorVersion.value()).c_str());
-    auto* descriptorVersionAttr =
-        xmlDocument_->allocate_attribute("DescriptorVersion", descriptorVersion);
-    channelNode->append_attribute(descriptorVersionAttr);
+    auto* descriptor_version =
+        xml_document_->allocate_string(std::to_string(channel.descriptorVersion.value()).c_str());
+    auto* descriptor_version_attr =
+        xml_document_->allocate_attribute("DescriptorVersion", descriptor_version);
+    channel_node->append_attribute(descriptor_version_attr);
   }
   if (channel.safetyClassification.has_value())
   {
-    auto* safetyClassification =
-        xmlDocument_->allocate_string(toString(channel.safetyClassification.value()).c_str());
-    auto* safetyClassificationAttr =
-        xmlDocument_->allocate_attribute("SafetyClassification", safetyClassification);
-    channelNode->append_attribute(safetyClassificationAttr);
+    auto* safety_classification =
+        xml_document_->allocate_string(to_string(channel.safetyClassification.value()).c_str());
+    auto* safety_classification_attr =
+        xml_document_->allocate_attribute("SafetyClassification", safety_classification);
+    channel_node->append_attribute(safety_classification_attr);
   }
   if (channel.type.has_value())
   {
-    auto* typeNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Type");
-    auto* codeAttr = xmlDocument_->allocate_attribute("Code", channel.type.value().code.c_str());
-    typeNode->append_attribute(codeAttr);
-    channelNode->append_node(typeNode);
+    auto* type_node = xml_document_->allocate_node(rapidxml::node_element, "pm:Type");
+    auto* code_attr = xml_document_->allocate_attribute("Code", channel.type.value().code.c_str());
+    type_node->append_attribute(code_attr);
+    channel_node->append_node(type_node);
   }
   for (const auto& metric : channel.metric)
   {
-    serialize(channelNode, *metric);
+    serialize(channel_node, *metric);
   }
-  parent->append_node(channelNode);
+  parent->append_node(channel_node);
 }
 
 void MessageSerializer::serialize(
     rapidxml::xml_node<>* parent,
-    const BICEPS::PM::AbstractMetricDescriptor& abstractMetricDescriptor)
+    const BICEPS::PM::AbstractMetricDescriptor& abstract_metric_descriptor)
 {
-  auto* metricNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Metric");
-  auto* handleAttr =
-      xmlDocument_->allocate_attribute("Handle", abstractMetricDescriptor.handle.c_str());
-  metricNode->append_attribute(handleAttr);
+  auto* metric_node = xml_document_->allocate_node(rapidxml::node_element, "pm:Metric");
+  auto* handle_attr =
+      xml_document_->allocate_attribute("Handle", abstract_metric_descriptor.handle.c_str());
+  metric_node->append_attribute(handle_attr);
 
-  auto* descriptorVersion = xmlDocument_->allocate_string(
-      std::to_string(abstractMetricDescriptor.descriptorVersion.value_or(0)).c_str());
-  auto* descriptorVersionAttr =
-      xmlDocument_->allocate_attribute("DescriptorVersion", descriptorVersion);
-  metricNode->append_attribute(descriptorVersionAttr);
+  auto* descriptor_version = xml_document_->allocate_string(
+      std::to_string(abstract_metric_descriptor.descriptorVersion.value_or(0)).c_str());
+  auto* descriptor_version_attr =
+      xml_document_->allocate_attribute("DescriptorVersion", descriptor_version);
+  metric_node->append_attribute(descriptor_version_attr);
 
-  if (abstractMetricDescriptor.safetyClassification.has_value())
+  if (abstract_metric_descriptor.safetyClassification.has_value())
   {
-    auto* safetyClassification = xmlDocument_->allocate_string(
-        toString(abstractMetricDescriptor.safetyClassification.value()).c_str());
-    auto* safetyClassificationAttr =
-        xmlDocument_->allocate_attribute("SafetyClassification", safetyClassification);
-    metricNode->append_attribute(safetyClassificationAttr);
+    auto* safety_classification = xml_document_->allocate_string(
+        to_string(abstract_metric_descriptor.safetyClassification.value()).c_str());
+    auto* safety_classification_attr =
+        xml_document_->allocate_attribute("SafetyClassification", safety_classification);
+    metric_node->append_attribute(safety_classification_attr);
   }
 
-  auto* unitNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Unit");
-  auto* unitCodeAttr =
-      xmlDocument_->allocate_attribute("Code", abstractMetricDescriptor.unit.code.c_str());
-  unitNode->append_attribute(unitCodeAttr);
-  metricNode->append_node(unitNode);
+  auto* unit_node = xml_document_->allocate_node(rapidxml::node_element, "pm:Unit");
+  auto* unit_code_attr =
+      xml_document_->allocate_attribute("Code", abstract_metric_descriptor.unit.code.c_str());
+  unit_node->append_attribute(unit_code_attr);
+  metric_node->append_node(unit_node);
 
-  auto* metricCategory =
-      xmlDocument_->allocate_string(toString(abstractMetricDescriptor.metricCategory).c_str());
-  auto* metricCategoryAttr = xmlDocument_->allocate_attribute("MetricCategory", metricCategory);
-  metricNode->append_attribute(metricCategoryAttr);
+  auto* metric_category =
+      xml_document_->allocate_string(to_string(abstract_metric_descriptor.metricCategory).c_str());
+  auto* metric_category_attr = xml_document_->allocate_attribute("MetricCategory", metric_category);
+  metric_node->append_attribute(metric_category_attr);
 
-  auto* metricAvailability =
-      xmlDocument_->allocate_string(toString(abstractMetricDescriptor.metricAvailability).c_str());
-  auto* metricAvailabilityAttr =
-      xmlDocument_->allocate_attribute("MetricAvailability", metricAvailability);
-  metricNode->append_attribute(metricAvailabilityAttr);
+  auto* metric_availability = xml_document_->allocate_string(
+      to_string(abstract_metric_descriptor.metricAvailability).c_str());
+  auto* metric_availability_attr =
+      xml_document_->allocate_attribute("MetricAvailability", metric_availability);
+  metric_node->append_attribute(metric_availability_attr);
 
-  if (const auto* const numericDescriptor =
-          dyn_cast<BICEPS::PM::NumericMetricDescriptor>(&abstractMetricDescriptor);
-      numericDescriptor != nullptr)
+  if (const auto* const numeric_descriptor =
+          dyn_cast<BICEPS::PM::NumericMetricDescriptor>(&abstract_metric_descriptor);
+      numeric_descriptor != nullptr)
   {
-    auto* typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:NumericMetricDescriptor");
-    metricNode->append_attribute(typeAttr);
+    auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:NumericMetricDescriptor");
+    metric_node->append_attribute(type_attr);
 
-    for (const auto& range : numericDescriptor->technicalRange)
+    for (const auto& range : numeric_descriptor->technicalRange)
     {
-      auto* technicalRangeNode =
-          xmlDocument_->allocate_node(rapidxml::node_element, "TechnicalRange");
-      serialize(technicalRangeNode, range);
-      metricNode->append_node(technicalRangeNode);
+      auto* technical_range_node =
+          xml_document_->allocate_node(rapidxml::node_element, "TechnicalRange");
+      serialize(technical_range_node, range);
+      metric_node->append_node(technical_range_node);
     }
 
     auto* resolution =
-        xmlDocument_->allocate_string(std::to_string(numericDescriptor->resolution).c_str());
-    auto* resolutionAttr = xmlDocument_->allocate_attribute("Resolution", resolution);
-    metricNode->append_attribute(resolutionAttr);
+        xml_document_->allocate_string(std::to_string(numeric_descriptor->resolution).c_str());
+    auto* resolution_attr = xml_document_->allocate_attribute("Resolution", resolution);
+    metric_node->append_attribute(resolution_attr);
 
-    if (numericDescriptor->averagingPeriod.has_value())
+    if (numeric_descriptor->averagingPeriod.has_value())
     {
-      auto* averagingPeriodAttr = xmlDocument_->allocate_attribute(
-          "AveragingPeriod", numericDescriptor->averagingPeriod->c_str());
-      metricNode->append_attribute(averagingPeriodAttr);
+      auto* averaging_period_attr = xml_document_->allocate_attribute(
+          "AveragingPeriod", numeric_descriptor->averagingPeriod->c_str());
+      metric_node->append_attribute(averaging_period_attr);
     }
   }
 
-  parent->append_node(metricNode);
+  parent->append_node(metric_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Range& range)
 {
   if (range.lower.has_value())
   {
-    auto* lower = xmlDocument_->allocate_string(std::to_string(range.lower.value()).c_str());
-    auto* lowerAttr = xmlDocument_->allocate_attribute("Lower", lower);
-    parent->append_attribute(lowerAttr);
+    auto* lower = xml_document_->allocate_string(std::to_string(range.lower.value()).c_str());
+    auto* lower_attr = xml_document_->allocate_attribute("Lower", lower);
+    parent->append_attribute(lower_attr);
   }
   if (range.upper.has_value())
   {
-    auto* upper = xmlDocument_->allocate_string(std::to_string(range.upper.value()).c_str());
-    auto* upperAttr = xmlDocument_->allocate_attribute("Upper", upper);
-    parent->append_attribute(upperAttr);
+    auto* upper = xml_document_->allocate_string(std::to_string(range.upper.value()).c_str());
+    auto* upper_attr = xml_document_->allocate_attribute("Upper", upper);
+    parent->append_attribute(upper_attr);
   }
   if (range.stepWidth.has_value())
   {
-    auto* stepWidth =
-        xmlDocument_->allocate_string(std::to_string(range.stepWidth.value()).c_str());
-    auto* stepWidthAttr = xmlDocument_->allocate_attribute("StepWidth", stepWidth);
-    parent->append_attribute(stepWidthAttr);
+    auto* step_width =
+        xml_document_->allocate_string(std::to_string(range.stepWidth.value()).c_str());
+    auto* step_width_attr = xml_document_->allocate_attribute("StepWidth", step_width);
+    parent->append_attribute(step_width_attr);
   }
   if (range.relativeAccuracy.has_value())
   {
-    auto* relativeAccuracy =
-        xmlDocument_->allocate_string(std::to_string(range.relativeAccuracy.value()).c_str());
-    auto* relativeAccuracyAttr =
-        xmlDocument_->allocate_attribute("RelativeAccuracy", relativeAccuracy);
-    parent->append_attribute(relativeAccuracyAttr);
+    auto* relative_accuracy =
+        xml_document_->allocate_string(std::to_string(range.relativeAccuracy.value()).c_str());
+    auto* relative_accuracy_attr =
+        xml_document_->allocate_attribute("RelativeAccuracy", relative_accuracy);
+    parent->append_attribute(relative_accuracy_attr);
   }
   if (range.absoluteAccuracy.has_value())
   {
-    auto* absoluteAccuracy =
-        xmlDocument_->allocate_string(std::to_string(range.absoluteAccuracy.value()).c_str());
-    auto* absoluteAccuracyAttr =
-        xmlDocument_->allocate_attribute("AbsoluteAccuracy", absoluteAccuracy);
-    parent->append_attribute(absoluteAccuracyAttr);
+    auto* absolute_accuracy =
+        xml_document_->allocate_string(std::to_string(range.absoluteAccuracy.value()).c_str());
+    auto* absolute_accuracy_attr =
+        xml_document_->allocate_attribute("AbsoluteAccuracy", absolute_accuracy);
+    parent->append_attribute(absolute_accuracy_attr);
   }
 }
 
-void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& mdState)
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& md_state)
 {
-  auto* mdStateNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MdState");
-  for (const auto& state : mdState.state)
+  auto* md_state_node = xml_document_->allocate_node(rapidxml::node_element, "pm:MdState");
+  for (const auto& state : md_state.state)
   {
-    serialize(mdStateNode, *state);
+    serialize(md_state_node, *state);
   }
-  parent->append_node(mdStateNode);
+  parent->append_node(md_state_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::AbstractState& state)
 {
-  auto* stateNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:State");
-  auto* descriptor = xmlDocument_->allocate_string(state.descriptorHandle.c_str());
-  auto* descriptorHandleAttr = xmlDocument_->allocate_attribute("DescriptorHandle", descriptor);
-  stateNode->append_attribute(descriptorHandleAttr);
+  auto* state_node = xml_document_->allocate_node(rapidxml::node_element, "pm:State");
+  auto* descriptor = xml_document_->allocate_string(state.descriptorHandle.c_str());
+  auto* descriptor_handle_attr = xml_document_->allocate_attribute("DescriptorHandle", descriptor);
+  state_node->append_attribute(descriptor_handle_attr);
 
   if (state.stateVersion.has_value())
   {
     auto* version =
-        xmlDocument_->allocate_string(std::to_string(state.stateVersion.value()).c_str());
-    auto* versionAttr = xmlDocument_->allocate_attribute("StateVersion", version);
-    stateNode->append_attribute(versionAttr);
+        xml_document_->allocate_string(std::to_string(state.stateVersion.value()).c_str());
+    auto* version_attr = xml_document_->allocate_attribute("StateVersion", version);
+    state_node->append_attribute(version_attr);
   }
 
-  if (const auto* numericMetricState = dyn_cast<BICEPS::PM::NumericMetricState>(&state);
-      numericMetricState != nullptr)
+  if (const auto* numeric_metric_state = dyn_cast<BICEPS::PM::NumericMetricState>(&state);
+      numeric_metric_state != nullptr)
   {
-    if (numericMetricState->metricValue.has_value())
+    if (numeric_metric_state->metricValue.has_value())
     {
-      serialize(stateNode, numericMetricState->metricValue.value());
+      serialize(state_node, numeric_metric_state->metricValue.value());
     }
-    auto* typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:NumericMetricState");
-    stateNode->append_attribute(typeAttr);
+    auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:NumericMetricState");
+    state_node->append_attribute(type_attr);
   }
-  if (const auto* locationContextState = dyn_cast<BICEPS::PM::LocationContextState>(&state);
-      locationContextState != nullptr)
+  else if (const auto* location_context_state = dyn_cast<BICEPS::PM::LocationContextState>(&state);
+           location_context_state != nullptr)
   {
-    for (const auto& validator : locationContextState->validator)
+    for (const auto& validator : location_context_state->validator)
     {
-      auto* node = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Validator");
+      auto* node = xml_document_->allocate_node(rapidxml::node_element, "pm:Validator");
       serialize(node, validator);
-      stateNode->append_node(node);
+      state_node->append_node(node);
     }
-    for (const auto& identifier : locationContextState->identification)
+    for (const auto& identifier : location_context_state->identification)
     {
-      auto* node = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Identification");
+      auto* node = xml_document_->allocate_node(rapidxml::node_element, "pm:Identification");
       serialize(node, identifier);
-      stateNode->append_node(node);
+      state_node->append_node(node);
     }
-    if (locationContextState->locationDetail.has_value())
+    if (location_context_state->locationDetail.has_value())
     {
-      serialize(stateNode, locationContextState->locationDetail.value());
+      serialize(state_node, location_context_state->locationDetail.value());
     }
-    if (locationContextState->bindingMdibVersion.has_value())
+    if (location_context_state->bindingMdibVersion.has_value())
     {
-      auto* version = xmlDocument_->allocate_string(
-          std::to_string(locationContextState->bindingMdibVersion.value()).c_str());
-      auto* attr = xmlDocument_->allocate_attribute("BindingMdibVersion", version);
-      stateNode->append_attribute(attr);
+      auto* version = xml_document_->allocate_string(
+          std::to_string(location_context_state->bindingMdibVersion.value()).c_str());
+      auto* attr = xml_document_->allocate_attribute("BindingMdibVersion", version);
+      state_node->append_attribute(attr);
     }
-    if (locationContextState->contextAssociation.has_value())
+    if (location_context_state->contextAssociation.has_value())
     {
-      auto* assoc = xmlDocument_->allocate_string(
-          toString(locationContextState->contextAssociation.value()).c_str());
-      auto* attr = xmlDocument_->allocate_attribute("ContextAssociation", assoc);
-      stateNode->append_attribute(attr);
+      auto* assoc = xml_document_->allocate_string(
+          to_string(location_context_state->contextAssociation.value()).c_str());
+      auto* attr = xml_document_->allocate_attribute("ContextAssociation", assoc);
+      state_node->append_attribute(attr);
     }
-    auto* typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:LocationContextState");
-    stateNode->append_attribute(typeAttr);
-    auto* handleAttr =
-        xmlDocument_->allocate_attribute("Handle", locationContextState->handle.c_str());
-    stateNode->append_attribute(handleAttr);
+    auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:LocationContextState");
+    state_node->append_attribute(type_attr);
+    auto* handle_attr =
+        xml_document_->allocate_attribute("Handle", location_context_state->handle.c_str());
+    state_node->append_attribute(handle_attr);
   }
-  parent->append_node(stateNode);
+  parent->append_node(state_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
@@ -870,279 +881,284 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   if (identifier.root.has_value())
   {
-    auto* rootAttr = xmlDocument_->allocate_attribute("Root", identifier.root.value().c_str());
-    parent->append_attribute(rootAttr);
+    auto* root_attr = xml_document_->allocate_attribute("Root", identifier.root.value().c_str());
+    parent->append_attribute(root_attr);
   }
   if (identifier.extension.has_value())
   {
-    auto* extensionAttr =
-        xmlDocument_->allocate_attribute("Extension", identifier.extension.value().c_str());
-    parent->append_attribute(extensionAttr);
+    auto* extension_attr =
+        xml_document_->allocate_attribute("Extension", identifier.extension.value().c_str());
+    parent->append_attribute(extension_attr);
   }
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::PM::LocationDetail& locationDetail)
+                                  const BICEPS::PM::LocationDetail& location_detail)
 {
-  auto* locationDetailNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "pm:LocationDetail");
-  if (locationDetail.poC.has_value())
+  auto* location_detail_node =
+      xml_document_->allocate_node(rapidxml::node_element, "pm:LocationDetail");
+  if (location_detail.poC.has_value())
   {
-    auto* pocAttr = xmlDocument_->allocate_attribute("PoC", locationDetail.poC.value().c_str());
-    locationDetailNode->append_attribute(pocAttr);
+    auto* poc_attr = xml_document_->allocate_attribute("PoC", location_detail.poC.value().c_str());
+    location_detail_node->append_attribute(poc_attr);
   }
-  if (locationDetail.room.has_value())
+  if (location_detail.room.has_value())
   {
-    auto* pocAttr = xmlDocument_->allocate_attribute("Room", locationDetail.room.value().c_str());
-    locationDetailNode->append_attribute(pocAttr);
+    auto* poc_attr =
+        xml_document_->allocate_attribute("Room", location_detail.room.value().c_str());
+    location_detail_node->append_attribute(poc_attr);
   }
-  if (locationDetail.bed.has_value())
+  if (location_detail.bed.has_value())
   {
-    auto* pocAttr = xmlDocument_->allocate_attribute("Bed", locationDetail.bed.value().c_str());
-    locationDetailNode->append_attribute(pocAttr);
+    auto* poc_attr = xml_document_->allocate_attribute("Bed", location_detail.bed.value().c_str());
+    location_detail_node->append_attribute(poc_attr);
   }
-  if (locationDetail.facility.has_value())
+  if (location_detail.facility.has_value())
   {
-    auto* pocAttr =
-        xmlDocument_->allocate_attribute("Facility", locationDetail.facility.value().c_str());
-    locationDetailNode->append_attribute(pocAttr);
+    auto* poc_attr =
+        xml_document_->allocate_attribute("Facility", location_detail.facility.value().c_str());
+    location_detail_node->append_attribute(poc_attr);
   }
-  if (locationDetail.building.has_value())
+  if (location_detail.building.has_value())
   {
-    auto* pocAttr =
-        xmlDocument_->allocate_attribute("Building", locationDetail.building.value().c_str());
-    locationDetailNode->append_attribute(pocAttr);
+    auto* poc_attr =
+        xml_document_->allocate_attribute("Building", location_detail.building.value().c_str());
+    location_detail_node->append_attribute(poc_attr);
   }
-  if (locationDetail.floor.has_value())
+  if (location_detail.floor.has_value())
   {
-    auto* pocAttr = xmlDocument_->allocate_attribute("Floor", locationDetail.floor.value().c_str());
-    locationDetailNode->append_attribute(pocAttr);
+    auto* poc_attr =
+        xml_document_->allocate_attribute("Floor", location_detail.floor.value().c_str());
+    location_detail_node->append_attribute(poc_attr);
   }
-  parent->append_node(locationDetailNode);
+  parent->append_node(location_detail_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::AbstractMetricValue& value)
 {
-  auto* valueNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MetricValue");
-  serialize(valueNode, value.metricQuality);
+  auto* value_node = xml_document_->allocate_node(rapidxml::node_element, "pm:MetricValue");
+  serialize(value_node, value.metricQuality);
 
-  if (const auto* numericValue = dyn_cast<BICEPS::PM::NumericMetricValue>(&value);
-      numericValue != nullptr)
+  if (const auto* numeric_value = dyn_cast<BICEPS::PM::NumericMetricValue>(&value);
+      numeric_value != nullptr)
   {
-    if (numericValue->value.has_value())
+    if (numeric_value->value.has_value())
     {
       auto* num =
-          xmlDocument_->allocate_string(std::to_string(numericValue->value.value()).c_str());
-      auto* valueAttr = xmlDocument_->allocate_attribute("Value", num);
-      valueNode->append_attribute(valueAttr);
+          xml_document_->allocate_string(std::to_string(numeric_value->value.value()).c_str());
+      auto* value_attr = xml_document_->allocate_attribute("Value", num);
+      value_node->append_attribute(value_attr);
     }
   }
 
-  parent->append_node(valueNode);
+  parent->append_node(value_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::MetricQuality& quality)
 {
-  auto* metricQualityNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:MetricQuality");
-  auto* validity = xmlDocument_->allocate_string(toString(quality.validity).c_str());
-  auto* validityAttr = xmlDocument_->allocate_attribute("Validity", validity);
-  metricQualityNode->append_attribute(validityAttr);
-  parent->append_node(metricQualityNode);
+  auto* metric_quality_node =
+      xml_document_->allocate_node(rapidxml::node_element, "pm:MetricQuality");
+  auto* validity = xml_document_->allocate_string(to_string(quality.validity).c_str());
+  auto* validity_attr = xml_document_->allocate_attribute("Validity", validity);
+  metric_quality_node->append_attribute(validity_attr);
+  parent->append_node(metric_quality_node);
 }
 
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::EVENTING::SubscribeResponse& subscribeResponse)
+                                  const WS::EVENTING::SubscribeResponse& subscribe_response)
 {
-  auto* subscribeResponseNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "wse:SubscribeResponse");
-  auto* subscriptionManagerNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "wse:SubscriptionManager");
+  auto* subscribe_response_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wse:SubscribeResponse");
+  auto* subscription_manager_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wse:SubscriptionManager");
 
-  auto* addressNode = xmlDocument_->allocate_node(rapidxml::node_element, "wsa:Address");
-  addressNode->value(subscribeResponse.subscriptionManager.address.c_str());
-  subscriptionManagerNode->append_node(addressNode);
+  auto* address_node = xml_document_->allocate_node(rapidxml::node_element, "wsa:Address");
+  address_node->value(subscribe_response.subscriptionManager.address.c_str());
+  subscription_manager_node->append_node(address_node);
 
-  serialize(subscriptionManagerNode,
-            subscribeResponse.subscriptionManager.referenceParameters.value());
+  serialize(subscription_manager_node,
+            subscribe_response.subscriptionManager.referenceParameters.value());
 
-  subscribeResponseNode->append_node(subscriptionManagerNode);
+  subscribe_response_node->append_node(subscription_manager_node);
 
-  serialize(subscribeResponseNode, subscribeResponse.expires);
+  serialize(subscribe_response_node, subscribe_response.expires);
 
-  parent->append_node(subscribeResponseNode);
+  parent->append_node(subscribe_response_node);
 }
 
 void MessageSerializer::serialize(
     rapidxml::xml_node<>* parent,
-    const WS::ADDRESSING::ReferenceParametersType& referenceParameters)
+    const WS::ADDRESSING::ReferenceParametersType& reference_parameters)
 {
-  auto* referenceParametersNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "wsa:ReferenceParameters");
-  if (referenceParameters.identifier.has_value())
+  auto* reference_parameters_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wsa:ReferenceParameters");
+  if (reference_parameters.identifier.has_value())
   {
-    auto* identifierNode = xmlDocument_->allocate_node(rapidxml::node_element, "wse:Identifier");
-    identifierNode->value(referenceParameters.identifier.value().c_str());
-    referenceParametersNode->append_node(identifierNode);
+    auto* identifier_node = xml_document_->allocate_node(rapidxml::node_element, "wse:Identifier");
+    identifier_node->value(reference_parameters.identifier.value().c_str());
+    reference_parameters_node->append_node(identifier_node);
   }
-  parent->append_node(referenceParametersNode);
+  parent->append_node(reference_parameters_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const WS::EVENTING::RenewResponse& renewResponse)
+                                  const WS::EVENTING::RenewResponse& renew_response)
 {
-  auto* renewResponseNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "wse:RenewResponse");
-  if (renewResponse.expires.has_value())
+  auto* renew_response_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wse:RenewResponse");
+  if (renew_response.expires.has_value())
   {
-    serialize(renewResponseNode, renewResponse.expires.value());
+    serialize(renew_response_node, renew_response.expires.value());
   }
-  parent->append_node(renewResponseNode);
+  parent->append_node(renew_response_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::MM::SetValueResponse& setValueResponse)
+                                  const BICEPS::MM::SetValueResponse& set_value_response)
 {
-  auto* setValueResponseNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "msg:SetValueResponse");
-  auto* xmlnsBicepsMessage =
-      xmlDocument_->allocate_attribute("xmlns:msg", SDC::NS_BICEPS_MESSAGE_MODEL);
-  setValueResponseNode->append_attribute(xmlnsBicepsMessage);
-  if (setValueResponse.mdibVersion.has_value())
+  auto* set_value_response_node =
+      xml_document_->allocate_node(rapidxml::node_element, "msg:SetValueResponse");
+  auto* xmlns_biceps_message =
+      xml_document_->allocate_attribute("xmlns:msg", SDC::NS_BICEPS_MESSAGE_MODEL);
+  set_value_response_node->append_attribute(xmlns_biceps_message);
+  if (set_value_response.mdibVersion.has_value())
   {
-    auto* mdibVersion =
-        xmlDocument_->allocate_string(std::to_string(setValueResponse.mdibVersion.value()).c_str());
-    auto* mdibVersionAttr = xmlDocument_->allocate_attribute("MdibVersion", mdibVersion);
-    setValueResponseNode->append_attribute(mdibVersionAttr);
+    auto* mdib_version = xml_document_->allocate_string(
+        std::to_string(set_value_response.mdibVersion.value()).c_str());
+    auto* mdib_version_attr = xml_document_->allocate_attribute("MdibVersion", mdib_version);
+    set_value_response_node->append_attribute(mdib_version_attr);
   }
-  auto* sequenceId = xmlDocument_->allocate_string(setValueResponse.sequenceId.c_str());
-  auto* SequenceIdAttr = xmlDocument_->allocate_attribute("SequenceId", sequenceId);
-  setValueResponseNode->append_attribute(SequenceIdAttr);
-  if (setValueResponse.instanceId.has_value())
+  auto* sequence_id = xml_document_->allocate_string(set_value_response.sequenceId.c_str());
+  auto* sequence_id_attr = xml_document_->allocate_attribute("SequenceId", sequence_id);
+  set_value_response_node->append_attribute(sequence_id_attr);
+  if (set_value_response.instanceId.has_value())
   {
-    auto* instanceId =
-        xmlDocument_->allocate_string(std::to_string(setValueResponse.instanceId.value()).c_str());
-    auto* instanceIdAttr = xmlDocument_->allocate_attribute("SequenceId", instanceId);
-    setValueResponseNode->append_attribute(instanceIdAttr);
+    auto* instance_id = xml_document_->allocate_string(
+        std::to_string(set_value_response.instanceId.value()).c_str());
+    auto* instance_id_attr = xml_document_->allocate_attribute("SequenceId", instance_id);
+    set_value_response_node->append_attribute(instance_id_attr);
   }
-  serialize(setValueResponseNode, setValueResponse.invocationInfo);
-  parent->append_node(setValueResponseNode);
+  serialize(set_value_response_node, set_value_response.invocationInfo);
+  parent->append_node(set_value_response_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
-                                  const BICEPS::MM::InvocationInfo& invocationInfo)
+                                  const BICEPS::MM::InvocationInfo& invocation_info)
 {
-  auto* invocationInfoNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationInfo");
+  auto* invocation_info_node =
+      xml_document_->allocate_node(rapidxml::node_element, "msg:InvocationInfo");
 
-  auto* transactionId =
-      xmlDocument_->allocate_string(std::to_string(invocationInfo.transactionId).c_str());
-  auto* transactionIdNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "msg:TransactionId", transactionId);
-  invocationInfoNode->append_node(transactionIdNode);
+  auto* transaction_id =
+      xml_document_->allocate_string(std::to_string(invocation_info.transactionId).c_str());
+  auto* transaction_id_node =
+      xml_document_->allocate_node(rapidxml::node_element, "msg:TransactionId", transaction_id);
+  invocation_info_node->append_node(transaction_id_node);
 
-  auto* invocationState =
-      xmlDocument_->allocate_string(toString(invocationInfo.invocationState).c_str());
-  auto* invocationStateNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationState", invocationState);
-  invocationInfoNode->append_node(invocationStateNode);
+  auto* invocation_state =
+      xml_document_->allocate_string(to_string(invocation_info.invocationState).c_str());
+  auto* invocation_state_node =
+      xml_document_->allocate_node(rapidxml::node_element, "msg:InvocationState", invocation_state);
+  invocation_info_node->append_node(invocation_state_node);
 
-  if (invocationInfo.invocationError.has_value())
+  if (invocation_info.invocationError.has_value())
   {
-    auto* invocationError =
-        xmlDocument_->allocate_string(toString(invocationInfo.invocationError.value()).c_str());
-    auto* invocationErrorNode =
-        xmlDocument_->allocate_node(rapidxml::node_element, "msg:InvocationError", invocationError);
-    invocationInfoNode->append_node(invocationErrorNode);
+    auto* invocation_error =
+        xml_document_->allocate_string(to_string(invocation_info.invocationError.value()).c_str());
+    auto* invocation_error_node = xml_document_->allocate_node(
+        rapidxml::node_element, "msg:InvocationError", invocation_error);
+    invocation_info_node->append_node(invocation_error_node);
   }
 
-  if (invocationInfo.invocationErrorMessage.has_value())
+  if (invocation_info.invocationErrorMessage.has_value())
   {
-    auto* invocationErrorMessage =
-        xmlDocument_->allocate_string(invocationInfo.invocationErrorMessage.value().c_str());
-    auto* invocationErrorMessageNode = xmlDocument_->allocate_node(
-        rapidxml::node_element, "msg:InvocationErrorMessage", invocationErrorMessage);
-    invocationInfoNode->append_node(invocationErrorMessageNode);
+    auto* invocation_error_message =
+        xml_document_->allocate_string(invocation_info.invocationErrorMessage.value().c_str());
+    auto* invocation_error_message_node = xml_document_->allocate_node(
+        rapidxml::node_element, "msg:InvocationErrorMessage", invocation_error_message);
+    invocation_info_node->append_node(invocation_error_message_node);
   }
-  parent->append_node(invocationInfoNode);
+  parent->append_node(invocation_info_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::MM::EpisodicMetricReport& report)
 {
-  auto* reportNode = xmlDocument_->allocate_node(rapidxml::node_element, "mm:EpisodicMetricReport");
+  auto* report_node =
+      xml_document_->allocate_node(rapidxml::node_element, "mm:EpisodicMetricReport");
   if (report.mdibVersion.has_value())
   {
     auto* version =
-        xmlDocument_->allocate_string(std::to_string(report.mdibVersion.value()).c_str());
-    auto* versionAttr = xmlDocument_->allocate_attribute("MdibVersion", version);
-    reportNode->append_attribute(versionAttr);
+        xml_document_->allocate_string(std::to_string(report.mdibVersion.value()).c_str());
+    auto* version_attr = xml_document_->allocate_attribute("MdibVersion", version);
+    report_node->append_attribute(version_attr);
   }
   for (const auto& part : report.reportPart)
   {
-    serialize(reportNode, part);
+    serialize(report_node, part);
   }
-  parent->append_node(reportNode);
+  parent->append_node(report_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::MM::MetricReportPart& part)
 {
-  auto* reportPartNode = xmlDocument_->allocate_node(rapidxml::node_element, "mm:ReportPart");
+  auto* report_part_node = xml_document_->allocate_node(rapidxml::node_element, "mm:ReportPart");
   for (const auto& state : part.metricState)
   {
-    serialize(reportPartNode, *state);
+    serialize(report_part_node, *state);
   }
-  parent->append_node(reportPartNode);
+  parent->append_node(report_part_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::ScoDescriptor& sco)
 {
-  auto* scoNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Sco");
-  auto* handleAttr = xmlDocument_->allocate_attribute("Handle", sco.handle.c_str());
-  scoNode->append_attribute(handleAttr);
-  auto* typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:ScoDescriptor");
-  scoNode->append_attribute(typeAttr);
+  auto* sco_node = xml_document_->allocate_node(rapidxml::node_element, "pm:Sco");
+  auto* handle_attr = xml_document_->allocate_attribute("Handle", sco.handle.c_str());
+  sco_node->append_attribute(handle_attr);
+  auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:ScoDescriptor");
+  sco_node->append_attribute(type_attr);
   for (const auto& operation : sco.operation)
   {
-    serialize(scoNode, *operation);
+    serialize(sco_node, *operation);
   }
-  parent->append_node(scoNode);
+  parent->append_node(sco_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::AbstractOperationDescriptor& operation)
 {
-  auto* operationNode = xmlDocument_->allocate_node(rapidxml::node_element, "pm:Operation");
-  auto* handleAttr = xmlDocument_->allocate_attribute("Handle", operation.handle.c_str());
-  operationNode->append_attribute(handleAttr);
-  auto* operationTargetAttr =
-      xmlDocument_->allocate_attribute("OperationTarget", operation.operationTarget.c_str());
-  operationNode->append_attribute(operationTargetAttr);
+  auto* operation_node = xml_document_->allocate_node(rapidxml::node_element, "pm:Operation");
+  auto* handle_attr = xml_document_->allocate_attribute("Handle", operation.handle.c_str());
+  operation_node->append_attribute(handle_attr);
+  auto* operation_target_attr =
+      xml_document_->allocate_attribute("OperationTarget", operation.operationTarget.c_str());
+  operation_node->append_attribute(operation_target_attr);
   if (isa<BICEPS::PM::SetValueOperationDescriptor>(&operation))
   {
-    auto* typeAttr = xmlDocument_->allocate_attribute("xsi:type", "pm:SetValueOperationDescriptor");
-    operationNode->append_attribute(typeAttr);
+    auto* type_attr =
+        xml_document_->allocate_attribute("xsi:type", "pm:SetValueOperationDescriptor");
+    operation_node->append_attribute(type_attr);
   }
-  parent->append_node(operationNode);
+  parent->append_node(operation_node);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::EVENTING::ExpirationType& expiration)
 {
-  const auto* expiresDuration = xmlDocument_->allocate_string(toString(expiration).c_str());
-  auto* expiresNode =
-      xmlDocument_->allocate_node(rapidxml::node_element, "wse:Expires", expiresDuration);
-  parent->append_node(expiresNode);
+  const auto* expires_duration = xml_document_->allocate_string(to_string(expiration).c_str());
+  auto* expires_node =
+      xml_document_->allocate_node(rapidxml::node_element, "wse:Expires", expires_duration);
+  parent->append_node(expires_node);
 }
 
 /*static*/ std::string
-MessageSerializer::toString(BICEPS::PM::SafetyClassification safetyClassification)
+MessageSerializer::to_string(BICEPS::PM::SafetyClassification safety_classification)
 {
-  switch (safetyClassification)
+  switch (safety_classification)
   {
     case BICEPS::PM::SafetyClassification::Inf:
       return "Inf";
@@ -1157,12 +1173,12 @@ MessageSerializer::toString(BICEPS::PM::SafetyClassification safetyClassificatio
   return "";
 }
 
-std::string MessageSerializer::toString(const WS::DISCOVERY::UriListType& uriList)
+std::string MessageSerializer::to_string(const WS::DISCOVERY::UriListType& uri_list)
 {
   std::string out;
-  for (auto uri = uriList.begin(); uri != uriList.end(); uri++)
+  for (auto uri = uri_list.begin(); uri != uri_list.end(); uri++)
   {
-    if (uri != uriList.begin())
+    if (uri != uri_list.begin())
     {
       out += " ";
     }
@@ -1171,12 +1187,12 @@ std::string MessageSerializer::toString(const WS::DISCOVERY::UriListType& uriLis
   return out;
 }
 
-std::string MessageSerializer::toString(const WS::DISCOVERY::QNameListType& qNameList)
+std::string MessageSerializer::to_string(const WS::DISCOVERY::QNameListType& q_name_list)
 {
   std::string out;
-  for (auto qname = qNameList.begin(); qname != qNameList.end(); qname++)
+  for (auto qname = q_name_list.begin(); qname != q_name_list.end(); qname++)
   {
-    if (qname != qNameList.begin())
+    if (qname != q_name_list.begin())
     {
       out += " ";
     }
@@ -1185,7 +1201,7 @@ std::string MessageSerializer::toString(const WS::DISCOVERY::QNameListType& qNam
   return out;
 }
 
-std::string MessageSerializer::toString(BICEPS::PM::MetricCategory category)
+std::string MessageSerializer::to_string(BICEPS::PM::MetricCategory category)
 {
   switch (category)
   {
@@ -1206,7 +1222,7 @@ std::string MessageSerializer::toString(BICEPS::PM::MetricCategory category)
   return "";
 }
 
-std::string MessageSerializer::toString(BICEPS::PM::MetricAvailability availability)
+std::string MessageSerializer::to_string(BICEPS::PM::MetricAvailability availability)
 {
   switch (availability)
   {
@@ -1219,7 +1235,7 @@ std::string MessageSerializer::toString(BICEPS::PM::MetricAvailability availabil
   return "";
 }
 
-std::string MessageSerializer::toString(BICEPS::PM::MeasurementValidity validity)
+std::string MessageSerializer::to_string(BICEPS::PM::MeasurementValidity validity)
 {
   switch (validity)
   {
@@ -1246,9 +1262,9 @@ std::string MessageSerializer::toString(BICEPS::PM::MeasurementValidity validity
   return "";
 }
 
-std::string MessageSerializer::toString(BICEPS::MM::InvocationState invocationState)
+std::string MessageSerializer::to_string(BICEPS::MM::InvocationState invocation_state)
 {
-  switch (invocationState)
+  switch (invocation_state)
   {
     case BICEPS::MM::InvocationState::Wait:
       return "Wait";
@@ -1269,9 +1285,9 @@ std::string MessageSerializer::toString(BICEPS::MM::InvocationState invocationSt
   return "";
 }
 
-std::string MessageSerializer::toString(BICEPS::MM::InvocationError invocationError)
+std::string MessageSerializer::to_string(BICEPS::MM::InvocationError invocation_error)
 {
-  switch (invocationError)
+  switch (invocation_error)
   {
     case BICEPS::MM::InvocationError::Unspec:
       return "Unspec";
@@ -1286,9 +1302,9 @@ std::string MessageSerializer::toString(BICEPS::MM::InvocationError invocationEr
   return "";
 }
 
-std::string MessageSerializer::toString(BICEPS::PM::ContextAssociation contextAssociation)
+std::string MessageSerializer::to_string(BICEPS::PM::ContextAssociation context_association)
 {
-  switch (contextAssociation)
+  switch (context_association)
   {
     case BICEPS::PM::ContextAssociation::No:
       return "No";
@@ -1303,7 +1319,7 @@ std::string MessageSerializer::toString(BICEPS::PM::ContextAssociation contextAs
   return "";
 }
 
-std::string MessageSerializer::toString(Duration duration)
+std::string MessageSerializer::to_string(Duration duration)
 {
   std::string out;
   out += "P";
