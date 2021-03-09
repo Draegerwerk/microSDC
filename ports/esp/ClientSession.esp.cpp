@@ -12,8 +12,8 @@ std::unique_ptr<ClientSessionInterface> ClientSessionFactory::produce(const std:
 ClientSessionEsp32::ClientSessionEsp32(std::string notify_to, const bool use_tls)
   : notify_to_(std::move(notify_to))
 {
-  extern const char* serverCrtStart asm("_binary_server_crt_start");
-  extern const char* serverKeyStart asm("_binary_server_key_start");
+  extern const char serverCrtStart[] asm("_binary_server_crt_start");
+  extern const char serverKeyStart[] asm("_binary_server_key_start");
   esp_http_client_config_t config{};
   config.url = notify_to_.c_str();
   if (use_tls)

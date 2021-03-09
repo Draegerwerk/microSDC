@@ -24,11 +24,6 @@
 
 static constexpr const char* TAG = "main_component";
 
-static std::uint8_t get_ip_byte(const std::uint32_t* const addr, const std::size_t idx)
-{
-  return reinterpret_cast<const std::uint8_t*>(&addr)[idx];
-}
-
 static void ip_event_handler(void* arg, esp_event_base_t /*event_base*/, int32_t event_id,
                              void* event_data)
 {
@@ -40,13 +35,13 @@ static void ip_event_handler(void* arg, esp_event_base_t /*event_base*/, int32_t
       // collect ip address information
       auto* event = static_cast<ip_event_got_ip_t*>(event_data);
       std::string ip_address;
-      ip_address += std::to_string(get_ip_byte(&event->ip_info.ip.addr, 0));
+      ip_address += std::to_string(esp_ip4_addr1_16(&event->ip_info.ip));
       ip_address += ".";
-      ip_address += std::to_string(get_ip_byte(&event->ip_info.ip.addr, 1));
+      ip_address += std::to_string(esp_ip4_addr2_16(&event->ip_info.ip));
       ip_address += ".";
-      ip_address += std::to_string(get_ip_byte(&event->ip_info.ip.addr, 2));
+      ip_address += std::to_string(esp_ip4_addr3_16(&event->ip_info.ip));
       ip_address += ".";
-      ip_address += std::to_string(get_ip_byte(&event->ip_info.ip.addr, 3));
+      ip_address += std::to_string(esp_ip4_addr4_16(&event->ip_info.ip));
       // startup MicroSDC
       auto* device = static_cast<SimpleDevice*>(arg);
       constexpr auto sdc_port = 443;
@@ -215,14 +210,10 @@ extern "C" void app_main()
 
   // initialize global ca store for client communication
   ESP_ERROR_CHECK(esp_tls_init_global_ca_store());
-  extern const unsigned char* ca_crt_start asm("_binary_ca_crt_start");
-  extern const unsigned char* ca_crt_end asm("_binary_ca_crt_end");
+  extern const unsigned char ca_crt_start[] asm("_binary_ca_crt_start");
+  extern const unsigned char ca_crt_end[] asm("_binary_ca_crt_end");
   const std::size_t ca_cert_len = ca_crt_end - ca_crt_start;
   ESP_ERROR_CHECK(esp_tls_set_global_ca_store(ca_crt_start, ca_cert_len));
-  //const std::size_t ca_cert_len = static_cast<const unsigned char*>(ca_crt_end) -
-  //                                static_cast<const unsigned char*>(ca_crt_start);
-  //ESP_ERROR_CHECK(
-  //    esp_tls_set_global_ca_store(static_cast<const unsigned char*>(ca_crt_start), ca_cert_len));
 
   // create MicroSDC instance
   auto* device = new SimpleDevice();

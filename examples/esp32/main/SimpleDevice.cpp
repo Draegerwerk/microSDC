@@ -18,9 +18,16 @@ SimpleDevice::NumericStateHandler::get_initial_state() const
 
 
 BICEPS::MM::InvocationState
-SimpleDevice::NumericStateHandler::request_state_change(const BICEPS::MM::AbstractSet& /*set*/)
+SimpleDevice::NumericStateHandler::request_state_change(const BICEPS::MM::AbstractSet& set)
 {
-  return BICEPS::MM::InvocationState::Fail;
+  const auto* const set_value = dyn_cast<const BICEPS::MM::SetValue>(&set);
+  if (set_value == nullptr)
+  {
+    LOG(LogLevel::ERROR, "Cannot cast to SetValue!");
+    return BICEPS::MM::InvocationState::Fail;
+  }
+  this->set_value(set_value->requestedNumericValue);
+  return BICEPS::MM::InvocationState::Fin;
 }
 
 void SimpleDevice::NumericStateHandler::set_value(double value)
@@ -82,7 +89,7 @@ void SimpleDevice::init()
 
   // Dummy settable state
   auto settable_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "settableState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
+      "settableState_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Set,
       BICEPS::PM::MetricAvailability::Cont, 1);
   settable_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
@@ -94,7 +101,7 @@ void SimpleDevice::init()
 
   BICEPS::PM::ScoDescriptor device_sco("sco_handle");
   auto set_value_operation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
-      "setValueOperation_handle", "settableState_handle");
+      "set_value_operation_handle", "settableState_handle");
   device_sco.operation.emplace_back(set_value_operation);
 
   device_channel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
