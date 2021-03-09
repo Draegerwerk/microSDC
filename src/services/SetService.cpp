@@ -1,6 +1,7 @@
 #include "SetService.hpp"
 #include "Log.hpp"
 #include "MetadataProvider.hpp"
+#include "MicroSDC.hpp"
 #include "SubscriptionManager.hpp"
 #include "WebServer/Request.hpp"
 #include "datamodel/ExpectedElement.hpp"
@@ -11,7 +12,7 @@
 
 static constexpr const char* TAG = "SetService";
 
-SetService::SetService(const MicroSDC& micro_sdc, std::shared_ptr<const MetadataProvider> metadata,
+SetService::SetService(MicroSDC* micro_sdc, std::shared_ptr<const MetadataProvider> metadata,
                        std::shared_ptr<SubscriptionManager> subscription_manager)
   : micro_sdc_(micro_sdc)
   , metadata_(std::move(metadata))
@@ -67,7 +68,8 @@ void SetService::handle_request(std::unique_ptr<Request> req)
   else if (soap_action == MDPWS::WS_ACTION_UNSUBSCRIBE)
   {
     auto unsubscribe_request = request_envelope.body.unsubscribe.value();
-    subscription_manager_->dispatch(unsubscribe_request, request_envelope.header.identifier.value());
+    subscription_manager_->dispatch(unsubscribe_request,
+                                    request_envelope.header.identifier.value());
     MESSAGEMODEL::Envelope response_envelope;
     fill_response_message_from_request_message(response_envelope, request_envelope);
     response_envelope.header.action =
@@ -91,13 +93,12 @@ void SetService::handle_request(std::unique_ptr<Request> req)
   }
 }
 
-BICEPS::MM::SetValueResponse SetService::dispatch(const BICEPS::MM::SetValue& /*set_value_request*/)
+BICEPS::MM::SetValueResponse SetService::dispatch(const BICEPS::MM::SetValue& set_value_request)
 {
-  // TODO: check if request is valid and update Mdib
+  const auto invocation_state = micro_sdc_->request_state_change(set_value_request);
   WS::ADDRESSING::URIType sequence_id("uuid:" + UUIDGenerator{}().to_string());
   unsigned int transaction_id = 0;
-  BICEPS::MM::InvocationInfo invocation_info(transaction_id, BICEPS::MM::InvocationState::Fin);
-  invocation_info.invocationErrorMessage = BICEPS::MM::InvocationErrorMessage("MicroSDC rocks!");
+  BICEPS::MM::InvocationInfo invocation_info(transaction_id, invocation_state);
   BICEPS::MM::SetValueResponse set_value_response(sequence_id, invocation_info);
   return set_value_response;
 }

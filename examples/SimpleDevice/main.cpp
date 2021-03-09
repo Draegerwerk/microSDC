@@ -30,6 +30,18 @@ public:
     return state;
   }
 
+  BICEPS::MM::InvocationState request_state_change(const BICEPS::MM::AbstractSet& set) override
+  {
+    const auto* const set_value = dyn_cast<const BICEPS::MM::SetValue>(&set);
+    if (set_value == nullptr)
+    {
+      LOG(LogLevel::ERROR, "Cannot cast to SetValue!");
+      return BICEPS::MM::InvocationState::Fail;
+    }
+    this->set_value(set_value->requestedNumericValue);
+    return BICEPS::MM::InvocationState::Fin;
+  }
+
   /// @param sets a new numeric value to the state handled by this handler and updates the mdib
   /// @param value the new value to set
   void set_value(double value)

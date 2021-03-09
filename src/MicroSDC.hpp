@@ -87,6 +87,11 @@ public:
   void set_location(const std::string& descriptor_handle,
                     const BICEPS::PM::LocationDetail& location_detail);
 
+  /// @brief request_state_change is called to request a change of state
+  /// @param set reference to the base set request
+  /// @return invocation state how this action performed
+  BICEPS::MM::InvocationState request_state_change(const BICEPS::MM::AbstractSet& set);
+
 private:
   /// a pointer to the location context state holding location descriptor of this instance
   std::shared_ptr<BICEPS::PM::LocationContextState> location_context_state_{nullptr};
@@ -141,4 +146,13 @@ private:
   /// @brief sends a notification to subscriber about a changed numeric metric state
   /// @param state a pointer to the state which was updated
   void notify_episodic_metric_report(std::shared_ptr<const BICEPS::PM::AbstractMetricState> state);
+
+
+  /// @brief find_operation_target_for_operation_handle searches all sco to find the operation
+  /// target that was triggered by the handle
+  /// @param handle the handle of the operation to find
+  /// @return target of the operation if found
+  std::optional<BICEPS::PM::AbstractOperationDescriptor::OperationTargetType>
+  find_operation_target_for_operation_handle(
+      const BICEPS::PM::AbstractDescriptor::HandleType& handle) const;
 };

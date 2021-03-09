@@ -20,7 +20,7 @@ public:
   /// @param microSDC a reference to the MicroSDC instance holding this service
   /// @param metadata a pointer to the metadata describing configurational data
   /// @param subscriptionManager a pointer to the SubscriptionManager implementation
-  SetService(const MicroSDC& micro_sdc, std::shared_ptr<const MetadataProvider> metadata,
+  SetService(MicroSDC* micro_sdc, std::shared_ptr<const MetadataProvider> metadata,
              std::shared_ptr<SubscriptionManager> subscription_manager);
 
   std::string get_uri() const override;
@@ -28,7 +28,7 @@ public:
 
 private:
   /// a reference to the microSDC instance holding this service
-  const MicroSDC& micro_sdc_;
+  MicroSDC* micro_sdc_;
   /// a pointer to the metadata
   const std::shared_ptr<const MetadataProvider> metadata_;
   /// a pointer to the SubscriptionManager implementation to maintain client subscriptions

@@ -38,6 +38,11 @@ public:
   /// @param state the new state to update
   void update_state(const std::shared_ptr<BICEPS::PM::AbstractState>& state);
 
+  /// @brief request_state_change is called to request a change of state
+  /// @param set reference to the base set request
+  /// @return invocation state how this action performed
+  virtual BICEPS::MM::InvocationState request_state_change(const BICEPS::MM::AbstractSet& set) = 0;
+
   /// @brief gets the initial state object of this metric
   /// @return pointer to the MdState constructed
   virtual std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const = 0;

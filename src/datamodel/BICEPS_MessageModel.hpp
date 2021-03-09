@@ -95,8 +95,23 @@ namespace BICEPS::MM
 
   struct AbstractSet
   {
+    enum class SetKind
+    {
+      SET_VALUE,
+    };
+    SetKind get_kind() const;
+
     using OperationHandleRefType = ::BICEPS::MM::OperationHandleRef;
     OperationHandleRefType operationHandleRef;
+
+
+  protected:
+    AbstractSet(SetKind kind, OperationHandleRefType operation_handle_ref);
+    explicit AbstractSet(SetKind kind, const rapidxml::xml_node<>& node);
+
+  private:
+    SetKind kind_;
+    void parse(const rapidxml::xml_node<>& node);
   };
 
   struct SetValue : public AbstractSet
@@ -105,6 +120,7 @@ namespace BICEPS::MM
     RequestedNumericValueType requestedNumericValue{0.0};
 
     explicit SetValue(const rapidxml::xml_node<>& node);
+    static bool classof(const AbstractSet* other);
 
   private:
     void parse(const rapidxml::xml_node<>& node);

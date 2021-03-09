@@ -90,7 +90,7 @@ void MicroSDC::startup()
   auto get_service = std::make_shared<GetService>(*this, metadata);
   auto get_wsdl_service =
       std::make_shared<StaticService>(get_service->get_uri() + "/wsdl", WSDL::GET_SERVICE_WSDL);
-  auto set_service = std::make_shared<SetService>(*this, metadata, subscription_manager_);
+  auto set_service = std::make_shared<SetService>(this, metadata, subscription_manager_);
   auto set_wsdl_service =
       std::make_shared<StaticService>(set_service->get_uri() + "/wsdl", WSDL::SET_SERVICE_WSDL);
   auto state_event_service =
@@ -189,6 +189,26 @@ void MicroSDC::set_location(const std::string& descriptor_handle,
   {
     discovery_service_->set_location(location_context_state_->locationDetail.value());
   }
+}
+
+BICEPS::MM::InvocationState MicroSDC::request_state_change(const BICEPS::MM::AbstractSet& set)
+{
+  const auto target_handle = find_operation_target_for_operation_handle(set.operationHandleRef);
+  if (!target_handle.has_value())
+  {
+    LOG(LogLevel::ERROR, "No operation target for " << set.operationHandleRef << " found!");
+    return BICEPS::MM::InvocationState::Fail;
+  }
+  const auto handler =
+      std::find_if(state_handlers_.begin(), state_handlers_.end(), [&](const auto& handler) {
+        return handler->get_descriptor_handle() == target_handle.value();
+      });
+  if (handler == state_handlers_.end())
+  {
+    LOG(LogLevel::ERROR, "No state handler for " << target_handle.value() << " found!");
+    return BICEPS::MM::InvocationState::Fail;
+  }
+  return (*handler)->request_state_change(set);
 }
 
 const BICEPS::PM::Mdib& MicroSDC::get_mdib() const
@@ -315,4 +335,33 @@ void MicroSDC::notify_episodic_metric_report(
   report.reportPart.emplace_back(std::move(report_part));
   report.mdibVersion = get_mdib_version();
   subscription_manager_->fire_event(report);
+}
+
+
+std::optional<BICEPS::PM::AbstractOperationDescriptor::OperationTargetType>
+MicroSDC::find_operation_target_for_operation_handle(
+    const BICEPS::PM::AbstractDescriptor::HandleType& handle) const
+{
+  if (!mdib_->mdDescription.has_value())
+  {
+    return {};
+  }
+  for (const auto& md : mdib_->mdDescription->mds)
+  {
+    for (const auto& vmd : md.vmd)
+    {
+      if (!vmd.sco.has_value())
+      {
+        continue;
+      }
+      for (const auto& operation : vmd.sco->operation)
+      {
+        if (operation->handle == handle)
+        {
+          return operation->operationTarget;
+        }
+      }
+    }
+  }
+  return {};
 }
