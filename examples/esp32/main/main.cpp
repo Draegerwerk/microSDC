@@ -191,7 +191,7 @@ void init_ethernet()
 // force c linkage for app_main()
 extern "C" void app_main()
 {
-  Log::set_log_level(LogLevel::DEBUG);
+  Log::set_log_level(LogLevel::INFO);
   LOG(LogLevel::INFO, "Starting up....");
 
   // Initialize NVS
