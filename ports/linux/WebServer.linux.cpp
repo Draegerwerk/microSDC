@@ -2,9 +2,9 @@
 #include "networking/NetworkConfig.hpp"
 
 std::unique_ptr<WebServerInterface>
-WebServerFactory::produce(const std::shared_ptr<const NetworkConfig>& networkConfig)
+WebServerFactory::produce(const std::shared_ptr<const NetworkConfig>& network_config)
 {
-  if (networkConfig->isUsingTLS())
+  if (network_config->is_using_tls())
   {
     return std::make_unique<WebServerSimple<SimpleWeb::HTTPS>>();
   }

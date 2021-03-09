@@ -24,7 +24,7 @@ public:
 
   /// @brief gets the parsed envelope inside this request
   /// @return shared pointer to the envelope
-  const MESSAGEMODEL::Envelope& getEnvelope();
+  const MESSAGEMODEL::Envelope& get_envelope();
 
 
   /// @brief enables direct access to raw string data
@@ -34,7 +34,7 @@ public:
 
   /// @brief send a SOAP envelope as response to the requesting client
   /// @param responseEnvelope the SOAP envelope to send
-  void respond(const MESSAGEMODEL::Envelope& responseEnvelope) const;
+  void respond(const MESSAGEMODEL::Envelope& response_envelope) const;
 
   /// @brief sends an actual response string to the requesting client
   /// @param msg the string to send
@@ -44,7 +44,7 @@ public:
 private:
   /// @brief sends an actual response string to the requesting client
   /// @param msg the string to send
-  virtual void sendResponse(const std::string& msg) const = 0;
+  virtual void send_response(const std::string& msg) const = 0;
 
   /// @brief parses the content of this request's raw message
   void parse();

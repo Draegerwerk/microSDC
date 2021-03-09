@@ -11,17 +11,22 @@ public:
   /// @brief default construct an empty UUID
   UUID() = default;
 
+  /// @brief number of bytes the uuid contains
+  static constexpr std::uint8_t num_bytes__{16};
+
+  using uuid_array_t = std::array<std::uint8_t, num_bytes__>;
+
   /// @brief Construct UUID from data
-  constexpr explicit UUID(std::array<std::uint8_t, 16> data)
+  constexpr explicit UUID(uuid_array_t data)
     : data_(data)
   {
   }
 
   /// @brief convert string from UUID object
   /// @return string representing the UUID
-  std::string toString() const;
+  std::string to_string() const;
 
 private:
   /// contains the raw uuid data
-  std::array<std::uint8_t, 16> data_{};
+  uuid_array_t data_{};
 };

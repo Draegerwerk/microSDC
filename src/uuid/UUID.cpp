@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <ios>
 
-std::string UUID::toString() const
+std::string UUID::to_string() const
 {
   std::stringstream s;
   s << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(data_[0]) << std::setw(2)
@@ -24,4 +24,3 @@ std::string UUID::toString() const
     << static_cast<int>(data_[15]);
   return s.str();
 }
-

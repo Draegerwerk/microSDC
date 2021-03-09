@@ -1,9 +1,9 @@
 #include "ClientSession.linux.hpp"
 
 std::unique_ptr<ClientSessionInterface> ClientSessionFactory::produce(const std::string& address,
-                                                                      const bool useTls)
+                                                                      const bool use_tls)
 {
-  if (useTls)
+  if (use_tls)
   {
     return std::make_unique<ClientSessionSimple<SimpleWeb::HTTPS>>(address);
   }

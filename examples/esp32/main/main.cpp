@@ -24,29 +24,34 @@
 
 static constexpr const char* TAG = "main_component";
 
-static void ipEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t eventId,
-                           void* eventData)
+static std::uint8_t get_ip_byte(const std::uint32_t* const addr, const std::size_t idx)
 {
-  switch (eventId)
+  return reinterpret_cast<const std::uint8_t*>(&addr)[idx];
+}
+
+static void ip_event_handler(void* arg, esp_event_base_t /*event_base*/, int32_t event_id,
+                             void* event_data)
+{
+  switch (event_id)
   {
     case IP_EVENT_ETH_GOT_IP:
       [[fallthrough]];
     case IP_EVENT_STA_GOT_IP: {
       // collect ip address information
-      auto* event = static_cast<ip_event_got_ip_t*>(eventData);
-      std::string ipAddress;
-      ipAddress += std::to_string(esp_ip4_addr1_16(&event->ip_info.ip));
-      ipAddress += ".";
-      ipAddress += std::to_string(esp_ip4_addr2_16(&event->ip_info.ip));
-      ipAddress += ".";
-      ipAddress += std::to_string(esp_ip4_addr3_16(&event->ip_info.ip));
-      ipAddress += ".";
-      ipAddress += std::to_string(esp_ip4_addr4_16(&event->ip_info.ip));
+      auto* event = static_cast<ip_event_got_ip_t*>(event_data);
+      std::string ip_address;
+      ip_address += std::to_string(get_ip_byte(&event->ip_info.ip.addr, 0));
+      ip_address += ".";
+      ip_address += std::to_string(get_ip_byte(&event->ip_info.ip.addr, 1));
+      ip_address += ".";
+      ip_address += std::to_string(get_ip_byte(&event->ip_info.ip.addr, 2));
+      ip_address += ".";
+      ip_address += std::to_string(get_ip_byte(&event->ip_info.ip.addr, 3));
       // startup MicroSDC
       auto* device = static_cast<SimpleDevice*>(arg);
-      constexpr auto sdcPort = 443;
-      device->setNetworkConfig(std::make_unique<NetworkConfig>(true, ipAddress, sdcPort));
-      device->startSDC();
+      constexpr auto sdc_port = 443;
+      device->set_network_config(std::make_unique<NetworkConfig>(true, ip_address, sdc_port));
+      device->start_sdc();
       break;
     }
     default:
@@ -54,10 +59,10 @@ static void ipEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t e
   }
 }
 
-static void wifiEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t eventId,
-                             void* /*event_data*/)
+static void wifi_event_handler(void* arg, esp_event_base_t /*event_base*/, int32_t event_id,
+                               void* /*event_data*/)
 {
-  switch (eventId)
+  switch (event_id)
   {
     case WIFI_EVENT_WIFI_READY:
       LOG(LogLevel::INFO, "WiFi ready");
@@ -88,25 +93,27 @@ static void wifiEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t
   }
 }
 
-static void ethEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t eventId,
-                            void* eventData)
+static void eth_event_handler(void* arg, esp_event_base_t /*event_base*/, int32_t event_id,
+                              void* event_data)
 {
-  std::uint8_t macAddress[6] = {0};
   // we can get the ethernet driver handle from event data
-  esp_eth_handle_t ethHandle = *static_cast<esp_eth_handle_t*>(eventData);
+  esp_eth_handle_t eth_handle = *static_cast<esp_eth_handle_t*>(event_data);
 
-  switch (eventId)
+  switch (event_id)
   {
     case ETHERNET_EVENT_CONNECTED: {
-      esp_eth_ioctl(ethHandle, ETH_CMD_G_MAC_ADDR, macAddress);
+      // std::uint8_t mac_address[6] = {0};
+      const auto mac_addr_num_bytes = 6;
+      std::array<std::uint8_t, mac_addr_num_bytes> mac_address{0};
+      esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, mac_address.data());
       LOG(LogLevel::INFO, "Ethernet Link Up");
       LOG(LogLevel::INFO, "Ethernet HW Addr " << std::hex
-                                              << static_cast<unsigned int>(macAddress[0]) << ":"
-                                              << static_cast<unsigned int>(macAddress[1]) << ":"
-                                              << static_cast<unsigned int>(macAddress[2]) << ":"
-                                              << static_cast<unsigned int>(macAddress[3]) << ":"
-                                              << static_cast<unsigned int>(macAddress[4]) << ":"
-                                              << static_cast<unsigned int>(macAddress[5]));
+                                              << static_cast<unsigned int>(mac_address[0]) << ":"
+                                              << static_cast<unsigned int>(mac_address[1]) << ":"
+                                              << static_cast<unsigned int>(mac_address[2]) << ":"
+                                              << static_cast<unsigned int>(mac_address[3]) << ":"
+                                              << static_cast<unsigned int>(mac_address[4]) << ":"
+                                              << static_cast<unsigned int>(mac_address[5]));
       break;
     }
     case ETHERNET_EVENT_DISCONNECTED: {
@@ -126,54 +133,55 @@ static void ethEventHandler(void* arg, esp_event_base_t /*event_base*/, int32_t 
   }
 }
 
-void initWifi()
+void init_wifi()
 {
   esp_netif_create_default_wifi_sta();
 
   wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
   ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
-  wifi_config_t wifiConfig = {.sta = {
-                                  CONFIG_WIFI_SSID,     // ssid
-                                  CONFIG_WIFI_PASSWORD, // password
-                                  {},                   // scan_method
-                                  {},                   // bssid_set
-                                  {},                   // bssid
-                                  {},                   // channel
-                                  {},                   // listen_interval
-                                  {},                   // sort_method
-                                  {},                   // threshold
-                                  {},                   // pmf_cfg
-                                  {},                   // rm_enabled
-                                  {},                   // btm_enabled
-                                  {},                   // reserved
-                              }};
+  wifi_config_t wifi_config = {.sta = {
+                                   CONFIG_WIFI_SSID,     // ssid
+                                   CONFIG_WIFI_PASSWORD, // password
+                                   {},                   // scan_method
+                                   {},                   // bssid_set
+                                   {},                   // bssid
+                                   {},                   // channel
+                                   {},                   // listen_interval
+                                   {},                   // sort_method
+                                   {},                   // threshold
+                                   {},                   // pmf_cfg
+                                   {},                   // rm_enabled
+                                   {},                   // btm_enabled
+                                   {},                   // reserved
+                               }};
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-  ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifiConfig));
+  ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
   ESP_ERROR_CHECK(esp_wifi_start());
 }
 
-void initEthernet()
+void init_ethernet()
 {
   esp_netif_config_t cfg = ESP_NETIF_DEFAULT_ETH();
-  esp_netif_t* ethNetif = esp_netif_new(&cfg);
+  esp_netif_t* eth_netif = esp_netif_new(&cfg);
 
   // Set default handlers to process TCP/IP stuffs
-  ESP_ERROR_CHECK(esp_eth_set_default_handlers(ethNetif));
+  ESP_ERROR_CHECK(esp_eth_set_default_handlers(eth_netif));
 
-  eth_mac_config_t macConfig = ETH_MAC_DEFAULT_CONFIG();
-  eth_phy_config_t phyConfig = ETH_PHY_DEFAULT_CONFIG();
+  eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
+  eth_phy_config_t phy_config = ETH_PHY_DEFAULT_CONFIG();
 
-  esp_eth_mac_t* mac = esp_eth_mac_new_esp32(&macConfig);
-  esp_eth_phy_t* phy = esp_eth_phy_new_ip101(&phyConfig);
+  esp_eth_mac_t* mac = esp_eth_mac_new_esp32(&mac_config);
+  // esp_eth_phy_t* phy = esp_eth_phy_new_ip101(&phyConfig);
+  esp_eth_phy_t* phy = esp_eth_phy_new_lan8720(&phy_config);
 
   esp_eth_config_t config = ETH_DEFAULT_CONFIG(mac, phy);
-  esp_eth_handle_t ethHandle = nullptr;
-  ESP_ERROR_CHECK(esp_eth_driver_install(&config, &ethHandle));
+  esp_eth_handle_t eth_handle = nullptr;
+  ESP_ERROR_CHECK(esp_eth_driver_install(&config, &eth_handle));
   /* attach Ethernet driver to TCP/IP stack */
-  ESP_ERROR_CHECK(esp_netif_attach(ethNetif, esp_eth_new_netif_glue(ethHandle)));
+  ESP_ERROR_CHECK(esp_netif_attach(eth_netif, esp_eth_new_netif_glue(eth_handle)));
   /* start Ethernet driver state machine */
-  ESP_ERROR_CHECK(esp_eth_start(ethHandle));
+  ESP_ERROR_CHECK(esp_eth_start(eth_handle));
 
   /*
   // Static IP address
@@ -188,7 +196,7 @@ void initEthernet()
 // force c linkage for app_main()
 extern "C" void app_main()
 {
-  Log::setLogLevel(LogLevel::DEBUG);
+  Log::set_log_level(LogLevel::DEBUG);
   LOG(LogLevel::INFO, "Starting up....");
 
   // Initialize NVS
@@ -207,22 +215,29 @@ extern "C" void app_main()
 
   // initialize global ca store for client communication
   ESP_ERROR_CHECK(esp_tls_init_global_ca_store());
-  extern const unsigned char ca_crt_start[] asm("_binary_ca_crt_start");
-  extern const unsigned char ca_crt_end[] asm("_binary_ca_crt_end");
+  extern const unsigned char* ca_crt_start asm("_binary_ca_crt_start");
+  extern const unsigned char* ca_crt_end asm("_binary_ca_crt_end");
   const std::size_t ca_cert_len = ca_crt_end - ca_crt_start;
   ESP_ERROR_CHECK(esp_tls_set_global_ca_store(ca_crt_start, ca_cert_len));
+  //const std::size_t ca_cert_len = static_cast<const unsigned char*>(ca_crt_end) -
+  //                                static_cast<const unsigned char*>(ca_crt_start);
+  //ESP_ERROR_CHECK(
+  //    esp_tls_set_global_ca_store(static_cast<const unsigned char*>(ca_crt_start), ca_cert_len));
 
   // create MicroSDC instance
   auto* device = new SimpleDevice();
 
-  ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ipEventHandler, device));
-  ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler, device));
-  ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &ethEventHandler, device));
+  ESP_ERROR_CHECK(
+      esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, &ip_event_handler, device));
+  ESP_ERROR_CHECK(
+      esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, device));
+  ESP_ERROR_CHECK(
+      esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &eth_event_handler, device));
   LOG(LogLevel::INFO, "Connecting...");
 #if CONFIG_CONNECT_ETHERNET
-  initEthernet();
+  init_ethernet();
 #elif CONFIG_CONNECT_WIFI
-  initWifi();
+  init_wifi();
 #endif
 
   device->run();

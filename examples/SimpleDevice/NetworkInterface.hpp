@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <array>
 #include <ifaddrs.h>
+#include <iostream>
 #include <net/if.h>
 #include <netinet/in.h>
 #include <stdexcept>
@@ -22,31 +23,31 @@ public:
   {
     if (interface->ifa_addr->sa_family == AF_INET)
     {
-      auto* tmpAddrPtr = &reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_addr;
-      std::array<char, INET_ADDRSTRLEN> addressBuffer{};
-      inet_ntop(AF_INET, tmpAddrPtr, addressBuffer.data(), INET_ADDRSTRLEN);
-      address_ = std::string(addressBuffer.data());
+      auto* tmp_addr_ptr = &reinterpret_cast<sockaddr_in*>(interface->ifa_addr)->sin_addr;
+      std::array<char, INET_ADDRSTRLEN> address_buffer{};
+      inet_ntop(AF_INET, tmp_addr_ptr, address_buffer.data(), INET_ADDRSTRLEN);
+      address_ = std::string(address_buffer.data());
     }
     else if (interface->ifa_addr->sa_family == AF_INET6)
     {
-      auto* tmpAddrPtr = &reinterpret_cast<sockaddr_in6*>(interface->ifa_addr)->sin6_addr;
-      std::array<char, INET6_ADDRSTRLEN> addressBuffer{};
-      inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer.data(), INET6_ADDRSTRLEN);
-      address_ = std::string(addressBuffer.data());
+      auto* tmp_addr_ptr = &reinterpret_cast<sockaddr_in6*>(interface->ifa_addr)->sin6_addr;
+      std::array<char, INET6_ADDRSTRLEN> address_buffer{};
+      inet_ntop(AF_INET6, tmp_addr_ptr, address_buffer.data(), INET6_ADDRSTRLEN);
+      address_ = std::string(address_buffer.data());
     }
   }
 
-  static NetworkInterface findDefaultInterface()
+  static NetworkInterface find_default_interface()
   {
-    return findInterface(IPFamily::NONE, "");
+    return find_interface(IPFamily::NONE, "");
   }
 
-  static NetworkInterface findInterface(const IPFamily family, const std::string& name)
+  static NetworkInterface find_interface(const IPFamily family, const std::string& name)
   {
-    ifaddrs* ifAddrStruct = nullptr;
-    getifaddrs(&ifAddrStruct);
+    ifaddrs* if_addr_struct = nullptr;
+    getifaddrs(&if_addr_struct);
 
-    for (auto* ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next)
+    for (auto* ifa = if_addr_struct; ifa != nullptr; ifa = ifa->ifa_next)
     {
       // filter by type
       if ((ifa->ifa_flags & IFF_LOOPBACK) != 0 || (ifa->ifa_flags & IFF_UP) == 0 ||
@@ -68,9 +69,9 @@ public:
       }
       return NetworkInterface(ifa);
     }
-    if (ifAddrStruct != nullptr)
+    if (if_addr_struct != nullptr)
     {
-      freeifaddrs(ifAddrStruct);
+      freeifaddrs(if_addr_struct);
     }
     throw std::runtime_error("No default interface found!");
   }

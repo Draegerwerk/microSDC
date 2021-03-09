@@ -13,31 +13,31 @@ public:
   public:
     /// @brief constructs a new NumericStateHandler attached to a given descriptor state handle
     /// @param descriptorHandle the handle of the state's descriptor
-    explicit NumericStateHandler(const std::string& descriptorHandle);
+    explicit NumericStateHandler(const std::string& descriptor_handle);
     NumericStateHandler(const NumericStateHandler& other) = delete;
     NumericStateHandler(NumericStateHandler&& other) = delete;
     NumericStateHandler& operator=(const NumericStateHandler& other) = delete;
     NumericStateHandler& operator=(NumericStateHandler&& other) = delete;
     ~NumericStateHandler() override = default;
 
-    std::shared_ptr<BICEPS::PM::AbstractState> getInitialState() const override;
+    std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override;
 
     /// @param sets a new numeric value to the state handled by this handler and updates the mdib
     /// @param value the new value to set
-    void setValue(double value);
+    void set_value(double value);
   };
 
   explicit SimpleDevice();
-  void setNetworkConfig(std::unique_ptr<NetworkConfig> networkConfig);
+  void set_network_config(std::unique_ptr<NetworkConfig> network_config);
   void init();
-  void startSDC();
+  void start_sdc();
   void run();
 
 private:
   MicroSDC sdc_;
 
-  std::shared_ptr<NumericStateHandler> pressureStateHandler_;
-  std::shared_ptr<NumericStateHandler> temperatureStateHandler_;
-  std::shared_ptr<NumericStateHandler> humidityStateHandler_;
-  std::shared_ptr<NumericStateHandler> settableStateHandler_;
+  std::shared_ptr<NumericStateHandler> pressure_state_handler_;
+  std::shared_ptr<NumericStateHandler> temperature_state_handler_;
+  std::shared_ptr<NumericStateHandler> humidity_state_handler_;
+  std::shared_ptr<NumericStateHandler> settable_state_handler_;
 };

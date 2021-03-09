@@ -1,9 +1,9 @@
 #include "Log.hpp"
 
-void Log::setLogLevel(const LogLevel level)
+void Log::set_log_level(const LogLevel level)
 {
-  logLevel__ = level;
+  log_level__ = level;
 }
 
 // default log level to INFO
-LogLevel Log::logLevel__{LogLevel::INFO};
+LogLevel Log::log_level__{LogLevel::INFO};

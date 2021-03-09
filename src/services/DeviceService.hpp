@@ -12,11 +12,11 @@ public:
   /// @param metadata a pointer to the metadata describing configurational data
   explicit DeviceService(std::shared_ptr<const MetadataProvider> metadata);
 
-  std::string getURI() const override;
+  std::string get_uri() const override;
 
-  void handleRequest(std::unique_ptr<Request> req) override;
+  void handle_request(std::unique_ptr<Request> req) override;
 
 private:
   /// a pointer to the metadata
-  const std::shared_ptr<const MetadataProvider> metadata_;
+  std::shared_ptr<const MetadataProvider> metadata_;
 };

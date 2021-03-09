@@ -9,72 +9,74 @@
 #include "datamodel/MessageModel.hpp"
 #include "services/SoapFault.hpp"
 
-StateEventService::StateEventService(const MicroSDC& microSDC,
+StateEventService::StateEventService(const MicroSDC& micro_sdc,
                                      std::shared_ptr<const MetadataProvider> metadata,
-                                     std::shared_ptr<SubscriptionManager> subscriptionManager)
-  : microSDC_(microSDC)
+                                     std::shared_ptr<SubscriptionManager> subscription_manager)
+  : micro_sdc_(micro_sdc)
   , metadata_(std::move(metadata))
-  , subscriptionManager_(std::move(subscriptionManager))
+  , subscription_manager_(std::move(subscription_manager))
 {
 }
 
-std::string StateEventService::getURI() const
+std::string StateEventService::get_uri() const
 {
-  return MetadataProvider::getStateEventServicePath();
+  return MetadataProvider::get_state_event_service_path();
 }
 
-void StateEventService::handleRequest(std::unique_ptr<Request> req)
+void StateEventService::handle_request(std::unique_ptr<Request> req)
 {
-  const auto& requestEnvelope = req->getEnvelope();
-  const auto& soapAction = requestEnvelope.header.action;
-  if (soapAction == MDPWS::WS_ACTION_GET_METADATA_REQUEST)
+  const auto& request_envelope = req->get_envelope();
+  const auto& soap_action = request_envelope.header.action;
+  if (soap_action == MDPWS::WS_ACTION_GET_METADATA_REQUEST)
   {
-    MESSAGEMODEL::Envelope responseEnvelope;
-    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    metadata_->fillStateEventServiceMetadata(responseEnvelope);
-    responseEnvelope.header.action =
+    MESSAGEMODEL::Envelope response_envelope;
+    fill_response_message_from_request_message(response_envelope, request_envelope);
+    metadata_->fill_state_event_service_metadata(response_envelope);
+    response_envelope.header.action =
         WS::ADDRESSING::URIType(MDPWS::WS_ACTION_GET_METADATA_RESPONSE);
-    req->respond(responseEnvelope);
+    req->respond(response_envelope);
   }
-  else if (soapAction == MDPWS::WS_ACTION_SUBSCRIBE)
+  else if (soap_action == MDPWS::WS_ACTION_SUBSCRIBE)
   {
-    auto subscribeRequest = requestEnvelope.body.subscribe;
-    auto response = subscriptionManager_->dispatch(subscribeRequest.value());
-    response.subscriptionManager.address = metadata_->getStateEventServiceURI();
+    auto subscribe_request = request_envelope.body.subscribe;
+    auto response = subscription_manager_->dispatch(subscribe_request.value());
+    response.subscriptionManager.address = metadata_->get_state_event_service_uri();
 
-    MESSAGEMODEL::Envelope responseEnvelope;
-    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_SUBSCRIBE_RESPONSE);
-    responseEnvelope.body.subscribeResponse = response;
-    req->respond(responseEnvelope);
+    MESSAGEMODEL::Envelope response_envelope;
+    fill_response_message_from_request_message(response_envelope, request_envelope);
+    response_envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_SUBSCRIBE_RESPONSE);
+    response_envelope.body.subscribeResponse = response;
+    req->respond(response_envelope);
   }
-  else if (soapAction == MDPWS::WS_ACTION_RENEW)
+  else if (soap_action == MDPWS::WS_ACTION_RENEW)
   {
-    auto renewRequest = requestEnvelope.body.renew.value();
-    if (!requestEnvelope.header.identifier.has_value())
+    auto renew_request = request_envelope.body.renew.value();
+    if (!request_envelope.header.identifier.has_value())
     {
       throw ExpectedElement("Identifier", MDPWS::WS_NS_EVENTING);
     }
     auto response =
-        subscriptionManager_->dispatch(renewRequest, requestEnvelope.header.identifier.value());
-    MESSAGEMODEL::Envelope responseEnvelope;
-    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RENEW_RESPONSE);
-    responseEnvelope.body.renewResponse = response;
-    req->respond(responseEnvelope);
+        subscription_manager_->dispatch(renew_request, request_envelope.header.identifier.value());
+    MESSAGEMODEL::Envelope response_envelope;
+    fill_response_message_from_request_message(response_envelope, request_envelope);
+    response_envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RENEW_RESPONSE);
+    response_envelope.body.renewResponse = response;
+    req->respond(response_envelope);
   }
-  else if (soapAction == MDPWS::WS_ACTION_UNSUBSCRIBE)
+  else if (soap_action == MDPWS::WS_ACTION_UNSUBSCRIBE)
   {
-    auto unsubscribeRequest = requestEnvelope.body.unsubscribe.value();
-    subscriptionManager_->dispatch(unsubscribeRequest, requestEnvelope.header.identifier.value());
-    MESSAGEMODEL::Envelope responseEnvelope;
-    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_UNSUBSCRIBE_RESPONSE);
-    req->respond(responseEnvelope);
+    auto unsubscribe_request = request_envelope.body.unsubscribe.value();
+    subscription_manager_->dispatch(unsubscribe_request,
+                                    request_envelope.header.identifier.value());
+    MESSAGEMODEL::Envelope response_envelope;
+    fill_response_message_from_request_message(response_envelope, request_envelope);
+    response_envelope.header.action =
+        WS::ADDRESSING::URIType(MDPWS::WS_ACTION_UNSUBSCRIBE_RESPONSE);
+    req->respond(response_envelope);
   }
   else
   {
-    LOG(LogLevel::ERROR, "Unknown soap action " << soapAction);
+    LOG(LogLevel::ERROR, "Unknown soap action " << soap_action);
     req->respond(SoapFault().envelope());
   }
 }

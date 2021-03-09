@@ -1,51 +1,51 @@
 #include "SimpleDevice.hpp"
 #include "BME280.hpp"
 
-SimpleDevice::NumericStateHandler::NumericStateHandler(const std::string& descriptorHandle)
-  : StateHandler(descriptorHandle)
+SimpleDevice::NumericStateHandler::NumericStateHandler(const std::string& descriptor_handle)
+  : StateHandler(descriptor_handle)
 {
 }
 
 std::shared_ptr<BICEPS::PM::AbstractState>
-SimpleDevice::NumericStateHandler::getInitialState() const
+SimpleDevice::NumericStateHandler::get_initial_state() const
 {
-  auto state = std::make_shared<BICEPS::PM::NumericMetricState>(getDescriptorHandle());
+  auto state = std::make_shared<BICEPS::PM::NumericMetricState>(get_descriptor_handle());
   state->metricValue = std::make_optional<BICEPS::PM::NumericMetricValue>(
       BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld});
   state->metricValue->value = 0;
   return state;
 }
 
-void SimpleDevice::NumericStateHandler::setValue(double value)
+void SimpleDevice::NumericStateHandler::set_value(double value)
 {
-  auto state = dyn_cast<BICEPS::PM::NumericMetricState>(getInitialState());
+  auto state = dyn_cast<BICEPS::PM::NumericMetricState>(get_initial_state());
   state->metricValue->value = value;
-  updateState(state);
+  update_state(state);
 }
 
 SimpleDevice::SimpleDevice()
-  : pressureStateHandler_{std::make_shared<NumericStateHandler>("pressureState_handle")}
-  , temperatureStateHandler_{std::make_shared<NumericStateHandler>("temperatureState_handle")}
-  , humidityStateHandler_{std::make_shared<NumericStateHandler>("humidityState_handle")}
-  , settableStateHandler_{std::make_shared<NumericStateHandler>("settableState_handle")}
+  : pressure_state_handler_{std::make_shared<NumericStateHandler>("pressureState_handle")}
+  , temperature_state_handler_{std::make_shared<NumericStateHandler>("temperatureState_handle")}
+  , humidity_state_handler_{std::make_shared<NumericStateHandler>("humidityState_handle")}
+  , settable_state_handler_{std::make_shared<NumericStateHandler>("settableState_handle")}
 {
   init();
 }
 
-void SimpleDevice::setNetworkConfig(std::unique_ptr<NetworkConfig> networkConfig)
+void SimpleDevice::set_network_config(std::unique_ptr<NetworkConfig> network_config)
 {
-  sdc_.setNetworkConfig(std::move(networkConfig));
+  sdc_.set_network_config(std::move(network_config));
 }
 
 void SimpleDevice::init()
 {
-  sdc_.setEndpointReference("urn:uuid:MicroSDC-provider-on-esp32");
+  sdc_.set_endpoint_reference("urn:uuid:MicroSDC-provider-on-esp32");
 
-  DeviceCharacteristics deviceCharacteristics;
-  deviceCharacteristics.setFriendlyName("MicroSDC on ESP32");
-  deviceCharacteristics.setManufacturer("Draeger");
-  deviceCharacteristics.setModelName("MicroSDC_Device01");
-  sdc_.setDeviceCharacteristics(deviceCharacteristics);
+  DeviceCharacteristics device_characteristics;
+  device_characteristics.set_friendly_name("MicroSDC on ESP32");
+  device_characteristics.set_manufacturer("Draeger");
+  device_characteristics.set_model_name("MicroSDC_Device01");
+  sdc_.set_device_characteristics(device_characteristics);
 
   BICEPS::PM::Metadata metadata;
   metadata.manufacturer.emplace_back("Draeger");
@@ -53,91 +53,91 @@ void SimpleDevice::init()
   metadata.modelNumber.emplace("1");
   metadata.serialNumber.emplace_back("2345-6789");
 
-  BICEPS::PM::SystemContextDescriptor systemContext("system_context");
-  systemContext.patientContext = BICEPS::PM::PatientContextDescriptor("patient_context");
-  systemContext.locationContext = BICEPS::PM::LocationContextDescriptor("location_context");
+  BICEPS::PM::SystemContextDescriptor system_context("system_context");
+  system_context.patientContext = BICEPS::PM::PatientContextDescriptor("patient_context");
+  system_context.locationContext = BICEPS::PM::LocationContextDescriptor("location_context");
 
   // States for measured values
-  auto pressureState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+  auto pressure_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "pressureState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  pressureState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  pressure_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
-  auto temperatureState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+  auto temperature_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "temperatureState_handle", BICEPS::PM::CodedValue("6048"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  temperatureState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  temperature_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
-  auto humidityState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+  auto humidity_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "humidityState_handle", BICEPS::PM::CodedValue("262688"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  humidityState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  humidity_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   // Dummy settable state
-  auto settableState = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+  auto settable_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "settableState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  settableState->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  settable_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
-  BICEPS::PM::ChannelDescriptor deviceChannel("device_channel");
-  deviceChannel.metric.emplace_back(pressureState);
-  deviceChannel.metric.emplace_back(temperatureState);
-  deviceChannel.metric.emplace_back(humidityState);
-  deviceChannel.metric.emplace_back(settableState);
+  BICEPS::PM::ChannelDescriptor device_channel("device_channel");
+  device_channel.metric.emplace_back(pressure_state);
+  device_channel.metric.emplace_back(temperature_state);
+  device_channel.metric.emplace_back(humidity_state);
+  device_channel.metric.emplace_back(settable_state);
 
-  BICEPS::PM::ScoDescriptor deviceSco("sco_handle");
-  auto setValueOperation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
+  BICEPS::PM::ScoDescriptor device_sco("sco_handle");
+  auto set_value_operation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
       "setValueOperation_handle", "settableState_handle");
-  deviceSco.operation.emplace_back(setValueOperation);
+  device_sco.operation.emplace_back(set_value_operation);
 
-  deviceChannel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
-  BICEPS::PM::VmdDescriptor deviceModule("device_vmd");
-  deviceModule.channel.emplace_back(deviceChannel);
-  deviceModule.sco = deviceSco;
+  device_channel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  BICEPS::PM::VmdDescriptor device_module("device_vmd");
+  device_module.channel.emplace_back(device_channel);
+  device_module.sco = device_sco;
 
-  BICEPS::PM::MdsDescriptor deviceDescriptor("MedicalDevices");
-  deviceDescriptor.metaData = metadata;
-  deviceDescriptor.systemContext = systemContext;
-  deviceDescriptor.vmd.emplace_back(deviceModule);
+  BICEPS::PM::MdsDescriptor device_descriptor("MedicalDevices");
+  device_descriptor.metaData = metadata;
+  device_descriptor.systemContext = system_context;
+  device_descriptor.vmd.emplace_back(device_module);
 
-  BICEPS::PM::MdDescription mdDescription;
-  mdDescription.mds.emplace_back(deviceDescriptor);
-  sdc_.setMdDescription(mdDescription);
+  BICEPS::PM::MdDescription md_description;
+  md_description.mds.emplace_back(device_descriptor);
+  sdc_.set_md_description(md_description);
 
-  BICEPS::PM::LocationDetail locationDetail;
-  locationDetail.poC = "PoC-A";
-  locationDetail.room = "Room-A";
-  locationDetail.bed = "Bed-A";
-  locationDetail.facility = "Facility-A";
-  locationDetail.building = "Building-A";
-  locationDetail.floor = "Floor-A";
-  sdc_.setLocation("location_context", locationDetail);
+  BICEPS::PM::LocationDetail location_detail;
+  location_detail.poC = "PoC-A";
+  location_detail.room = "Room-A";
+  location_detail.bed = "Bed-A";
+  location_detail.facility = "Facility-A";
+  location_detail.building = "Building-A";
+  location_detail.floor = "Floor-A";
+  sdc_.set_location("location_context", location_detail);
 
-  sdc_.addMdState(pressureStateHandler_);
-  sdc_.addMdState(temperatureStateHandler_);
-  sdc_.addMdState(humidityStateHandler_);
-  sdc_.addMdState(settableStateHandler_);
+  sdc_.add_md_state(pressure_state_handler_);
+  sdc_.add_md_state(temperature_state_handler_);
+  sdc_.add_md_state(humidity_state_handler_);
+  sdc_.add_md_state(settable_state_handler_);
 }
 
-void SimpleDevice::startSDC()
+void SimpleDevice::start_sdc()
 {
   sdc_.start();
 }
 
 void SimpleDevice::run()
 {
-  const auto deviceAddress = 0x76U;
-  const auto sdaPin = GPIO_NUM_13;
-  const auto sclPin = GPIO_NUM_16;
-  BME280 bme280(I2C_NUM_0, deviceAddress, sdaPin, sclPin);
+  const auto device_address = 0x76U;
+  const auto sda_pin = GPIO_NUM_13;
+  const auto scl_pin = GPIO_NUM_16;
+  BME280 bme280(I2C_NUM_0, device_address, sda_pin, scl_pin);
   while (true)
   {
-    const auto sensorData = bme280.getSensorData();
-    LOG(LogLevel::INFO, "pressure: " << sensorData.pressure << " temp: " << sensorData.temperature
-                                     << " humidity: " << sensorData.humidity);
-    pressureStateHandler_->setValue(sensorData.pressure);
-    temperatureStateHandler_->setValue(sensorData.temperature);
-    humidityStateHandler_->setValue(sensorData.humidity);
+    const auto sensor_data = bme280.get_sensor_data();
+    LOG(LogLevel::INFO, "pressure: " << sensor_data.pressure << " temp: " << sensor_data.temperature
+                                     << " humidity: " << sensor_data.humidity);
+    pressure_state_handler_->set_value(sensor_data.pressure);
+    temperature_state_handler_->set_value(sensor_data.temperature);
+    humidity_state_handler_->set_value(sensor_data.humidity);
     const auto delay = 2000;
     vTaskDelay(delay / portTICK_PERIOD_MS);
   }

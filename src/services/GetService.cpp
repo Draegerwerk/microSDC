@@ -1,53 +1,53 @@
 #include "GetService.hpp"
 
 #include "Log.hpp"
+#include "MetadataProvider.hpp"
 #include "MicroSDC.hpp"
 #include "WebServer/Request.hpp"
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
 #include "datamodel/MessageSerializer.hpp"
-#include "MetadataProvider.hpp"
 #include "services/SoapFault.hpp"
 
 static constexpr const char* TAG = "GetService";
 
-GetService::GetService(const MicroSDC& microSDC, std::shared_ptr<const MetadataProvider> metadata)
-  : microSDC_(microSDC)
+GetService::GetService(const MicroSDC& micro_sdc, std::shared_ptr<const MetadataProvider> metadata)
+  : micro_sdc_(micro_sdc)
   , metadata_(std::move(metadata))
 {
 }
 
-std::string GetService::getURI() const
+std::string GetService::get_uri() const
 {
-  return MetadataProvider::getGetServicePath();
+  return MetadataProvider::get_get_service_path();
 }
 
-void GetService::handleRequest(std::unique_ptr<Request> req)
+void GetService::handle_request(std::unique_ptr<Request> req)
 {
-  const auto& requestEnvelope = req->getEnvelope();
-  const auto& soapAction = requestEnvelope.header.action;
-  if (soapAction == MDPWS::WS_ACTION_GET_METADATA_REQUEST)
+  const auto& request_envelope = req->get_envelope();
+  const auto& soap_action = request_envelope.header.action;
+  if (soap_action == MDPWS::WS_ACTION_GET_METADATA_REQUEST)
   {
-    MESSAGEMODEL::Envelope responseEnvelope;
-    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    metadata_->fillGetServiceMetadata(responseEnvelope);
-    responseEnvelope.header.action =
+    MESSAGEMODEL::Envelope response_envelope;
+    fill_response_message_from_request_message(response_envelope, request_envelope);
+    metadata_->fill_get_service_metadata(response_envelope);
+    response_envelope.header.action =
         WS::ADDRESSING::URIType(MDPWS::WS_ACTION_GET_METADATA_RESPONSE);
-    req->respond(responseEnvelope);
+    req->respond(response_envelope);
   }
-  else if (soapAction == SDC::ACTION_GET_MDIB_REQUEST)
+  else if (soap_action == SDC::ACTION_GET_MDIB_REQUEST)
   {
-    MESSAGEMODEL::Envelope responseEnvelope;
-    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.header.action = WS::ADDRESSING::URIType(SDC::ACTION_GET_MDIB_RESPONSE);
-    responseEnvelope.body.getMdibResponse =
-        std::make_optional<MESSAGEMODEL::Body::GetMdibResponseType>(microSDC_.getMdib());
-    req->respond(responseEnvelope);
+    MESSAGEMODEL::Envelope response_envelope;
+    fill_response_message_from_request_message(response_envelope, request_envelope);
+    response_envelope.header.action = WS::ADDRESSING::URIType(SDC::ACTION_GET_MDIB_RESPONSE);
+    response_envelope.body.getMdibResponse =
+        std::make_optional<MESSAGEMODEL::Body::GetMdibResponseType>(micro_sdc_.get_mdib());
+    req->respond(response_envelope);
   }
   else
   {
-    LOG(LogLevel::ERROR, "Unknown soap action " << soapAction);
+    LOG(LogLevel::ERROR, "Unknown soap action " << soap_action);
     req->respond(SoapFault().envelope());
   }
 }

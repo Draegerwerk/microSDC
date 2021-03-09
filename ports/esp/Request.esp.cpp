@@ -2,11 +2,11 @@
 
 RequestEsp32::RequestEsp32(httpd_req_t* req, std::string msg)
   : Request(std::move(msg))
-  , httpdReq_(req)
+  , httpd_req_(req)
 {
 }
 
-void RequestEsp32::sendResponse(const std::string& msg) const
+void RequestEsp32::send_response(const std::string& msg) const
 {
-  httpd_resp_send(httpdReq_, msg.c_str(), msg.length());
+  httpd_resp_send(httpd_req_, msg.c_str(), msg.length());
 }

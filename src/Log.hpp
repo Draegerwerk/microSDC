@@ -63,11 +63,11 @@ private:
   static inline void output(std::ostream& /*os*/, None /*unused*/) {}
 
   /// the lowest log level this logger is writing to the output
-  static LogLevel logLevel__;
+  static LogLevel log_level__;
 
 public:
   /// @brief sets the lowest log level this logger is writing to its output
-  static void setLogLevel(LogLevel level);
+  static void set_log_level(LogLevel level);
 
   /// @brief logs data to the output
   /// @param file the filename the log command was issued
@@ -76,7 +76,7 @@ public:
   template <LogLevel level, typename List>
   static void log(const char* file, int line, LogData<List>&& data)
   {
-    if (level < logLevel__)
+    if (level < log_level__)
     {
       return;
     }

@@ -14,27 +14,31 @@ class WebServerSimple : public WebServerInterface
 {
 public:
   explicit WebServerSimple();
+  WebServerSimple(const WebServerSimple& other) = delete;
+  WebServerSimple& operator=(const WebServerSimple& other) = delete;
+  WebServerSimple(WebServerSimple&& other) = delete;
+  WebServerSimple& operator=(WebServerSimple&& other) = delete;
   ~WebServerSimple() override;
   void start() override;
   void stop() override;
 
-  void addService(std::shared_ptr<ServiceInterface> service) override;
+  void add_service(std::shared_ptr<ServiceInterface> service) override;
 
 private:
   std::unique_ptr<SimpleWeb::Server<SocketType>> server_;
-  std::thread serverThread_{};
+  std::thread server_thread_{};
 };
 
 template <class SocketType>
 void WebServerSimple<SocketType>::start()
 {
   // Start server and receive assigned port when server is listening for requests
-  std::promise<std::uint16_t> serverPort;
-  serverThread_ = std::thread([this, &serverPort]() {
+  std::promise<std::uint16_t> server_port;
+  server_thread_ = std::thread([this, &server_port]() {
     // Start server
-    server_->start([&serverPort](unsigned short port) { serverPort.set_value(port); });
+    server_->start([&server_port](unsigned short port) { server_port.set_value(port); });
   });
-  LOG(LogLevel::INFO, "Server listening on port " << serverPort.get_future().get());
+  LOG(LogLevel::INFO, "Server listening on port " << server_port.get_future().get());
 }
 
 template <class SocketType>
@@ -42,7 +46,7 @@ void WebServerSimple<SocketType>::stop()
 {
   server_->stop();
   LOG(LogLevel::INFO, "Server stopping...");
-  serverThread_.join();
+  server_thread_.join();
 }
 
 template <class SocketType>
@@ -52,14 +56,14 @@ WebServerSimple<SocketType>::~WebServerSimple<SocketType>()
 }
 
 template <class SocketType>
-void WebServerSimple<SocketType>::addService(std::shared_ptr<ServiceInterface> service)
+void WebServerSimple<SocketType>::add_service(std::shared_ptr<ServiceInterface> service)
 {
   const auto handler =
       [service](std::shared_ptr<typename SimpleWeb::Server<SocketType>::Response> response,
                 std::shared_ptr<typename SimpleWeb::Server<SocketType>::Request> request) {
         try
         {
-          service->handleRequest(std::make_unique<RequestSimple<SocketType>>(response, request));
+          service->handle_request(std::make_unique<RequestSimple<SocketType>>(response, request));
         }
         catch (rapidxml::parse_error& e)
         {
@@ -74,6 +78,6 @@ void WebServerSimple<SocketType>::addService(std::shared_ptr<ServiceInterface> s
           LOG(LogLevel::ERROR, "Error while handling request!");
         }
       };
-  server_->resource["^" + service->getURI() + "$"]["GET"] = handler;
-  server_->resource["^" + service->getURI() + "$"]["POST"] = handler;
+  server_->resource["^" + service->get_uri() + "$"]["GET"] = handler;
+  server_->resource["^" + service->get_uri() + "$"]["POST"] = handler;
 }

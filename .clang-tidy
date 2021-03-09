@@ -4,6 +4,7 @@ Checks: >
     -cert-dcl37-c,
     -cert-dcl37-cpp,
     -cert-dcl51-cpp,
+    -cppcoreguidelines-pro-type-reinterpret-cast,
     -cppcoreguidelines-pro-type-union-access,
     -fuchsia-default-arguments-calls,
     -fuchsia-default-arguments-declarations,
@@ -24,22 +25,22 @@ CheckOptions:
   - { key: readability-identifier-naming.ClassCase,             value: CamelCase  }
   - { key: readability-identifier-naming.StructCase,            value: CamelCase  }
 
-  - { key: readability-identifier-naming.ClassMemberCase,       value: camelBack  }
+  - { key: readability-identifier-naming.ClassMemberCase,       value: lower_case  }
   - { key: readability-identifier-naming.ClassMemberSuffix,     value: __         }
-  - { key: readability-identifier-naming.ClassConstantCase,     value: camelBack  }
+  - { key: readability-identifier-naming.ClassConstantCase,     value: lower_case  }
   - { key: readability-identifier-naming.ClassConstantSuffix,   value: __         }
 
-  - { key: readability-identifier-naming.StaticVariableCase,    value: camelBack  }
+  - { key: readability-identifier-naming.StaticVariableCase,    value: lower_case  }
   - { key: readability-identifier-naming.StaticVariableSuffix,  value: __         }
 
-  - { key: readability-identifier-naming.MemberCase,            value: camelBack  }
-  - { key: readability-identifier-naming.PrivateMemberCase,     value: camelBack  }
+  - { key: readability-identifier-naming.MemberCase,            value: lower_case  }
+  - { key: readability-identifier-naming.PrivateMemberCase,     value: lower_case  }
   - { key: readability-identifier-naming.PrivateMemberSuffix,   value: _          }
-  - { key: readability-identifier-naming.ProtectedMemberCase,   value: camelBack  }
+  - { key: readability-identifier-naming.ProtectedMemberCase,   value: lower_case  }
   - { key: readability-identifier-naming.ProtectedMemberSuffix, value: _          }
 
-  - { key: readability-identifier-naming.FunctionCase,          value: camelBack  }
-  - { key: readability-identifier-naming.VariableCase,          value: camelBack  }
-  - { key: readability-identifier-naming.ParameterCase,         value: camelBack  }
+  - { key: readability-identifier-naming.FunctionCase,          value: lower_case  }
+  - { key: readability-identifier-naming.VariableCase,          value: lower_case  }
+  - { key: readability-identifier-naming.ParameterCase,         value: lower_case  }
   - { key: readability-identifier-naming.GlobalConstantCase,    value: UPPER_CASE }
   - { key: readability-identifier-naming.EnumConstantCase,      value: UPPER_CASE }

@@ -1,26 +1,26 @@
 #include "StateHandler.hpp"
 
-StateHandler::StateHandler(std::string descriptorHandle)
-  : descriptorHandle_(std::move(descriptorHandle))
+StateHandler::StateHandler(std::string descriptor_handle)
+  : descriptor_handle_(std::move(descriptor_handle))
 {
 }
 
-void StateHandler::updateState(const std::shared_ptr<BICEPS::PM::AbstractState>& state)
+void StateHandler::update_state(const std::shared_ptr<BICEPS::PM::AbstractState>& state)
 {
-  if (microSDC_ == nullptr)
+  if (micro_sdc_ == nullptr)
   {
-    LOG(LogLevel::ERROR, "Cannot update state of unassigned state! Use addMdState!");
+    LOG(LogLevel::ERROR, "Cannot update state of unassigned state! Use add_md_state!");
     return;
   }
-  microSDC_->updateState(state);
+  micro_sdc_->update_state(state);
 }
 
-const std::string& StateHandler::getDescriptorHandle() const
+const std::string& StateHandler::get_descriptor_handle() const
 {
-  return descriptorHandle_;
+  return descriptor_handle_;
 }
 
-void StateHandler::setMicroSDC(MicroSDC* microSDC)
+void StateHandler::set_micro_sdc(MicroSDC* micro_sdc)
 {
-  microSDC_ = microSDC;
+  micro_sdc_ = micro_sdc;
 }

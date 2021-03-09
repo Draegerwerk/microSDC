@@ -21,5 +21,5 @@ public:
 class ClientSessionFactory
 {
 public:
-  static std::unique_ptr<ClientSessionInterface> produce(const std::string& address, bool useTls);
+  static std::unique_ptr<ClientSessionInterface> produce(const std::string& address, bool use_tls);
 };

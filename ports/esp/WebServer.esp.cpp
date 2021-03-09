@@ -14,7 +14,7 @@
 std::unique_ptr<WebServerInterface>
 WebServerFactory::produce(const std::shared_ptr<const NetworkConfig>& networkConfig)
 {
-  return std::make_unique<WebServerEsp32>(networkConfig->isUsingTLS());
+  return std::make_unique<WebServerEsp32>(networkConfig->is_using_tls());
 }
 
 WebServerEsp32::WebServerEsp32(bool useTLS)
@@ -55,7 +55,7 @@ void WebServerEsp32::start()
     throw std::runtime_error("Cannot start WebServer!");
     return;
   }
-  registerUriHandlers();
+  register_uri_handlers();
 }
 
 void WebServerEsp32::stop()
@@ -64,12 +64,12 @@ void WebServerEsp32::stop()
   httpd_stop(server_);
 }
 
-void WebServerEsp32::addService(std::shared_ptr<ServiceInterface> service)
+void WebServerEsp32::add_service(std::shared_ptr<ServiceInterface> service)
 {
   services_.emplace_back(service);
 }
 
-esp_err_t WebServerEsp32::handlerCallback(httpd_req_t* req)
+esp_err_t WebServerEsp32::handler_callback(httpd_req_t* req)
 {
   std::vector<char> buffer;
   buffer.resize(req->content_len + 1);
@@ -88,7 +88,7 @@ esp_err_t WebServerEsp32::handlerCallback(httpd_req_t* req)
   LOG(LogLevel::INFO, "Dispatch URI: " << req->uri);
   auto service = std::find_if(
       webServer->services_.begin(), webServer->services_.end(),
-      [&](const auto& service) { return strcmp(service->getURI().c_str(), req->uri) == 0; });
+      [&](const auto& service) { return strcmp(service->get_uri().c_str(), req->uri) == 0; });
   if (service == webServer->services_.end())
   {
     // send 404 and close socket
@@ -98,7 +98,7 @@ esp_err_t WebServerEsp32::handlerCallback(httpd_req_t* req)
 
   try
   {
-    (*service)->handleRequest(
+    (*service)->handle_request(
         std::make_unique<RequestEsp32>(req, std::string(buffer.begin(), buffer.end())));
   }
   catch (rapidxml::parse_error& e)
@@ -125,20 +125,20 @@ esp_err_t WebServerEsp32::handlerCallback(httpd_req_t* req)
   return ESP_OK;
 }
 
-void WebServerEsp32::registerUriHandlers()
+void WebServerEsp32::register_uri_handlers()
 {
   LOG(LogLevel::INFO, "Registering URI handlers...");
   const httpd_uri_t get = {
-      "*",             // uri
-      HTTP_GET,        // method
-      handlerCallback, // handler
-      this             // user_ctx
+      "*",              // uri
+      HTTP_GET,         // method
+      handler_callback, // handler
+      this              // user_ctx
   };
   const httpd_uri_t post = {
-      "*",             // uri
-      HTTP_POST,       // method
-      handlerCallback, // handler
-      this             // user_ctx
+      "*",              // uri
+      HTTP_POST,        // method
+      handler_callback, // handler
+      this              // user_ctx
   };
   httpd_register_uri_handler(server_, &get);
   httpd_register_uri_handler(server_, &post);

@@ -9,7 +9,7 @@ public:
   explicit RequestEsp32(httpd_req_t* req, std::string msg);
 
 private:
-  void sendResponse(const std::string& msg) const override;
+  void send_response(const std::string& msg) const override;
 
-  httpd_req_t* httpdReq_;
+  httpd_req_t* httpd_req_;
 };

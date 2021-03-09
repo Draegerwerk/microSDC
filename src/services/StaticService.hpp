@@ -9,10 +9,10 @@ public:
   /// @brief constructs a new StaticService with given uri and content
   /// @param uri the uri of this service
   /// @param staticContent the content to provide
-  StaticService(std::string uri, std::string staticContent);
+  StaticService(std::string uri, std::string static_content);
 
-  std::string getURI() const override;
-  void handleRequest(std::unique_ptr<Request> req) override;
+  std::string get_uri() const override;
+  void handle_request(std::unique_ptr<Request> req) override;
 
 private:
   /// the content this service exposes and provides

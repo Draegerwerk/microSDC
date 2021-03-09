@@ -2,76 +2,76 @@
 
 // ThisModel
 //
-void DeviceCharacteristics::setManufacturer(const std::string& name)
+void DeviceCharacteristics::set_manufacturer(const std::string& name)
 {
   manufacturer_ = name;
 }
-void DeviceCharacteristics::setManufacturerUrl(const std::string& url)
+void DeviceCharacteristics::set_manufacturer_url(const std::string& url)
 {
-  manufacturerUrl_ = url;
+  manufacturer_url_ = url;
 }
-void DeviceCharacteristics::setModelName(const std::string& name)
+void DeviceCharacteristics::set_model_name(const std::string& name)
 {
-  modelName_ = name;
+  model_name_ = name;
 }
-void DeviceCharacteristics::setPresentationUrl(const std::string& url)
+void DeviceCharacteristics::set_presentation_url(const std::string& url)
 {
-  presentationUrl_ = url;
+  presentation_url_ = url;
 }
 
-const std::string& DeviceCharacteristics::getManufacturer() const
+const std::string& DeviceCharacteristics::get_manufacturer() const
 {
   return manufacturer_;
 }
-const std::string& DeviceCharacteristics::getManufacturerUrl() const
+const std::string& DeviceCharacteristics::get_manufacturer_url() const
 {
-  return manufacturerUrl_;
+  return manufacturer_url_;
 }
-const std::string& DeviceCharacteristics::getModelName() const
+const std::string& DeviceCharacteristics::get_model_name() const
 {
-  return modelName_;
+  return model_name_;
 }
-const std::string& DeviceCharacteristics::getPresentationUrl() const
+const std::string& DeviceCharacteristics::get_presentation_url() const
 {
-  return presentationUrl_;
+  return presentation_url_;
 }
 
 // ThisDevice
 //
-void DeviceCharacteristics::setFriendlyName(const std::string& name)
+void DeviceCharacteristics::set_friendly_name(const std::string& name)
 {
-  friendlyName_ = name;
+  friendly_name_ = name;
 }
-void DeviceCharacteristics::setFirmwareVersion(const std::string& version)
+void DeviceCharacteristics::set_firmware_version(const std::string& version)
 {
-  firmwareVersion_ = version;
+  firmware_version_ = version;
 }
-void DeviceCharacteristics::setSerialNumber(const std::string& serialNumber)
+void DeviceCharacteristics::set_serial_number(const std::string& serial_number)
 {
-  serialNumber_ = serialNumber;
+  serial_number_ = serial_number;
 }
 
-const std::string& DeviceCharacteristics::getFriendlyName() const
+const std::string& DeviceCharacteristics::get_friendly_name() const
 {
-  return friendlyName_;
+  return friendly_name_;
 }
-const std::string& DeviceCharacteristics::getFirmwareVersion() const
+const std::string& DeviceCharacteristics::get_firmware_version() const
 {
-  return firmwareVersion_;
+  return firmware_version_;
 }
-const std::string& DeviceCharacteristics::getSerialNumber() const
+const std::string& DeviceCharacteristics::get_serial_number() const
 {
-  return serialNumber_;
+  return serial_number_;
 }
 
 // Host
 //
-void DeviceCharacteristics::setEndpointReference(const std::string& epr)
+void DeviceCharacteristics::set_endpoint_reference(const std::string& epr)
 {
-  endpointReference_ = epr;
+  endpoint_reference_ = epr;
 }
 
-const std::string& DeviceCharacteristics::getEndpointReference() const
+const std::string& DeviceCharacteristics::get_endpoint_reference() const
 {
-  return endpointReference_;
+  return endpoint_reference_;
 }

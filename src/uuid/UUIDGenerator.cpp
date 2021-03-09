@@ -7,8 +7,8 @@ UUID UUIDGenerator::operator()()
   std::mt19937 generator(seed);
   std::uniform_int_distribution<> distribution;
 
-  std::array<uint8_t, 16> bytes{};
-  for (int i = 0; i < 16; i += 4)
+  UUID::uuid_array_t bytes{};
+  for (int i = 0; i < UUID::num_bytes__; i += 4)
   {
     *reinterpret_cast<uint32_t*>(bytes.data() + i) = distribution(generator);
   }

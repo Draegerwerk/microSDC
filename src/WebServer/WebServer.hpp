@@ -20,7 +20,7 @@ public:
 
   /// @brief adds a service to the handlers
   /// @param service a pointer to the service to add
-  virtual void addService(std::shared_ptr<ServiceInterface> service) = 0;
+  virtual void add_service(std::shared_ptr<ServiceInterface> service) = 0;
 };
 
 class NetworkConfig;
@@ -28,5 +28,5 @@ class NetworkConfig;
 class WebServerFactory
 {
 public:
-  static std::unique_ptr<WebServerInterface> produce(const std::shared_ptr<const NetworkConfig>& networkConfig);
+  static std::unique_ptr<WebServerInterface> produce(const std::shared_ptr<const NetworkConfig>& network_config);
 };

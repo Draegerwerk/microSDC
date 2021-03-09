@@ -12,30 +12,30 @@ DeviceService::DeviceService(std::shared_ptr<const MetadataProvider> metadata)
 {
 }
 
-std::string DeviceService::getURI() const
+std::string DeviceService::get_uri() const
 {
-  return MetadataProvider::getDeviceServicePath();
+  return MetadataProvider::get_device_service_path();
 }
 
-void DeviceService::handleRequest(std::unique_ptr<Request> req)
+void DeviceService::handle_request(std::unique_ptr<Request> req)
 {
-  const auto requestEnvelope = req->getEnvelope();
-  const auto& soapAction = requestEnvelope.header.action;
-  if (soapAction == MDPWS::WS_ACTION_GET)
+  const auto request_envelope = req->get_envelope();
+  const auto& soap_action = request_envelope.header.action;
+  if (soap_action == MDPWS::WS_ACTION_GET)
   {
-    MESSAGEMODEL::Envelope responseEnvelope;
-    fillResponseMessageFromRequestMessage(responseEnvelope, requestEnvelope);
-    responseEnvelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_GET_RESPONSE);
-    metadata_->fillDeviceMetadata(responseEnvelope);
-    req->respond(responseEnvelope);
+    MESSAGEMODEL::Envelope response_envelope;
+    fill_response_message_from_request_message(response_envelope, request_envelope);
+    response_envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_GET_RESPONSE);
+    metadata_->fill_device_metadata(response_envelope);
+    req->respond(response_envelope);
   }
-  else if (soapAction == MDPWS::WS_ACTION_GET_METADATA_REQUEST)
+  else if (soap_action == MDPWS::WS_ACTION_GET_METADATA_REQUEST)
   {
     LOG(LogLevel::WARNING, "HANDLE ACTION_GETMETADATA_REQUEST");
   }
   else
   {
-    LOG(LogLevel::ERROR, "Unknown soap action " << soapAction);
+    LOG(LogLevel::ERROR, "Unknown soap action " << soap_action);
     req->respond(SoapFault().envelope());
   }
 }

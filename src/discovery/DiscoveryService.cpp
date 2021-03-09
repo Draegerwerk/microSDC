@@ -13,20 +13,20 @@ static constexpr const char* TAG = "DPWS";
 
 DiscoveryService::DiscoveryService(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
                                    WS::DISCOVERY::QNameListType types,
-                                   WS::DISCOVERY::UriListType xAddresses,
-                                   WS::DISCOVERY::HelloType::MetadataVersionType metadataVersion)
-  : socket_(ioContext_,
+                                   WS::DISCOVERY::UriListType x_addresses,
+                                   WS::DISCOVERY::HelloType::MetadataVersionType metadata_version)
+  : socket_(io_context_,
             asio::ip::udp::endpoint(asio::ip::udp::v4(), MDPWS::UDP_MULTICAST_DISCOVERY_PORT))
-  , multicastEndpoint_(addressFromString(MDPWS::UDP_MULTICAST_DISCOVERY_IP_V4),
-                       MDPWS::UDP_MULTICAST_DISCOVERY_PORT)
-  , receiveBuffer_(std::make_unique<std::array<char, MDPWS::MAX_ENVELOPE_SIZE + 1>>())
-  , endpointReference_(std::move(epr))
+  , multicast_endpoint_(address_from_string(MDPWS::UDP_MULTICAST_DISCOVERY_IP_V4),
+                        MDPWS::UDP_MULTICAST_DISCOVERY_PORT)
+  , receive_buffer_(std::make_unique<std::array<char, MDPWS::MAX_ENVELOPE_SIZE + 1>>())
+  , endpoint_reference_(std::move(epr))
   , types_(std::move(types))
-  , xAddresses_(std::move(xAddresses))
-  , metadataVersion_(metadataVersion)
+  , x_addresses_(std::move(x_addresses))
+  , metadata_version_(metadata_version)
 {
   socket_.set_option(asio::ip::udp::socket::reuse_address(true));
-  socket_.set_option(asio::ip::multicast::join_group(multicastEndpoint_.address()));
+  socket_.set_option(asio::ip::multicast::join_group(multicast_endpoint_.address()));
 }
 
 DiscoveryService::~DiscoveryService() noexcept
@@ -37,10 +37,10 @@ DiscoveryService::~DiscoveryService() noexcept
 void DiscoveryService::stop()
 {
   LOG(LogLevel::INFO, "Stopping...");
-  sendBye();
+  send_bye();
   running_.store(false);
   socket_.close();
-  ioContext_.stop();
+  io_context_.stop();
   thread_.join();
 }
 
@@ -48,10 +48,10 @@ void DiscoveryService::start()
 {
   thread_ = std::thread([&]() {
     running_.store(true);
-    sendHello();
+    send_hello();
     LOG(LogLevel::INFO, "Start listening for discovery messages...");
-    doReceive();
-    ioContext_.run();
+    do_receive();
+    io_context_.run();
     LOG(LogLevel::INFO, "Shutting down discovery service thread...");
   });
 }
@@ -61,86 +61,86 @@ bool DiscoveryService::running() const
   return running_.load();
 }
 
-void DiscoveryService::configureProxy(const NetworkConfig::DiscoveryProxyProtocol proxyProtocol,
-                                      const std::string& proxyAddress)
+void DiscoveryService::configure_proxy(const NetworkConfig::DiscoveryProxyProtocol proxy_protocol,
+                                       const std::string& proxy_address)
 {
-  discoveryProxyProtocol_ = proxyProtocol;
-  if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP)
+  discovery_proxy_protocol_ = proxy_protocol;
+  if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP)
   {
-    discoveryProxyUdpEndpoint_ = {addressFromString(proxyAddress.c_str()),
-                                  MDPWS::UDP_MULTICAST_DISCOVERY_PORT};
+    discovery_proxy_udp_endpoint_ = {address_from_string(proxy_address.c_str()),
+                                     MDPWS::UDP_MULTICAST_DISCOVERY_PORT};
   }
-  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP ||
-           discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
+  else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP ||
+           discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
   {
-    discoveryProxyHttpEndpoint_ = proxyAddress;
+    discovery_proxy_http_endpoint_ = proxy_address;
   }
   if (running())
   {
-    sendHello();
+    send_hello();
   }
 }
 
-void DiscoveryService::setLocation(const BICEPS::PM::LocationDetail& locationDetail)
+void DiscoveryService::set_location(const BICEPS::PM::LocationDetail& location_detail)
 {
   std::string ctxt = "sdc.ctxt.loc:/sdc.ctxt.loc.detail/?";
-  ctxt += "fac=" + locationDetail.facility.value_or("");
-  ctxt += "&bldng=" + locationDetail.building.value_or("");
-  ctxt += "&poc=" + locationDetail.poC.value_or("");
-  ctxt += "&flr=" + locationDetail.floor.value_or("");
-  ctxt += "&rm=" + locationDetail.room.value_or("");
-  ctxt += "&bed=" + locationDetail.bed.value_or("");
+  ctxt += "fac=" + location_detail.facility.value_or("");
+  ctxt += "&bldng=" + location_detail.building.value_or("");
+  ctxt += "&poc=" + location_detail.poC.value_or("");
+  ctxt += "&flr=" + location_detail.floor.value_or("");
+  ctxt += "&rm=" + location_detail.room.value_or("");
+  ctxt += "&bed=" + location_detail.bed.value_or("");
   scopes_.emplace_back(WS::ADDRESSING::URIType(ctxt));
 }
 
-void DiscoveryService::doReceive()
+void DiscoveryService::do_receive()
 {
   if (running_.load())
   {
     socket_.async_receive_from(
-        asio::buffer(receiveBuffer_->data(), receiveBuffer_->size()), senderEndpoint_,
-        [this](const std::error_code& error, std::size_t bytesRecvd) {
-          LOG(LogLevel::DEBUG, "Received " << bytesRecvd << " bytes, ec: " << error.message());
+        asio::buffer(receive_buffer_->data(), receive_buffer_->size()), sender_endpoint_,
+        [this](const std::error_code& error, std::size_t bytes_recvd) {
+          LOG(LogLevel::DEBUG, "Received " << bytes_recvd << " bytes, ec: " << error.message());
           // null terminate whatever received
-          receiveBuffer_->at(bytesRecvd) = '\0';
+          receive_buffer_->at(bytes_recvd) = '\0';
           if (!error)
           {
-            handleUDPMessage(bytesRecvd);
+            handle_udp_message(bytes_recvd);
           }
-          doReceive();
+          do_receive();
         });
   }
 }
 
-asio::ip::address_v4 DiscoveryService::addressFromString(const char* addressString)
+asio::ip::address_v4 DiscoveryService::address_from_string(const char* address_string)
 {
-  asio::ip::address_v4::bytes_type addressBytes;
-  if (inet_pton(AF_INET, addressString, &addressBytes) <= 0)
+  asio::ip::address_v4::bytes_type address_bytes;
+  if (inet_pton(AF_INET, address_string, &address_bytes) <= 0)
   {
     throw std::runtime_error("Cannot create ip address from string!");
   }
-  return asio::ip::address_v4(addressBytes);
+  return asio::ip::address_v4(address_bytes);
 }
 
-void DiscoveryService::handleUDPMessage(std::size_t bytesRecvd)
+void DiscoveryService::handle_udp_message(std::size_t bytes_recvd)
 {
-  const auto senderAddress = senderEndpoint_.address().to_string();
-  LOG(LogLevel::DEBUG, "Received " << bytesRecvd << " bytes from " << senderAddress << "\n"
-                                   << receiveBuffer_->data());
+  const auto sender_address = sender_endpoint_.address().to_string();
+  LOG(LogLevel::DEBUG, "Received " << bytes_recvd << " bytes from " << sender_address << "\n"
+                                   << receive_buffer_->data());
 
   rapidxml::xml_document<> doc;
   try
   {
-    doc.parse<rapidxml::parse_fastest>(receiveBuffer_->data());
+    doc.parse<rapidxml::parse_fastest>(receive_buffer_->data());
   }
   catch (const rapidxml::parse_error& e)
   {
     LOG(LogLevel::ERROR, "ParseError at " << *e.where<char>() << " ("
-                                          << e.where<char>() - receiveBuffer_->data()
+                                          << e.where<char>() - receive_buffer_->data()
                                           << "): " << e.what());
   }
-  auto* envelopeNode = doc.first_node("Envelope", MDPWS::WS_NS_SOAP_ENVELOPE);
-  if (envelopeNode == nullptr)
+  auto* envelope_node = doc.first_node("Envelope", MDPWS::WS_NS_SOAP_ENVELOPE);
+  if (envelope_node == nullptr)
   {
     LOG(LogLevel::ERROR, "Cannot find soap envelope node in received message!");
     return;
@@ -149,43 +149,43 @@ void DiscoveryService::handleUDPMessage(std::size_t bytesRecvd)
 
   try
   {
-    envelope = std::make_unique<MESSAGEMODEL::Envelope>(*envelopeNode);
+    envelope = std::make_unique<MESSAGEMODEL::Envelope>(*envelope_node);
   }
   catch (ExpectedElement& e)
   {
-    LOG(LogLevel::WARNING, "In Message from " << senderAddress << ": ExpectedElement " << e.ns()
+    LOG(LogLevel::WARNING, "In Message from " << sender_address << ": ExpectedElement " << e.ns()
                                               << ":" << e.name() << " not encountered: \n"
-                                              << receiveBuffer_->data());
+                                              << receive_buffer_->data());
     return;
   }
 
   if (envelope->body.probe.has_value())
   {
-    LOG(LogLevel::INFO, "Received Probe from " << senderAddress);
-    handleProbe(*envelope);
+    LOG(LogLevel::INFO, "Received Probe from " << sender_address);
+    handle_probe(*envelope);
   }
   else if (envelope->body.bye.has_value())
   {
-    LOG(LogLevel::INFO, "Received WS-Discovery Bye message from " << senderAddress);
+    LOG(LogLevel::INFO, "Received WS-Discovery Bye message from " << sender_address);
   }
   else if (envelope->body.hello.has_value())
   {
-    LOG(LogLevel::INFO, "Received WS-Discovery Hello message from " << senderAddress);
+    LOG(LogLevel::INFO, "Received WS-Discovery Hello message from " << sender_address);
   }
   else if (envelope->body.probeMatches.has_value())
   {
-    LOG(LogLevel::INFO, "Received WS-Discovery ProbeMatches message from " << senderAddress);
+    LOG(LogLevel::INFO, "Received WS-Discovery ProbeMatches message from " << sender_address);
   }
   else if (envelope->body.resolve.has_value())
   {
     LOG(LogLevel::INFO, "Received WS-Discovery Resolve message from "
-                            << senderAddress << " asking for EndpointReference "
+                            << sender_address << " asking for EndpointReference "
                             << envelope->body.resolve->endpointReference.address);
-    handleResolve(*envelope);
+    handle_resolve(*envelope);
   }
   else if (envelope->body.resolveMatches.has_value())
   {
-    LOG(LogLevel::INFO, "Received WS-Discovery ResolveMatches message from " << senderAddress);
+    LOG(LogLevel::INFO, "Received WS-Discovery ResolveMatches message from " << sender_address);
   }
   else
   {
@@ -194,57 +194,59 @@ void DiscoveryService::handleUDPMessage(std::size_t bytesRecvd)
   doc.clear();
 }
 
-void DiscoveryService::sendHello()
+void DiscoveryService::send_hello()
 {
-  messagingContext_.resetInstanceId();
+  messaging_context_.reset_instance_id();
   // Construct Hello Message
   auto message = std::make_unique<MESSAGEMODEL::Envelope>();
-  buildHelloMessage(*message);
-  MESSAGEMODEL::Envelope::HeaderType::AppSequenceType appSequence(
-      messagingContext_.getInstanceId(), messagingContext_.getNextMessageCounter());
-  message->header.appSequence = appSequence;
+  build_hello_message(*message);
+  MESSAGEMODEL::Envelope::HeaderType::AppSequenceType app_sequence(
+      messaging_context_.get_instance_id(), messaging_context_.get_next_message_counter());
+  message->header.appSequence = app_sequence;
   // Serialize and send
   MessageSerializer serializer;
   serializer.serialize(*message);
   auto msg = std::make_shared<std::string>(serializer.str());
   LOG(LogLevel::INFO, "Sending hello message...");
-  const auto asyncCallback = [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
+  const auto async_callback = [msg](const std::error_code& ec,
+                                    const std::size_t bytes_transferred) {
     if (ec)
     {
       LOG(LogLevel::ERROR, "Error while sending Hello: ec " << ec.value() << ": " << ec.message());
       return;
     }
-    LOG(LogLevel::DEBUG, "Sent hello msg (" << bytesTransferred << " bytes): \n" << *msg);
+    LOG(LogLevel::DEBUG, "Sent hello msg (" << bytes_transferred << " bytes): \n" << *msg);
   };
 
   // alwayas send hello to multicast group
-  socket_.async_send_to(asio::buffer(*msg), multicastEndpoint_, asyncCallback);
+  socket_.async_send_to(asio::buffer(*msg), multicast_endpoint_, async_callback);
 
   // handle configured discovery proxy
-  if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP &&
-      discoveryProxyUdpEndpoint_.has_value())
+  if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP &&
+      discovery_proxy_udp_endpoint_.has_value())
   {
-    socket_.async_send_to(asio::buffer(*msg), discoveryProxyUdpEndpoint_.value(), asyncCallback);
+    socket_.async_send_to(asio::buffer(*msg), discovery_proxy_udp_endpoint_.value(),
+                          async_callback);
   }
-  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
+  else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
   {
-    auto session = ClientSessionFactory::produce(discoveryProxyHttpEndpoint_, false);
+    auto session = ClientSessionFactory::produce(discovery_proxy_http_endpoint_, false);
     session->send(*msg);
   }
-  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
+  else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
   {
-    auto session = ClientSessionFactory::produce(discoveryProxyHttpEndpoint_, true);
+    auto session = ClientSessionFactory::produce(discovery_proxy_http_endpoint_, true);
     session->send(*msg);
   }
 }
 
-void DiscoveryService::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
+void DiscoveryService::build_hello_message(MESSAGEMODEL::Envelope& envelope)
 {
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_HELLO);
   envelope.header.to = WS::ADDRESSING::URIType(MDPWS::WS_DISCOVERY_URN);
-  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculateMessageID()};
+  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
   auto& hello = envelope.body.hello = WS::DISCOVERY::HelloType(
-      WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
+      WS::ADDRESSING::EndpointReferenceType(endpoint_reference_), metadata_version_);
   if (!scopes_.empty())
   {
     hello->scopes = scopes_;
@@ -253,62 +255,64 @@ void DiscoveryService::buildHelloMessage(MESSAGEMODEL::Envelope& envelope)
   {
     hello->types = types_;
   }
-  if (!xAddresses_.empty())
+  if (!x_addresses_.empty())
   {
-    hello->xAddrs = xAddresses_;
+    hello->xAddrs = x_addresses_;
   }
 }
 
-void DiscoveryService::sendBye()
+void DiscoveryService::send_bye()
 {
   // Construct Bye Message
   auto message = std::make_unique<MESSAGEMODEL::Envelope>();
-  buildByeMessage(*message);
-  MESSAGEMODEL::Envelope::HeaderType::AppSequenceType appSequence(
-      messagingContext_.getInstanceId(), messagingContext_.getNextMessageCounter());
-  message->header.appSequence = appSequence;
+  build_bye_message(*message);
+  MESSAGEMODEL::Envelope::HeaderType::AppSequenceType app_sequence(
+      messaging_context_.get_instance_id(), messaging_context_.get_next_message_counter());
+  message->header.appSequence = app_sequence;
   // Serialize and send
   MessageSerializer serializer;
   serializer.serialize(*message);
   auto msg = std::make_shared<std::string>(serializer.str());
   LOG(LogLevel::INFO, "Sending bye message...");
-  const auto asyncCallback = [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
+  const auto async_callback = [msg](const std::error_code& ec,
+                                    const std::size_t bytes_transferred) {
     if (ec)
     {
       LOG(LogLevel::ERROR, "Error while sending Bye: ec " << ec.value() << ": " << ec.message());
       return;
     }
-    LOG(LogLevel::DEBUG, "Sent bye msg (" << bytesTransferred << " bytes): \n" << *msg);
+    LOG(LogLevel::DEBUG, "Sent bye msg (" << bytes_transferred << " bytes): \n" << *msg);
   };
 
   // alwayas send bye to multicast group
-  socket_.async_send_to(asio::buffer(*msg), multicastEndpoint_, asyncCallback);
+  socket_.async_send_to(asio::buffer(*msg), multicast_endpoint_, async_callback);
 
   // handle configured discovery proxy
-  if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP &&
-      discoveryProxyUdpEndpoint_.has_value())
+  if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::UDP &&
+      discovery_proxy_udp_endpoint_.has_value())
   {
-    socket_.async_send_to(asio::buffer(*msg), discoveryProxyUdpEndpoint_.value(), asyncCallback);
+    socket_.async_send_to(asio::buffer(*msg), discovery_proxy_udp_endpoint_.value(),
+                          async_callback);
   }
-  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
+  else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
   {
-    auto session = ClientSessionFactory::produce(discoveryProxyHttpEndpoint_, false);
+    auto session = ClientSessionFactory::produce(discovery_proxy_http_endpoint_, false);
     session->send(*msg);
   }
-  else if (discoveryProxyProtocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
+  else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
   {
-    auto session = ClientSessionFactory::produce(discoveryProxyHttpEndpoint_, true);
+    auto session = ClientSessionFactory::produce(discovery_proxy_http_endpoint_, true);
     session->send(*msg);
   }
 }
 
-void DiscoveryService::buildByeMessage(MESSAGEMODEL::Envelope& envelope)
+void DiscoveryService::build_bye_message(MESSAGEMODEL::Envelope& envelope)
 {
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_BYE);
   envelope.header.to = WS::ADDRESSING::URIType(MDPWS::WS_DISCOVERY_URN);
-  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculateMessageID()};
+  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
   auto& bye = envelope.body.bye =
-      WS::DISCOVERY::ByeType(WS::ADDRESSING::EndpointReferenceType(endpointReference_));
+      WS::DISCOVERY::ByeType(WS::ADDRESSING::EndpointReferenceType(endpoint_reference_));
   if (!scopes_.empty())
   {
     bye->scopes = scopes_;
@@ -317,66 +321,66 @@ void DiscoveryService::buildByeMessage(MESSAGEMODEL::Envelope& envelope)
   {
     bye->types = types_;
   }
-  if (!xAddresses_.empty())
+  if (!x_addresses_.empty())
   {
-    bye->xAddrs = xAddresses_;
+    bye->xAddrs = x_addresses_;
   }
 }
 
-void DiscoveryService::handleProbe(const MESSAGEMODEL::Envelope& envelope)
+void DiscoveryService::handle_probe(const MESSAGEMODEL::Envelope& envelope)
 {
-  auto responseMessage = std::make_unique<MESSAGEMODEL::Envelope>();
-  buildProbeMatchMessage(*responseMessage, envelope);
+  auto response_message = std::make_unique<MESSAGEMODEL::Envelope>();
+  build_probe_match_message(*response_message, envelope);
   MessageSerializer serializer;
-  serializer.serialize(*responseMessage);
+  serializer.serialize(*response_message);
   LOG(LogLevel::INFO, "Sending ProbeMatch");
   auto msg = std::make_shared<std::string>(serializer.str());
   socket_.async_send_to(
-      asio::buffer(*msg), senderEndpoint_,
-      [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
+      asio::buffer(*msg), sender_endpoint_,
+      [msg](const std::error_code& ec, const std::size_t bytes_transferred) {
         if (ec)
         {
           LOG(LogLevel::ERROR,
               "Error while sending ProbeMatch: ec " << ec.value() << ": " << ec.message());
           return;
         }
-        LOG(LogLevel::DEBUG, "Sent ProbeMatch msg (" << bytesTransferred << " bytes): \n" << *msg);
+        LOG(LogLevel::DEBUG, "Sent ProbeMatch msg (" << bytes_transferred << " bytes): \n" << *msg);
       });
 }
 
-void DiscoveryService::handleResolve(const MESSAGEMODEL::Envelope& envelope)
+void DiscoveryService::handle_resolve(const MESSAGEMODEL::Envelope& envelope)
 {
-  if (envelope.body.resolve->endpointReference.address != endpointReference_)
+  if (envelope.body.resolve->endpointReference.address != endpoint_reference_)
   {
     return;
   }
-  auto responseMessage = std::make_unique<MESSAGEMODEL::Envelope>();
-  buildResolveMatchMessage(*responseMessage, envelope);
+  auto response_message = std::make_unique<MESSAGEMODEL::Envelope>();
+  build_resolve_match_message(*response_message, envelope);
   MessageSerializer serializer;
-  serializer.serialize(*responseMessage);
+  serializer.serialize(*response_message);
   LOG(LogLevel::INFO, "Sending ResolveMatch");
   auto msg = std::make_shared<std::string>(serializer.str());
-  socket_.async_send_to(asio::buffer(*msg), senderEndpoint_,
-                        [msg](const std::error_code& ec, const std::size_t bytesTransferred) {
+  socket_.async_send_to(asio::buffer(*msg), sender_endpoint_,
+                        [msg](const std::error_code& ec, const std::size_t bytes_transferred) {
                           if (ec)
                           {
                             LOG(LogLevel::ERROR, "Error while sending ResolveMatch: ec "
                                                      << ec.value() << ": " << ec.message());
                             return;
                           }
-                          LOG(LogLevel::DEBUG, "Sent ResolveMatch msg (" << bytesTransferred
+                          LOG(LogLevel::DEBUG, "Sent ResolveMatch msg (" << bytes_transferred
                                                                          << " bytes): \n"
                                                                          << *msg);
                         });
 }
 
-void DiscoveryService::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
-                                              const MESSAGEMODEL::Envelope& request)
+void DiscoveryService::build_probe_match_message(MESSAGEMODEL::Envelope& envelope,
+                                                 const MESSAGEMODEL::Envelope& request)
 {
-  auto& probeMatches = envelope.body.probeMatches = WS::DISCOVERY::ProbeMatchesType({});
+  auto& probe_matches = envelope.body.probeMatches = WS::DISCOVERY::ProbeMatchesType({});
   // TODO: check for match
-  auto& match = probeMatches->probeMatch.emplace_back(
-      WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
+  auto& match = probe_matches->probeMatch.emplace_back(
+      WS::ADDRESSING::EndpointReferenceType(endpoint_reference_), metadata_version_);
   if (!scopes_.empty())
   {
     match.scopes = scopes_;
@@ -385,9 +389,9 @@ void DiscoveryService::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
   {
     match.types = types_;
   }
-  if (!xAddresses_.empty())
+  if (!x_addresses_.empty())
   {
-    match.xAddrs = xAddresses_;
+    match.xAddrs = x_addresses_;
   }
 
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_PROBE_MATCHES);
@@ -403,15 +407,15 @@ void DiscoveryService::buildProbeMatchMessage(MESSAGEMODEL::Envelope& envelope,
   {
     envelope.header.relatesTo = WS::ADDRESSING::RelatesToType(request.header.messageID.value());
   }
-  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculateMessageID()};
+  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
 }
 
-void DiscoveryService::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope,
-                                                const MESSAGEMODEL::Envelope& request)
+void DiscoveryService::build_resolve_match_message(MESSAGEMODEL::Envelope& envelope,
+                                                   const MESSAGEMODEL::Envelope& request)
 {
-  auto& resolveMatches = envelope.body.resolveMatches = WS::DISCOVERY::ResolveMatchesType({});
-  auto& match = resolveMatches->resolveMatch.emplace_back(
-      WS::ADDRESSING::EndpointReferenceType(endpointReference_), metadataVersion_);
+  auto& resolve_matches = envelope.body.resolveMatches = WS::DISCOVERY::ResolveMatchesType({});
+  auto& match = resolve_matches->resolveMatch.emplace_back(
+      WS::ADDRESSING::EndpointReferenceType(endpoint_reference_), metadata_version_);
   if (!scopes_.empty())
   {
     match.scopes = scopes_;
@@ -420,9 +424,9 @@ void DiscoveryService::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope
   {
     match.types = types_;
   }
-  if (!xAddresses_.empty())
+  if (!x_addresses_.empty())
   {
-    match.xAddrs = xAddresses_;
+    match.xAddrs = x_addresses_;
   }
 
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RESOLVE_MATCHES);
@@ -438,5 +442,5 @@ void DiscoveryService::buildResolveMatchMessage(MESSAGEMODEL::Envelope& envelope
   {
     envelope.header.relatesTo = WS::ADDRESSING::RelatesToType(request.header.messageID.value());
   }
-  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculateMessageID()};
+  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
 }

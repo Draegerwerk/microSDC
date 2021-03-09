@@ -10,14 +10,14 @@ class RequestSimple : public Request
 public:
   explicit RequestSimple(std::shared_ptr<typename SimpleWeb::Server<SocketType>::Response> response,
                          std::shared_ptr<typename SimpleWeb::Server<SocketType>::Request> request);
-  RequestSimple(const RequestSimple&) = delete;
-  RequestSimple(RequestSimple&&) = delete;
-  RequestSimple& operator=(const RequestSimple&) = delete;
-  RequestSimple& operator=(RequestSimple&&) = delete;
+  RequestSimple(const RequestSimple& other) = delete;
+  RequestSimple(RequestSimple&& other) = delete;
+  RequestSimple& operator=(const RequestSimple& other) = delete;
+  RequestSimple& operator=(RequestSimple&& other) = delete;
   ~RequestSimple() override = default;
 
 private:
-  void sendResponse(const std::string& msg) const override;
+  void send_response(const std::string& msg) const override;
 
   const std::shared_ptr<typename SimpleWeb::Server<SocketType>::Response> response_;
   const std::shared_ptr<const typename SimpleWeb::Server<SocketType>::Request> request_;
@@ -34,7 +34,7 @@ RequestSimple<SocketType>::RequestSimple(
 }
 
 template <class SocketType>
-void RequestSimple<SocketType>::sendResponse(const std::string& msg) const
+void RequestSimple<SocketType>::send_response(const std::string& msg) const
 {
   LOG(LogLevel::DEBUG, "Writing: \n" << msg);
   // response_->close_connection_after_response = true;
