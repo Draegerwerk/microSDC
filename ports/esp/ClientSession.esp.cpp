@@ -23,6 +23,8 @@ ClientSessionEsp32::ClientSessionEsp32(std::string notify_to, const bool use_tls
     config.use_global_ca_store = true;
     config.skip_cert_common_name_check = true;
   }
+  config.keep_alive_enable = true;
+  config.keep_alive_idle = 30;
   config.method = HTTP_METHOD_POST;
   config.transport_type = HTTP_TRANSPORT_OVER_TCP;
   session_ = esp_http_client_init(&config);
