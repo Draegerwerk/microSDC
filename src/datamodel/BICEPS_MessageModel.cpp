@@ -29,8 +29,8 @@ namespace BICEPS::MM
   }
 
   AbstractSet::AbstractSet(SetKind kind, OperationHandleRefType operation_handle_ref)
-    : kind_(kind)
-    , operationHandleRef(std::move(operation_handle_ref))
+    : operationHandleRef(std::move(operation_handle_ref))
+    , kind_(kind)
   {
   }
   AbstractSet::AbstractSet(SetKind kind, const rapidxml::xml_node<>& node)

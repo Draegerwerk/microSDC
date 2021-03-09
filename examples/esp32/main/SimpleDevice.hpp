@@ -22,6 +22,8 @@ public:
 
     std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override;
 
+    BICEPS::MM::InvocationState request_state_change(const BICEPS::MM::AbstractSet& set) override;
+
     /// @param sets a new numeric value to the state handled by this handler and updates the mdib
     /// @param value the new value to set
     void set_value(double value);

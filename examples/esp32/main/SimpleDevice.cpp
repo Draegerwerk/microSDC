@@ -16,6 +16,13 @@ SimpleDevice::NumericStateHandler::get_initial_state() const
   return state;
 }
 
+
+BICEPS::MM::InvocationState
+SimpleDevice::NumericStateHandler::request_state_change(const BICEPS::MM::AbstractSet& /*set*/)
+{
+  return BICEPS::MM::InvocationState::Fail;
+}
+
 void SimpleDevice::NumericStateHandler::set_value(double value)
 {
   auto state = dyn_cast<BICEPS::PM::NumericMetricState>(get_initial_state());
