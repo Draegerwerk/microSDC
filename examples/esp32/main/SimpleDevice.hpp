@@ -14,11 +14,6 @@ public:
     /// @brief constructs a new NumericStateHandler attached to a given descriptor state handle
     /// @param descriptorHandle the handle of the state's descriptor
     explicit NumericStateHandler(const std::string& descriptor_handle);
-    NumericStateHandler(const NumericStateHandler& other) = delete;
-    NumericStateHandler(NumericStateHandler&& other) = delete;
-    NumericStateHandler& operator=(const NumericStateHandler& other) = delete;
-    NumericStateHandler& operator=(NumericStateHandler&& other) = delete;
-    ~NumericStateHandler() override = default;
 
     std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override;
 

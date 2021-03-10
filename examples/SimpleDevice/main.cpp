@@ -15,11 +15,6 @@ public:
     : StateHandler(descriptor_handle)
   {
   }
-  NumericStateHandler(const NumericStateHandler&) = delete;
-  NumericStateHandler(NumericStateHandler&&) = delete;
-  NumericStateHandler& operator=(const NumericStateHandler&) = delete;
-  NumericStateHandler& operator=(NumericStateHandler&&) = delete;
-  ~NumericStateHandler() override = default;
 
   std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override
   {
@@ -61,11 +56,6 @@ public:
     : StateHandler(descriptor_handle)
   {
   }
-  StringStateHandler(const StringStateHandler&) = delete;
-  StringStateHandler(StringStateHandler&&) = delete;
-  StringStateHandler& operator=(const StringStateHandler&) = delete;
-  StringStateHandler& operator=(StringStateHandler&&) = delete;
-  ~StringStateHandler() override = default;
 
   std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override
   {
