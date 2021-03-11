@@ -104,7 +104,8 @@ void SimpleDevice::init()
 
   BICEPS::PM::ChannelDescriptor device_channel("device_channel");
   device_channel.type = BICEPS::PM::CodedValue{"128771"};
-  device_channel.type->concept_description = BICEPS::PM::LocalizedText{"dynamic not settable metrics"};
+  device_channel.type->concept_description =
+      BICEPS::PM::LocalizedText{"dynamic not settable metrics"};
   device_channel.metric.emplace_back(pressure_state);
   device_channel.metric.emplace_back(temperature_state);
   device_channel.metric.emplace_back(humidity_state);
@@ -126,6 +127,8 @@ void SimpleDevice::init()
   device_descriptor.meta_data = metadata;
   device_descriptor.system_context = system_context;
   device_descriptor.vmd.emplace_back(device_module);
+  device_descriptor.type = BICEPS::PM::CodedValue{"70825"};
+  device_descriptor.type->concept_description = BICEPS::PM::LocalizedText{"Mds"};
 
   BICEPS::PM::MdDescription md_description;
   md_description.mds.emplace_back(device_descriptor);
