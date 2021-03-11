@@ -118,7 +118,6 @@ void MicroSDC::stop()
   {
     discovery_service_->stop();
     webserver_->stop();
-    sdc_thread_.join();
     running_ = false;
     LOG(LogLevel::INFO, "stopped");
   }

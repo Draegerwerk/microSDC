@@ -95,8 +95,6 @@ public:
 private:
   /// a pointer to the location context state holding location descriptor of this instance
   std::shared_ptr<BICEPS::PM::LocationContextState> location_context_state_{nullptr};
-  /// the SDC thread
-  std::thread sdc_thread_;
   /// pointer to the discovery service
   std::unique_ptr<DiscoveryService> discovery_service_{nullptr};
   /// pointer to the subscription manager
