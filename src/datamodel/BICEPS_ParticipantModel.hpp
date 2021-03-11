@@ -86,10 +86,51 @@ namespace BICEPS::PM
     Unspec
   };
 
+  enum class LocalizedTextWidth
+  {
+    xs,
+    s,
+    m,
+    l,
+    xl,
+    xxl
+  };
+
+  using LocalizedTextRef = std::string;
+
+  struct LocalizedText
+  {
+    using RefType = LocalizedTextRef;
+    using RefOptional = std::optional<RefType>;
+    RefOptional ref;
+
+    using LangType = std::string;
+    using LangOptional = std::optional<LangType>;
+    LangOptional lang;
+
+    using VersionType = unsigned int;
+    using VersionOptional = std::optional<VersionType>;
+    VersionOptional version;
+
+    using TextWidthType = LocalizedTextWidth;
+    using TextWidthOptional = std::optional<TextWidthType>;
+    TextWidthOptional textWidth;
+
+    using ContentType = std::string;
+    ContentType content;
+
+    LocalizedText() = default;
+    explicit LocalizedText(std::string content);
+  };
+
   struct CodedValue
   {
     using CodeType = std::string;
     CodeType code;
+
+    using ConceptDescriptionType = LocalizedText;
+    using ConceptDescriptionOptional = std::optional<ConceptDescriptionType>;
+    ConceptDescriptionOptional conceptDescription;
 
     explicit CodedValue(CodeType code);
   };
@@ -116,12 +157,12 @@ namespace BICEPS::PM
       LAST_COMPLEX_DEVICE_COMPONENT_DESCRIPTOR,
       CHANNEL_DESCRIPTOR,
       SCO_DESCRIPTOR,
+      SYSTEM_CONTEXT_DESCRIPTOR,
       LAST_DEVICE_COMPONENT_DESCRIPTOR,
 
       CONTEXT_DESCRIPTOR,
       PATIENT_CONTEXT_DESCRIPTOR,
       LOCATION_CONTEXT_DESCRIPTOR,
-      SYSTEM_CONTEXT_DESCRIPTOR,
       LAST_CONTEXT_DESCRIPTOR,
     };
     DescriptorKind getKind() const;
@@ -194,9 +235,24 @@ namespace BICEPS::PM
     AbstractDeviceComponentDescriptor(DescriptorKind kind, const HandleType&);
   };
 
+  struct ScoDescriptor : public AbstractDeviceComponentDescriptor
+  {
+    using OperationType = ::BICEPS::PM::AbstractOperationDescriptor;
+    using OperationSequence = std::vector<std::shared_ptr<OperationType>>;
+    OperationSequence operation;
+
+    static bool classof(const AbstractDescriptor* other);
+
+    explicit ScoDescriptor(const HandleType& handle);
+  };
+
   struct AbstractComplexDeviceComponentDescriptor : public AbstractDeviceComponentDescriptor
   {
     static bool classof(const AbstractDescriptor* other);
+
+    using ScoType = ::BICEPS::PM::ScoDescriptor;
+    using ScoOptional = std::optional<ScoType>;
+    ScoOptional sco;
 
   protected:
     AbstractComplexDeviceComponentDescriptor(DescriptorKind kind, const HandleType&);
@@ -205,11 +261,11 @@ namespace BICEPS::PM
   struct Metadata
   {
   public:
-    using ManufacturerType = std::string;
+    using ManufacturerType = LocalizedText;
     using ManufacturerSequence = std::vector<ManufacturerType>;
     ManufacturerSequence manufacturer;
 
-    using ModelNameType = std::string;
+    using ModelNameType = LocalizedText;
     using ModelNameSequence = std::vector<ModelNameType>;
     ModelNameSequence modelName;
 
@@ -244,7 +300,7 @@ namespace BICEPS::PM
     explicit LocationContextDescriptor(const HandleType&);
   };
 
-  struct SystemContextDescriptor : public AbstractContextDescriptor
+  struct SystemContextDescriptor : public AbstractDeviceComponentDescriptor
   {
     using PatientContextType = PatientContextDescriptor;
     using PatientContextOptional = std::optional<PatientContextType>;
@@ -403,26 +459,11 @@ namespace BICEPS::PM
     explicit ChannelDescriptor(const HandleType&);
   };
 
-  struct ScoDescriptor : public AbstractDeviceComponentDescriptor
-  {
-    using OperationType = ::BICEPS::PM::AbstractOperationDescriptor;
-    using OperationSequence = std::vector<std::shared_ptr<OperationType>>;
-    OperationSequence operation;
-
-    static bool classof(const AbstractDescriptor* other);
-
-    explicit ScoDescriptor(const HandleType& handle);
-  };
-
   struct VmdDescriptor : public AbstractComplexDeviceComponentDescriptor
   {
     using ChannelType = ChannelDescriptor;
     using ChannelSequence = std::vector<ChannelType>;
     ChannelSequence channel;
-
-    using ScoType = ::BICEPS::PM::ScoDescriptor;
-    using ScoOptional = std::optional<ScoType>;
-    ScoOptional sco;
 
     static bool classof(const AbstractDescriptor* other);
 
@@ -491,6 +532,7 @@ namespace BICEPS::PM
       METRIC_STATE,
       NUMERIC_METRIC_STATE,
       STRING_METRIC_STATE,
+      ENUM_STRING_METRIC_STATE,
       LAST_METRIC_STATE,
     };
     StateKind getKind() const;
@@ -501,6 +543,10 @@ namespace BICEPS::PM
 
     using DescriptorHandleType = std::string;
     DescriptorHandleType descriptorHandle;
+
+    using DescriptorVersionType = unsigned int;
+    using DescriptorVersionOptional = std::optional<DescriptorVersionType>;
+    DescriptorVersionOptional descriptorVersion;
 
     virtual ~AbstractState() = default;
 
@@ -591,6 +637,16 @@ namespace BICEPS::PM
 
   using Timestamp = unsigned int;
 
+  struct PhysicalConnectorInfo
+  {
+    using NumberType = int;
+    using NumberOptional = std::optional<NumberType>;
+    NumberOptional number;
+
+    using LabelSequence = std::vector<LocalizedText>;
+    LabelSequence label;
+  };
+
   struct CalibrationInfo
   {
     using ComponentCalibrationStateType = CalibrationState;
@@ -604,47 +660,6 @@ namespace BICEPS::PM
     using TimeType = Timestamp;
     using TimeOptional = std::optional<TimeType>;
     TimeOptional time;
-  };
-
-  enum class LocalizedTextWidth
-  {
-    xs,
-    s,
-    m,
-    l,
-    xl,
-    xxl
-  };
-
-  using LocalizedTextRef = std::string;
-
-  struct LocalizedText
-  {
-    using RefType = LocalizedTextRef;
-    using RefOptional = std::optional<RefType>;
-    RefOptional ref;
-
-    using LangType = std::string;
-    using LangOptional = std::optional<LangType>;
-    LangOptional lang;
-
-    using VersionType = unsigned int;
-    using VersionOptional = std::optional<VersionType>;
-    VersionOptional version;
-
-    using TextWidthType = LocalizedTextWidth;
-    using TextWidthOptional = std::optional<TextWidthType>;
-    TextWidthOptional textWidth;
-  };
-
-  struct PhysicalConnectorInfo
-  {
-    using NumberType = int;
-    using NumberOptional = std::optional<NumberType>;
-    NumberOptional number;
-
-    using LabelSequence = std::vector<LocalizedText>;
-    LabelSequence label;
   };
 
   struct AbstractDeviceComponentState : public AbstractState
@@ -673,8 +688,16 @@ namespace BICEPS::PM
     using PhysicalConnectorOptional = std::optional<PhysicalConnectorType>;
     PhysicalConnectorOptional physicalConnector;
 
+    static bool classof(const AbstractDescriptor* other);
+
   protected:
     AbstractDeviceComponentState(StateKind kind, DescriptorHandleType handle);
+  };
+
+  struct SystemContextState : public AbstractDeviceComponentState
+  {
+    static bool classof(const AbstractDescriptor* other);
+    explicit SystemContextState(const DescriptorHandleType& descriptor_handle);
   };
 
   struct AbstractComplexDeviceComponentState : public AbstractDeviceComponentState
@@ -871,6 +894,13 @@ namespace BICEPS::PM
     static bool classof(const AbstractState* other);
 
     explicit StringMetricState(DescriptorHandleType handle);
+    StringMetricState(StateKind kind, DescriptorHandleType handle);
+  };
+
+  struct EnumStringMetricState : public StringMetricState
+  {
+    static bool classof(const AbstractState* other);
+    explicit EnumStringMetricState(DescriptorHandleType handle);
   };
 
   struct MdState

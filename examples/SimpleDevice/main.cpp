@@ -21,7 +21,7 @@ public:
     auto state = std::make_shared<BICEPS::PM::NumericMetricState>(get_descriptor_handle());
     state->metricValue = std::make_optional<BICEPS::PM::NumericMetricValue>(
         BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld});
-    state->metricValue->value = 0;
+    state->metricValue->value = 42;
     return state;
   }
 
@@ -88,6 +88,47 @@ public:
   }
 };
 
+class EnumStringStateHandler : public StateHandler
+{
+public:
+  /// @brief constructs a new NumericStateHandler attached to a given descriptor state handle
+  /// @param descriptorHandle the handle of the state's descriptor
+  explicit EnumStringStateHandler(const std::string& descriptor_handle)
+    : StateHandler(descriptor_handle)
+  {
+  }
+
+  std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override
+  {
+    auto state = std::make_shared<BICEPS::PM::EnumStringMetricState>(get_descriptor_handle());
+    state->metricValue = std::make_optional<BICEPS::PM::StringMetricValue>(
+        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld});
+    state->metricValue->value = "OFF";
+    return state;
+  }
+
+  BICEPS::MM::InvocationState request_state_change(const BICEPS::MM::AbstractSet& set) override
+  {
+    const auto* const set_string = dyn_cast<const BICEPS::MM::SetString>(&set);
+    if (set_string == nullptr)
+    {
+      LOG(LogLevel::ERROR, "Cannot cast to SetString!");
+      return BICEPS::MM::InvocationState::Fail;
+    }
+    this->set_value(set_string->requestedStringValue);
+    return BICEPS::MM::InvocationState::Fin;
+  }
+
+  /// @param sets a new numeric value to the state handled by this handler and updates the mdib
+  /// @param value the new value to set
+  void set_value(std::string value)
+  {
+    auto state = dyn_cast<BICEPS::PM::EnumStringMetricState>(get_initial_state());
+    state->metricValue->value = value;
+    update_state(state);
+  }
+};
+
 static volatile std::atomic_bool keep_running = true;
 static std::condition_variable cv_running;
 static std::mutex running_mutex;
@@ -101,7 +142,7 @@ void int_handler(int /*unused*/)
 
 int main()
 {
-  Log::set_log_level(LogLevel::DEBUG);
+  Log::set_log_level(LogLevel::INFO);
   LOG(LogLevel::INFO, "Starting up....");
 
   auto micro_sdc = std::make_unique<MicroSDC>();
@@ -109,7 +150,9 @@ int main()
   const auto sdc_port = 8080;
   const auto default_address = NetworkInterface::find_default_interface().address();
   LOG(LogLevel::INFO, "Setting local ip address " << default_address);
-  micro_sdc->set_network_config(std::make_unique<NetworkConfig>(true, default_address, sdc_port, NetworkConfig::DiscoveryProxyProtocol::HTTPS, "https://10.52.219.176:3703"));
+  micro_sdc->set_network_config(std::make_unique<NetworkConfig>(
+      true, default_address, sdc_port, NetworkConfig::DiscoveryProxyProtocol::HTTPS,
+      "https://10.52.219.176:3703"));
 
   DeviceCharacteristics device_characteristics;
   device_characteristics.set_friendly_name("MicroSDC on Linux");
@@ -128,26 +171,40 @@ int main()
   device_descriptor.systemContext = system_context;
 
   // Dummy numeric state
-  auto numeric_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+  auto numeric_descriptor = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "numeric_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  numeric_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
-  // dummy string tate
-  auto string_state = std::make_shared<BICEPS::PM::StringMetricDescriptor>(
-      "string_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Set,
-      BICEPS::PM::MetricAvailability::Cont);
-  string_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  numeric_descriptor->type = BICEPS::PM::CodedValue{"196074"};
+  numeric_descriptor->type->conceptDescription =
+      BICEPS::PM::LocalizedText{"dummy dynamic numeric metric"};
   // settable numeric
-  auto settable_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+  auto settable_descriptor = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "settable_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Set,
       BICEPS::PM::MetricAvailability::Cont, 1);
-  numeric_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  // dummy string tate
+  auto string_descriptor = std::make_shared<BICEPS::PM::StringMetricDescriptor>(
+      "string_state_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Set,
+      BICEPS::PM::MetricAvailability::Cont);
+  // dummy enum string tate
+  BICEPS::PM::EnumStringMetricDescriptor::AllowedValueSequence allowed_value;
+  auto& on = allowed_value.emplace_back("ON");
+  on.type = BICEPS::PM::AllowedValue::TypeType("192834");
+  on.type->conceptDescription = BICEPS::PM::LocalizedText{"On"};
+  auto& off = allowed_value.emplace_back("OFF");
+  off.type = BICEPS::PM::AllowedValue::TypeType("192835");
+  off.type->conceptDescription = BICEPS::PM::LocalizedText{"Off"};
+  auto enum_string_descriptor = std::make_shared<BICEPS::PM::EnumStringMetricDescriptor>(
+      "enum_string_state_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Set,
+      BICEPS::PM::MetricAvailability::Cont, std::move(allowed_value));
 
   BICEPS::PM::ChannelDescriptor device_channel("device_channel");
-  device_channel.metric.emplace_back(numeric_state);
-  device_channel.metric.emplace_back(settable_state);
-  device_channel.metric.emplace_back(string_state);
+  device_channel.metric.emplace_back(numeric_descriptor);
+  device_channel.metric.emplace_back(settable_descriptor);
+  device_channel.metric.emplace_back(string_descriptor);
+  device_channel.metric.emplace_back(enum_string_descriptor);
   device_channel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  device_channel.type = BICEPS::PM::CodedValue{"130537"};
+  device_channel.type->conceptDescription = BICEPS::PM::LocalizedText{"dynamic not settable metrics"};
 
   BICEPS::PM::ScoDescriptor device_sco("sco_handle");
   auto set_value_operation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
@@ -158,6 +215,8 @@ int main()
   device_sco.operation.emplace_back(set_string_operation);
 
   BICEPS::PM::VmdDescriptor device_module("device_vmd");
+  device_module.type = BICEPS::PM::CodedValue{"130536"};
+  device_module.type->conceptDescription = BICEPS::PM::LocalizedText{"not settable metrics"};
   device_module.channel.emplace_back(device_channel);
   device_module.sco = device_sco;
 
@@ -181,9 +240,12 @@ int main()
   auto numeric_state_handler = std::make_shared<NumericStateHandler>("numeric_state_handle");
   auto settable_state_handler = std::make_shared<NumericStateHandler>("settable_state_handle");
   auto string_state_handler = std::make_shared<StringStateHandler>("string_state_handle");
+  auto enum_string_state_handler =
+      std::make_shared<EnumStringStateHandler>("enum_string_state_handle");
   micro_sdc->add_md_state(numeric_state_handler);
   micro_sdc->add_md_state(settable_state_handler);
   micro_sdc->add_md_state(string_state_handler);
+  micro_sdc->add_md_state(enum_string_state_handler);
 
   micro_sdc->start();
 
@@ -191,7 +253,7 @@ int main()
     double i = 0.0;
     while (keep_running)
     {
-      numeric_state_handler->set_value(i++);
+      // numeric_state_handler->set_value(i++);
       std::unique_lock<std::mutex> lock(running_mutex);
       cv_running.wait_for(lock, std::chrono::seconds(1));
     }

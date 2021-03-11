@@ -4,6 +4,11 @@
 namespace BICEPS::PM
 {
 
+  LocalizedText::LocalizedText(std::string content)
+    : content(std::move(content))
+  {
+  }
+
   CodedValue::CodedValue(CodeType code)
     : code(std::move(code))
   {
@@ -89,7 +94,7 @@ namespace BICEPS::PM
   }
 
   SystemContextDescriptor::SystemContextDescriptor(const HandleType& handle)
-    : AbstractContextDescriptor(DescriptorKind::SYSTEM_CONTEXT_DESCRIPTOR, handle)
+    : AbstractDeviceComponentDescriptor(DescriptorKind::SYSTEM_CONTEXT_DESCRIPTOR, handle)
   {
   }
 
@@ -391,6 +396,19 @@ namespace BICEPS::PM
   }
   StringMetricState::StringMetricState(DescriptorHandleType handle)
     : AbstractMetricState(StateKind::STRING_METRIC_STATE, std::move(handle))
+  {
+  }
+  StringMetricState::StringMetricState(StateKind kind, DescriptorHandleType handle)
+    : AbstractMetricState(kind, std::move(handle))
+  {
+  }
+
+  bool EnumStringMetricState::classof(const AbstractState* other)
+  {
+    return other->getKind() == StateKind::ENUM_STRING_METRIC_STATE;
+  }
+  EnumStringMetricState::EnumStringMetricState(DescriptorHandleType handle)
+    : StringMetricState(StateKind::ENUM_STRING_METRIC_STATE, std::move(handle))
   {
   }
 

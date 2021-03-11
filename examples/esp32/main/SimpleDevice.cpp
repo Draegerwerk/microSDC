@@ -41,7 +41,7 @@ SimpleDevice::SimpleDevice()
   : pressure_state_handler_{std::make_shared<NumericStateHandler>("pressureState_handle")}
   , temperature_state_handler_{std::make_shared<NumericStateHandler>("temperatureState_handle")}
   , humidity_state_handler_{std::make_shared<NumericStateHandler>("humidityState_handle")}
-  , settable_state_handler_{std::make_shared<NumericStateHandler>("settableState_handle")}
+//, settable_state_handler_{std::make_shared<NumericStateHandler>("settableState_handle")}
 {
   init();
 }
@@ -53,7 +53,7 @@ void SimpleDevice::set_network_config(std::unique_ptr<NetworkConfig> network_con
 
 void SimpleDevice::init()
 {
-  sdc_.set_endpoint_reference("urn:uuid:MicroSDC-provider-on-esp32");
+  sdc_.set_endpoint_reference("urn:uuid:a1337d00-d306-4c2f-a981-7f15a4ec2022");
 
   DeviceCharacteristics device_characteristics;
   device_characteristics.set_friendly_name("MicroSDC on ESP32");
@@ -75,37 +75,50 @@ void SimpleDevice::init()
   auto pressure_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "pressureState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
+  pressure_state->unit.conceptDescription = BICEPS::PM::LocalizedText{"Pa"};
   pressure_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  pressure_state->type = BICEPS::PM::CodedValue{"152836"};
+  pressure_state->type->conceptDescription = BICEPS::PM::LocalizedText{"Air pressure"};
 
   auto temperature_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "temperatureState_handle", BICEPS::PM::CodedValue("6048"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
+  temperature_state->unit.conceptDescription = BICEPS::PM::LocalizedText{"°C"};
   temperature_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  temperature_state->type = BICEPS::PM::CodedValue{"184296"};
+  temperature_state->type->conceptDescription = BICEPS::PM::LocalizedText{"Temperature"};
 
   auto humidity_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
       "humidityState_handle", BICEPS::PM::CodedValue("262688"), BICEPS::PM::MetricCategory::Msrmt,
       BICEPS::PM::MetricAvailability::Cont, 1);
+  humidity_state->unit.conceptDescription = BICEPS::PM::LocalizedText{"%"};
   humidity_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  humidity_state->type = BICEPS::PM::CodedValue{"184292"};
+  humidity_state->type->conceptDescription = BICEPS::PM::LocalizedText{"Humidity"};
 
   // Dummy settable state
-  auto settable_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "settableState_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Set,
-      BICEPS::PM::MetricAvailability::Cont, 1);
-  settable_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  //  auto settable_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+  //      "settableState_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Set,
+  //      BICEPS::PM::MetricAvailability::Cont, 1);
+  //  settable_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   BICEPS::PM::ChannelDescriptor device_channel("device_channel");
+  device_channel.type = BICEPS::PM::CodedValue{"128771"};
+  device_channel.type->conceptDescription = BICEPS::PM::LocalizedText{"dynamic not settable metrics"};
   device_channel.metric.emplace_back(pressure_state);
   device_channel.metric.emplace_back(temperature_state);
   device_channel.metric.emplace_back(humidity_state);
-  device_channel.metric.emplace_back(settable_state);
+  // device_channel.metric.emplace_back(settable_state);
 
   BICEPS::PM::ScoDescriptor device_sco("sco_handle");
-  auto set_value_operation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
-      "set_value_operation_handle", "settableState_handle");
-  device_sco.operation.emplace_back(set_value_operation);
+  //  auto set_value_operation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
+  //      "set_value_operation_handle", "settableState_handle");
+  //  device_sco.operation.emplace_back(set_value_operation);
 
   device_channel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
   BICEPS::PM::VmdDescriptor device_module("device_vmd");
+  device_module.type = BICEPS::PM::CodedValue{"128770"};
+  device_module.type->conceptDescription = BICEPS::PM::LocalizedText{"not settable metrics"};
   device_module.channel.emplace_back(device_channel);
   device_module.sco = device_sco;
 
@@ -119,10 +132,10 @@ void SimpleDevice::init()
   sdc_.set_md_description(md_description);
 
   BICEPS::PM::LocationDetail location_detail;
-  location_detail.poC = "PoC-A";
+  location_detail.poC = "SC8";
   location_detail.room = "Room-A";
-  location_detail.bed = "Bed-A";
-  location_detail.facility = "Facility-A";
+  location_detail.bed = "tam";
+  location_detail.facility = "DRAEGER";
   location_detail.building = "Building-A";
   location_detail.floor = "Floor-A";
   sdc_.set_location("location_context", location_detail);
@@ -130,7 +143,7 @@ void SimpleDevice::init()
   sdc_.add_md_state(pressure_state_handler_);
   sdc_.add_md_state(temperature_state_handler_);
   sdc_.add_md_state(humidity_state_handler_);
-  sdc_.add_md_state(settable_state_handler_);
+  // sdc_.add_md_state(settable_state_handler_);
 }
 
 void SimpleDevice::start_sdc()

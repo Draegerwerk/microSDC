@@ -47,10 +47,21 @@ public:
                  const BICEPS::MM::GetMdibResponse& get_mdib_response);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Mdib& mdib);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdDescription& md_description);
+
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::LocalizedText& localized_text);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::CodedValue& coded_value);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::AbstractDescriptor& abstract_descriptor);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::AbstractDeviceComponentDescriptor& device);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::AbstractComplexDeviceComponentDescriptor& complex_device);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdsDescriptor& mds_descriptor);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Metadata& metadata);
   void serialize(rapidxml::xml_node<>* parent,
                  const BICEPS::PM::SystemContextDescriptor& system_context);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::AbstractContextDescriptor& context);
   void serialize(rapidxml::xml_node<>* parent,
                  const BICEPS::PM::PatientContextDescriptor& patient_context);
   void serialize(rapidxml::xml_node<>* parent,
@@ -62,9 +73,21 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Range& range);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& md_state);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractMetricState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::NumericMetricState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::StringMetricState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::EnumStringMetricState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractMultiState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractContextState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::LocationContextState& state);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::LocationDetail& location_detail);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractMetricValue& metric_value);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::NumericMetricValue& metric_value);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::StringMetricValue& metric_value);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MetricQuality& quality);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractOperationState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::SetValueOperationState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::SetStringOperationState& state);
 
   void serialize(rapidxml::xml_node<>* parent,
                  const WS::EVENTING::SubscribeResponse& subscribe_response);
@@ -78,13 +101,28 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ScoDescriptor& sco);
   void serialize(rapidxml::xml_node<>* parent,
                  const BICEPS::PM::AbstractOperationDescriptor& operation);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::SetStringOperationDescriptor& operation);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::SetValueOperationDescriptor& operation);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::InstanceIdentifier& identifier);
   void serialize(rapidxml::xml_node<>* parent, const WS::EVENTING::ExpirationType& expiration);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AllowedValue& allowed_value);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Measurement& measurement);
+
+  template <typename T>
+  void append_to_string_attribute(rapidxml::xml_node<>* parent, const char* name, T value)
+  {
+    auto* str = xml_document_->allocate_string(std::to_string(value).c_str());
+    auto* attr = xml_document_->allocate_attribute(name, str);
+    parent->append_attribute(attr);
+  }
+  void append_attribute(rapidxml::xml_node<>* parent, const char* name, const std::string& value);
 
   static std::string to_string(BICEPS::PM::SafetyClassification);
   static std::string to_string(const WS::DISCOVERY::UriListType& uri_list);
   static std::string to_string(const WS::DISCOVERY::QNameListType& q_name_list);
+  static std::string to_string(BICEPS::PM::LocalizedTextWidth);
   static std::string to_string(BICEPS::PM::MetricCategory);
   static std::string to_string(BICEPS::PM::MetricAvailability);
   static std::string to_string(BICEPS::PM::MeasurementValidity);
@@ -92,6 +130,7 @@ public:
   static std::string to_string(BICEPS::MM::InvocationError invocation_error);
   static std::string to_string(BICEPS::PM::ContextAssociation context_association);
   static std::string to_string(BICEPS::PM::OperatingMode operating_mode);
+  static std::string to_string(BICEPS::PM::ComponentActivation activation);
   static std::string to_string(Duration duration);
 
 private:

@@ -36,5 +36,5 @@ private:
   std::shared_ptr<NumericStateHandler> pressure_state_handler_;
   std::shared_ptr<NumericStateHandler> temperature_state_handler_;
   std::shared_ptr<NumericStateHandler> humidity_state_handler_;
-  std::shared_ptr<NumericStateHandler> settable_state_handler_;
+  // std::shared_ptr<NumericStateHandler> settable_state_handler_;
 };
