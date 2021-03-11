@@ -157,8 +157,8 @@ void SimpleDevice::start_sdc()
 void SimpleDevice::run()
 {
   const auto device_address = 0x76U;
-  const auto sda_pin = GPIO_NUM_13;
-  const auto scl_pin = GPIO_NUM_16;
+  const auto sda_pin = GPIO_NUM_33;
+  const auto scl_pin = GPIO_NUM_32;
   BME280 bme280(I2C_NUM_0, device_address, sda_pin, scl_pin);
   while (true)
   {
