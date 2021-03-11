@@ -148,7 +148,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::ADDRESSING::RelatesToType& relates_to)
 {
-  auto* relates_to_node = xml_document_->allocate_node(rapidxml::node_element, "mdpws:RelatesTo");
+  auto* relates_to_node = xml_document_->allocate_node(rapidxml::node_element, "wsa:RelatesTo");
   relates_to_node->value(relates_to.c_str());
   parent->append_node(relates_to_node);
 }
