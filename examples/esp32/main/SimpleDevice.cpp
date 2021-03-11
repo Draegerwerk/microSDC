@@ -10,9 +10,9 @@ std::shared_ptr<BICEPS::PM::AbstractState>
 SimpleDevice::NumericStateHandler::get_initial_state() const
 {
   auto state = std::make_shared<BICEPS::PM::NumericMetricState>(get_descriptor_handle());
-  state->metricValue = std::make_optional<BICEPS::PM::NumericMetricValue>(
-      BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld});
-  state->metricValue->value = 0;
+  state->metric_value = std::make_optional<BICEPS::PM::NumericMetricValue>(
+      BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::VLD});
+  state->metric_value->value = 0;
   return state;
 }
 
@@ -33,7 +33,7 @@ SimpleDevice::NumericStateHandler::request_state_change(const BICEPS::MM::Abstra
 void SimpleDevice::NumericStateHandler::set_value(double value)
 {
   auto state = dyn_cast<BICEPS::PM::NumericMetricState>(get_initial_state());
-  state->metricValue->value = value;
+  state->metric_value->value = value;
   update_state(state);
 }
 
@@ -63,48 +63,48 @@ void SimpleDevice::init()
 
   BICEPS::PM::Metadata metadata;
   metadata.manufacturer.emplace_back("Draeger");
-  metadata.modelName.emplace_back("MicroSDC_Device01");
-  metadata.modelNumber.emplace("1");
-  metadata.serialNumber.emplace_back("2345-6789");
+  metadata.model_name.emplace_back("MicroSDC_Device01");
+  metadata.model_number.emplace("1");
+  metadata.serial_number.emplace_back("2345-6789");
 
   BICEPS::PM::SystemContextDescriptor system_context("system_context");
-  system_context.patientContext = BICEPS::PM::PatientContextDescriptor("patient_context");
-  system_context.locationContext = BICEPS::PM::LocationContextDescriptor("location_context");
+  system_context.patient_context = BICEPS::PM::PatientContextDescriptor("patient_context");
+  system_context.location_context = BICEPS::PM::LocationContextDescriptor("location_context");
 
   // States for measured values
   auto pressure_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "pressureState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
-      BICEPS::PM::MetricAvailability::Cont, 1);
-  pressure_state->unit.conceptDescription = BICEPS::PM::LocalizedText{"Pa"};
-  pressure_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+      "pressureState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::MSRMT,
+      BICEPS::PM::MetricAvailability::CONT, 1);
+  pressure_state->unit.concept_description = BICEPS::PM::LocalizedText{"Pa"};
+  pressure_state->safety_classification = BICEPS::PM::SafetyClassification::MED_A;
   pressure_state->type = BICEPS::PM::CodedValue{"152836"};
-  pressure_state->type->conceptDescription = BICEPS::PM::LocalizedText{"Air pressure"};
+  pressure_state->type->concept_description = BICEPS::PM::LocalizedText{"Air pressure"};
 
   auto temperature_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "temperatureState_handle", BICEPS::PM::CodedValue("6048"), BICEPS::PM::MetricCategory::Msrmt,
-      BICEPS::PM::MetricAvailability::Cont, 1);
-  temperature_state->unit.conceptDescription = BICEPS::PM::LocalizedText{"°C"};
-  temperature_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+      "temperatureState_handle", BICEPS::PM::CodedValue("6048"), BICEPS::PM::MetricCategory::MSRMT,
+      BICEPS::PM::MetricAvailability::CONT, 1);
+  temperature_state->unit.concept_description = BICEPS::PM::LocalizedText{"°C"};
+  temperature_state->safety_classification = BICEPS::PM::SafetyClassification::MED_A;
   temperature_state->type = BICEPS::PM::CodedValue{"184296"};
-  temperature_state->type->conceptDescription = BICEPS::PM::LocalizedText{"Temperature"};
+  temperature_state->type->concept_description = BICEPS::PM::LocalizedText{"Temperature"};
 
   auto humidity_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "humidityState_handle", BICEPS::PM::CodedValue("262688"), BICEPS::PM::MetricCategory::Msrmt,
-      BICEPS::PM::MetricAvailability::Cont, 1);
-  humidity_state->unit.conceptDescription = BICEPS::PM::LocalizedText{"%"};
-  humidity_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+      "humidityState_handle", BICEPS::PM::CodedValue("262688"), BICEPS::PM::MetricCategory::MSRMT,
+      BICEPS::PM::MetricAvailability::CONT, 1);
+  humidity_state->unit.concept_description = BICEPS::PM::LocalizedText{"%"};
+  humidity_state->safety_classification = BICEPS::PM::SafetyClassification::MED_A;
   humidity_state->type = BICEPS::PM::CodedValue{"184292"};
-  humidity_state->type->conceptDescription = BICEPS::PM::LocalizedText{"Humidity"};
+  humidity_state->type->concept_description = BICEPS::PM::LocalizedText{"Humidity"};
 
   // Dummy settable state
   //  auto settable_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
   //      "settableState_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Set,
-  //      BICEPS::PM::MetricAvailability::Cont, 1);
+  //      BICEPS::PM::MetricAvailability::CONT, 1);
   //  settable_state->safetyClassification = BICEPS::PM::SafetyClassification::MedA;
 
   BICEPS::PM::ChannelDescriptor device_channel("device_channel");
   device_channel.type = BICEPS::PM::CodedValue{"128771"};
-  device_channel.type->conceptDescription = BICEPS::PM::LocalizedText{"dynamic not settable metrics"};
+  device_channel.type->concept_description = BICEPS::PM::LocalizedText{"dynamic not settable metrics"};
   device_channel.metric.emplace_back(pressure_state);
   device_channel.metric.emplace_back(temperature_state);
   device_channel.metric.emplace_back(humidity_state);
@@ -115,16 +115,16 @@ void SimpleDevice::init()
   //      "set_value_operation_handle", "settableState_handle");
   //  device_sco.operation.emplace_back(set_value_operation);
 
-  device_channel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  device_channel.safety_classification = BICEPS::PM::SafetyClassification::MED_A;
   BICEPS::PM::VmdDescriptor device_module("device_vmd");
   device_module.type = BICEPS::PM::CodedValue{"128770"};
-  device_module.type->conceptDescription = BICEPS::PM::LocalizedText{"not settable metrics"};
+  device_module.type->concept_description = BICEPS::PM::LocalizedText{"not settable metrics"};
   device_module.channel.emplace_back(device_channel);
   device_module.sco = device_sco;
 
   BICEPS::PM::MdsDescriptor device_descriptor("MedicalDevices");
-  device_descriptor.metaData = metadata;
-  device_descriptor.systemContext = system_context;
+  device_descriptor.meta_data = metadata;
+  device_descriptor.system_context = system_context;
   device_descriptor.vmd.emplace_back(device_module);
 
   BICEPS::PM::MdDescription md_description;
@@ -132,7 +132,7 @@ void SimpleDevice::init()
   sdc_.set_md_description(md_description);
 
   BICEPS::PM::LocationDetail location_detail;
-  location_detail.poC = "SC8";
+  location_detail.poc = "SC8";
   location_detail.room = "Room-A";
   location_detail.bed = "tam";
   location_detail.facility = "DRAEGER";

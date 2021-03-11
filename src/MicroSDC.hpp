@@ -131,7 +131,7 @@ private:
   /// @tparam infered state type of the state to update
   /// @param state the new state to update in the mdib
   std::shared_ptr<const BICEPS::PM::AbstractState>
-  update_mdib(std::shared_ptr<BICEPS::PM::AbstractState> state);
+  update_mdib(const std::shared_ptr<BICEPS::PM::AbstractState>& state);
 
   /// @brief update the version attribute of the mdib. Will be called everytime the mdib changes
   void increment_mdib_version();

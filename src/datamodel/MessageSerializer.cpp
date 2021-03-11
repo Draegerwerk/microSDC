@@ -496,15 +496,15 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Mdib& mdib)
 {
   auto* mdib_node = xml_document_->allocate_node(rapidxml::node_element, "mm:Mdib");
-  append_attribute(mdib_node, "SequenceId", mdib.sequenceId);
-  append_to_string_attribute(mdib_node, "MdibVersion", mdib.mdibVersion.value_or(0));
-  if (mdib.mdDescription.has_value())
+  append_attribute(mdib_node, "SequenceId", mdib.sequence_id);
+  append_to_string_attribute(mdib_node, "MdibVersion", mdib.mdib_version.value_or(0));
+  if (mdib.md_description.has_value())
   {
-    serialize(mdib_node, mdib.mdDescription.value());
+    serialize(mdib_node, mdib.md_description.value());
   }
-  if (mdib.mdState.has_value())
+  if (mdib.md_state.has_value())
   {
-    serialize(mdib_node, mdib.mdState.value());
+    serialize(mdib_node, mdib.md_state.value());
   }
   parent->append_node(mdib_node);
 }
@@ -514,10 +514,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* md_description_node =
       xml_document_->allocate_node(rapidxml::node_element, "pm:MdDescription");
-  if (md_description.descriptionVersion.has_value())
+  if (md_description.description_version.has_value())
   {
     append_to_string_attribute(md_description_node, "DescriptionVersion",
-                               md_description.descriptionVersion.value());
+                               md_description.description_version.value());
   }
   for (const auto& md : md_description.mds)
   {
@@ -541,9 +541,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   {
     append_to_string_attribute(parent, "Version", localized_text.version.value());
   }
-  if (localized_text.textWidth.has_value())
+  if (localized_text.text_width.has_value())
   {
-    append_attribute(parent, "TextWidth", to_string(localized_text.textWidth.value()));
+    append_attribute(parent, "TextWidth", to_string(localized_text.text_width.value()));
   }
   auto* content_str = xml_document_->allocate_string(localized_text.content.c_str());
   parent->value(content_str);
@@ -553,11 +553,11 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::CodedValue& coded_value)
 {
   append_attribute(parent, "Code", coded_value.code);
-  if (coded_value.conceptDescription.has_value())
+  if (coded_value.concept_description.has_value())
   {
     auto* concept_description_node =
         xml_document_->allocate_node(rapidxml::node_element, "pm:ConceptDescription");
-    serialize(concept_description_node, coded_value.conceptDescription.value());
+    serialize(concept_description_node, coded_value.concept_description.value());
     parent->append_node(concept_description_node);
   }
 }
@@ -567,15 +567,15 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   append_attribute(parent, "Handle", abstract_descriptor.handle);
 
-  if (abstract_descriptor.descriptorVersion.has_value())
+  if (abstract_descriptor.descriptor_version.has_value())
   {
     append_to_string_attribute(parent, "DescriptorVersion",
-                               abstract_descriptor.descriptorVersion.value());
+                               abstract_descriptor.descriptor_version.value());
   }
-  if (abstract_descriptor.safetyClassification.has_value())
+  if (abstract_descriptor.safety_classification.has_value())
   {
     append_attribute(parent, "SafetyClassification",
-                     to_string(abstract_descriptor.safetyClassification.value()));
+                     to_string(abstract_descriptor.safety_classification.value()));
   }
   if (abstract_descriptor.type.has_value())
   {
@@ -612,13 +612,13 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
       mds_descriptor_node,
       static_cast<const BICEPS::PM::AbstractComplexDeviceComponentDescriptor&>(mds_descriptor));
 
-  if (mds_descriptor.metaData.has_value())
+  if (mds_descriptor.meta_data.has_value())
   {
-    serialize(mds_descriptor_node, mds_descriptor.metaData.value());
+    serialize(mds_descriptor_node, mds_descriptor.meta_data.value());
   }
-  if (mds_descriptor.systemContext.has_value())
+  if (mds_descriptor.system_context.has_value())
   {
-    serialize(mds_descriptor_node, mds_descriptor.systemContext.value());
+    serialize(mds_descriptor_node, mds_descriptor.system_context.value());
   }
   for (const auto& vmd : mds_descriptor.vmd)
   {
@@ -632,20 +632,20 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* meta_data_node = xml_document_->allocate_node(rapidxml::node_element, "pm:MetaData");
 
-  for (const auto& model_name : metadata.modelName)
+  for (const auto& model_name : metadata.model_name)
   {
     auto* model_name_node = xml_document_->allocate_node(rapidxml::node_element, "pm:ModelName");
     serialize(model_name_node, model_name);
     meta_data_node->append_node(model_name_node);
   }
-  if (metadata.modelNumber.has_value())
+  if (metadata.model_number.has_value())
   {
     auto* model_number_node =
         xml_document_->allocate_node(rapidxml::node_element, "pm:ModelNumber");
-    model_number_node->value(metadata.modelNumber.value().c_str());
+    model_number_node->value(metadata.model_number.value().c_str());
     meta_data_node->append_node(model_number_node);
   }
-  for (const auto& serial_number : metadata.serialNumber)
+  for (const auto& serial_number : metadata.serial_number)
   {
     auto* serial_number_node =
         xml_document_->allocate_node(rapidxml::node_element, "pm:SerialNumber");
@@ -669,13 +669,13 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
       xml_document_->allocate_node(rapidxml::node_element, "pm:SystemContext");
   serialize(system_context_node,
             static_cast<const BICEPS::PM::AbstractDeviceComponentDescriptor&>(system_context));
-  if (system_context.patientContext.has_value())
+  if (system_context.patient_context.has_value())
   {
-    serialize(system_context_node, system_context.patientContext.value());
+    serialize(system_context_node, system_context.patient_context.value());
   }
-  if (system_context.locationContext.has_value())
+  if (system_context.location_context.has_value())
   {
-    serialize(system_context_node, system_context.locationContext.value());
+    serialize(system_context_node, system_context.location_context.value());
   }
   parent->append_node(system_context_node);
 }
@@ -745,9 +745,9 @@ void MessageSerializer::serialize(
   metric_node->append_node(unit_node);
 
   append_attribute(metric_node, "MetricCategory",
-                   to_string(abstract_metric_descriptor.metricCategory));
+                   to_string(abstract_metric_descriptor.metric_category));
   append_attribute(metric_node, "MetricAvailability",
-                   to_string(abstract_metric_descriptor.metricAvailability));
+                   to_string(abstract_metric_descriptor.metric_availability));
 
   if (const auto* const numeric_descriptor =
           dyn_cast<BICEPS::PM::NumericMetricDescriptor>(&abstract_metric_descriptor);
@@ -756,7 +756,7 @@ void MessageSerializer::serialize(
     auto* type_attr = xml_document_->allocate_attribute("xsi:type", "pm:NumericMetricDescriptor");
     metric_node->append_attribute(type_attr);
 
-    for (const auto& range : numeric_descriptor->technicalRange)
+    for (const auto& range : numeric_descriptor->technical_range)
     {
       auto* technical_range_node =
           xml_document_->allocate_node(rapidxml::node_element, "TechnicalRange");
@@ -766,9 +766,10 @@ void MessageSerializer::serialize(
 
     append_to_string_attribute(metric_node, "Resolution", numeric_descriptor->resolution);
 
-    if (numeric_descriptor->averagingPeriod.has_value())
+    if (numeric_descriptor->averaging_period.has_value())
     {
-      append_attribute(metric_node, "AveragingPeriod", numeric_descriptor->averagingPeriod.value());
+      append_attribute(metric_node, "AveragingPeriod",
+                       numeric_descriptor->averaging_period.value());
     }
   }
   else if (const auto* const string_descriptor =
@@ -782,7 +783,7 @@ void MessageSerializer::serialize(
            enum_string_descriptor != nullptr)
   {
     append_attribute(metric_node, "xsi:type", "pm:EnumStringMetricDescriptor");
-    for (const auto& value : enum_string_descriptor->allowedValue)
+    for (const auto& value : enum_string_descriptor->allowed_value)
     {
       serialize(metric_node, value);
     }
@@ -801,26 +802,26 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM
   {
     append_to_string_attribute(parent, "Upper", range.upper.value());
   }
-  if (range.stepWidth.has_value())
+  if (range.step_width.has_value())
   {
-    append_to_string_attribute(parent, "StepWidth", range.stepWidth.value());
+    append_to_string_attribute(parent, "StepWidth", range.step_width.value());
   }
-  if (range.relativeAccuracy.has_value())
+  if (range.relative_accuracy.has_value())
   {
-    append_to_string_attribute(parent, "RelativeAccuracy", range.relativeAccuracy.value());
+    append_to_string_attribute(parent, "RelativeAccuracy", range.relative_accuracy.value());
   }
-  if (range.absoluteAccuracy.has_value())
+  if (range.absolute_accuracy.has_value())
   {
-    append_to_string_attribute(parent, "AbsoluteAccuracy", range.absoluteAccuracy.value());
+    append_to_string_attribute(parent, "AbsoluteAccuracy", range.absolute_accuracy.value());
   }
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& md_state)
 {
   auto* md_state_node = xml_document_->allocate_node(rapidxml::node_element, "pm:MdState");
-  if (md_state.stateVersion.has_value())
+  if (md_state.state_version.has_value())
   {
-    append_to_string_attribute(md_state_node, "StateVersion", md_state.stateVersion.value());
+    append_to_string_attribute(md_state_node, "StateVersion", md_state.state_version.value());
   }
   for (const auto& state : md_state.state)
   {
@@ -863,11 +864,11 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::AbstractState& state)
 {
-  append_attribute(parent, "DescriptorHandle", state.descriptorHandle);
+  append_attribute(parent, "DescriptorHandle", state.descriptor_handle);
 
-  if (state.stateVersion.has_value())
+  if (state.state_version.has_value())
   {
-    append_to_string_attribute(parent, "StateVersion", state.stateVersion.value());
+    append_to_string_attribute(parent, "StateVersion", state.state_version.value());
   }
 }
 
@@ -875,9 +876,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::AbstractMetricState& metric_state)
 {
   serialize(parent, static_cast<const BICEPS::PM::AbstractState&>(metric_state));
-  if (metric_state.activationState.has_value())
+  if (metric_state.activation_state.has_value())
   {
-    append_attribute(parent, "ActivationState", to_string(metric_state.activationState.value()));
+    append_attribute(parent, "ActivationState", to_string(metric_state.activation_state.value()));
   }
 }
 
@@ -885,17 +886,17 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::NumericMetricState& state)
 {
   serialize(parent, static_cast<const BICEPS::PM::AbstractMetricState&>(state));
-  if (state.activeAveragingPeriod.has_value())
+  if (state.active_averaging_period.has_value())
   {
-    append_attribute(parent, "ActiveAveragingPeriod", state.activeAveragingPeriod.value());
+    append_attribute(parent, "ActiveAveragingPeriod", state.active_averaging_period.value());
   }
-  if (state.metricValue.has_value())
+  if (state.metric_value.has_value())
   {
     auto* value_node = xml_document_->allocate_node(rapidxml::node_element, "pm:MetricValue");
-    serialize(value_node, state.metricValue.value());
+    serialize(value_node, state.metric_value.value());
     parent->append_node(value_node);
   }
-  for (const auto& range : state.physiologicalRange)
+  for (const auto& range : state.physiological_range)
   {
     auto* range_node = xml_document_->allocate_node(rapidxml::node_element, "PhysiologicalRange");
     serialize(range_node, range);
@@ -908,10 +909,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::StringMetricState& state)
 {
   serialize(parent, static_cast<const BICEPS::PM::AbstractMetricState&>(state));
-  if (state.metricValue.has_value())
+  if (state.metric_value.has_value())
   {
     auto* value_node = xml_document_->allocate_node(rapidxml::node_element, "pm:MetricValue");
-    serialize(value_node, state.metricValue.value());
+    serialize(value_node, state.metric_value.value());
     parent->append_node(value_node);
   }
   append_attribute(parent, "xsi:type", "pm:StringMetricState");
@@ -921,10 +922,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::EnumStringMetricState& state)
 {
   serialize(parent, static_cast<const BICEPS::PM::AbstractMetricState&>(state));
-  if (state.metricValue.has_value())
+  if (state.metric_value.has_value())
   {
     auto* value_node = xml_document_->allocate_node(rapidxml::node_element, "pm:MetricValue");
-    serialize(value_node, state.metricValue.value());
+    serialize(value_node, state.metric_value.value());
     parent->append_node(value_node);
   }
   append_attribute(parent, "xsi:type", "pm:EnumStringMetricState");
@@ -946,13 +947,13 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::AbstractContextState& state)
 {
   serialize(parent, static_cast<const BICEPS::PM::AbstractMultiState&>(state));
-  if (state.bindingMdibVersion.has_value())
+  if (state.binding_mdib_version.has_value())
   {
-    append_to_string_attribute(parent, "BindingMdibVersion", state.bindingMdibVersion.value());
+    append_to_string_attribute(parent, "BindingMdibVersion", state.binding_mdib_version.value());
   }
-  if (state.contextAssociation.has_value())
+  if (state.context_association.has_value())
   {
-    append_attribute(parent, "ContextAssociation", to_string(state.contextAssociation.value()));
+    append_attribute(parent, "ContextAssociation", to_string(state.context_association.value()));
   }
   for (const auto& validator : state.validator)
   {
@@ -972,9 +973,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::LocationContextState& state)
 {
   serialize(parent, static_cast<const BICEPS::PM::AbstractContextState&>(state));
-  if (state.locationDetail.has_value())
+  if (state.location_detail.has_value())
   {
-    serialize(parent, state.locationDetail.value());
+    serialize(parent, state.location_detail.value());
   }
   append_attribute(parent, "xsi:type", "pm:LocationContextState");
 }
@@ -983,7 +984,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::AbstractOperationState& state)
 {
   serialize(parent, static_cast<const BICEPS::PM::AbstractState&>(state));
-  append_attribute(parent, "OperatingMode", to_string(state.operatingMode));
+  append_attribute(parent, "OperatingMode", to_string(state.operating_mode));
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
@@ -999,7 +1000,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   serialize(parent, static_cast<const BICEPS::PM::AbstractOperationState&>(state));
   append_attribute(parent, "xsi:type", "pm:SetStringOperationState");
 
-  for (const auto& allowed : state.allowedValues)
+  for (const auto& allowed : state.allowed_values)
   {
     auto* allowed_value_str = xml_document_->allocate_string(allowed.c_str());
     auto* allowed_value_node = xml_document_->allocate_node(rapidxml::node_element, "pm:Value");
@@ -1026,9 +1027,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* location_detail_node =
       xml_document_->allocate_node(rapidxml::node_element, "pm:LocationDetail");
-  if (location_detail.poC.has_value())
+  if (location_detail.poc.has_value())
   {
-    append_attribute(location_detail_node, "PoC", location_detail.poC.value());
+    append_attribute(location_detail_node, "PoC", location_detail.poc.value());
   }
   if (location_detail.room.has_value())
   {
@@ -1056,7 +1057,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::AbstractMetricValue& value)
 {
-  serialize(parent, value.metricQuality);
+  serialize(parent, value.metric_quality);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
@@ -1271,7 +1272,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::AbstractOperationDescriptor& operation)
 {
   serialize(parent, static_cast<const BICEPS::PM::AbstractDescriptor&>(operation));
-  append_attribute(parent, "OperationTarget", operation.operationTarget);
+  append_attribute(parent, "OperationTarget", operation.operation_target);
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
@@ -1279,9 +1280,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   serialize(parent, static_cast<const BICEPS::PM::AbstractOperationDescriptor&>(operation));
   append_attribute(parent, "xsi:type", "pm:SetStringOperationDescriptor");
-  if (operation.maxLength.has_value())
+  if (operation.max_length.has_value())
   {
-    append_to_string_attribute(parent, "MaxLength", operation.maxLength.value());
+    append_to_string_attribute(parent, "MaxLength", operation.max_length.value());
   }
 }
 
@@ -1327,9 +1328,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::PM::Measurement& measurement)
 {
-  append_to_string_attribute(parent, "MeasuredValue", measurement.measuredValue);
+  append_to_string_attribute(parent, "MeasuredValue", measurement.measured_value);
   auto* unit_node = xml_document_->allocate_node(rapidxml::node_element, "pm:MeasurementUnit");
-  serialize(unit_node, measurement.measurementUnit);
+  serialize(unit_node, measurement.measurement_unit);
   parent->append_node(unit_node);
 }
 
@@ -1355,13 +1356,13 @@ MessageSerializer::to_string(BICEPS::PM::SafetyClassification safety_classificat
 {
   switch (safety_classification)
   {
-    case BICEPS::PM::SafetyClassification::Inf:
+    case BICEPS::PM::SafetyClassification::INF:
       return "Inf";
-    case BICEPS::PM::SafetyClassification::MedA:
+    case BICEPS::PM::SafetyClassification::MED_A:
       return "MedA";
-    case BICEPS::PM::SafetyClassification::MedB:
+    case BICEPS::PM::SafetyClassification::MED_B:
       return "MedB";
-    case BICEPS::PM::SafetyClassification::MedC:
+    case BICEPS::PM::SafetyClassification::MED_C:
       return "MedC";
   }
   assert(false && "Uncatched value in SafetyClassification");
@@ -1400,17 +1401,17 @@ std::string MessageSerializer::to_string(BICEPS::PM::LocalizedTextWidth width)
 {
   switch (width)
   {
-    case BICEPS::PM::LocalizedTextWidth::xs:
+    case BICEPS::PM::LocalizedTextWidth::XS:
       return "xs";
-    case BICEPS::PM::LocalizedTextWidth::s:
+    case BICEPS::PM::LocalizedTextWidth::S:
       return "s";
-    case BICEPS::PM::LocalizedTextWidth::m:
+    case BICEPS::PM::LocalizedTextWidth::M:
       return "m";
-    case BICEPS::PM::LocalizedTextWidth::l:
+    case BICEPS::PM::LocalizedTextWidth::L:
       return "l";
-    case BICEPS::PM::LocalizedTextWidth::xl:
+    case BICEPS::PM::LocalizedTextWidth::XL:
       return "xl";
-    case BICEPS::PM::LocalizedTextWidth::xxl:
+    case BICEPS::PM::LocalizedTextWidth::XXL:
       return "xxl";
   }
   assert(false && "Uncatched value in LocalizedTextWidth");
@@ -1421,17 +1422,17 @@ std::string MessageSerializer::to_string(BICEPS::PM::MetricCategory category)
 {
   switch (category)
   {
-    case BICEPS::PM::MetricCategory::Unspec:
+    case BICEPS::PM::MetricCategory::UNSPEC:
       return "Unspec";
-    case BICEPS::PM::MetricCategory::Msrmt:
+    case BICEPS::PM::MetricCategory::MSRMT:
       return "Msrmt";
-    case BICEPS::PM::MetricCategory::Clc:
+    case BICEPS::PM::MetricCategory::CLC:
       return "Clc";
-    case BICEPS::PM::MetricCategory::Set:
+    case BICEPS::PM::MetricCategory::SET:
       return "Set";
-    case BICEPS::PM::MetricCategory::Preset:
+    case BICEPS::PM::MetricCategory::PRESET:
       return "Preset";
-    case BICEPS::PM::MetricCategory::Rcmm:
+    case BICEPS::PM::MetricCategory::RCMM:
       return "Rcmm";
   }
   assert(false && "Uncatched value in MetricCategory");
@@ -1442,9 +1443,9 @@ std::string MessageSerializer::to_string(BICEPS::PM::MetricAvailability availabi
 {
   switch (availability)
   {
-    case BICEPS::PM::MetricAvailability::Intr:
+    case BICEPS::PM::MetricAvailability::INTR:
       return "Intr";
-    case BICEPS::PM::MetricAvailability::Cont:
+    case BICEPS::PM::MetricAvailability::CONT:
       return "Cont";
   }
   assert(false && "Uncatched value in MetricAvailability");
@@ -1455,23 +1456,23 @@ std::string MessageSerializer::to_string(BICEPS::PM::MeasurementValidity validit
 {
   switch (validity)
   {
-    case BICEPS::PM::MeasurementValidity::Calib:
+    case BICEPS::PM::MeasurementValidity::CALIB:
       return "Calib";
-    case BICEPS::PM::MeasurementValidity::Inv:
+    case BICEPS::PM::MeasurementValidity::INV:
       return "Inv";
     case BICEPS::PM::MeasurementValidity::NA:
       return "NA";
-    case BICEPS::PM::MeasurementValidity::Oflw:
+    case BICEPS::PM::MeasurementValidity::OFLW:
       return "Oflw";
-    case BICEPS::PM::MeasurementValidity::Ong:
+    case BICEPS::PM::MeasurementValidity::ONG:
       return "Ong";
-    case BICEPS::PM::MeasurementValidity::Qst:
+    case BICEPS::PM::MeasurementValidity::QST:
       return "Qst";
-    case BICEPS::PM::MeasurementValidity::Uflw:
+    case BICEPS::PM::MeasurementValidity::UFLW:
       return "Uflw";
-    case BICEPS::PM::MeasurementValidity::Vld:
+    case BICEPS::PM::MeasurementValidity::VLD:
       return "Vld";
-    case BICEPS::PM::MeasurementValidity::Vldated:
+    case BICEPS::PM::MeasurementValidity::VLDATED:
       return "Vldated";
   }
   assert(false && "Uncatched value in MeasurementValidity");
@@ -1522,13 +1523,13 @@ std::string MessageSerializer::to_string(BICEPS::PM::ContextAssociation context_
 {
   switch (context_association)
   {
-    case BICEPS::PM::ContextAssociation::No:
+    case BICEPS::PM::ContextAssociation::NO:
       return "No";
-    case BICEPS::PM::ContextAssociation::Pre:
+    case BICEPS::PM::ContextAssociation::PRE:
       return "Pre";
-    case BICEPS::PM::ContextAssociation::Assoc:
+    case BICEPS::PM::ContextAssociation::ASSOC:
       return "Assoc";
-    case BICEPS::PM::ContextAssociation::Dis:
+    case BICEPS::PM::ContextAssociation::DIS:
       return "Dis";
   }
   assert(false && "Uncatched value in ContextAssociation");
@@ -1539,9 +1540,9 @@ std::string MessageSerializer::to_string(BICEPS::PM::OperatingMode operating_mod
 {
   switch (operating_mode)
   {
-    case BICEPS::PM::OperatingMode::Dis:
+    case BICEPS::PM::OperatingMode::DIS:
       return "Dis";
-    case BICEPS::PM::OperatingMode::En:
+    case BICEPS::PM::OperatingMode::EN:
       return "En";
     case BICEPS::PM::OperatingMode::NA:
       return "NA";
@@ -1554,17 +1555,17 @@ std::string MessageSerializer::to_string(BICEPS::PM::ComponentActivation activat
 {
   switch (activation)
   {
-    case BICEPS::PM::ComponentActivation::On:
+    case BICEPS::PM::ComponentActivation::ON:
       return "On";
-    case BICEPS::PM::ComponentActivation::NotRdy:
+    case BICEPS::PM::ComponentActivation::NOT_RDY:
       return "NotRdy";
-    case BICEPS::PM::ComponentActivation::StndBy:
+    case BICEPS::PM::ComponentActivation::STND_BY:
       return "StndBy";
-    case BICEPS::PM::ComponentActivation::Off:
+    case BICEPS::PM::ComponentActivation::OFF:
       return "Off";
-    case BICEPS::PM::ComponentActivation::Shtdn:
+    case BICEPS::PM::ComponentActivation::SHTDN:
       return "Shtdn";
-    case BICEPS::PM::ComponentActivation::Fail:
+    case BICEPS::PM::ComponentActivation::FAIL:
       return "Fail";
   }
   assert(false && "Uncatched value in ComponentActivation");

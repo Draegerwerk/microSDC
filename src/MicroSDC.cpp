@@ -23,7 +23,7 @@
 MicroSDC::MicroSDC()
   : mdib_(std::make_unique<BICEPS::PM::Mdib>(WS::ADDRESSING::URIType("0")))
 {
-  mdib_->mdState = BICEPS::PM::MdState();
+  mdib_->md_state = BICEPS::PM::MdState();
 }
 
 void MicroSDC::start()
@@ -70,9 +70,9 @@ void MicroSDC::startup()
 
   discovery_service_ = std::make_unique<DiscoveryService>(
       WS::ADDRESSING::EndpointReferenceType::AddressType(endpoint_reference_), types, x_addresses);
-  if (location_context_state_ != nullptr && location_context_state_->locationDetail.has_value())
+  if (location_context_state_ != nullptr && location_context_state_->location_detail.has_value())
   {
-    discovery_service_->set_location(location_context_state_->locationDetail.value());
+    discovery_service_->set_location(location_context_state_->location_detail.value());
   }
   if (network_config_->discovery_proxy().has_value())
   {
@@ -135,9 +135,9 @@ void MicroSDC::initialize_md_states()
   std::lock_guard<std::mutex> lock(mdib_mutex_);
   for (const auto& handler : state_handlers_)
   {
-    mdib_->mdState->state.emplace_back(handler->get_initial_state());
+    mdib_->md_state->state.emplace_back(handler->get_initial_state());
   }
-  for (const auto& md : mdib_->mdDescription->mds)
+  for (const auto& md : mdib_->md_description->mds)
   {
     for (const auto& vmd : md.vmd)
     {
@@ -150,14 +150,14 @@ void MicroSDC::initialize_md_states()
         if (const auto descriptor = dyn_cast<BICEPS::PM::SetValueOperationDescriptor>(operation);
             descriptor != nullptr)
         {
-          mdib_->mdState->state.emplace_back(std::make_shared<BICEPS::PM::SetValueOperationState>(
+          mdib_->md_state->state.emplace_back(std::make_shared<BICEPS::PM::SetValueOperationState>(
               descriptor->handle, BICEPS::PM::OperatingMode::NA));
         }
         else if (const auto descriptor =
                      dyn_cast<BICEPS::PM::SetStringOperationDescriptor>(operation);
                  descriptor != nullptr)
         {
-          mdib_->mdState->state.emplace_back(std::make_shared<BICEPS::PM::SetStringOperationState>(
+          mdib_->md_state->state.emplace_back(std::make_shared<BICEPS::PM::SetStringOperationState>(
               descriptor->handle, BICEPS::PM::OperatingMode::NA));
         }
       }
@@ -174,14 +174,14 @@ void MicroSDC::set_location(const std::string& descriptor_handle,
   {
     location_context_state_ =
         std::make_shared<BICEPS::PM::LocationContextState>(descriptor_handle, descriptor_handle);
-    mdib_->mdState->state.emplace_back(location_context_state_);
+    mdib_->md_state->state.emplace_back(location_context_state_);
   }
-  location_context_state_->locationDetail = location_detail;
+  location_context_state_->location_detail = location_detail;
 
   BICEPS::PM::InstanceIdentifier identification;
   identification.root = WS::ADDRESSING::URIType("sdc.ctxt.loc.detail");
   identification.extension = location_detail.facility.value() + "///" +
-                             location_detail.poC.value() + "//" + location_detail.bed.value();
+                             location_detail.poc.value() + "//" + location_detail.bed.value();
   location_context_state_->identification.emplace_back(identification);
 
   BICEPS::PM::InstanceIdentifier validator;
@@ -189,12 +189,12 @@ void MicroSDC::set_location(const std::string& descriptor_handle,
   identification.extension = "System";
   location_context_state_->validator.emplace_back(validator);
 
-  location_context_state_->contextAssociation = BICEPS::PM::ContextAssociation::Assoc;
-  location_context_state_->bindingMdibVersion = mdib_version;
+  location_context_state_->context_association = BICEPS::PM::ContextAssociation::ASSOC;
+  location_context_state_->binding_mdib_version = mdib_version;
 
-  if (discovery_service_ != nullptr && location_context_state_->locationDetail.has_value())
+  if (discovery_service_ != nullptr && location_context_state_->location_detail.has_value())
   {
-    discovery_service_->set_location(location_context_state_->locationDetail.value());
+    discovery_service_->set_location(location_context_state_->location_detail.value());
   }
 }
 
@@ -232,7 +232,7 @@ void MicroSDC::set_md_description(const BICEPS::PM::MdDescription& md_descriptio
     throw std::runtime_error("MicroSDC has to be stopped to set MdDescription!");
   }
   std::lock_guard<std::mutex> lock(mdib_mutex_);
-  mdib_->mdDescription = md_description;
+  mdib_->md_description = md_description;
 }
 
 void MicroSDC::set_device_characteristics(DeviceCharacteristics dev_char)
@@ -302,21 +302,21 @@ void MicroSDC::update_state(const std::shared_ptr<BICEPS::PM::AbstractState>& st
 }
 
 std::shared_ptr<const BICEPS::PM::AbstractState>
-MicroSDC::update_mdib(std::shared_ptr<BICEPS::PM::AbstractState> new_state)
+MicroSDC::update_mdib(const std::shared_ptr<BICEPS::PM::AbstractState>& new_state)
 {
   increment_mdib_version();
   std::lock_guard<std::mutex> lock(mdib_mutex_);
-  const auto state = std::find_if(mdib_->mdState->state.begin(), mdib_->mdState->state.end(),
+  const auto state = std::find_if(mdib_->md_state->state.begin(), mdib_->md_state->state.end(),
                                   [new_state](const auto& state) {
-                                    return new_state->descriptorHandle == state->descriptorHandle;
+                                    return new_state->descriptor_handle == state->descriptor_handle;
                                   });
-  if (state == mdib_->mdState->state.end())
+  if (state == mdib_->md_state->state.end())
   {
-    throw std::runtime_error("Cannot find descriptor handle '" + new_state->descriptorHandle +
+    throw std::runtime_error("Cannot find descriptor handle '" + new_state->descriptor_handle +
                              "'in mdib");
     return nullptr;
   }
-  new_state->stateVersion = (*state)->stateVersion.value_or(0) + 1;
+  new_state->state_version = (*state)->state_version.value_or(0) + 1;
   *state = new_state;
   return *state;
 }
@@ -324,13 +324,13 @@ MicroSDC::update_mdib(std::shared_ptr<BICEPS::PM::AbstractState> new_state)
 void MicroSDC::increment_mdib_version()
 {
   std::lock_guard<std::mutex> lock(mdib_mutex_);
-  mdib_->mdibVersion = mdib_->mdibVersion.value_or(0) + 1;
+  mdib_->mdib_version = mdib_->mdib_version.value_or(0) + 1;
 }
 
 unsigned int MicroSDC::get_mdib_version() const
 {
   std::lock_guard<std::mutex> lock(mdib_mutex_);
-  return mdib_->mdibVersion.value_or(0);
+  return mdib_->mdib_version.value_or(0);
 }
 
 void MicroSDC::notify_episodic_metric_report(
@@ -349,11 +349,11 @@ std::optional<BICEPS::PM::AbstractOperationDescriptor::OperationTargetType>
 MicroSDC::find_operation_target_for_operation_handle(
     const BICEPS::PM::AbstractDescriptor::HandleType& handle) const
 {
-  if (!mdib_->mdDescription.has_value())
+  if (!mdib_->md_description.has_value())
   {
     return {};
   }
-  for (const auto& md : mdib_->mdDescription->mds)
+  for (const auto& md : mdib_->md_description->mds)
   {
     for (const auto& vmd : md.vmd)
     {
@@ -365,7 +365,7 @@ MicroSDC::find_operation_target_for_operation_handle(
       {
         if (operation->handle == handle)
         {
-          return operation->operationTarget;
+          return operation->operation_target;
         }
       }
     }

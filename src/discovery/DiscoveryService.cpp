@@ -86,7 +86,7 @@ void DiscoveryService::set_location(const BICEPS::PM::LocationDetail& location_d
   std::string ctxt = "sdc.ctxt.loc:/sdc.ctxt.loc.detail/?";
   ctxt += "fac=" + location_detail.facility.value_or("");
   ctxt += "&bldng=" + location_detail.building.value_or("");
-  ctxt += "&poc=" + location_detail.poC.value_or("");
+  ctxt += "&poc=" + location_detail.poc.value_or("");
   ctxt += "&flr=" + location_detail.floor.value_or("");
   ctxt += "&rm=" + location_detail.room.value_or("");
   ctxt += "&bed=" + location_detail.bed.value_or("");

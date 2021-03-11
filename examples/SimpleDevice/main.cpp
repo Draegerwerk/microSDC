@@ -19,9 +19,9 @@ public:
   std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override
   {
     auto state = std::make_shared<BICEPS::PM::NumericMetricState>(get_descriptor_handle());
-    state->metricValue = std::make_optional<BICEPS::PM::NumericMetricValue>(
-        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld});
-    state->metricValue->value = 42;
+    state->metric_value = std::make_optional<BICEPS::PM::NumericMetricValue>(
+        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::VLD});
+    state->metric_value->value = 42;
     return state;
   }
 
@@ -42,7 +42,7 @@ public:
   void set_value(double value)
   {
     auto state = dyn_cast<BICEPS::PM::NumericMetricState>(get_initial_state());
-    state->metricValue->value = value;
+    state->metric_value->value = value;
     update_state(state);
   }
 };
@@ -60,9 +60,9 @@ public:
   std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override
   {
     auto state = std::make_shared<BICEPS::PM::StringMetricState>(get_descriptor_handle());
-    state->metricValue = std::make_optional<BICEPS::PM::StringMetricValue>(
-        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld});
-    state->metricValue->value = "Hello Esp32!";
+    state->metric_value = std::make_optional<BICEPS::PM::StringMetricValue>(
+        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::VLD});
+    state->metric_value->value = "Hello Esp32!";
     return state;
   }
 
@@ -83,7 +83,7 @@ public:
   void set_value(std::string value)
   {
     auto state = dyn_cast<BICEPS::PM::StringMetricState>(get_initial_state());
-    state->metricValue->value = value;
+    state->metric_value->value = value;
     update_state(state);
   }
 };
@@ -101,9 +101,9 @@ public:
   std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override
   {
     auto state = std::make_shared<BICEPS::PM::EnumStringMetricState>(get_descriptor_handle());
-    state->metricValue = std::make_optional<BICEPS::PM::StringMetricValue>(
-        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::Vld});
-    state->metricValue->value = "OFF";
+    state->metric_value = std::make_optional<BICEPS::PM::StringMetricValue>(
+        BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::VLD});
+    state->metric_value->value = "OFF";
     return state;
   }
 
@@ -124,7 +124,7 @@ public:
   void set_value(std::string value)
   {
     auto state = dyn_cast<BICEPS::PM::EnumStringMetricState>(get_initial_state());
-    state->metricValue->value = value;
+    state->metric_value->value = value;
     update_state(state);
   }
 };
@@ -164,47 +164,47 @@ int main()
 
   // Construct MdDescription
   BICEPS::PM::SystemContextDescriptor system_context("system_context");
-  system_context.patientContext = BICEPS::PM::PatientContextDescriptor("patient_context");
-  system_context.locationContext = BICEPS::PM::LocationContextDescriptor("location_context");
+  system_context.patient_context = BICEPS::PM::PatientContextDescriptor("patient_context");
+  system_context.location_context = BICEPS::PM::LocationContextDescriptor("location_context");
 
   BICEPS::PM::MdsDescriptor device_descriptor("MedicalDevices");
-  device_descriptor.systemContext = system_context;
+  device_descriptor.system_context = system_context;
 
   // Dummy numeric state
   auto numeric_descriptor = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "numeric_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Msrmt,
-      BICEPS::PM::MetricAvailability::Cont, 1);
+      "numeric_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::MSRMT,
+      BICEPS::PM::MetricAvailability::CONT, 1);
   numeric_descriptor->type = BICEPS::PM::CodedValue{"196074"};
-  numeric_descriptor->type->conceptDescription =
+  numeric_descriptor->type->concept_description =
       BICEPS::PM::LocalizedText{"dummy dynamic numeric metric"};
   // settable numeric
   auto settable_descriptor = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "settable_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::Set,
-      BICEPS::PM::MetricAvailability::Cont, 1);
+      "settable_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::SET,
+      BICEPS::PM::MetricAvailability::CONT, 1);
   // dummy string tate
   auto string_descriptor = std::make_shared<BICEPS::PM::StringMetricDescriptor>(
-      "string_state_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Set,
-      BICEPS::PM::MetricAvailability::Cont);
+      "string_state_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::SET,
+      BICEPS::PM::MetricAvailability::CONT);
   // dummy enum string tate
   BICEPS::PM::EnumStringMetricDescriptor::AllowedValueSequence allowed_value;
   auto& on = allowed_value.emplace_back("ON");
   on.type = BICEPS::PM::AllowedValue::TypeType("192834");
-  on.type->conceptDescription = BICEPS::PM::LocalizedText{"On"};
+  on.type->concept_description = BICEPS::PM::LocalizedText{"On"};
   auto& off = allowed_value.emplace_back("OFF");
   off.type = BICEPS::PM::AllowedValue::TypeType("192835");
-  off.type->conceptDescription = BICEPS::PM::LocalizedText{"Off"};
+  off.type->concept_description = BICEPS::PM::LocalizedText{"Off"};
   auto enum_string_descriptor = std::make_shared<BICEPS::PM::EnumStringMetricDescriptor>(
-      "enum_string_state_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::Set,
-      BICEPS::PM::MetricAvailability::Cont, std::move(allowed_value));
+      "enum_string_state_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::SET,
+      BICEPS::PM::MetricAvailability::CONT, std::move(allowed_value));
 
   BICEPS::PM::ChannelDescriptor device_channel("device_channel");
   device_channel.metric.emplace_back(numeric_descriptor);
   device_channel.metric.emplace_back(settable_descriptor);
   device_channel.metric.emplace_back(string_descriptor);
   device_channel.metric.emplace_back(enum_string_descriptor);
-  device_channel.safetyClassification = BICEPS::PM::SafetyClassification::MedA;
+  device_channel.safety_classification = BICEPS::PM::SafetyClassification::MED_A;
   device_channel.type = BICEPS::PM::CodedValue{"130537"};
-  device_channel.type->conceptDescription = BICEPS::PM::LocalizedText{"dynamic not settable metrics"};
+  device_channel.type->concept_description = BICEPS::PM::LocalizedText{"dynamic not settable metrics"};
 
   BICEPS::PM::ScoDescriptor device_sco("sco_handle");
   auto set_value_operation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
@@ -216,7 +216,7 @@ int main()
 
   BICEPS::PM::VmdDescriptor device_module("device_vmd");
   device_module.type = BICEPS::PM::CodedValue{"130536"};
-  device_module.type->conceptDescription = BICEPS::PM::LocalizedText{"not settable metrics"};
+  device_module.type->concept_description = BICEPS::PM::LocalizedText{"not settable metrics"};
   device_module.channel.emplace_back(device_channel);
   device_module.sco = device_sco;
 
@@ -229,7 +229,7 @@ int main()
 
   // set location detail
   BICEPS::PM::LocationDetail location_detail;
-  location_detail.poC = "PoC-A";
+  location_detail.poc = "PoC-A";
   location_detail.room = "Room-A";
   location_detail.bed = "Bed-A";
   location_detail.facility = "Facility-A";
