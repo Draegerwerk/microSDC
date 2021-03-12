@@ -28,7 +28,7 @@ namespace SimpleWeb {
      * @param verify_file        If non-empty, use this certificate authority file to perform verification of client's certificate and hostname according to RFC 2818.
      */
     Server(const std::string &certification_file, const std::string &private_key_file, const std::string &verify_file = std::string())
-        : ServerBase<HTTPS>::ServerBase(443), context(asio::ssl::context::tlsv12) {
+        : ServerBase<HTTPS>::ServerBase(443), context(asio::ssl::context::tlsv13) {
       context.use_certificate_chain_file(certification_file);
       context.use_private_key_file(private_key_file, asio::ssl::context::pem);
 
