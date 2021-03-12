@@ -141,7 +141,7 @@ void SimpleDevice::init()
   location_detail.facility = "DRAEGER";
   //location_detail.building = "Building-A";
   //location_detail.floor = "Floor-A";
-  sdc_.set_location("location_context", location_detail);
+  sdc_.set_location("location_context", "location_context_state01", location_detail);
 
   sdc_.add_md_state(pressure_state_handler_);
   sdc_.add_md_state(temperature_state_handler_);
