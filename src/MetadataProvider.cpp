@@ -52,9 +52,9 @@ WS::ADDRESSING::URIType MetadataProvider::get_state_event_service_uri() const
 void MetadataProvider::fill_device_metadata(MESSAGEMODEL::Envelope& envelope) const
 {
   auto& metadata = envelope.body.metadata = WS::MEX::Metadata();
-  metadata->metadataSection.emplace_back(create_metadata_section_this_model());
-  metadata->metadataSection.emplace_back(create_metadata_section_this_device());
-  metadata->metadataSection.emplace_back(create_netadata_section_relationship(
+  metadata->metadata_section.emplace_back(create_metadata_section_this_model());
+  metadata->metadata_section.emplace_back(create_metadata_section_this_device());
+  metadata->metadata_section.emplace_back(create_netadata_section_relationship(
       create_host_metadata(), {create_hosted_get_service(), create_hosted_set_service(),
                                create_hosted_state_event_service()}));
 }
@@ -62,44 +62,44 @@ void MetadataProvider::fill_device_metadata(MESSAGEMODEL::Envelope& envelope) co
 void MetadataProvider::fill_get_service_metadata(MESSAGEMODEL::Envelope& envelope) const
 {
   auto& metadata = envelope.body.metadata = WS::MEX::Metadata();
-  metadata->metadataSection.emplace_back(create_metadata_section_wsdl_get_service());
-  metadata->metadataSection.emplace_back(
+  metadata->metadata_section.emplace_back(create_metadata_section_wsdl_get_service());
+  metadata->metadata_section.emplace_back(
       create_netadata_section_relationship(create_host_metadata(), {create_hosted_get_service()}));
 }
 
 void MetadataProvider::fill_set_service_metadata(MESSAGEMODEL::Envelope& envelope) const
 {
   auto& metadata = envelope.body.metadata = WS::MEX::Metadata();
-  metadata->metadataSection.emplace_back(create_metadata_section_wsdl_set_service());
-  metadata->metadataSection.emplace_back(
+  metadata->metadata_section.emplace_back(create_metadata_section_wsdl_set_service());
+  metadata->metadata_section.emplace_back(
       create_netadata_section_relationship(create_host_metadata(), {create_hosted_set_service()}));
 }
 
 void MetadataProvider::fill_state_event_service_metadata(MESSAGEMODEL::Envelope& envelope) const
 {
   auto& metadata = envelope.body.metadata = WS::MEX::Metadata();
-  metadata->metadataSection.emplace_back(create_metadata_section_wsdl_state_event_service());
-  metadata->metadataSection.emplace_back(create_netadata_section_relationship(
+  metadata->metadata_section.emplace_back(create_metadata_section_wsdl_state_event_service());
+  metadata->metadata_section.emplace_back(create_netadata_section_relationship(
       create_host_metadata(), {create_hosted_state_event_service()}));
 }
 
 MetadataProvider::MetadataSection MetadataProvider::create_metadata_section_this_model() const
 {
   MetadataSection metadata = MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_MODEL));
-  auto& this_model = metadata.thisModel = WS::DPWS::ThisModelType();
+  auto& this_model = metadata.this_model = WS::DPWS::ThisModelType();
   WS::DPWS::ThisModelType::ManufacturerType manufacturer(
       device_characteristics_.get_manufacturer());
   this_model->manufacturer.emplace_back(manufacturer);
-  this_model->modelName.emplace_back(device_characteristics_.get_model_name());
+  this_model->model_name.emplace_back(device_characteristics_.get_model_name());
   return metadata;
 }
 
 MetadataProvider::MetadataSection MetadataProvider::create_metadata_section_this_device() const
 {
   MetadataSection metadata = MetadataSection(WS::ADDRESSING::URIType(MDPWS::WS_MEX_DIALECT_DEVICE));
-  auto& this_device = metadata.thisDevice = WS::DPWS::ThisDeviceType();
+  auto& this_device = metadata.this_device = WS::DPWS::ThisDeviceType();
   auto friendly_name = device_characteristics_.get_friendly_name();
-  this_device->friendlyName.emplace_back(friendly_name);
+  this_device->friendly_name.emplace_back(friendly_name);
   return metadata;
 }
 

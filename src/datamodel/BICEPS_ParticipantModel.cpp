@@ -313,14 +313,59 @@ namespace BICEPS::PM
   {
   }
 
+  bool SystemContextState::classof(const AbstractState* other)
+  {
+    return other->get_kind() == StateKind::SYSTEM_CONTEXT_STATE;
+  }
+  SystemContextState::SystemContextState(const DescriptorHandleType& descriptor_handle)
+    : AbstractDeviceComponentState(StateKind::SYSTEM_CONTEXT_STATE, descriptor_handle)
+  {
+  }
+
+  bool ChannelState::classof(const AbstractState* other)
+  {
+    return other->get_kind() == StateKind::CHANNEL_STATE;
+  }
+  ChannelState::ChannelState(const DescriptorHandleType& descriptor_handle)
+    : AbstractDeviceComponentState(StateKind::CHANNEL_STATE, descriptor_handle)
+  {
+  }
+
+  OperationGroup::OperationGroup(TypeType type)
+    : type(std::move(type))
+  {
+  }
+
+  bool ScoState::classof(const AbstractState* other)
+  {
+    return other->get_kind() == StateKind::SCO_STATE;
+  }
+  ScoState::ScoState(const DescriptorHandleType& descriptor_handle)
+    : AbstractDeviceComponentState(StateKind::SCO_STATE, descriptor_handle)
+  {
+  }
+
   AbstractComplexDeviceComponentState::AbstractComplexDeviceComponentState(
       StateKind kind, DescriptorHandleType handle)
     : AbstractDeviceComponentState(kind, std::move(handle))
   {
   }
 
+  bool MdsState::classof(const AbstractState* other)
+  {
+    return other->get_kind() == StateKind::MDS_STATE;
+  }
   MdsState::MdsState(DescriptorHandleType handle)
     : AbstractComplexDeviceComponentState(StateKind::MDS_STATE, std::move(handle))
+  {
+  }
+
+  bool VmdState::classof(const AbstractState* other)
+  {
+    return other->get_kind() == StateKind::VMD_STATE;
+  }
+  VmdState::VmdState(DescriptorHandleType handle)
+    : AbstractComplexDeviceComponentState(StateKind::VMD_STATE, std::move(handle))
   {
   }
 

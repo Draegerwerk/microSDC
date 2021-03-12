@@ -42,12 +42,12 @@ void SetService::handle_request(std::unique_ptr<Request> req)
   {
     auto subscribe_request = request_envelope.body.subscribe;
     auto response = subscription_manager_->dispatch(subscribe_request.value());
-    response.subscriptionManager.address = metadata_->get_set_service_uri();
+    response.subscription_manager.address = metadata_->get_set_service_uri();
 
     MESSAGEMODEL::Envelope response_envelope;
     fill_response_message_from_request_message(response_envelope, request_envelope);
     response_envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_SUBSCRIBE_RESPONSE);
-    response_envelope.body.subscribeResponse = response;
+    response_envelope.body.subscribe_response = response;
     req->respond(response_envelope);
   }
   else if (soap_action == MDPWS::WS_ACTION_RENEW)
@@ -62,7 +62,7 @@ void SetService::handle_request(std::unique_ptr<Request> req)
     MESSAGEMODEL::Envelope response_envelope;
     fill_response_message_from_request_message(response_envelope, request_envelope);
     response_envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RENEW_RESPONSE);
-    response_envelope.body.renewResponse = response;
+    response_envelope.body.renew_response = response;
     req->respond(response_envelope);
   }
   else if (soap_action == MDPWS::WS_ACTION_UNSUBSCRIBE)
@@ -78,22 +78,22 @@ void SetService::handle_request(std::unique_ptr<Request> req)
   }
   else if (soap_action == SDC::ACTION_SET_VALUE)
   {
-    auto set_value_request = request_envelope.body.setValue.value();
+    auto set_value_request = request_envelope.body.set_value.value();
     auto set_value_response = this->dispatch(set_value_request);
     MESSAGEMODEL::Envelope response_envelope;
     fill_response_message_from_request_message(response_envelope, request_envelope);
     response_envelope.header.action = WS::ADDRESSING::URIType(SDC::ACTION_SET_VALUE_RESPONSE);
-    response_envelope.body.setValueResponse = set_value_response;
+    response_envelope.body.set_value_response = set_value_response;
     req->respond(response_envelope);
   }
   else if (soap_action == SDC::ACTION_SET_STRING)
   {
-    auto set_string_request = request_envelope.body.setString.value();
+    auto set_string_request = request_envelope.body.set_string.value();
     auto set_string_response = this->dispatch(set_string_request);
     MESSAGEMODEL::Envelope response_envelope;
     fill_response_message_from_request_message(response_envelope, request_envelope);
     response_envelope.header.action = WS::ADDRESSING::URIType(SDC::ACTION_SET_VALUE_RESPONSE);
-    response_envelope.body.setStringResponse = set_string_response;
+    response_envelope.body.set_string_response = set_string_response;
     req->respond(response_envelope);
   }
   else

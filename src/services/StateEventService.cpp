@@ -40,12 +40,12 @@ void StateEventService::handle_request(std::unique_ptr<Request> req)
   {
     auto subscribe_request = request_envelope.body.subscribe;
     auto response = subscription_manager_->dispatch(subscribe_request.value());
-    response.subscriptionManager.address = metadata_->get_state_event_service_uri();
+    response.subscription_manager.address = metadata_->get_state_event_service_uri();
 
     MESSAGEMODEL::Envelope response_envelope;
     fill_response_message_from_request_message(response_envelope, request_envelope);
     response_envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_SUBSCRIBE_RESPONSE);
-    response_envelope.body.subscribeResponse = response;
+    response_envelope.body.subscribe_response = response;
     req->respond(response_envelope);
   }
   else if (soap_action == MDPWS::WS_ACTION_RENEW)
@@ -60,7 +60,7 @@ void StateEventService::handle_request(std::unique_ptr<Request> req)
     MESSAGEMODEL::Envelope response_envelope;
     fill_response_message_from_request_message(response_envelope, request_envelope);
     response_envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RENEW_RESPONSE);
-    response_envelope.body.renewResponse = response;
+    response_envelope.body.renew_response = response;
     req->respond(response_envelope);
   }
   else if (soap_action == MDPWS::WS_ACTION_UNSUBSCRIBE)

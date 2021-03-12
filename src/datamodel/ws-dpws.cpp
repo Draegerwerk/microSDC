@@ -3,15 +3,15 @@
 namespace WS::DPWS
 {
   HostServiceType::HostServiceType(EndpointReferenceType epr)
-    : endpointReference(std::move(epr))
+    : endpoint_reference(std::move(epr))
   {
   }
 
   HostedServiceType::HostedServiceType(EndpointReferenceSequence epr, TypesType types,
-                                       ServiceIdType serviceId)
-    : endpointReference(std::move(epr))
+                                       ServiceIdType service_id)
+    : endpoint_reference(std::move(epr))
     , types(std::move(types))
-    , serviceId(std::move(serviceId))
+    , service_id(std::move(service_id))
   {
   }
 

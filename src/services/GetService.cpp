@@ -41,7 +41,7 @@ void GetService::handle_request(std::unique_ptr<Request> req)
     MESSAGEMODEL::Envelope response_envelope;
     fill_response_message_from_request_message(response_envelope, request_envelope);
     response_envelope.header.action = WS::ADDRESSING::URIType(SDC::ACTION_GET_MDIB_RESPONSE);
-    response_envelope.body.getMdibResponse =
+    response_envelope.body.get_mdib_response =
         std::make_optional<MESSAGEMODEL::Body::GetMdibResponseType>(micro_sdc_.get_mdib());
     req->respond(response_envelope);
   }

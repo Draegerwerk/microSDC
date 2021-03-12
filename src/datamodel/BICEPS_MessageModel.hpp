@@ -9,21 +9,21 @@ namespace BICEPS::MM
 {
   enum class InvocationState
   {
-    Wait,
-    Start,
-    Cnclld,
-    CnclldMan,
-    Fin,
-    FinMod,
-    Fail
+    WAIT,
+    START,
+    CNCLLD,
+    CNCLLD_MAN,
+    FIN,
+    FIN_MOD,
+    FAIL
   };
 
   enum class InvocationError
   {
-    Unspec,
-    Unkn,
-    Inv,
-    Oth
+    UNSPEC,
+    UNKN,
+    INV,
+    OTH
   };
 
   struct GetMdib
@@ -42,24 +42,24 @@ namespace BICEPS::MM
   {
     using MdibVersionType = unsigned int;
     using MdibVersionOptional = std::optional<MdibVersionType>;
-    MdibVersionOptional mdibVersion;
+    MdibVersionOptional mdib_version;
 
     using SequenceIdType = WS::ADDRESSING::URIType;
-    SequenceIdType sequenceId;
+    SequenceIdType sequence_id;
 
     using InstanceIdType = unsigned int;
     using InstanceIdOptional = std::optional<InstanceIdType>;
-    InstanceIdOptional instanceId;
+    InstanceIdOptional instance_id;
 
   protected:
-    explicit AbstractReport(WS::ADDRESSING::URIType sequenceId);
+    explicit AbstractReport(WS::ADDRESSING::URIType sequence_id);
   };
 
   struct AbstractReportPart
   {
     using SourceMdsType = std::string;
     using SourceMdsOptional = std::optional<SourceMdsType>;
-    SourceMdsOptional sourceMds;
+    SourceMdsOptional source_mds;
 
   protected:
     AbstractReportPart() = default;
@@ -69,22 +69,22 @@ namespace BICEPS::MM
   {
     using MetricStateType = std::shared_ptr<const PM::AbstractMetricState>;
     using MetricStateSequence = std::vector<MetricStateType>;
-    MetricStateSequence metricState;
+    MetricStateSequence metric_state;
   };
 
   struct AbstractMetricReport : public AbstractReport
   {
     using ReportPartType = MetricReportPart;
     using ReportPartSequence = std::vector<ReportPartType>;
-    ReportPartSequence reportPart;
+    ReportPartSequence report_part;
 
   protected:
-    explicit AbstractMetricReport(const SequenceIdType& sequenceId);
+    explicit AbstractMetricReport(const SequenceIdType& sequence_id);
   };
 
   struct EpisodicMetricReport : public AbstractMetricReport
   {
-    explicit EpisodicMetricReport(const SequenceIdType& sequenceId);
+    explicit EpisodicMetricReport(const SequenceIdType& sequence_id);
   };
 
   struct OperationHandleRef : public std::string
@@ -103,7 +103,7 @@ namespace BICEPS::MM
     SetKind get_kind() const;
 
     using OperationHandleRefType = ::BICEPS::MM::OperationHandleRef;
-    OperationHandleRefType operationHandleRef;
+    OperationHandleRefType operation_handle_ref;
 
 
   protected:
@@ -118,7 +118,7 @@ namespace BICEPS::MM
   struct SetValue : public AbstractSet
   {
     using RequestedNumericValueType = double;
-    RequestedNumericValueType requestedNumericValue{0.0};
+    RequestedNumericValueType requested_numeric_value{0.0};
 
     explicit SetValue(const rapidxml::xml_node<>& node);
     static bool classof(const AbstractSet* other);

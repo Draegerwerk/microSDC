@@ -23,20 +23,20 @@ namespace WS::DISCOVERY
     // TODO
   }
 
-  AppSequenceType::AppSequenceType(const uint64_t& instanceId, const uint64_t& messageNumber)
-    : instanceId(instanceId)
-    , messageNumber(messageNumber)
+  AppSequenceType::AppSequenceType(const uint64_t& instance_id, const uint64_t& message_number)
+    : instance_id(instance_id)
+    , message_number(message_number)
   {
   }
 
   ByeType::ByeType(EndpointReferenceType epr)
-    : endpointReference(std::move(epr))
+    : endpoint_reference(std::move(epr))
   {
   }
 
-  HelloType::HelloType(EndpointReferenceType epr, MetadataVersionType metadataVersion)
-    : endpointReference(std::move(epr))
-    , metadataVersion(metadataVersion)
+  HelloType::HelloType(EndpointReferenceType epr, MetadataVersionType metadata_version)
+    : endpoint_reference(std::move(epr))
+    , metadata_version(metadata_version)
   {
   }
 
@@ -51,41 +51,42 @@ namespace WS::DISCOVERY
   }
 
 
-  ProbeMatchType::ProbeMatchType(EndpointReferenceType epr, MetadataVersionType metadataVersion)
-    : endpointReference(std::move(epr))
-    , metadataVersion(metadataVersion)
+  ProbeMatchType::ProbeMatchType(EndpointReferenceType epr, MetadataVersionType metadata_version)
+    : endpoint_reference(std::move(epr))
+    , metadata_version(metadata_version)
   {
   }
 
   ProbeMatchesType::ProbeMatchesType(ProbeMatchSequence x)
-    : probeMatch(std::move(x))
+    : probe_match(std::move(x))
   {
   }
 
   ResolveType::ResolveType(const rapidxml::xml_node<>& node)
-    : endpointReference(WS::ADDRESSING::URIType(""))
+    : endpoint_reference(WS::ADDRESSING::URIType(""))
   {
     this->parse(node);
   }
 
   void ResolveType::parse(const rapidxml::xml_node<>& node)
   {
-    const auto* eprNode = node.first_node("EndpointReference", MDPWS::WS_NS_ADDRESSING);
-    if (eprNode == nullptr)
+    const auto* epr_node = node.first_node("EndpointReference", MDPWS::WS_NS_ADDRESSING);
+    if (epr_node == nullptr)
     {
       throw ExpectedElement("EndpointReference", MDPWS::WS_NS_ADDRESSING);
     }
-    endpointReference = EndpointReferenceType(*eprNode);
+    endpoint_reference = EndpointReferenceType(*epr_node);
   }
 
-  ResolveMatchType::ResolveMatchType(EndpointReferenceType epr, MetadataVersionType metadataVersion)
-    : endpointReference(std::move(epr))
-    , metadataVersion(metadataVersion)
+  ResolveMatchType::ResolveMatchType(EndpointReferenceType epr,
+                                     MetadataVersionType metadata_version)
+    : endpoint_reference(std::move(epr))
+    , metadata_version(metadata_version)
   {
   }
 
   ResolveMatchesType::ResolveMatchesType(ResolveMatchSequence x)
-    : resolveMatch(std::move(x))
+    : resolve_match(std::move(x))
   {
   }
 

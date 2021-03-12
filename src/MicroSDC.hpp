@@ -84,7 +84,7 @@ public:
   /// @brief sets the location of this instance
   /// @param descriptorHandle the descriptor of the location state descriptor
   /// @param locationDetail the location information to set
-  void set_location(const std::string& descriptor_handle,
+  void set_location(const std::string& descriptor_handle, const std::string& state_handle,
                     const BICEPS::PM::LocationDetail& location_detail);
 
   /// @brief request_state_change is called to request a change of state

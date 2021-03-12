@@ -31,10 +31,10 @@ public:
     if (set_value == nullptr)
     {
       LOG(LogLevel::ERROR, "Cannot cast to SetValue!");
-      return BICEPS::MM::InvocationState::Fail;
+      return BICEPS::MM::InvocationState::FAIL;
     }
-    this->set_value(set_value->requestedNumericValue);
-    return BICEPS::MM::InvocationState::Fin;
+    this->set_value(set_value->requested_numeric_value);
+    return BICEPS::MM::InvocationState::FIN;
   }
 
   /// @param sets a new numeric value to the state handled by this handler and updates the mdib
@@ -72,10 +72,10 @@ public:
     if (set_string == nullptr)
     {
       LOG(LogLevel::ERROR, "Cannot cast to SetString!");
-      return BICEPS::MM::InvocationState::Fail;
+      return BICEPS::MM::InvocationState::FAIL;
     }
     this->set_value(set_string->requestedStringValue);
-    return BICEPS::MM::InvocationState::Fin;
+    return BICEPS::MM::InvocationState::FIN;
   }
 
   /// @param sets a new numeric value to the state handled by this handler and updates the mdib
@@ -113,10 +113,10 @@ public:
     if (set_string == nullptr)
     {
       LOG(LogLevel::ERROR, "Cannot cast to SetString!");
-      return BICEPS::MM::InvocationState::Fail;
+      return BICEPS::MM::InvocationState::FAIL;
     }
     this->set_value(set_string->requestedStringValue);
-    return BICEPS::MM::InvocationState::Fin;
+    return BICEPS::MM::InvocationState::FIN;
   }
 
   /// @param sets a new numeric value to the state handled by this handler and updates the mdib
@@ -142,122 +142,117 @@ void int_handler(int /*unused*/)
 
 int main()
 {
-  Log::set_log_level(LogLevel::INFO);
+  Log::set_log_level(LogLevel::DEBUG);
   LOG(LogLevel::INFO, "Starting up....");
 
-  auto micro_sdc = std::make_unique<MicroSDC>();
+  auto sdc = std::make_unique<MicroSDC>();
 
   const auto sdc_port = 8080;
   const auto default_address = NetworkInterface::find_default_interface().address();
   LOG(LogLevel::INFO, "Setting local ip address " << default_address);
-  micro_sdc->set_network_config(std::make_unique<NetworkConfig>(
+  sdc->set_network_config(std::make_unique<NetworkConfig>(
       true, default_address, sdc_port, NetworkConfig::DiscoveryProxyProtocol::HTTPS,
       "https://10.52.219.176:3703"));
+
+  sdc->set_endpoint_reference("urn:uuid:a1337d00-d306-4c2f-a981-7f15a4ec2022");
 
   DeviceCharacteristics device_characteristics;
   device_characteristics.set_friendly_name("MicroSDC on Linux");
   device_characteristics.set_manufacturer("Draeger");
-  device_characteristics.set_model_name("MicroSDC_Device01");
-  micro_sdc->set_device_characteristics(device_characteristics);
+  device_characteristics.set_model_name("MicroSDC_Device02");
+  sdc->set_device_characteristics(device_characteristics);
 
-  micro_sdc->set_endpoint_reference("urn:uuid:MicroSDC-provider-on-linux");
+  BICEPS::PM::Metadata metadata;
+  metadata.manufacturer.emplace_back("Draeger");
+  metadata.model_name.emplace_back("MicroSDC_Device01");
+  metadata.model_number.emplace("1");
+  metadata.serial_number.emplace_back("2345-6789");
 
-  // Construct MdDescription
   BICEPS::PM::SystemContextDescriptor system_context("system_context");
   system_context.patient_context = BICEPS::PM::PatientContextDescriptor("patient_context");
   system_context.location_context = BICEPS::PM::LocationContextDescriptor("location_context");
 
-  BICEPS::PM::MdsDescriptor device_descriptor("MedicalDevices");
-  device_descriptor.system_context = system_context;
+  // States for measured values
+  auto pressure_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "pressureState_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::MSRMT,
+      BICEPS::PM::MetricAvailability::CONT, 1);
+  pressure_state->unit.concept_description = BICEPS::PM::LocalizedText{"Pa"};
+  pressure_state->safety_classification = BICEPS::PM::SafetyClassification::MED_A;
+  pressure_state->type = BICEPS::PM::CodedValue{"152836"};
+  pressure_state->type->concept_description = BICEPS::PM::LocalizedText{"Air pressure"};
 
-  // Dummy numeric state
-  auto numeric_descriptor = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "numeric_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::MSRMT,
+  auto temperature_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "temperatureState_handle", BICEPS::PM::CodedValue("6048"), BICEPS::PM::MetricCategory::MSRMT,
       BICEPS::PM::MetricAvailability::CONT, 1);
-  numeric_descriptor->type = BICEPS::PM::CodedValue{"196074"};
-  numeric_descriptor->type->concept_description =
-      BICEPS::PM::LocalizedText{"dummy dynamic numeric metric"};
-  // settable numeric
-  auto settable_descriptor = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
-      "settable_state_handle", BICEPS::PM::CodedValue("3840"), BICEPS::PM::MetricCategory::SET,
+  temperature_state->unit.concept_description = BICEPS::PM::LocalizedText{"°C"};
+  temperature_state->safety_classification = BICEPS::PM::SafetyClassification::MED_A;
+  temperature_state->type = BICEPS::PM::CodedValue{"184296"};
+  temperature_state->type->concept_description = BICEPS::PM::LocalizedText{"Temperature"};
+
+  auto humidity_state = std::make_shared<BICEPS::PM::NumericMetricDescriptor>(
+      "humidityState_handle", BICEPS::PM::CodedValue("262688"), BICEPS::PM::MetricCategory::MSRMT,
       BICEPS::PM::MetricAvailability::CONT, 1);
-  // dummy string tate
-  auto string_descriptor = std::make_shared<BICEPS::PM::StringMetricDescriptor>(
-      "string_state_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::SET,
-      BICEPS::PM::MetricAvailability::CONT);
-  // dummy enum string tate
-  BICEPS::PM::EnumStringMetricDescriptor::AllowedValueSequence allowed_value;
-  auto& on = allowed_value.emplace_back("ON");
-  on.type = BICEPS::PM::AllowedValue::TypeType("192834");
-  on.type->concept_description = BICEPS::PM::LocalizedText{"On"};
-  auto& off = allowed_value.emplace_back("OFF");
-  off.type = BICEPS::PM::AllowedValue::TypeType("192835");
-  off.type->concept_description = BICEPS::PM::LocalizedText{"Off"};
-  auto enum_string_descriptor = std::make_shared<BICEPS::PM::EnumStringMetricDescriptor>(
-      "enum_string_state_handle", BICEPS::PM::CodedValue("262656"), BICEPS::PM::MetricCategory::SET,
-      BICEPS::PM::MetricAvailability::CONT, std::move(allowed_value));
+  humidity_state->unit.concept_description = BICEPS::PM::LocalizedText{"%"};
+  humidity_state->safety_classification = BICEPS::PM::SafetyClassification::MED_A;
+  humidity_state->type = BICEPS::PM::CodedValue{"184292"};
+  humidity_state->type->concept_description = BICEPS::PM::LocalizedText{"Humidity"};
 
   BICEPS::PM::ChannelDescriptor device_channel("device_channel");
-  device_channel.metric.emplace_back(numeric_descriptor);
-  device_channel.metric.emplace_back(settable_descriptor);
-  device_channel.metric.emplace_back(string_descriptor);
-  device_channel.metric.emplace_back(enum_string_descriptor);
-  device_channel.safety_classification = BICEPS::PM::SafetyClassification::MED_A;
-  device_channel.type = BICEPS::PM::CodedValue{"130537"};
-  device_channel.type->concept_description = BICEPS::PM::LocalizedText{"dynamic not settable metrics"};
+  device_channel.type = BICEPS::PM::CodedValue{"128771"};
+  device_channel.type->concept_description =
+      BICEPS::PM::LocalizedText{"dynamic not settable metrics"};
+  device_channel.metric.emplace_back(pressure_state);
+  device_channel.metric.emplace_back(temperature_state);
+  device_channel.metric.emplace_back(humidity_state);
 
   BICEPS::PM::ScoDescriptor device_sco("sco_handle");
-  auto set_value_operation = std::make_shared<BICEPS::PM::SetValueOperationDescriptor>(
-      "set_value_operation_handle", "settable_state_handle");
-  auto set_string_operation = std::make_shared<BICEPS::PM::SetStringOperationDescriptor>(
-      "set_string_operation_handle", "string_state_handle");
-  device_sco.operation.emplace_back(set_value_operation);
-  device_sco.operation.emplace_back(set_string_operation);
 
+  device_channel.safety_classification = BICEPS::PM::SafetyClassification::MED_A;
   BICEPS::PM::VmdDescriptor device_module("device_vmd");
-  device_module.type = BICEPS::PM::CodedValue{"130536"};
+  device_module.type = BICEPS::PM::CodedValue{"128770"};
   device_module.type->concept_description = BICEPS::PM::LocalizedText{"not settable metrics"};
   device_module.channel.emplace_back(device_channel);
   device_module.sco = device_sco;
 
+  BICEPS::PM::MdsDescriptor device_descriptor("MedicalDevices");
+  device_descriptor.meta_data = metadata;
+  device_descriptor.system_context = system_context;
   device_descriptor.vmd.emplace_back(device_module);
+  device_descriptor.type = BICEPS::PM::CodedValue{"70825"};
+  device_descriptor.type->concept_description = BICEPS::PM::LocalizedText{"Mds"};
 
   BICEPS::PM::MdDescription md_description;
   md_description.mds.emplace_back(device_descriptor);
+  sdc->set_md_description(md_description);
 
-  micro_sdc->set_md_description(md_description);
-
-  // set location detail
   BICEPS::PM::LocationDetail location_detail;
-  location_detail.poc = "PoC-A";
-  location_detail.room = "Room-A";
-  location_detail.bed = "Bed-A";
-  location_detail.facility = "Facility-A";
-  location_detail.building = "Building-A";
-  location_detail.floor = "Floor-A";
-  micro_sdc->set_location("location_context", location_detail);
+  location_detail.poc = "SC8";
+  location_detail.bed = "tam";
+  location_detail.facility = "DRAEGER";
+  sdc->set_location("location_context", "location_context_state01", location_detail);
 
-  auto numeric_state_handler = std::make_shared<NumericStateHandler>("numeric_state_handle");
-  auto settable_state_handler = std::make_shared<NumericStateHandler>("settable_state_handle");
-  auto string_state_handler = std::make_shared<StringStateHandler>("string_state_handle");
-  auto enum_string_state_handler =
-      std::make_shared<EnumStringStateHandler>("enum_string_state_handle");
-  micro_sdc->add_md_state(numeric_state_handler);
-  micro_sdc->add_md_state(settable_state_handler);
-  micro_sdc->add_md_state(string_state_handler);
-  micro_sdc->add_md_state(enum_string_state_handler);
+  auto pressure_state_handler{std::make_shared<NumericStateHandler>("pressureState_handle")};
+  auto temperature_state_handler{std::make_shared<NumericStateHandler>("temperatureState_handle")};
+  auto humidity_state_handler{std::make_shared<NumericStateHandler>("humidityState_handle")};
 
-  micro_sdc->start();
+  sdc->add_md_state(pressure_state_handler);
+  sdc->add_md_state(temperature_state_handler);
+  sdc->add_md_state(humidity_state_handler);
 
-  auto value_thread = std::thread([numeric_state_handler]() {
-    double i = 0.0;
-    while (keep_running)
-    {
-      // numeric_state_handler->set_value(i++);
-      std::unique_lock<std::mutex> lock(running_mutex);
-      cv_running.wait_for(lock, std::chrono::seconds(1));
-    }
-  });
+  sdc->start();
+
+  auto value_thread =
+      std::thread([pressure_state_handler, temperature_state_handler, humidity_state_handler]() {
+        double i = 0.0;
+        while (keep_running)
+        {
+          // pressure_state_handler->set_value(i++);
+          // temperature_state_handler->set_value(2 * i);
+          // humidity_state_handler->set_value(3 * i);
+          std::unique_lock<std::mutex> lock(running_mutex);
+          cv_running.wait_for(lock, std::chrono::seconds(1));
+        }
+      });
 
   struct sigaction sa
   {

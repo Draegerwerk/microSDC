@@ -21,7 +21,7 @@ WebServerSimple<SimpleWeb::HTTPS>::WebServerSimple()
   server_->config.timeout_request = 0;
   server_->on_error = [](std::shared_ptr<SimpleWeb::Server<SimpleWeb::HTTPS>::Request> /*request*/,
                          const SimpleWeb::error_code& ec) {
-    LOG(LogLevel::ERROR, "Error processing request: " << ec);
+    LOG(LogLevel::ERROR, "Error processing request: " << ec << " : " << ec.message());
   };
 }
 

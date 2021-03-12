@@ -24,10 +24,10 @@ SimpleDevice::NumericStateHandler::request_state_change(const BICEPS::MM::Abstra
   if (set_value == nullptr)
   {
     LOG(LogLevel::ERROR, "Cannot cast to SetValue!");
-    return BICEPS::MM::InvocationState::Fail;
+    return BICEPS::MM::InvocationState::FAIL;
   }
-  this->set_value(set_value->requestedNumericValue);
-  return BICEPS::MM::InvocationState::Fin;
+  this->set_value(set_value->requested_numeric_value);
+  return BICEPS::MM::InvocationState::FIN;
 }
 
 void SimpleDevice::NumericStateHandler::set_value(double value)
@@ -136,11 +136,11 @@ void SimpleDevice::init()
 
   BICEPS::PM::LocationDetail location_detail;
   location_detail.poc = "SC8";
-  location_detail.room = "Room-A";
+  //location_detail.room = "Room-A";
   location_detail.bed = "tam";
   location_detail.facility = "DRAEGER";
-  location_detail.building = "Building-A";
-  location_detail.floor = "Floor-A";
+  //location_detail.building = "Building-A";
+  //location_detail.floor = "Floor-A";
   sdc_.set_location("location_context", location_detail);
 
   sdc_.add_md_state(pressure_state_handler_);

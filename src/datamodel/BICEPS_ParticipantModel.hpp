@@ -538,8 +538,12 @@ namespace BICEPS::PM
       LAST_MULTI_STATE,
 
       DEVICE_COMPONENT_STATE,
+      SYSTEM_CONTEXT_STATE,
+      CHANNEL_STATE,
+      SCO_STATE,
       COMPLEX_DEVICE_COMPONENT_STATE,
       MDS_STATE,
+      VMD_STATE,
       LAST_COMPLEX_DEVICE_COMPONENT_STATE,
       LAST_DEVICE_COMPONENT_STATE,
 
@@ -666,6 +670,17 @@ namespace BICEPS::PM
     LabelSequence label;
   };
 
+  struct CalibrationDocumentation
+  {
+    using DocumentationType = LocalizedText;
+    using DocumentationOptional = std::optional<DocumentationType>;
+    DocumentationOptional documentation;
+
+    using CalibrationResultType = CodedValue;
+    using CalibrationResultOptional = std::optional<CalibrationResultType>;
+    CalibrationResultOptional calibration_result;
+  };
+
   struct CalibrationInfo
   {
     using ComponentCalibrationStateType = CalibrationState;
@@ -679,6 +694,10 @@ namespace BICEPS::PM
     using TimeType = Timestamp;
     using TimeOptional = std::optional<TimeType>;
     TimeOptional time;
+
+    using CalibrationDocumentationType = CalibrationDocumentation;
+    using CalibrationDocumentationOptional = std::optional<CalibrationDocumentationType>;
+    CalibrationDocumentationOptional calibration_documentation;
   };
 
   struct AbstractDeviceComponentState : public AbstractState
@@ -701,7 +720,7 @@ namespace BICEPS::PM
 
     using NextCalibrationType = struct CalibrationInfo;
     using NextCalibrationOptional = std::optional<NextCalibrationType>;
-    CalibrationInfoOptional next_calibration;
+    NextCalibrationOptional next_calibration;
 
     using PhysicalConnectorType = PhysicalConnectorInfo;
     using PhysicalConnectorOptional = std::optional<PhysicalConnectorType>;
@@ -715,8 +734,52 @@ namespace BICEPS::PM
 
   struct SystemContextState : public AbstractDeviceComponentState
   {
-    static bool classof(const AbstractDescriptor* other);
+    static bool classof(const AbstractState* other);
     explicit SystemContextState(const DescriptorHandleType& descriptor_handle);
+  };
+
+  struct ChannelState : public AbstractDeviceComponentState
+  {
+    static bool classof(const AbstractState* other);
+    explicit ChannelState(const DescriptorHandleType& descriptor_handle);
+  };
+
+  using HandleRef = std::string;
+
+  using OperationRef = std::vector<HandleRef>;
+
+  struct OperationGroup
+  {
+    using OperatingModeType = OperatingMode;
+    using OperatingModeOptional = std::optional<OperatingModeType>;
+    OperatingModeOptional operating_mode;
+
+    using OperationsType = OperationRef;
+    using OperationsOptional = std::optional<OperationsType>;
+    OperationsOptional operations;
+
+    using TypeType = CodedValue;
+    TypeType type;
+
+    explicit OperationGroup(TypeType type);
+  };
+
+  struct ScoState : public AbstractDeviceComponentState
+  {
+    using InvocationRequestedType = OperationRef;
+    using InvocationRequestedOptional = std::optional<InvocationRequestedType>;
+    InvocationRequestedOptional invocation_requested;
+
+    using InvocationRequiredType = OperationRef;
+    using InvocationRequiredOptional = std::optional<InvocationRequiredType>;
+    InvocationRequiredOptional invocation_required;
+
+    using OperationGroupType = OperationGroup;
+    using OperationGroupOptional = std::optional<OperationGroupType>;
+    OperationGroupOptional operation_group;
+
+    static bool classof(const AbstractState* other);
+    explicit ScoState(const DescriptorHandleType& descriptor_handle);
   };
 
   struct AbstractComplexDeviceComponentState : public AbstractDeviceComponentState
@@ -743,7 +806,18 @@ namespace BICEPS::PM
     using OperatingJurisdictionOptional = std::optional<OperatingJurisdictionType>;
     OperatingJurisdictionOptional operating_jurisdiction;
 
+    static bool classof(const AbstractState* other);
     explicit MdsState(DescriptorHandleType handle);
+  };
+
+  struct VmdState : public AbstractComplexDeviceComponentState
+  {
+    using OperatingJurisdictionType = OperatingJurisdiction;
+    using OperatingJurisdictionOptional = std::optional<OperatingJurisdictionType>;
+    OperatingJurisdictionOptional operating_jurisdiction;
+
+    static bool classof(const AbstractState* other);
+    explicit VmdState(DescriptorHandleType handle);
   };
 
   struct AbstractOperationState : public AbstractState

@@ -13,13 +13,13 @@ namespace WS::EVENTING
   {
   public:
     using NotifyToType = WS::ADDRESSING::EndpointReferenceType;
-    NotifyToType notifyTo;
+    NotifyToType notify_to;
 
     using ModeType = std::string;
     using ModeOptional = std::optional<ModeType>;
     ModeOptional mode;
 
-    explicit DeliveryType(NotifyToType notifyTo);
+    explicit DeliveryType(NotifyToType notify_to);
     explicit DeliveryType(const rapidxml::xml_node<>& node);
 
   private:
@@ -52,7 +52,7 @@ namespace WS::EVENTING
   public:
     using EndToType = WS::ADDRESSING::EndpointReferenceType;
     using EndToOptional = std::optional<EndToType>;
-    EndToOptional endTo;
+    EndToOptional end_to;
 
     using DeliveryType = WS::EVENTING::DeliveryType;
     DeliveryType delivery;
@@ -76,12 +76,12 @@ namespace WS::EVENTING
   {
   public:
     using SubscriptionManagerType = WS::ADDRESSING::EndpointReferenceType;
-    SubscriptionManagerType subscriptionManager;
+    SubscriptionManagerType subscription_manager;
 
     using ExpiresType = ExpirationType;
     ExpiresType expires;
 
-    SubscribeResponse(SubscriptionManagerType subscriptionManager, ExpiresType expires);
+    SubscribeResponse(SubscriptionManagerType subscription_manager, ExpiresType expires);
   };
 
   struct Renew

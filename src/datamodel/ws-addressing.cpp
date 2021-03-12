@@ -20,18 +20,18 @@ namespace WS::EVENTING
   void Identifier::parse(const rapidxml::xml_node<>& node)
   {
     *this = std::string(node.value(), node.value_size());
-    const auto* isReferenceParameterNode = node.first_attribute("IsReferenceParameter");
-    if (isReferenceParameterNode != nullptr)
+    const auto* is_reference_parameter_node = node.first_attribute("IsReferenceParameter");
+    if (is_reference_parameter_node != nullptr)
     {
-      if (strncmp(isReferenceParameterNode->value(), "true",
-                  isReferenceParameterNode->name_size()) == 0)
+      if (strncmp(is_reference_parameter_node->value(), "true",
+                  is_reference_parameter_node->name_size()) == 0)
       {
-        isReferenceParameter = true;
+        is_reference_parameter = true;
       }
-      else if (strncmp(isReferenceParameterNode->value(), "false",
-                       isReferenceParameterNode->name_size()) == 0)
+      else if (strncmp(is_reference_parameter_node->value(), "false",
+                       is_reference_parameter_node->name_size()) == 0)
       {
-        isReferenceParameter = false;
+        is_reference_parameter = false;
       }
     }
   }
@@ -62,12 +62,12 @@ namespace WS::ADDRESSING
   }
   void EndpointReferenceType::parse(const rapidxml::xml_node<>& node)
   {
-    const auto* addressNode = node.first_node("Address", MDPWS::WS_NS_ADDRESSING);
-    if (addressNode == nullptr)
+    const auto* address_node = node.first_node("Address", MDPWS::WS_NS_ADDRESSING);
+    if (address_node == nullptr)
     {
       throw ExpectedElement("Address", MDPWS::WS_NS_ADDRESSING);
     }
-    address = URIType{addressNode->value(), addressNode->value_size()};
+    address = URIType{address_node->value(), address_node->value_size()};
   }
 
   // RelatesToType

@@ -6,6 +6,7 @@
 #include "rapidxml.hpp"
 #include "server_https.hpp"
 #include "services/ServiceInterface.hpp"
+#include <future>
 
 class ServiceInterface;
 

@@ -10,21 +10,21 @@ namespace WS::EVENTING
 
   // DeliveryType
   //
-  DeliveryType::DeliveryType(NotifyToType notifyTo)
-    : notifyTo(std::move(notifyTo))
+  DeliveryType::DeliveryType(NotifyToType notify_to)
+    : notify_to(std::move(notify_to))
   {
   }
   DeliveryType::DeliveryType(const rapidxml::xml_node<>& node)
-    : notifyTo(WS::ADDRESSING::URIType(""))
+    : notify_to(WS::ADDRESSING::URIType(""))
   {
     this->parse(node);
   }
   void DeliveryType::parse(const rapidxml::xml_node<>& node)
   {
-    const auto* nodeAttr = node.first_attribute("Mode");
-    if (nodeAttr == nullptr || (nodeAttr->value() != nullptr &&
-                                strncmp(nodeAttr->value(), MDPWS::WS_EVENTING_DELIVERYMODE_PUSH,
-                                        nodeAttr->value_size()) == 0))
+    const auto* node_attr = node.first_attribute("Mode");
+    if (node_attr == nullptr || (node_attr->value() != nullptr &&
+                                 strncmp(node_attr->value(), MDPWS::WS_EVENTING_DELIVERYMODE_PUSH,
+                                         node_attr->value_size()) == 0))
     {
       mode = ::MDPWS::WS_EVENTING_DELIVERYMODE_PUSH;
     }
@@ -35,7 +35,7 @@ namespace WS::EVENTING
           entry->xmlns() != nullptr &&
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        notifyTo = NotifyToType(*entry);
+        notify_to = NotifyToType(*entry);
       }
     }
   }
@@ -57,9 +57,9 @@ namespace WS::EVENTING
   }
   void FilterType::parse(const rapidxml::xml_node<>& node)
   {
-    const auto* dialectAttr = node.first_attribute("Dialect");
-    if (dialectAttr == nullptr || strncmp(dialectAttr->value(), MDPWS::WS_EVENTING_FILTER_ACTION,
-                                          dialectAttr->value_size()) != 0)
+    const auto* dialect_attr = node.first_attribute("Dialect");
+    if (dialect_attr == nullptr || strncmp(dialect_attr->value(), MDPWS::WS_EVENTING_FILTER_ACTION,
+                                           dialect_attr->value_size()) != 0)
     {
       throw ExpectedElement("Dialect", MDPWS::WS_EVENTING_FILTER_ACTION);
     }
@@ -99,7 +99,7 @@ namespace WS::EVENTING
       if (strncmp(entry->name(), "EndTo", entry->name_size()) == 0 &&
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        endTo = std::make_optional<EndToType>(*entry);
+        end_to = std::make_optional<EndToType>(*entry);
       }
       else if (strncmp(entry->name(), "Delivery", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
@@ -122,10 +122,10 @@ namespace WS::EVENTING
 
   // SubscribeResponse
   //
-  SubscribeResponse::SubscribeResponse(SubscriptionManagerType subscriptionManager,
+  SubscribeResponse::SubscribeResponse(SubscriptionManagerType subscription_manager,
                                        ExpiresType expires)
-    : subscriptionManager(std::move(subscriptionManager))
-    , expires(std::move(expires))
+    : subscription_manager(std::move(subscription_manager))
+    , expires(expires)
   {
   }
 
@@ -138,10 +138,10 @@ namespace WS::EVENTING
 
   void Renew::parse(const rapidxml::xml_node<>& node)
   {
-    const auto* expiresNode = node.first_node("Expires", MDPWS::WS_NS_EVENTING);
-    if (expiresNode != nullptr)
+    const auto* expires_node = node.first_node("Expires", MDPWS::WS_NS_EVENTING);
+    if (expires_node != nullptr)
     {
-      expires = ExpiresType(std::string{expiresNode->value(), expiresNode->value_size()});
+      expires = ExpiresType(std::string{expires_node->value(), expires_node->value_size()});
     }
   }
 

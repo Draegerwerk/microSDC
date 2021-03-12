@@ -67,7 +67,9 @@ public:
       {
         continue;
       }
-      return NetworkInterface(ifa);
+      NetworkInterface iface{ifa};
+      freeifaddrs(if_addr_struct);
+      return iface;
     }
     if (if_addr_struct != nullptr)
     {

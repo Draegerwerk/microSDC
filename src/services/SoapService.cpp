@@ -6,6 +6,6 @@ void SoapService::fill_response_message_from_request_message(MESSAGEMODEL::Envel
                                                              const MESSAGEMODEL::Envelope& request)
 {
   using MessageIDType = MESSAGEMODEL::Envelope::HeaderType::MessageIDType;
-  envelope.header.messageID = MessageIDType(MicroSDC::calculate_message_id());
-  envelope.header.relatesTo = WS::ADDRESSING::RelatesToType(request.header.messageID.value());
+  envelope.header.message_id = MessageIDType(MicroSDC::calculate_message_id());
+  envelope.header.relates_to = WS::ADDRESSING::RelatesToType(request.header.message_id.value());
 }

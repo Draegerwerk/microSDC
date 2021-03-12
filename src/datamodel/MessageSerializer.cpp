@@ -1,5 +1,6 @@
 #include "MessageSerializer.hpp"
 #include "Casting.hpp"
+#include "datamodel/BICEPS_ParticipantModel.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "rapidxml_print.hpp"
 
@@ -72,10 +73,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   action_node->value(header.action.c_str());
   header_node->append_node(action_node);
   // optionals
-  if (header.messageID.has_value())
+  if (header.message_id.has_value())
   {
     auto* message_id_node = xml_document_->allocate_node(rapidxml::node_element, "wsa:MessageID");
-    message_id_node->value(header.messageID->c_str());
+    message_id_node->value(header.message_id->c_str());
     header_node->append_node(message_id_node);
   }
   if (header.to.has_value())
@@ -84,13 +85,13 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
     to_node->value(header.to->c_str());
     header_node->append_node(to_node);
   }
-  if (header.appSequence.has_value())
+  if (header.app_sequence.has_value())
   {
-    serialize(header_node, header.appSequence.value());
+    serialize(header_node, header.app_sequence.value());
   }
-  if (header.relatesTo.has_value())
+  if (header.relates_to.has_value())
   {
-    serialize(header_node, header.relatesTo.value());
+    serialize(header_node, header.relates_to.value());
   }
   parent->append_node(header_node);
 }
@@ -106,41 +107,41 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   {
     serialize(body_node, body.bye.value());
   }
-  else if (body.probeMatches.has_value())
+  else if (body.probe_matches.has_value())
   {
-    serialize(body_node, body.probeMatches.value());
+    serialize(body_node, body.probe_matches.value());
   }
-  else if (body.resolveMatches.has_value())
+  else if (body.resolve_matches.has_value())
   {
-    serialize(body_node, body.resolveMatches.value());
+    serialize(body_node, body.resolve_matches.value());
   }
   else if (body.metadata.has_value())
   {
     serialize(body_node, body.metadata.value());
   }
-  else if (body.getMdibResponse.has_value())
+  else if (body.get_mdib_response.has_value())
   {
-    serialize(body_node, body.getMdibResponse.value());
+    serialize(body_node, body.get_mdib_response.value());
   }
-  else if (body.subscribeResponse.has_value())
+  else if (body.subscribe_response.has_value())
   {
-    serialize(body_node, body.subscribeResponse.value());
+    serialize(body_node, body.subscribe_response.value());
   }
-  else if (body.renewResponse.has_value())
+  else if (body.renew_response.has_value())
   {
-    serialize(body_node, body.renewResponse.value());
+    serialize(body_node, body.renew_response.value());
   }
-  else if (body.episodicMetricReport.has_value())
+  else if (body.episodic_metric_report.has_value())
   {
-    serialize(body_node, body.episodicMetricReport.value());
+    serialize(body_node, body.episodic_metric_report.value());
   }
-  else if (body.setValueResponse.has_value())
+  else if (body.set_value_response.has_value())
   {
-    serialize(body_node, body.setValueResponse.value());
+    serialize(body_node, body.set_value_response.value());
   }
-  else if (body.setStringResponse.has_value())
+  else if (body.set_string_response.has_value())
   {
-    serialize(body_node, body.setStringResponse.value());
+    serialize(body_node, body.set_string_response.value());
   }
   parent->append_node(body_node);
 }
@@ -167,17 +168,17 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::AppSequenceType& app_sequence)
 {
   auto* app_sequence_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:AppSequence");
-  const auto instance_id_str = std::to_string(app_sequence.instanceId);
+  const auto instance_id_str = std::to_string(app_sequence.instance_id);
   auto* instance_id = xml_document_->allocate_string(instance_id_str.c_str());
   auto* instance_id_attr = xml_document_->allocate_attribute("InstanceId", instance_id);
   app_sequence_node->append_attribute(instance_id_attr);
-  if (app_sequence.sequenceId.has_value())
+  if (app_sequence.sequence_id.has_value())
   {
-    auto* sequence_id = xml_document_->allocate_string(app_sequence.sequenceId->c_str());
+    auto* sequence_id = xml_document_->allocate_string(app_sequence.sequence_id->c_str());
     auto* sequence_id_attr = xml_document_->allocate_attribute("SequenceId", sequence_id);
     app_sequence_node->append_attribute(sequence_id_attr);
   }
-  auto message_number_str = std::to_string(app_sequence.messageNumber);
+  auto message_number_str = std::to_string(app_sequence.message_number);
   auto* message_number = xml_document_->allocate_string(message_number_str.c_str());
   auto* message_number_attr = xml_document_->allocate_attribute("MessageNumber", message_number);
   app_sequence_node->append_attribute(message_number_attr);
@@ -188,9 +189,9 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::ScopesType& scopes)
 {
   auto* scopes_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Scopes");
-  if (scopes.matchBy.has_value())
+  if (scopes.match_by.has_value())
   {
-    auto* match_by_attr = xml_document_->allocate_attribute("MatchBy", scopes.matchBy->c_str());
+    auto* match_by_attr = xml_document_->allocate_attribute("MatchBy", scopes.match_by->c_str());
     scopes_node->append_attribute(match_by_attr);
   }
   const auto scopes_str = to_string(scopes);
@@ -203,7 +204,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::HelloType& hello)
 {
   auto* hello_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Hello");
-  serialize(hello_node, hello.endpointReference);
+  serialize(hello_node, hello.endpoint_reference);
   if (hello.types.has_value())
   {
     auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Types");
@@ -215,17 +216,17 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   {
     serialize(hello_node, hello.scopes.value());
   }
-  if (hello.xAddrs.has_value())
+  if (hello.x_addrs.has_value())
   {
     auto* x_addrs_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
-    auto* x_addrs_str = xml_document_->allocate_string(to_string(hello.xAddrs.value()).c_str());
+    auto* x_addrs_str = xml_document_->allocate_string(to_string(hello.x_addrs.value()).c_str());
     x_addrs_node->value(x_addrs_str);
     hello_node->append_node(x_addrs_node);
   }
   auto* metadata_version_node =
       xml_document_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
   auto* metadata_version =
-      xml_document_->allocate_string(std::to_string(hello.metadataVersion).c_str());
+      xml_document_->allocate_string(std::to_string(hello.metadata_version).c_str());
   metadata_version_node->value(metadata_version);
   parent->append_node(hello_node);
 }
@@ -233,7 +234,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const WS::DISCOVERY::ByeType& bye)
 {
   auto* bye_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:bye");
-  serialize(bye_node, bye.endpointReference);
+  serialize(bye_node, bye.endpoint_reference);
   if (bye.types.has_value())
   {
     auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Types");
@@ -245,19 +246,19 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const WS::DISCOV
   {
     serialize(bye_node, bye.scopes.value());
   }
-  if (bye.xAddrs.has_value())
+  if (bye.x_addrs.has_value())
   {
     auto* x_addrs_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
-    auto* x_addrs_str = xml_document_->allocate_string(to_string(bye.xAddrs.value()).c_str());
+    auto* x_addrs_str = xml_document_->allocate_string(to_string(bye.x_addrs.value()).c_str());
     x_addrs_node->value(x_addrs_str);
     bye_node->append_node(x_addrs_node);
   }
-  if (bye.metadataVersion.has_value())
+  if (bye.metadata_version.has_value())
   {
     auto* metadata_version_node =
         xml_document_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
     auto* metadata_version =
-        xml_document_->allocate_string(std::to_string(bye.metadataVersion.value()).c_str());
+        xml_document_->allocate_string(std::to_string(bye.metadata_version.value()).c_str());
     metadata_version_node->value(metadata_version);
   }
   parent->append_node(bye_node);
@@ -267,7 +268,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::ProbeMatchType& probe_match)
 {
   auto* probe_match_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:ProbeMatch");
-  serialize(probe_match_node, probe_match.endpointReference);
+  serialize(probe_match_node, probe_match.endpoint_reference);
   if (probe_match.types.has_value())
   {
     auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Types");
@@ -279,18 +280,18 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   {
     serialize(probe_match_node, probe_match.scopes.value());
   }
-  if (probe_match.xAddrs.has_value())
+  if (probe_match.x_addrs.has_value())
   {
     auto* x_addrs_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
     auto* x_addrs_str =
-        xml_document_->allocate_string(to_string(probe_match.xAddrs.value()).c_str());
+        xml_document_->allocate_string(to_string(probe_match.x_addrs.value()).c_str());
     x_addrs_node->value(x_addrs_str);
     probe_match_node->append_node(x_addrs_node);
   }
   auto* metadata_version_node =
       xml_document_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
   auto* metadata_version =
-      xml_document_->allocate_string(std::to_string(probe_match.metadataVersion).c_str());
+      xml_document_->allocate_string(std::to_string(probe_match.metadata_version).c_str());
   metadata_version_node->value(metadata_version);
   probe_match_node->append_node(metadata_version_node);
   parent->append_node(probe_match_node);
@@ -301,7 +302,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* probe_matches_node =
       xml_document_->allocate_node(rapidxml::node_element, "wsd:ProbeMatches");
-  for (const auto& probe_match : probe_matches.probeMatch)
+  for (const auto& probe_match : probe_matches.probe_match)
   {
     serialize(probe_matches_node, probe_match);
   }
@@ -312,8 +313,8 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DISCOVERY::ResolveMatchType& resolve_match)
 {
   auto* resolve_match_node =
-      xml_document_->allocate_node(rapidxml::node_element, "wsd:ResolveMatches");
-  serialize(resolve_match_node, resolve_match.endpointReference);
+      xml_document_->allocate_node(rapidxml::node_element, "wsd:ResolveMatch");
+  serialize(resolve_match_node, resolve_match.endpoint_reference);
   if (resolve_match.types.has_value())
   {
     auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:Types");
@@ -326,18 +327,18 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   {
     serialize(resolve_match_node, resolve_match.scopes.value());
   }
-  if (resolve_match.xAddrs.has_value())
+  if (resolve_match.x_addrs.has_value())
   {
     auto* x_addrs_node = xml_document_->allocate_node(rapidxml::node_element, "wsd:XAddrs");
     auto* x_addrs_str =
-        xml_document_->allocate_string(to_string(resolve_match.xAddrs.value()).c_str());
+        xml_document_->allocate_string(to_string(resolve_match.x_addrs.value()).c_str());
     x_addrs_node->value(x_addrs_str);
     resolve_match_node->append_node(x_addrs_node);
   }
   auto* metadata_version_node =
       xml_document_->allocate_node(rapidxml::node_element, "wsd:MetadataVersion");
   auto* metadata_version =
-      xml_document_->allocate_string(std::to_string(resolve_match.metadataVersion).c_str());
+      xml_document_->allocate_string(std::to_string(resolve_match.metadata_version).c_str());
   metadata_version_node->value(metadata_version);
   resolve_match_node->append_node(metadata_version_node);
   parent->append_node(resolve_match_node);
@@ -348,7 +349,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* resolve_matches_node =
       xml_document_->allocate_node(rapidxml::node_element, "wsd:ResolveMatches");
-  for (const auto& resolve_match : resolve_matches.resolveMatch)
+  for (const auto& resolve_match : resolve_matches.resolve_match)
   {
     serialize(resolve_matches_node, resolve_match);
   }
@@ -358,7 +359,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const WS::MEX::Metadata& metadata)
 {
   auto* metadata_node = xml_document_->allocate_node(rapidxml::node_element, "mex:Metadata");
-  for (const auto& metadata_section : metadata.metadataSection)
+  for (const auto& metadata_section : metadata.metadata_section)
   {
     serialize(metadata_node, metadata_section);
   }
@@ -373,13 +374,13 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto* dialect_attr =
       xml_document_->allocate_attribute("Dialect", metadata_section.dialect.c_str());
   metadata_section_node->append_attribute(dialect_attr);
-  if (metadata_section.thisModel.has_value())
+  if (metadata_section.this_model.has_value())
   {
-    serialize(metadata_section_node, metadata_section.thisModel.value());
+    serialize(metadata_section_node, metadata_section.this_model.value());
   }
-  else if (metadata_section.thisDevice.has_value())
+  else if (metadata_section.this_device.has_value())
   {
-    serialize(metadata_section_node, metadata_section.thisDevice.value());
+    serialize(metadata_section_node, metadata_section.this_device.value());
   }
   else if (metadata_section.relationship.has_value())
   {
@@ -407,7 +408,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
     this_model_node->append_node(manufacturer_node);
   }
   // ModelName
-  for (const auto& model_name : this_model.modelName)
+  for (const auto& model_name : this_model.model_name)
   {
     auto* model_name_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:ModelName");
     model_name_node->value(model_name.c_str());
@@ -421,7 +422,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* this_device_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:ThisDevice");
   // FriendlyName
-  for (const auto& friendly_name : this_device.friendlyName)
+  for (const auto& friendly_name : this_device.friendly_name)
   {
     auto* friendly_name_node =
         xml_document_->allocate_node(rapidxml::node_element, "dpws:FriendlyName");
@@ -451,7 +452,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DPWS::HostServiceType& host)
 {
   auto* host_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:Host");
-  serialize(host_node, host.endpointReference);
+  serialize(host_node, host.endpoint_reference);
   if (host.types.has_value())
   {
     auto* types_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:Types");
@@ -466,7 +467,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const WS::DPWS::HostedServiceType& hosted)
 {
   auto* hosted_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:Hosted");
-  for (const auto& epr : hosted.endpointReference)
+  for (const auto& epr : hosted.endpoint_reference)
   {
     serialize(hosted_node, epr);
   }
@@ -477,7 +478,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   hosted_node->append_node(types_node);
   // ServiceId
   auto* service_id_node = xml_document_->allocate_node(rapidxml::node_element, "dpws:ServiceId");
-  service_id_node->value(hosted.serviceId.c_str());
+  service_id_node->value(hosted.service_id.c_str());
   hosted_node->append_node(service_id_node);
   parent->append_node(hosted_node);
 }
@@ -826,8 +827,30 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM
   for (const auto& state : md_state.state)
   {
     auto* state_node = xml_document_->allocate_node(rapidxml::node_element, "pm:State");
-    if (const auto numeric_metric_state = dyn_cast<BICEPS::PM::NumericMetricState>(state);
-        numeric_metric_state != nullptr)
+    if (const auto mds_state = dyn_cast<BICEPS::PM::MdsState>(state); mds_state != nullptr)
+    {
+      serialize(state_node, *mds_state);
+    }
+    else if (const auto system_context_state = dyn_cast<BICEPS::PM::SystemContextState>(state);
+             system_context_state != nullptr)
+    {
+      serialize(state_node, *system_context_state);
+    }
+    else if (const auto channel_state = dyn_cast<BICEPS::PM::ChannelState>(state);
+             channel_state != nullptr)
+    {
+      serialize(state_node, *channel_state);
+    }
+    else if (const auto sco_state = dyn_cast<BICEPS::PM::ScoState>(state); sco_state != nullptr)
+    {
+      serialize(state_node, *sco_state);
+    }
+    else if (const auto vmd_state = dyn_cast<BICEPS::PM::VmdState>(state); vmd_state != nullptr)
+    {
+      serialize(state_node, *vmd_state);
+    }
+    else if (const auto numeric_metric_state = dyn_cast<BICEPS::PM::NumericMetricState>(state);
+             numeric_metric_state != nullptr)
     {
       serialize(state_node, *numeric_metric_state);
     }
@@ -870,6 +893,198 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   {
     append_to_string_attribute(parent, "StateVersion", state.state_version.value());
   }
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::AbstractDeviceComponentState& state)
+{
+  serialize(parent, static_cast<const BICEPS::PM::AbstractState&>(state));
+
+  if (state.activation_state.has_value())
+  {
+    append_attribute(parent, "ActivationState", to_string(state.activation_state.value()));
+  }
+  if (state.operating_hours.has_value())
+  {
+    append_to_string_attribute(parent, "OperatingHours", state.operating_hours.value());
+  }
+  if (state.operating_cycles.has_value())
+  {
+    append_to_string_attribute(parent, "OperatingCycles", state.operating_cycles.value());
+  }
+  if (state.calibration_info.has_value())
+  {
+    auto* node = xml_document_->allocate_node(rapidxml::node_element, "pm:CalibrationInfo");
+    serialize(node, state.calibration_info.value());
+    parent->append_node(node);
+  }
+  if (state.next_calibration.has_value())
+  {
+    auto* node = xml_document_->allocate_node(rapidxml::node_element, "pm:NextCalibration");
+    serialize(node, state.next_calibration.value());
+    parent->append_node(node);
+  }
+  if (state.physical_connector.has_value())
+  {
+    auto* node = xml_document_->allocate_node(rapidxml::node_element, "pm:PhysicalConnector");
+    serialize(node, state.physical_connector.value());
+    parent->append_node(node);
+  }
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::CalibrationInfo& info)
+{
+  if (info.component_calibration_state.has_value())
+  {
+    append_attribute(parent, "ComponentCalibrationState",
+                     to_string(info.component_calibration_state.value()));
+  }
+  if (info.type.has_value())
+  {
+    append_attribute(parent, "Type", to_string(info.type.value()));
+  }
+  if (info.time.has_value())
+  {
+    append_to_string_attribute(parent, "Time", info.time.value());
+  }
+  if (info.calibration_documentation.has_value())
+  {
+    auto* node =
+        xml_document_->allocate_node(rapidxml::node_element, "pm:CalibrationDocumentation");
+    serialize(node, info.calibration_documentation.value());
+    parent->append_node(node);
+  }
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::CalibrationDocumentation& documentation)
+{
+  if (documentation.documentation.has_value())
+  {
+    auto* node = xml_document_->allocate_node(rapidxml::node_element, "pm:Documentation");
+    serialize(node, documentation.documentation.value());
+    parent->append_node(node);
+  }
+  if (documentation.calibration_result.has_value())
+  {
+    auto* node = xml_document_->allocate_node(rapidxml::node_element, "pm:CalibrationResult");
+    serialize(node, documentation.calibration_result.value());
+    parent->append_node(node);
+  }
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::PhysicalConnectorInfo& info)
+{
+  if (info.number.has_value())
+  {
+    append_to_string_attribute(parent, "Number", info.number.value());
+  }
+  for (const auto& label : info.label)
+  {
+    auto* node = xml_document_->allocate_node(rapidxml::node_element, "pm:Label");
+    serialize(node, label);
+    parent->append_node(node);
+  }
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::SystemContextState& state)
+{
+  serialize(parent, static_cast<const BICEPS::PM::AbstractDeviceComponentState&>(state));
+  append_attribute(parent, "xsi:type", "pm:SystemContextState");
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::ChannelState& state)
+{
+  serialize(parent, static_cast<const BICEPS::PM::AbstractDeviceComponentState&>(state));
+  append_attribute(parent, "xsi:type", "pm:ChannelState");
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::OperationGroup& operation_group)
+{
+  if (operation_group.operating_mode.has_value())
+  {
+    // TODO
+    throw std::runtime_error("Not Implemented!");
+  }
+  if (operation_group.operations.has_value())
+  {
+    // TODO
+    throw std::runtime_error("Not Implemented!");
+  }
+  auto* node = xml_document_->allocate_node(rapidxml::node_element, "pm:Type");
+  serialize(node, operation_group.type);
+  parent->append_node(node);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ScoState& state)
+{
+  serialize(parent, static_cast<const BICEPS::PM::AbstractDeviceComponentState&>(state));
+
+  if (state.invocation_requested.has_value())
+  {
+    // TODO
+    throw std::runtime_error("Not Implemented!");
+  }
+  if (state.invocation_required.has_value())
+  {
+    // TODO
+    throw std::runtime_error("Not Implemented!");
+  }
+  if (state.operation_group.has_value())
+  {
+    auto* node = xml_document_->allocate_node(rapidxml::node_element, "pm:OperatingJurisdiction");
+    serialize(node, state.operation_group.value());
+    parent->append_node(node);
+  }
+
+  append_attribute(parent, "xsi:type", "pm:ScoState");
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::AbstractComplexDeviceComponentState& state)
+{
+  serialize(parent, static_cast<const BICEPS::PM::AbstractDeviceComponentState&>(state));
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdsState& state)
+{
+  serialize(parent, static_cast<const BICEPS::PM::AbstractComplexDeviceComponentState&>(state));
+  if (state.lang.has_value())
+  {
+    append_attribute(parent, "Lang", state.lang.value());
+  }
+  if (state.operating_mode.has_value())
+  {
+    append_attribute(parent, "OperatingMode", to_string(state.operating_mode.value()));
+  }
+
+  if (state.operating_jurisdiction.has_value())
+  {
+    auto* operating_jurisdiction_parent =
+        xml_document_->allocate_node(rapidxml::node_element, "pm:OperatingJurisdiction");
+    serialize(operating_jurisdiction_parent, state.operating_jurisdiction.value());
+    parent->append_node(operating_jurisdiction_parent);
+  }
+  append_attribute(parent, "xsi:type", "pm:MdsState");
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::VmdState& state)
+{
+  serialize(parent, static_cast<const BICEPS::PM::AbstractComplexDeviceComponentState&>(state));
+
+  if (state.operating_jurisdiction.has_value())
+  {
+    auto* operating_jurisdiction_parent =
+        xml_document_->allocate_node(rapidxml::node_element, "pm:OperatingJurisdiction");
+    serialize(operating_jurisdiction_parent, state.operating_jurisdiction.value());
+    parent->append_node(operating_jurisdiction_parent);
+  }
+  append_attribute(parent, "xsi:type", "pm:VmdState");
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
@@ -1099,11 +1314,11 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
       xml_document_->allocate_node(rapidxml::node_element, "wse:SubscriptionManager");
 
   auto* address_node = xml_document_->allocate_node(rapidxml::node_element, "wsa:Address");
-  address_node->value(subscribe_response.subscriptionManager.address.c_str());
+  address_node->value(subscribe_response.subscription_manager.address.c_str());
   subscription_manager_node->append_node(address_node);
 
   serialize(subscription_manager_node,
-            subscribe_response.subscriptionManager.referenceParameters.value());
+            subscribe_response.subscription_manager.reference_parameters.value());
 
   subscribe_response_node->append_node(subscription_manager_node);
 
@@ -1205,11 +1420,11 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* report_node =
       xml_document_->allocate_node(rapidxml::node_element, "mm:EpisodicMetricReport");
-  if (report.mdibVersion.has_value())
+  if (report.mdib_version.has_value())
   {
-    append_to_string_attribute(report_node, "MdibVersion", report.mdibVersion.value());
+    append_to_string_attribute(report_node, "MdibVersion", report.mdib_version.value());
   }
-  for (const auto& part : report.reportPart)
+  for (const auto& part : report.report_part)
   {
     serialize(report_node, part);
   }
@@ -1220,7 +1435,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::MM::MetricReportPart& part)
 {
   auto* report_part_node = xml_document_->allocate_node(rapidxml::node_element, "mm:ReportPart");
-  for (const auto& state : part.metricState)
+  for (const auto& state : part.metric_state)
   {
     auto* state_node = xml_document_->allocate_node(rapidxml::node_element, "pm:State");
     if (const auto numeric_metric_state = dyn_cast<const BICEPS::PM::NumericMetricState>(state);
@@ -1483,19 +1698,19 @@ std::string MessageSerializer::to_string(BICEPS::MM::InvocationState invocation_
 {
   switch (invocation_state)
   {
-    case BICEPS::MM::InvocationState::Wait:
+    case BICEPS::MM::InvocationState::WAIT:
       return "Wait";
-    case BICEPS::MM::InvocationState::Start:
+    case BICEPS::MM::InvocationState::START:
       return "Start";
-    case BICEPS::MM::InvocationState::Cnclld:
+    case BICEPS::MM::InvocationState::CNCLLD:
       return "Cnclld";
-    case BICEPS::MM::InvocationState::CnclldMan:
+    case BICEPS::MM::InvocationState::CNCLLD_MAN:
       return "CnclldMan";
-    case BICEPS::MM::InvocationState::Fin:
+    case BICEPS::MM::InvocationState::FIN:
       return "Fin";
-    case BICEPS::MM::InvocationState::FinMod:
+    case BICEPS::MM::InvocationState::FIN_MOD:
       return "FinMod";
-    case BICEPS::MM::InvocationState::Fail:
+    case BICEPS::MM::InvocationState::FAIL:
       return "Fail";
   }
   assert(false && "Uncatched value in InvocationState");
@@ -1506,13 +1721,13 @@ std::string MessageSerializer::to_string(BICEPS::MM::InvocationError invocation_
 {
   switch (invocation_error)
   {
-    case BICEPS::MM::InvocationError::Unspec:
+    case BICEPS::MM::InvocationError::UNSPEC:
       return "Unspec";
-    case BICEPS::MM::InvocationError::Unkn:
+    case BICEPS::MM::InvocationError::UNKN:
       return "Unkn";
-    case BICEPS::MM::InvocationError::Inv:
+    case BICEPS::MM::InvocationError::INV:
       return "Inv";
-    case BICEPS::MM::InvocationError::Oth:
+    case BICEPS::MM::InvocationError::OTH:
       return "Oth";
   }
   assert(false && "Uncatched value in InvocationError");
@@ -1569,6 +1784,59 @@ std::string MessageSerializer::to_string(BICEPS::PM::ComponentActivation activat
       return "Fail";
   }
   assert(false && "Uncatched value in ComponentActivation");
+  return "";
+}
+
+std::string MessageSerializer::to_string(BICEPS::PM::MdsOperatingMode operating_mode)
+{
+  switch (operating_mode)
+  {
+    case BICEPS::PM::MdsOperatingMode::NML:
+      return "Nml";
+    case BICEPS::PM::MdsOperatingMode::DMO:
+      return "Dmo";
+    case BICEPS::PM::MdsOperatingMode::SRV:
+      return "Srv";
+    case BICEPS::PM::MdsOperatingMode::MTN:
+      return "Mtn";
+  }
+  assert(false && "Uncatched value in MdsOperatingMode");
+  return "";
+}
+
+std::string MessageSerializer::to_string(BICEPS::PM::CalibrationState calib_state)
+{
+  switch (calib_state)
+  {
+    case BICEPS::PM::CalibrationState::NO:
+      return "No";
+    case BICEPS::PM::CalibrationState::REQ:
+      return "Req";
+    case BICEPS::PM::CalibrationState::RUN:
+      return "Run";
+    case BICEPS::PM::CalibrationState::CAL:
+      return "Cal";
+    case BICEPS::PM::CalibrationState::OTH:
+      return "Oth";
+  }
+  assert(false && "Uncatched value in MdsOperatingMode");
+  return "";
+}
+
+std::string MessageSerializer::to_string(BICEPS::PM::CalibrationType calib_type)
+{
+  switch (calib_type)
+  {
+    case BICEPS::PM::CalibrationType::OFFSET:
+      return "Offset";
+    case BICEPS::PM::CalibrationType::GAIN:
+      return "Gain";
+    case BICEPS::PM::CalibrationType::TP:
+      return "Tp";
+    case BICEPS::PM::CalibrationType::UNSPEC:
+      return "Unspec";
+  }
+  assert(false && "Uncatched value in MdsOperatingMode");
   return "";
 }
 

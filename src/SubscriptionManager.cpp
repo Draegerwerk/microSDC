@@ -30,6 +30,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribe_request)
                   allowed_subscription_event_actions_.end(),
                   filter_action) == allowed_subscription_event_actions_.end())
     {
+      LOG(LogLevel::ERROR, "Unknown Event action: " << filter_action);
       throw std::runtime_error("Unknown event action");
     }
   }
@@ -38,8 +39,8 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribe_request)
   const Duration duration(subscribe_request.expires.value_or(WS::EVENTING::ExpirationType(
       Duration(Duration::Years{0}, Duration::Months{0}, Duration::Days{0}, Duration::Hours{1},
                Duration::Minutes{0}, Duration::Seconds{0}, false))));
-  const auto expires = duration.toExpirationTimePoint();
-  SubscriptionInformation info{subscribe_request.delivery.notifyTo,
+  const auto expires = duration.to_expiration_time_point();
+  SubscriptionInformation info{subscribe_request.delivery.notify_to,
                                subscribe_request.filter.value(), expires};
 
   {
@@ -51,7 +52,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Subscribe& subscribe_request)
   WS::EVENTING::SubscribeResponse::SubscriptionManagerType subscription_manager(
       WS::ADDRESSING::EndpointReferenceType(
           WS::ADDRESSING::URIType("To be filled by Soap Service")));
-  subscription_manager.referenceParameters =
+  subscription_manager.reference_parameters =
       WS::ADDRESSING::ReferenceParametersType(WS::EVENTING::Identifier{identifier});
   WS::EVENTING::SubscribeResponse subscribe_response(
       subscription_manager, WS::EVENTING::SubscribeResponse::ExpiresType{duration});
@@ -72,7 +73,7 @@ SubscriptionManager::dispatch(const WS::EVENTING::Renew& renew_request,
     throw std::runtime_error("Could not find subscription corresponding to Renew Identifier " +
                              identifier);
   }
-  subscription_info->second.expiration_time = duration.toExpirationTimePoint();
+  subscription_info->second.expiration_time = duration.to_expiration_time_point();
   WS::EVENTING::RenewResponse renew_response;
   renew_response.expires = WS::EVENTING::RenewResponse::ExpiresType{duration};
   LOG(LogLevel::INFO, "Successfully renewed subscription for " << identifier);
@@ -122,11 +123,11 @@ void SubscriptionManager::fire_event(const BICEPS::MM::EpisodicMetricReport& rep
     return;
   }
   MESSAGEMODEL::Header header;
-  header.messageID = MESSAGEMODEL::Header::MessageIDType(MicroSDC::calculate_message_id());
+  header.message_id = MESSAGEMODEL::Header::MessageIDType(MicroSDC::calculate_message_id());
   header.action = WS::ADDRESSING::URIType(SDC::ACTION_EPISODIC_METRIC_REPORT);
 
   MESSAGEMODEL::Body body;
-  body.episodicMetricReport = report;
+  body.episodic_metric_report = report;
 
   MESSAGEMODEL::Envelope notify_envelope;
   notify_envelope.header = std::move(header);

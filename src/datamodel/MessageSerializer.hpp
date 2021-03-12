@@ -73,6 +73,20 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Range& range);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdState& md_state);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractState& state);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::AbstractDeviceComponentState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::CalibrationInfo& info);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::CalibrationDocumentation& documentation);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::PhysicalConnectorInfo& info);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::SystemContextState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ChannelState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::OperationGroup& operation_group);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ScoState& state);
+  void serialize(rapidxml::xml_node<>* parent,
+                 const BICEPS::PM::AbstractComplexDeviceComponentState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdsState& state);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::VmdState& state);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::AbstractMetricState& state);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::NumericMetricState& state);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::StringMetricState& state);
@@ -131,6 +145,9 @@ public:
   static std::string to_string(BICEPS::PM::ContextAssociation context_association);
   static std::string to_string(BICEPS::PM::OperatingMode operating_mode);
   static std::string to_string(BICEPS::PM::ComponentActivation activation);
+  static std::string to_string(BICEPS::PM::MdsOperatingMode operating_mode);
+  static std::string to_string(BICEPS::PM::CalibrationState calib_state);
+  static std::string to_string(BICEPS::PM::CalibrationType calib_type);
   static std::string to_string(Duration duration);
 
 private:

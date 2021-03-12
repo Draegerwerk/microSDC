@@ -138,12 +138,26 @@ void MicroSDC::initialize_md_states()
   }
   for (const auto& md : mdib_->md_description->mds)
   {
+    mdib_->md_state->state.emplace_back(std::make_shared<BICEPS::PM::MdsState>(md.handle));
+    if (md.system_context.has_value())
+    {
+      mdib_->md_state->state.emplace_back(
+          std::make_shared<BICEPS::PM::SystemContextState>(md.system_context.value().handle));
+    }
     for (const auto& vmd : md.vmd)
     {
+      mdib_->md_state->state.emplace_back(std::make_shared<BICEPS::PM::VmdState>(vmd.handle));
+      for (const auto& channel : vmd.channel)
+      {
+        mdib_->md_state->state.emplace_back(
+            std::make_shared<BICEPS::PM::ChannelState>(channel.handle));
+      }
       if (!vmd.sco.has_value())
       {
         continue;
       }
+      mdib_->md_state->state.emplace_back(
+          std::make_shared<BICEPS::PM::ScoState>(vmd.sco.value().handle));
       for (const auto& operation : vmd.sco.value().operation)
       {
         if (const auto descriptor = dyn_cast<BICEPS::PM::SetValueOperationDescriptor>(operation);
@@ -164,7 +178,7 @@ void MicroSDC::initialize_md_states()
   }
 }
 
-void MicroSDC::set_location(const std::string& descriptor_handle,
+void MicroSDC::set_location(const std::string& descriptor_handle, const std::string& state_handle,
                             const BICEPS::PM::LocationDetail& location_detail)
 {
   auto mdib_version = get_mdib_version();
@@ -172,7 +186,7 @@ void MicroSDC::set_location(const std::string& descriptor_handle,
   if (location_context_state_ == nullptr)
   {
     location_context_state_ =
-        std::make_shared<BICEPS::PM::LocationContextState>(descriptor_handle, descriptor_handle);
+        std::make_shared<BICEPS::PM::LocationContextState>(descriptor_handle, state_handle);
     mdib_->md_state->state.emplace_back(location_context_state_);
   }
   location_context_state_->location_detail = location_detail;
@@ -199,11 +213,11 @@ void MicroSDC::set_location(const std::string& descriptor_handle,
 
 BICEPS::MM::InvocationState MicroSDC::request_state_change(const BICEPS::MM::AbstractSet& set)
 {
-  const auto target_handle = find_operation_target_for_operation_handle(set.operationHandleRef);
+  const auto target_handle = find_operation_target_for_operation_handle(set.operation_handle_ref);
   if (!target_handle.has_value())
   {
-    LOG(LogLevel::ERROR, "No operation target for " << set.operationHandleRef << " found!");
-    return BICEPS::MM::InvocationState::Fail;
+    LOG(LogLevel::ERROR, "No operation target for " << set.operation_handle_ref << " found!");
+    return BICEPS::MM::InvocationState::FAIL;
   }
   const auto handler =
       std::find_if(state_handlers_.begin(), state_handlers_.end(), [&](const auto& handler) {
@@ -212,7 +226,7 @@ BICEPS::MM::InvocationState MicroSDC::request_state_change(const BICEPS::MM::Abs
   if (handler == state_handlers_.end())
   {
     LOG(LogLevel::ERROR, "No state handler for " << target_handle.value() << " found!");
-    return BICEPS::MM::InvocationState::Fail;
+    return BICEPS::MM::InvocationState::FAIL;
   }
   return (*handler)->request_state_change(set);
 }
@@ -336,10 +350,10 @@ void MicroSDC::notify_episodic_metric_report(
     std::shared_ptr<const BICEPS::PM::AbstractMetricState> state)
 {
   BICEPS::MM::MetricReportPart report_part;
-  report_part.metricState.emplace_back(std::move(state));
+  report_part.metric_state.emplace_back(std::move(state));
   BICEPS::MM::EpisodicMetricReport report(WS::ADDRESSING::URIType("0"));
-  report.reportPart.emplace_back(std::move(report_part));
-  report.mdibVersion = get_mdib_version();
+  report.report_part.emplace_back(std::move(report_part));
+  report.mdib_version = get_mdib_version();
   subscription_manager_->fire_event(report);
 }
 

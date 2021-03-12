@@ -59,5 +59,13 @@ namespace SDC
   SDCConstant ACTION_PERIODIC_OPERATIONAL_STATE_REPORT =
       "http://standards.ieee.org/downloads/11073/11073-20701-2018/StateEventService/"
       "PeriodicOperationalStateReport";
+  SDCConstant ACTION_DESCRIPTION_MODIFICATION_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/DescriptionEventService/"
+      "DescriptionModificationReport";
+  SDCConstant ACTION_EPISODIC_CONTEXT_REPORT =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/ContextService/"
+      "EpisodicContextReport";
+  SDCConstant ACTION_WAVEFORM_STREAM =
+      "http://standards.ieee.org/downloads/11073/11073-20701-2018/WaveformService/WaveformStream";
 
 } // namespace SDC

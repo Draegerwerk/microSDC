@@ -84,12 +84,30 @@ void DiscoveryService::configure_proxy(const NetworkConfig::DiscoveryProxyProtoc
 void DiscoveryService::set_location(const BICEPS::PM::LocationDetail& location_detail)
 {
   std::string ctxt = "sdc.ctxt.loc:/sdc.ctxt.loc.detail/?";
-  ctxt += "fac=" + location_detail.facility.value_or("");
-  ctxt += "&bldng=" + location_detail.building.value_or("");
-  ctxt += "&poc=" + location_detail.poc.value_or("");
-  ctxt += "&flr=" + location_detail.floor.value_or("");
-  ctxt += "&rm=" + location_detail.room.value_or("");
-  ctxt += "&bed=" + location_detail.bed.value_or("");
+  if (location_detail.facility.has_value())
+  {
+    ctxt += "fac=" + location_detail.facility.value();
+  }
+  if (location_detail.building.has_value())
+  {
+    ctxt += "&bldng=" + location_detail.building.value();
+  }
+  if (location_detail.poc.has_value())
+  {
+    ctxt += "&poc=" + location_detail.poc.value();
+  }
+  if (location_detail.floor.has_value())
+  {
+    ctxt += "&flr=" + location_detail.floor.value();
+  }
+  if (location_detail.room.has_value())
+  {
+    ctxt += "&rm=" + location_detail.room.value();
+  }
+  if (location_detail.bed.has_value())
+  {
+    ctxt += "&bed=" + location_detail.bed.value();
+  }
   scopes_.emplace_back(WS::ADDRESSING::URIType(ctxt));
 }
 
@@ -172,7 +190,7 @@ void DiscoveryService::handle_udp_message(std::size_t bytes_recvd)
   {
     LOG(LogLevel::INFO, "Received WS-Discovery Hello message from " << sender_address);
   }
-  else if (envelope->body.probeMatches.has_value())
+  else if (envelope->body.probe_matches.has_value())
   {
     LOG(LogLevel::INFO, "Received WS-Discovery ProbeMatches message from " << sender_address);
   }
@@ -180,10 +198,10 @@ void DiscoveryService::handle_udp_message(std::size_t bytes_recvd)
   {
     LOG(LogLevel::INFO, "Received WS-Discovery Resolve message from "
                             << sender_address << " asking for EndpointReference "
-                            << envelope->body.resolve->endpointReference.address);
+                            << envelope->body.resolve->endpoint_reference.address);
     handle_resolve(*envelope);
   }
-  else if (envelope->body.resolveMatches.has_value())
+  else if (envelope->body.resolve_matches.has_value())
   {
     LOG(LogLevel::INFO, "Received WS-Discovery ResolveMatches message from " << sender_address);
   }
@@ -202,7 +220,7 @@ void DiscoveryService::send_hello()
   build_hello_message(*message);
   MESSAGEMODEL::Envelope::HeaderType::AppSequenceType app_sequence(
       messaging_context_.get_instance_id(), messaging_context_.get_next_message_counter());
-  message->header.appSequence = app_sequence;
+  message->header.app_sequence = app_sequence;
   // Serialize and send
   MessageSerializer serializer;
   serializer.serialize(*message);
@@ -244,7 +262,7 @@ void DiscoveryService::build_hello_message(MESSAGEMODEL::Envelope& envelope)
 {
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_HELLO);
   envelope.header.to = WS::ADDRESSING::URIType(MDPWS::WS_DISCOVERY_URN);
-  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
+  envelope.header.message_id = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
   auto& hello = envelope.body.hello = WS::DISCOVERY::HelloType(
       WS::ADDRESSING::EndpointReferenceType(endpoint_reference_), metadata_version_);
   if (!scopes_.empty())
@@ -257,7 +275,7 @@ void DiscoveryService::build_hello_message(MESSAGEMODEL::Envelope& envelope)
   }
   if (!x_addresses_.empty())
   {
-    hello->xAddrs = x_addresses_;
+    hello->x_addrs = x_addresses_;
   }
 }
 
@@ -268,7 +286,7 @@ void DiscoveryService::send_bye()
   build_bye_message(*message);
   MESSAGEMODEL::Envelope::HeaderType::AppSequenceType app_sequence(
       messaging_context_.get_instance_id(), messaging_context_.get_next_message_counter());
-  message->header.appSequence = app_sequence;
+  message->header.app_sequence = app_sequence;
   // Serialize and send
   MessageSerializer serializer;
   serializer.serialize(*message);
@@ -310,7 +328,7 @@ void DiscoveryService::build_bye_message(MESSAGEMODEL::Envelope& envelope)
 {
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_BYE);
   envelope.header.to = WS::ADDRESSING::URIType(MDPWS::WS_DISCOVERY_URN);
-  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
+  envelope.header.message_id = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
   auto& bye = envelope.body.bye =
       WS::DISCOVERY::ByeType(WS::ADDRESSING::EndpointReferenceType(endpoint_reference_));
   if (!scopes_.empty())
@@ -323,7 +341,7 @@ void DiscoveryService::build_bye_message(MESSAGEMODEL::Envelope& envelope)
   }
   if (!x_addresses_.empty())
   {
-    bye->xAddrs = x_addresses_;
+    bye->x_addrs = x_addresses_;
   }
 }
 
@@ -350,7 +368,7 @@ void DiscoveryService::handle_probe(const MESSAGEMODEL::Envelope& envelope)
 
 void DiscoveryService::handle_resolve(const MESSAGEMODEL::Envelope& envelope)
 {
-  if (envelope.body.resolve->endpointReference.address != endpoint_reference_)
+  if (envelope.body.resolve->endpoint_reference.address != endpoint_reference_)
   {
     return;
   }
@@ -377,9 +395,9 @@ void DiscoveryService::handle_resolve(const MESSAGEMODEL::Envelope& envelope)
 void DiscoveryService::build_probe_match_message(MESSAGEMODEL::Envelope& envelope,
                                                  const MESSAGEMODEL::Envelope& request)
 {
-  auto& probe_matches = envelope.body.probeMatches = WS::DISCOVERY::ProbeMatchesType({});
+  auto& probe_matches = envelope.body.probe_matches = WS::DISCOVERY::ProbeMatchesType({});
   // TODO: check for match
-  auto& match = probe_matches->probeMatch.emplace_back(
+  auto& match = probe_matches->probe_match.emplace_back(
       WS::ADDRESSING::EndpointReferenceType(endpoint_reference_), metadata_version_);
   if (!scopes_.empty())
   {
@@ -391,30 +409,30 @@ void DiscoveryService::build_probe_match_message(MESSAGEMODEL::Envelope& envelop
   }
   if (!x_addresses_.empty())
   {
-    match.xAddrs = x_addresses_;
+    match.x_addrs = x_addresses_;
   }
 
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_PROBE_MATCHES);
-  if (request.header.replyTo.has_value())
+  if (request.header.reply_to.has_value())
   {
-    envelope.header.to = request.header.replyTo->address;
+    envelope.header.to = request.header.reply_to->address;
   }
   else
   {
     envelope.header.to = WS::ADDRESSING::URIType(MDPWS::WS_ADDRESSING_ANONYMOUS);
   }
-  if (request.header.messageID.has_value())
+  if (request.header.message_id.has_value())
   {
-    envelope.header.relatesTo = WS::ADDRESSING::RelatesToType(request.header.messageID.value());
+    envelope.header.relates_to = WS::ADDRESSING::RelatesToType(request.header.message_id.value());
   }
-  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
+  envelope.header.message_id = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
 }
 
 void DiscoveryService::build_resolve_match_message(MESSAGEMODEL::Envelope& envelope,
                                                    const MESSAGEMODEL::Envelope& request)
 {
-  auto& resolve_matches = envelope.body.resolveMatches = WS::DISCOVERY::ResolveMatchesType({});
-  auto& match = resolve_matches->resolveMatch.emplace_back(
+  auto& resolve_matches = envelope.body.resolve_matches = WS::DISCOVERY::ResolveMatchesType({});
+  auto& match = resolve_matches->resolve_match.emplace_back(
       WS::ADDRESSING::EndpointReferenceType(endpoint_reference_), metadata_version_);
   if (!scopes_.empty())
   {
@@ -426,21 +444,21 @@ void DiscoveryService::build_resolve_match_message(MESSAGEMODEL::Envelope& envel
   }
   if (!x_addresses_.empty())
   {
-    match.xAddrs = x_addresses_;
+    match.x_addrs = x_addresses_;
   }
 
   envelope.header.action = WS::ADDRESSING::URIType(MDPWS::WS_ACTION_RESOLVE_MATCHES);
-  if (request.header.replyTo.has_value())
+  if (request.header.reply_to.has_value())
   {
-    envelope.header.to = request.header.replyTo->address;
+    envelope.header.to = request.header.reply_to->address;
   }
   else
   {
     envelope.header.to = WS::ADDRESSING::URIType(MDPWS::WS_ADDRESSING_ANONYMOUS);
   }
-  if (request.header.messageID.has_value())
+  if (request.header.message_id.has_value())
   {
-    envelope.header.relatesTo = WS::ADDRESSING::RelatesToType(request.header.messageID.value());
+    envelope.header.relates_to = WS::ADDRESSING::RelatesToType(request.header.message_id.value());
   }
-  envelope.header.messageID = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
+  envelope.header.message_id = WS::ADDRESSING::URIType{MicroSDC::calculate_message_id()};
 }

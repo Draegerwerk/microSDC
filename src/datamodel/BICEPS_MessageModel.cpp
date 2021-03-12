@@ -14,7 +14,7 @@ namespace BICEPS::MM
   }
 
   AbstractReport::AbstractReport(WS::ADDRESSING::URIType sequenceId)
-    : sequenceId(std::move(sequenceId))
+    : sequence_id(std::move(sequenceId))
   {
   }
 
@@ -29,7 +29,7 @@ namespace BICEPS::MM
   }
 
   AbstractSet::AbstractSet(SetKind kind, OperationHandleRefType operation_handle_ref)
-    : operationHandleRef(std::move(operation_handle_ref))
+    : operation_handle_ref(std::move(operation_handle_ref))
     , kind_(kind)
   {
   }
@@ -52,7 +52,7 @@ namespace BICEPS::MM
           entry->xmlns() != nullptr &&
           strncmp(entry->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL, entry->xmlns_size()) == 0)
       {
-        operationHandleRef = std::string(entry->value(), entry->value_size());
+        operation_handle_ref = std::string(entry->value(), entry->value_size());
       }
     }
   }
@@ -76,7 +76,7 @@ namespace BICEPS::MM
           entry->xmlns() != nullptr &&
           strncmp(entry->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL, entry->xmlns_size()) == 0)
       {
-        requestedNumericValue = std::stod(std::string(entry->value(), entry->value_size()));
+        requested_numeric_value = std::stod(std::string(entry->value(), entry->value_size()));
       }
     }
   }

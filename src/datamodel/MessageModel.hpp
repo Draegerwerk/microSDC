@@ -22,11 +22,11 @@ namespace MESSAGEMODEL
 
     using AppSequenceType = WS::DISCOVERY::AppSequenceType;
     using AppSequenceOptional = std::optional<AppSequenceType>;
-    AppSequenceOptional appSequence;
+    AppSequenceOptional app_sequence;
 
     using FaultToType = WS::ADDRESSING::EndpointReferenceType;
     using FaultToOptional = std::optional<FaultToType>;
-    FaultToOptional faultTo;
+    FaultToOptional fault_to;
 
     using FromType = WS::ADDRESSING::EndpointReferenceType;
     using FromOptional = std::optional<FromType>;
@@ -34,19 +34,19 @@ namespace MESSAGEMODEL
 
     using MessageIDType = WS::ADDRESSING::URIType;
     using MessageIDOptional = std::optional<MessageIDType>;
-    MessageIDOptional messageID;
+    MessageIDOptional message_id;
 
     using ReferenceParametersType = WS::ADDRESSING::ReferenceParametersType;
     using ReferenceParametersOptional = std::optional<ReferenceParametersType>;
-    ReferenceParametersOptional referenceParameters;
+    ReferenceParametersOptional reference_parameters;
 
     using RelatesToType = WS::ADDRESSING::RelatesToType;
     using RelatesToOptional = std::optional<RelatesToType>;
-    RelatesToOptional relatesTo;
+    RelatesToOptional relates_to;
 
     using ReplyToType = WS::ADDRESSING::EndpointReferenceType;
     using ReplyToOptional = std::optional<ReplyToType>;
-    ReplyToOptional replyTo;
+    ReplyToOptional reply_to;
 
     using ToType = WS::ADDRESSING::URIType;
     using ToOptional = std::optional<ToType>;
@@ -80,7 +80,7 @@ namespace MESSAGEMODEL
 
     using ProbeMatchesType = WS::DISCOVERY::ProbeMatchesType;
     using ProbeMatchesOptional = std::optional<ProbeMatchesType>;
-    ProbeMatchesOptional probeMatches;
+    ProbeMatchesOptional probe_matches;
 
     using ResolveType = WS::DISCOVERY::ResolveType;
     using ResolveOptional = std::optional<ResolveType>;
@@ -88,11 +88,11 @@ namespace MESSAGEMODEL
 
     using ResolveMatchesType = WS::DISCOVERY::ResolveMatchesType;
     using ResolveMatchesOptional = std::optional<ResolveMatchesType>;
-    ResolveMatchesOptional resolveMatches;
+    ResolveMatchesOptional resolve_matches;
 
     using GetMetadataType = WS::MEX::GetMetadata;
     using GetMetadataOptional = std::optional<GetMetadataType>;
-    GetMetadataOptional getMetadata;
+    GetMetadataOptional get_metadata;
 
     using MetadataType = WS::MEX::Metadata;
     using MetadataOptional = std::optional<MetadataType>;
@@ -100,11 +100,11 @@ namespace MESSAGEMODEL
 
     using GetMdibType = BICEPS::MM::GetMdib;
     using GetMdibOptional = std::optional<GetMdibType>;
-    GetMdibOptional getMdib;
+    GetMdibOptional get_mdib;
 
     using GetMdibResponseType = BICEPS::MM::GetMdibResponse;
     using GetMdibResponseOptional = std::optional<GetMdibResponseType>;
-    GetMdibResponseOptional getMdibResponse;
+    GetMdibResponseOptional get_mdib_response;
 
     using SubscribeType = WS::EVENTING::Subscribe;
     using SubscribeOptional = std::optional<SubscribeType>;
@@ -112,7 +112,7 @@ namespace MESSAGEMODEL
 
     using SubscribeResponseType = WS::EVENTING::SubscribeResponse;
     using SubscribeResponseOptional = std::optional<SubscribeResponseType>;
-    SubscribeResponseOptional subscribeResponse;
+    SubscribeResponseOptional subscribe_response;
 
     using RenewType = WS::EVENTING::Renew;
     using RenewOptional = std::optional<RenewType>;
@@ -120,7 +120,7 @@ namespace MESSAGEMODEL
 
     using RenewResponseType = WS::EVENTING::RenewResponse;
     using RenewResponseOptional = std::optional<RenewResponseType>;
-    RenewResponseOptional renewResponse;
+    RenewResponseOptional renew_response;
 
     using UnsubscribeType = WS::EVENTING::Unsubscribe;
     using UnsubscribeOptional = std::optional<UnsubscribeType>;
@@ -128,23 +128,23 @@ namespace MESSAGEMODEL
 
     using SetStringType = BICEPS::MM::SetString;
     using SetStringOptional = std::optional<SetStringType>;
-    SetStringOptional setString;
+    SetStringOptional set_string;
 
     using SetStringResponseType = BICEPS::MM::SetStringResponse;
     using SetStringResponseOptional = std::optional<SetStringResponseType>;
-    SetStringResponseOptional setStringResponse;
+    SetStringResponseOptional set_string_response;
 
     using SetValueType = BICEPS::MM::SetValue;
     using SetValueOptional = std::optional<SetValueType>;
-    SetValueOptional setValue;
+    SetValueOptional set_value;
 
     using SetValueResponseType = BICEPS::MM::SetValueResponse;
     using SetValueResponseOptional = std::optional<SetValueResponseType>;
-    SetValueResponseOptional setValueResponse;
+    SetValueResponseOptional set_value_response;
 
     using EpisodicMetricReportType = BICEPS::MM::EpisodicMetricReport;
     using EpisodicMetricReportOptional = std::optional<EpisodicMetricReportType>;
-    EpisodicMetricReportOptional episodicMetricReport;
+    EpisodicMetricReportOptional episodic_metric_report;
 
   private:
     void parse(const rapidxml::xml_node<>& node);

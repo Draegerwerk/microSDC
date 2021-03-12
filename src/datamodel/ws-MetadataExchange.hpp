@@ -38,7 +38,7 @@ namespace WS::MEX
     //
     using MetadataReferenceType = WS::MEX::MetadataReference;
     using MetadataReferenceOptional = std::optional<MetadataReferenceType>;
-    MetadataReferenceOptional metadataReference;
+    MetadataReferenceOptional metadata_reference;
 
     // Location
     //
@@ -50,13 +50,13 @@ namespace WS::MEX
     //
     using ThisModelType = WS::DPWS::ThisModelType;
     using ThisModelOptional = std::optional<ThisModelType>;
-    ThisModelOptional thisModel;
+    ThisModelOptional this_model;
 
     // ThisDevice
     //
     using ThisDeviceType = WS::DPWS::ThisDeviceType;
     using ThisDeviceOptional = std::optional<ThisDeviceType>;
-    ThisDeviceOptional thisDevice;
+    ThisDeviceOptional this_device;
 
     // Relationship
     //
@@ -82,6 +82,6 @@ namespace WS::MEX
   {
     using MetadataSectionType = WS::MEX::MetadataSection;
     using MetadataSectionSequence = std::vector<MetadataSectionType>;
-    MetadataSectionSequence metadataSection;
+    MetadataSectionSequence metadata_section;
   };
 } // namespace WS::MEX

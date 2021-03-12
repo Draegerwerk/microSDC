@@ -7,8 +7,8 @@ Duration::Duration(const std::string& string)
 }
 
 Duration::Duration(Years years, Months months, Days days, Hours hours, Minutes minutes,
-                   Seconds seconds, bool isNegative)
-  : isNegative_(isNegative)
+                   Seconds seconds, bool is_negative)
+  : is_negative_(is_negative)
   , years_(years)
   , months_(months)
   , days_(days)
@@ -48,21 +48,22 @@ Duration::Seconds::rep Duration::seconds() const
   return seconds_.count();
 }
 
-Duration::TimePoint Duration::toExpirationTimePoint() const
+Duration::TimePoint Duration::to_expiration_time_point() const
 {
   const auto duration = years_ + months_ + days_ + hours_ + minutes_ +
                         std::chrono::duration_cast<std::chrono::steady_clock::duration>(seconds_);
-  return std::chrono::steady_clock::now() + duration * (isNegative_ ? -1 : 1);
+  return std::chrono::steady_clock::now() + duration * (is_negative_ ? -1 : 1);
 }
 
 void Duration::parse(const std::string& string)
 {
 
-  const std::regex durationRegex("(-)?P(?:([0-9]+)Y)?(?:([0-9]+)M)?(?:([0-9]+)D)?(?:T(?:([0-9]+)H)?"
-                                 "(?:([0-9]+)M)?(?:((?:[0-9]*[.])?[0-9]+)S)?)");
+  const std::regex duration_regex(
+      "(-)?P(?:([0-9]+)Y)?(?:([0-9]+)M)?(?:([0-9]+)D)?(?:T(?:([0-9]+)H)?"
+      "(?:([0-9]+)M)?(?:((?:[0-9]*[.])?[0-9]+)S)?)");
   std::smatch match;
-  std::regex_match(string, match, durationRegex);
-  isNegative_ = match[1].matched;
+  std::regex_match(string, match, duration_regex);
+  is_negative_ = match[1].matched;
   if (match[2].matched)
   {
     years_ = Years{std::stoi(match[2].str())};
