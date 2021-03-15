@@ -56,7 +56,7 @@ private:
    */
   template <i2c_port_t I2C_PORT>
   static int8_t read_i2c(uint8_t dev_address, uint8_t reg_address, uint8_t* reg_data,
-                          uint16_t data_len)
+                         uint16_t data_len)
   {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
@@ -93,7 +93,7 @@ private:
    */
   template <i2c_port_t I2C_PORT>
   static int8_t write_i2c(uint8_t dev_address, uint8_t reg_address, uint8_t* reg_data,
-                           uint16_t data_len)
+                          uint16_t data_len)
   {
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);

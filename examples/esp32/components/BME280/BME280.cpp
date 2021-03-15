@@ -1,6 +1,7 @@
 #include "BME280.hpp"
 
-BME280::BME280(i2c_port_t i2c_port, std::uint8_t device_address, gpio_num_t sda_pin, gpio_num_t scl_pin)
+BME280::BME280(i2c_port_t i2c_port, std::uint8_t device_address, gpio_num_t sda_pin,
+               gpio_num_t scl_pin)
   : i2c_port_(i2c_port)
 {
   i2c_config_t i2c_config{};
@@ -32,7 +33,7 @@ void BME280::delay(uint32_t period)
   vTaskDelay(period / portTICK_PERIOD_MS);
 }
 
-void BME280::init_sensor(std::uint8_t  /*device_address*/)
+void BME280::init_sensor(std::uint8_t /*device_address*/)
 {
   device_.dev_id = BME280_I2C_ADDR_PRIM;
   device_.intf = BME280_I2C_INTF;
