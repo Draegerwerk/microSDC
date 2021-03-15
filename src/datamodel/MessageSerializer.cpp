@@ -649,6 +649,13 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* meta_data_node = xml_document_->allocate_node(rapidxml::node_element, "pm:MetaData");
 
+  for (const auto& manufacturer : metadata.manufacturer)
+  {
+    auto* manufacturer_node =
+        xml_document_->allocate_node(rapidxml::node_element, "pm:Manufacturer");
+    serialize(manufacturer_node, manufacturer);
+    meta_data_node->append_node(manufacturer_node);
+  }
   for (const auto& model_name : metadata.model_name)
   {
     auto* model_name_node = xml_document_->allocate_node(rapidxml::node_element, "pm:ModelName");
@@ -668,13 +675,6 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
         xml_document_->allocate_node(rapidxml::node_element, "pm:SerialNumber");
     serial_number_node->value(serial_number.c_str());
     meta_data_node->append_node(serial_number_node);
-  }
-  for (const auto& manufacturer : metadata.manufacturer)
-  {
-    auto* manufacturer_node =
-        xml_document_->allocate_node(rapidxml::node_element, "pm:Manufacturer");
-    serialize(manufacturer_node, manufacturer);
-    meta_data_node->append_node(manufacturer_node);
   }
   parent->append_node(meta_data_node);
 }
