@@ -30,29 +30,28 @@ namespace BICEPS::MM
   {
   };
 
-  struct GetMdibResponse
+  struct AbstractGetResponse
   {
-    using MdibType = BICEPS::PM::Mdib;
+    PM::MdibVersionGroup mdib_version_group;
+
+  protected:
+    explicit AbstractGetResponse(PM::MdibVersionGroup mdib_version_group);
+  };
+
+  struct GetMdibResponse : public AbstractGetResponse
+  {
+    using MdibType = PM::Mdib;
     MdibType mdib;
 
-    explicit GetMdibResponse(MdibType mdib);
+    explicit GetMdibResponse(PM::MdibVersionGroup mdib_version_group, MdibType mdib);
   };
 
   struct AbstractReport
   {
-    using MdibVersionType = unsigned int;
-    using MdibVersionOptional = std::optional<MdibVersionType>;
-    MdibVersionOptional mdib_version;
-
-    using SequenceIdType = WS::ADDRESSING::URIType;
-    SequenceIdType sequence_id;
-
-    using InstanceIdType = unsigned int;
-    using InstanceIdOptional = std::optional<InstanceIdType>;
-    InstanceIdOptional instance_id;
+    PM::MdibVersionGroup mdib_version_group;
 
   protected:
-    explicit AbstractReport(WS::ADDRESSING::URIType sequence_id);
+    explicit AbstractReport(PM::MdibVersionGroup mdib_version_group);
   };
 
   struct AbstractReportPart
@@ -79,19 +78,15 @@ namespace BICEPS::MM
     ReportPartSequence report_part;
 
   protected:
-    explicit AbstractMetricReport(const SequenceIdType& sequence_id);
+    explicit AbstractMetricReport(const PM::MdibVersionGroup& mdib_version_group);
   };
 
   struct EpisodicMetricReport : public AbstractMetricReport
   {
-    explicit EpisodicMetricReport(const SequenceIdType& sequence_id);
+    explicit EpisodicMetricReport(const PM::MdibVersionGroup& mdib_version_group);
   };
 
-  struct OperationHandleRef : public std::string
-  {
-    using std::string::string;
-    using std::string::operator=;
-  };
+  using OperationHandleRef = PM::HandleRef;
 
   struct AbstractSet
   {
@@ -102,7 +97,7 @@ namespace BICEPS::MM
     };
     SetKind get_kind() const;
 
-    using OperationHandleRefType = ::BICEPS::MM::OperationHandleRef;
+    using OperationHandleRefType = OperationHandleRef;
     OperationHandleRefType operation_handle_ref;
 
 
@@ -130,7 +125,7 @@ namespace BICEPS::MM
   struct SetString : public AbstractSet
   {
     using RequestedStringValueType = std::string;
-    RequestedStringValueType requestedStringValue;
+    RequestedStringValueType requested_string_value;
 
     explicit SetString(const rapidxml::xml_node<>& node);
     static bool classof(const AbstractSet* other);
@@ -141,45 +136,37 @@ namespace BICEPS::MM
 
   struct InvocationErrorMessage : public std::string
   {
-    explicit InvocationErrorMessage(std::string invocationErrorMessage);
+    explicit InvocationErrorMessage(std::string invocation_error_message);
   };
 
   struct InvocationInfo
   {
     using TransactionIdType = unsigned int;
-    TransactionIdType transactionId;
+    TransactionIdType transaction_id;
 
-    using InvocationStateType = ::BICEPS::MM::InvocationState;
-    InvocationStateType invocationState;
+    using InvocationStateType = InvocationState;
+    InvocationStateType invocation_state;
 
-    using InvocationErrorType = ::BICEPS::MM::InvocationError;
+    using InvocationErrorType = InvocationError;
     using InvocationErrorOptional = std::optional<InvocationErrorType>;
-    InvocationErrorOptional invocationError;
+    InvocationErrorOptional invocation_error;
 
-    using InvocationErrorMessageType = ::BICEPS::MM::InvocationErrorMessage;
+    using InvocationErrorMessageType = InvocationErrorMessage;
     using InvocationErrorMessageOptional = std::optional<InvocationErrorMessageType>;
-    InvocationErrorMessageOptional invocationErrorMessage;
+    InvocationErrorMessageOptional invocation_error_message;
 
-    InvocationInfo(TransactionIdType transactionId, InvocationStateType invocationState);
+    InvocationInfo(TransactionIdType transaction_id, InvocationStateType invocation_state);
   };
 
   struct AbstractSetResponse
   {
-    using MdibVersionType = unsigned int;
-    using MdibVersionOptional = std::optional<MdibVersionType>;
-    MdibVersionOptional mdibVersion;
+    PM::MdibVersionGroup mdib_version_group;
 
-    using SequenceIdType = WS::ADDRESSING::URIType;
-    SequenceIdType sequenceId;
+    using InvocationInfoType = InvocationInfo;
+    InvocationInfoType invocation_info;
 
-    using InstanceIdType = unsigned int;
-    using InstanceIdOptional = std::optional<InstanceIdType>;
-    InstanceIdOptional instanceId;
-
-    using InvocationInfoType = ::BICEPS::MM::InvocationInfo;
-    InvocationInfoType invocationInfo;
-
-    AbstractSetResponse(SequenceIdType sequenceId, InvocationInfoType invocationInfo);
+    AbstractSetResponse(PM::MdibVersionGroup mdib_version_group,
+                        InvocationInfoType invocation_info);
   };
 
   struct SetValueResponse : public AbstractSetResponse
@@ -200,31 +187,54 @@ namespace BICEPS::MM
   {
   };
 
-  struct ReportPart
+  struct ComponentReportPart
   {
-    using OperationHandleRefType = ::BICEPS::MM::OperationHandleRef;
-    OperationHandleRefType operationHandleRef;
+    using ComponentStateType = std::shared_ptr<const PM::AbstractDeviceComponentState>;
+    using ComponentStateSequence = std::vector<ComponentStateType>;
+    ComponentStateSequence component_state;
+  };
 
-    using OperationTargetType = ::BICEPS::MM::OperationTarget;
+  struct AbstractComponentReport : public AbstractReport
+  {
+    using ReportPartType = ComponentReportPart;
+    using ReportPartSequence = std::vector<ReportPartType>;
+    ReportPartSequence report_part;
+
+    explicit AbstractComponentReport(const PM::MdibVersionGroup& mdib_version_group);
+  };
+
+  struct EpisodicComponentReport : public AbstractComponentReport
+  {
+    explicit EpisodicComponentReport(const PM::MdibVersionGroup& mdib_version_group);
+  };
+
+  struct OperationInvokedReportPart : public AbstractReportPart
+  {
+    using OperationHandleRefType = PM::HandleRef;
+    OperationHandleRefType operation_handle_ref;
+
+    using OperationTargetType = PM::HandleRef;
     using OperationTargetOptional = std::optional<OperationTargetType>;
-    OperationTargetOptional operationTarget;
+    OperationTargetOptional operation_target;
 
-    using InvocationInfoType = ::BICEPS::MM::InvocationInfo;
-    InvocationInfoType invocationInfo;
+    using InvocationInfoType = InvocationInfo;
+    InvocationInfoType invocation_info;
 
-    using InvocationSourceType = ::BICEPS::MM::InvocationSource;
-    InvocationSourceType invocationSource;
+    using InvocationSourceType = PM::InstanceIdentifier;
+    InvocationSourceType invocation_source;
 
-    ReportPart(OperationHandleRefType operationHandleRef, InvocationInfoType invocationInfo,
-               InvocationSourceType invocationSource);
+    OperationInvokedReportPart(OperationHandleRefType operation_handle_ref,
+                               InvocationInfoType invocation_info,
+                               InvocationSourceType invocation_source);
   };
 
   struct OperationInvokedReport : public AbstractReport
   {
-    using ReportPartType = ::BICEPS::MM::ReportPart;
-    ReportPartType reportPart;
+    using ReportPartType = OperationInvokedReportPart;
+    ReportPartType report_part;
 
-    OperationInvokedReport(const SequenceIdType& sequenceId, ReportPartType reportPart);
+    OperationInvokedReport(const PM::MdibVersionGroup& mdib_version_group,
+                           ReportPartType report_part);
   };
 
 } // namespace BICEPS::MM

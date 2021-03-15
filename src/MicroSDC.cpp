@@ -6,6 +6,7 @@
 #include "SDCConstants.hpp"
 #include "StateHandler.hpp"
 #include "SubscriptionManager.hpp"
+#include "datamodel/BICEPS_MessageModel.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "networking/NetworkConfig.hpp"
 #include "services/DeviceService.hpp"
@@ -21,7 +22,8 @@
 #include "asio/system_error.hpp"
 
 MicroSDC::MicroSDC()
-  : mdib_(std::make_unique<BICEPS::PM::Mdib>(WS::ADDRESSING::URIType("0")))
+  : mdib_(std::make_unique<BICEPS::PM::Mdib>(
+        BICEPS::PM::MdibVersionGroup{WS::ADDRESSING::URIType("0")}))
 {
   mdib_->md_state = BICEPS::PM::MdState();
 }
@@ -312,6 +314,11 @@ void MicroSDC::update_state(const std::shared_ptr<BICEPS::PM::AbstractState>& st
   {
     notify_episodic_metric_report(metric_state);
   }
+  else if (const auto component_state =
+               dyn_cast<const BICEPS::PM::AbstractDeviceComponentState>(new_state))
+  {
+    notify_episodic_component_report(component_state);
+  }
 }
 
 std::shared_ptr<const BICEPS::PM::AbstractState>
@@ -337,13 +344,13 @@ MicroSDC::update_mdib(const std::shared_ptr<BICEPS::PM::AbstractState>& new_stat
 void MicroSDC::increment_mdib_version()
 {
   std::lock_guard<std::mutex> lock(mdib_mutex_);
-  mdib_->mdib_version = mdib_->mdib_version.value_or(0) + 1;
+  mdib_->mdib_version_group.mdib_version = mdib_->mdib_version_group.mdib_version.value_or(0) + 1;
 }
 
 unsigned int MicroSDC::get_mdib_version() const
 {
   std::lock_guard<std::mutex> lock(mdib_mutex_);
-  return mdib_->mdib_version.value_or(0);
+  return mdib_->mdib_version_group.mdib_version.value_or(0);
 }
 
 void MicroSDC::notify_episodic_metric_report(
@@ -351,12 +358,24 @@ void MicroSDC::notify_episodic_metric_report(
 {
   BICEPS::MM::MetricReportPart report_part;
   report_part.metric_state.emplace_back(std::move(state));
-  BICEPS::MM::EpisodicMetricReport report(WS::ADDRESSING::URIType("0"));
+  BICEPS::MM::EpisodicMetricReport report(
+      BICEPS::PM::MdibVersionGroup{WS::ADDRESSING::URIType("0")});
   report.report_part.emplace_back(std::move(report_part));
-  report.mdib_version = get_mdib_version();
+  report.mdib_version_group.mdib_version = get_mdib_version();
   subscription_manager_->fire_event(report);
 }
 
+void MicroSDC::notify_episodic_component_report(
+    std::shared_ptr<const BICEPS::PM::AbstractDeviceComponentState> state)
+{
+  BICEPS::MM::ComponentReportPart report_part;
+  report_part.component_state.emplace_back(std::move(state));
+  BICEPS::MM::EpisodicComponentReport report(
+      BICEPS::PM::MdibVersionGroup{WS::ADDRESSING::URIType("0")});
+  report.report_part.emplace_back(std::move(report_part));
+  report.mdib_version_group.mdib_version = get_mdib_version();
+  subscription_manager_->fire_event(report);
+}
 
 std::optional<BICEPS::PM::AbstractOperationDescriptor::OperationTargetType>
 MicroSDC::find_operation_target_for_operation_handle(

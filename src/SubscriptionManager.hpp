@@ -14,6 +14,7 @@ struct esp_http_client;
 namespace BICEPS::MM
 {
   class EpisodicMetricReport;
+  class EpisodicComponentReport;
 } // namespace BICEPS::MM
 
 /// @brief SubscriptionManager manages subscriptions in terms of ws-eventing
@@ -46,6 +47,10 @@ public:
   /// @brief triggers an event with given report by notifying all subscribers of this event
   /// @param report the report to notify about
   void fire_event(const BICEPS::MM::EpisodicMetricReport& report);
+
+  /// @brief triggers an event with given report by notifying all subscribers of this event
+  /// @param report the report to notify about
+  void fire_event(const BICEPS::MM::EpisodicComponentReport& report);
 
 private:
   /// @brief SubscriptionInformation stores stateful information about a subscription

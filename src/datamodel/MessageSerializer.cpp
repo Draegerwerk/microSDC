@@ -135,6 +135,10 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const MESSAGEMOD
   {
     serialize(body_node, body.episodic_metric_report.value());
   }
+  else if (body.episodic_component_report.has_value())
+  {
+    serialize(body_node, body.episodic_component_report.value());
+  }
   else if (body.set_value_response.has_value())
   {
     serialize(body_node, body.set_value_response.value());
@@ -484,12 +488,25 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::PM::MdibVersionGroup& version_group)
+{
+  append_attribute(parent, "SequenceId", version_group.sequence_id);
+  if (version_group.mdib_version.has_value())
+  {
+    append_to_string_attribute(parent, "MdibVersion", version_group.mdib_version.value());
+  }
+  if (version_group.instance_id.has_value())
+  {
+    append_to_string_attribute(parent, "InstanceId", version_group.instance_id.value());
+  }
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::MM::GetMdibResponse& get_mdib_response)
 {
   auto* get_mdib_response_node =
       xml_document_->allocate_node(rapidxml::node_element, "mm:GetMdibResponse");
-  auto* sequence_id_attr = xml_document_->allocate_attribute("SequenceId", "0");
-  get_mdib_response_node->append_attribute(sequence_id_attr);
+  serialize(get_mdib_response_node, get_mdib_response.mdib_version_group);
   serialize(get_mdib_response_node, get_mdib_response.mdib);
   parent->append_node(get_mdib_response_node);
 }
@@ -497,8 +514,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Mdib& mdib)
 {
   auto* mdib_node = xml_document_->allocate_node(rapidxml::node_element, "mm:Mdib");
-  append_attribute(mdib_node, "SequenceId", mdib.sequence_id);
-  append_to_string_attribute(mdib_node, "MdibVersion", mdib.mdib_version.value_or(0));
+  serialize(mdib_node, mdib.mdib_version_group);
   if (mdib.md_description.has_value())
   {
     serialize(mdib_node, mdib.md_description.value());
@@ -1362,18 +1378,19 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto* xmlns_biceps_message =
       xml_document_->allocate_attribute("xmlns:msg", SDC::NS_BICEPS_MESSAGE_MODEL);
   set_value_response_node->append_attribute(xmlns_biceps_message);
-  if (set_response.mdibVersion.has_value())
+  if (set_response.mdib_version_group.mdib_version.has_value())
   {
     append_to_string_attribute(set_value_response_node, "MdibVersion",
-                               set_response.mdibVersion.value());
+                               set_response.mdib_version_group.mdib_version.value());
   }
-  append_attribute(set_value_response_node, "SequenceId", set_response.sequenceId);
-  if (set_response.instanceId.has_value())
+  append_attribute(set_value_response_node, "SequenceId",
+                   set_response.mdib_version_group.sequence_id);
+  if (set_response.mdib_version_group.instance_id.has_value())
   {
     append_to_string_attribute(set_value_response_node, "InstanceId",
-                               set_response.instanceId.value());
+                               set_response.mdib_version_group.instance_id.value());
   }
-  serialize(set_value_response_node, set_response.invocationInfo);
+  serialize(set_value_response_node, set_response.invocation_info);
   parent->append_node(set_value_response_node);
 }
 
@@ -1384,30 +1401,30 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
       xml_document_->allocate_node(rapidxml::node_element, "msg:InvocationInfo");
 
   auto* transaction_id =
-      xml_document_->allocate_string(std::to_string(invocation_info.transactionId).c_str());
+      xml_document_->allocate_string(std::to_string(invocation_info.transaction_id).c_str());
   auto* transaction_id_node =
       xml_document_->allocate_node(rapidxml::node_element, "msg:TransactionId", transaction_id);
   invocation_info_node->append_node(transaction_id_node);
 
   auto* invocation_state =
-      xml_document_->allocate_string(to_string(invocation_info.invocationState).c_str());
+      xml_document_->allocate_string(to_string(invocation_info.invocation_state).c_str());
   auto* invocation_state_node =
       xml_document_->allocate_node(rapidxml::node_element, "msg:InvocationState", invocation_state);
   invocation_info_node->append_node(invocation_state_node);
 
-  if (invocation_info.invocationError.has_value())
+  if (invocation_info.invocation_error.has_value())
   {
     auto* invocation_error =
-        xml_document_->allocate_string(to_string(invocation_info.invocationError.value()).c_str());
+        xml_document_->allocate_string(to_string(invocation_info.invocation_error.value()).c_str());
     auto* invocation_error_node = xml_document_->allocate_node(
         rapidxml::node_element, "msg:InvocationError", invocation_error);
     invocation_info_node->append_node(invocation_error_node);
   }
 
-  if (invocation_info.invocationErrorMessage.has_value())
+  if (invocation_info.invocation_error_message.has_value())
   {
     auto* invocation_error_message =
-        xml_document_->allocate_string(invocation_info.invocationErrorMessage.value().c_str());
+        xml_document_->allocate_string(invocation_info.invocation_error_message.value().c_str());
     auto* invocation_error_message_node = xml_document_->allocate_node(
         rapidxml::node_element, "msg:InvocationErrorMessage", invocation_error_message);
     invocation_info_node->append_node(invocation_error_message_node);
@@ -1420,9 +1437,27 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 {
   auto* report_node =
       xml_document_->allocate_node(rapidxml::node_element, "mm:EpisodicMetricReport");
-  if (report.mdib_version.has_value())
+  if (report.mdib_version_group.mdib_version.has_value())
   {
-    append_to_string_attribute(report_node, "MdibVersion", report.mdib_version.value());
+    append_to_string_attribute(report_node, "MdibVersion",
+                               report.mdib_version_group.mdib_version.value());
+  }
+  for (const auto& part : report.report_part)
+  {
+    serialize(report_node, part);
+  }
+  parent->append_node(report_node);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::MM::EpisodicComponentReport& report)
+{
+  auto* report_node =
+      xml_document_->allocate_node(rapidxml::node_element, "mm:EpisodicComponentReport");
+  if (report.mdib_version_group.mdib_version.has_value())
+  {
+    append_to_string_attribute(report_node, "MdibVersion",
+                               report.mdib_version_group.mdib_version.value());
   }
   for (const auto& part : report.report_part)
   {
@@ -1453,6 +1488,43 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
              string_metric_state != nullptr)
     {
       serialize(state_node, *string_metric_state);
+    }
+    report_part_node->append_node(state_node);
+  }
+  parent->append_node(report_part_node);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::MM::ComponentReportPart& part)
+{
+  auto* report_part_node = xml_document_->allocate_node(rapidxml::node_element, "mm:ReportPart");
+  for (const auto& state : part.component_state)
+  {
+    auto* state_node = xml_document_->allocate_node(rapidxml::node_element, "pm:State");
+    if (const auto system_context_state = dyn_cast<const BICEPS::PM::SystemContextState>(state);
+        system_context_state != nullptr)
+    {
+      serialize(state_node, *system_context_state);
+    }
+    else if (const auto channel_state = dyn_cast<const BICEPS::PM::ChannelState>(state);
+             channel_state != nullptr)
+    {
+      serialize(state_node, *channel_state);
+    }
+    else if (const auto sco_state = dyn_cast<const BICEPS::PM::ScoState>(state);
+             sco_state != nullptr)
+    {
+      serialize(state_node, *sco_state);
+    }
+    else if (const auto mds_state = dyn_cast<const BICEPS::PM::MdsState>(state);
+             mds_state != nullptr)
+    {
+      serialize(state_node, *mds_state);
+    }
+    else if (const auto vmd_state = dyn_cast<const BICEPS::PM::VmdState>(state);
+             vmd_state != nullptr)
+    {
+      serialize(state_node, *vmd_state);
     }
     report_part_node->append_node(state_node);
   }

@@ -74,7 +74,7 @@ public:
       LOG(LogLevel::ERROR, "Cannot cast to SetString!");
       return BICEPS::MM::InvocationState::FAIL;
     }
-    this->set_value(set_string->requestedStringValue);
+    this->set_value(set_string->requested_string_value);
     return BICEPS::MM::InvocationState::FIN;
   }
 
@@ -115,7 +115,7 @@ public:
       LOG(LogLevel::ERROR, "Cannot cast to SetString!");
       return BICEPS::MM::InvocationState::FAIL;
     }
-    this->set_value(set_string->requestedStringValue);
+    this->set_value(set_string->requested_string_value);
     return BICEPS::MM::InvocationState::FIN;
   }
 
@@ -145,7 +145,7 @@ int main()
   Log::set_log_level(LogLevel::DEBUG);
   LOG(LogLevel::INFO, "Starting up....");
 
-  auto sdc = std::make_unique<MicroSDC>();
+  auto sdc = std::make_shared<MicroSDC>();
 
   const auto sdc_port = 8080;
   const auto default_address = NetworkInterface::find_default_interface().address();
@@ -241,18 +241,19 @@ int main()
 
   sdc->start();
 
-  auto value_thread =
-      std::thread([pressure_state_handler, temperature_state_handler, humidity_state_handler]() {
-        double i = 0.0;
-        while (keep_running)
-        {
-          // pressure_state_handler->set_value(i++);
-          // temperature_state_handler->set_value(2 * i);
-          // humidity_state_handler->set_value(3 * i);
-          std::unique_lock<std::mutex> lock(running_mutex);
-          cv_running.wait_for(lock, std::chrono::seconds(1));
-        }
-      });
+  auto value_thread = std::thread([sdc, device_descriptor, pressure_state_handler,
+                                   temperature_state_handler, humidity_state_handler]() {
+    double i = 0.0;
+    while (keep_running)
+    {
+      // pressure_state_handler->set_value(i++);
+      // temperature_state_handler->set_value(2 * i);
+      // humidity_state_handler->set_value(3 * i);
+      sdc->update_state(std::make_shared<BICEPS::PM::MdsState>(device_descriptor.handle));
+      std::unique_lock<std::mutex> lock(running_mutex);
+      cv_running.wait_for(lock, std::chrono::seconds(1));
+    }
+  });
 
   struct sigaction sa
   {

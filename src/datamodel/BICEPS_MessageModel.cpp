@@ -6,25 +6,29 @@
 
 namespace BICEPS::MM
 {
-  // GetMdibResponse
-  //
-  GetMdibResponse::GetMdibResponse(MdibType mdib)
-    : mdib(std::move(mdib))
+  AbstractGetResponse::AbstractGetResponse(PM::MdibVersionGroup mdib_version_group)
+    : mdib_version_group(std::move(mdib_version_group))
   {
   }
 
-  AbstractReport::AbstractReport(WS::ADDRESSING::URIType sequenceId)
-    : sequence_id(std::move(sequenceId))
+  GetMdibResponse::GetMdibResponse(PM::MdibVersionGroup mdib_version_group, MdibType mdib)
+    : AbstractGetResponse(std::move(mdib_version_group))
+    , mdib(std::move(mdib))
   {
   }
 
-  AbstractMetricReport::AbstractMetricReport(const SequenceIdType& sequenceId)
-    : AbstractReport(sequenceId)
+  AbstractReport::AbstractReport(PM::MdibVersionGroup mdib_version_group)
+    : mdib_version_group(std::move(mdib_version_group))
   {
   }
 
-  EpisodicMetricReport::EpisodicMetricReport(const SequenceIdType& sequenceId)
-    : AbstractMetricReport(sequenceId)
+  AbstractMetricReport::AbstractMetricReport(const PM::MdibVersionGroup& mdib_version_group)
+    : AbstractReport(mdib_version_group)
+  {
+  }
+
+  EpisodicMetricReport::EpisodicMetricReport(const PM::MdibVersionGroup& mdib_version_group)
+    : AbstractMetricReport(mdib_version_group)
   {
   }
 
@@ -100,42 +104,53 @@ namespace BICEPS::MM
           entry->xmlns() != nullptr &&
           strncmp(entry->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL, entry->xmlns_size()) == 0)
       {
-        requestedStringValue = std::string(entry->value(), entry->value_size());
+        requested_string_value = std::string(entry->value(), entry->value_size());
       }
     }
   }
 
-  InvocationErrorMessage::InvocationErrorMessage(std::string invocationError)
-    : std::string(std::move(invocationError))
+  InvocationErrorMessage::InvocationErrorMessage(std::string invocation_error)
+    : std::string(std::move(invocation_error))
   {
   }
 
-  InvocationInfo::InvocationInfo(TransactionIdType transactionId,
-                                 InvocationStateType invocationState)
-    : transactionId(transactionId)
-    , invocationState(invocationState)
+  InvocationInfo::InvocationInfo(TransactionIdType transaction_id,
+                                 InvocationStateType invocation_state)
+    : transaction_id(transaction_id)
+    , invocation_state(invocation_state)
   {
   }
 
-  AbstractSetResponse::AbstractSetResponse(SequenceIdType sequenceId,
-                                           InvocationInfoType invocationInfo)
-    : sequenceId(std::move(sequenceId))
-    , invocationInfo(std::move(invocationInfo))
+  AbstractSetResponse::AbstractSetResponse(PM::MdibVersionGroup mdib_version_group,
+                                           InvocationInfoType invocation_info)
+    : mdib_version_group(std::move(mdib_version_group))
+    , invocation_info(std::move(invocation_info))
   {
   }
 
-  ReportPart::ReportPart(OperationHandleRefType operationHandleRef,
-                         InvocationInfoType invocationInfo, InvocationSourceType invocationSource)
-    : operationHandleRef(std::move(operationHandleRef))
-    , invocationInfo(std::move(invocationInfo))
-    , invocationSource(invocationSource)
+  AbstractComponentReport::AbstractComponentReport(const PM::MdibVersionGroup& mdib_version_group)
+    : AbstractReport(mdib_version_group)
   {
   }
 
-  OperationInvokedReport::OperationInvokedReport(const SequenceIdType& sequenceId,
-                                                 ReportPartType reportPart)
-    : AbstractReport(sequenceId)
-    , reportPart(std::move(reportPart))
+  EpisodicComponentReport::EpisodicComponentReport(const PM::MdibVersionGroup& mdib_version_group)
+    : AbstractComponentReport(mdib_version_group)
+  {
+  }
+
+  OperationInvokedReportPart::OperationInvokedReportPart(
+      OperationHandleRefType operation_handle_ref, InvocationInfoType invocation_info,
+      InvocationSourceType invocation_source)
+    : operation_handle_ref(std::move(operation_handle_ref))
+    , invocation_info(std::move(invocation_info))
+    , invocation_source(std::move(invocation_source))
+  {
+  }
+
+  OperationInvokedReport::OperationInvokedReport(const PM::MdibVersionGroup& mdib_version_group,
+                                                 ReportPartType report_part)
+    : AbstractReport(mdib_version_group)
+    , report_part(std::move(report_part))
   {
   }
 } // namespace BICEPS::MM

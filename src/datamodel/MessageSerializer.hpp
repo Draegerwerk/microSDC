@@ -43,6 +43,7 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const WS::DPWS::Relationship& relationship);
   void serialize(rapidxml::xml_node<>* parent, const WS::DPWS::HostServiceType& host);
   void serialize(rapidxml::xml_node<>* parent, const WS::DPWS::HostedServiceType& hosted);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::MdibVersionGroup& version_group);
   void serialize(rapidxml::xml_node<>* parent,
                  const BICEPS::MM::GetMdibResponse& get_mdib_response);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::Mdib& mdib);
@@ -112,6 +113,8 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::InvocationInfo& invocation_info);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::EpisodicMetricReport& report);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::MetricReportPart&);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::EpisodicComponentReport& report);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::ComponentReportPart&);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::PM::ScoDescriptor& sco);
   void serialize(rapidxml::xml_node<>* parent,
                  const BICEPS::PM::AbstractOperationDescriptor& operation);

@@ -143,6 +143,44 @@ void SubscriptionManager::fire_event(const BICEPS::MM::EpisodicMetricReport& rep
   }
 }
 
+void SubscriptionManager::fire_event(const BICEPS::MM::EpisodicComponentReport& report)
+{
+  LOG(LogLevel::DEBUG, "Fire Event: EpisodicComponentReport");
+  std::lock_guard<std::mutex> lock(subscription_mutex_);
+  std::vector<const SubscriptionInformation*> subscriber;
+  for (const auto& [id, info] : subscriptions_)
+  {
+    if (std::find(info.filter.begin(), info.filter.end(), SDC::ACTION_EPISODIC_COMPONENT_REPORT) !=
+        info.filter.end())
+    {
+      subscriber.emplace_back(&info);
+    }
+  }
+  if (subscriber.empty())
+  {
+    return;
+  }
+  MESSAGEMODEL::Header header;
+  header.message_id = MESSAGEMODEL::Header::MessageIDType(MicroSDC::calculate_message_id());
+  header.action = WS::ADDRESSING::URIType(SDC::ACTION_EPISODIC_COMPONENT_REPORT);
+
+  MESSAGEMODEL::Body body;
+  body.episodic_component_report = report;
+
+  MESSAGEMODEL::Envelope notify_envelope;
+  notify_envelope.header = std::move(header);
+  notify_envelope.body = std::move(body);
+
+  MessageSerializer serializer;
+  serializer.serialize(notify_envelope);
+  const auto message_str = serializer.str();
+  LOG(LogLevel::DEBUG, "SENDING: " << message_str);
+  for (const auto* const info : subscriber)
+  {
+    session_manager_.send_to_session(info->notify_to.address, message_str);
+  }
+}
+
 void SubscriptionManager::print_subscriptions() const
 {
   std::stringstream out;

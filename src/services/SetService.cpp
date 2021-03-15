@@ -4,6 +4,7 @@
 #include "MicroSDC.hpp"
 #include "SubscriptionManager.hpp"
 #include "WebServer/Request.hpp"
+#include "datamodel/BICEPS_MessageModel.hpp"
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageSerializer.hpp"
@@ -109,7 +110,8 @@ BICEPS::MM::SetStringResponse SetService::dispatch(const BICEPS::MM::SetString& 
   WS::ADDRESSING::URIType sequence_id("uuid:" + UUIDGenerator{}().to_string());
   unsigned int transaction_id = 0;
   BICEPS::MM::InvocationInfo invocation_info(transaction_id, invocation_state);
-  BICEPS::MM::SetStringResponse set_string_response(sequence_id, invocation_info);
+  BICEPS::MM::SetStringResponse set_string_response(BICEPS::PM::MdibVersionGroup{sequence_id},
+                                                    invocation_info);
   return set_string_response;
 }
 
@@ -119,6 +121,7 @@ BICEPS::MM::SetValueResponse SetService::dispatch(const BICEPS::MM::SetValue& se
   WS::ADDRESSING::URIType sequence_id("uuid:" + UUIDGenerator{}().to_string());
   unsigned int transaction_id = 0;
   BICEPS::MM::InvocationInfo invocation_info(transaction_id, invocation_state);
-  BICEPS::MM::SetValueResponse set_value_response(sequence_id, invocation_info);
+  BICEPS::MM::SetValueResponse set_value_response(BICEPS::PM::MdibVersionGroup{sequence_id},
+                                                  invocation_info);
   return set_value_response;
 }

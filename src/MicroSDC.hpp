@@ -115,6 +115,8 @@ private:
   mutable std::mutex running_mutex_;
   /// endpoint reference of this MicroSDC instance
   std::string endpoint_reference_;
+  /// instance id of this sdc instance
+  WS::ADDRESSING::URIType instance_id_;
   /// mutex protecting the endpointReference
   mutable std::mutex epr_mutex_;
 
@@ -145,6 +147,10 @@ private:
   /// @param state a pointer to the state which was updated
   void notify_episodic_metric_report(std::shared_ptr<const BICEPS::PM::AbstractMetricState> state);
 
+  /// @brief sends a notification to subscriber about a changed device component state
+  /// @param state a pointer to the state which was updated
+  void notify_episodic_component_report(
+      std::shared_ptr<const BICEPS::PM::AbstractDeviceComponentState> state);
 
   /// @brief find_operation_target_for_operation_handle searches all sco to find the operation
   /// target that was triggered by the handle

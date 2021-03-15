@@ -307,6 +307,11 @@ namespace BICEPS::PM
     return other->get_kind() == StateKind::LOCATION_CONTEXT_STATE;
   }
 
+  bool AbstractDeviceComponentState::classof(const AbstractState* other)
+  {
+    return other->get_kind() >= StateKind::DEVICE_COMPONENT_STATE &&
+           other->get_kind() < StateKind::LAST_DEVICE_COMPONENT_STATE;
+  }
   AbstractDeviceComponentState::AbstractDeviceComponentState(StateKind kind,
                                                              DescriptorHandleType handle)
     : AbstractState(kind, std::move(handle))
@@ -456,8 +461,13 @@ namespace BICEPS::PM
   {
   }
 
-  Mdib::Mdib(SequenceIdType sequence_id_type)
-    : sequence_id(std::move(sequence_id_type))
+  MdibVersionGroup::MdibVersionGroup(SequenceIdType sequence_id)
+    : sequence_id(std::move(sequence_id))
+  {
+  }
+
+  Mdib::Mdib(MdibVersionGroup mdib_version_group)
+    : mdib_version_group(std::move(mdib_version_group))
   {
   }
 } // namespace BICEPS::PM

@@ -146,6 +146,10 @@ namespace MESSAGEMODEL
     using EpisodicMetricReportOptional = std::optional<EpisodicMetricReportType>;
     EpisodicMetricReportOptional episodic_metric_report;
 
+    using EpisodicComponentReportType = BICEPS::MM::EpisodicComponentReport;
+    using EpisodicComponentReportOptional = std::optional<EpisodicComponentReportType>;
+    EpisodicComponentReportOptional episodic_component_report;
+
   private:
     void parse(const rapidxml::xml_node<>& node);
   };

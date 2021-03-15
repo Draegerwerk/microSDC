@@ -726,7 +726,7 @@ namespace BICEPS::PM
     using PhysicalConnectorOptional = std::optional<PhysicalConnectorType>;
     PhysicalConnectorOptional physical_connector;
 
-    static bool classof(const AbstractDescriptor* other);
+    static bool classof(const AbstractState* other);
 
   protected:
     AbstractDeviceComponentState(StateKind kind, DescriptorHandleType handle);
@@ -995,6 +995,22 @@ namespace BICEPS::PM
     StateVersionOptional state_version;
   };
 
+  struct MdibVersionGroup
+  {
+    using MdibVersionType = unsigned long;
+    using MdibVersionOptional = std::optional<MdibVersionType>;
+    MdibVersionOptional mdib_version;
+
+    using SequenceIdType = WS::ADDRESSING::URIType;
+    SequenceIdType sequence_id;
+
+    using InstanceIdType = unsigned long;
+    using InstanceIdOptional = std::optional<InstanceIdType>;
+    InstanceIdOptional instance_id;
+
+    explicit MdibVersionGroup(SequenceIdType sequence_id);
+  };
+
   struct Mdib
   {
     using MdDescriptionType = ::BICEPS::PM::MdDescription;
@@ -1005,17 +1021,8 @@ namespace BICEPS::PM
     using MdStateOptional = std::optional<MdStateType>;
     MdStateOptional md_state;
 
-    using MdibVersionType = unsigned int;
-    using MdibVersionOptional = std::optional<MdibVersionType>;
-    MdibVersionOptional mdib_version;
+    MdibVersionGroup mdib_version_group;
 
-    using SequenceIdType = WS::ADDRESSING::URIType;
-    SequenceIdType sequence_id;
-
-    using InstanceIdType = unsigned int;
-    using InstanceIdOptional = std::optional<InstanceIdType>;
-    InstanceIdOptional instance_id;
-
-    explicit Mdib(SequenceIdType sequence_id_type);
+    explicit Mdib(MdibVersionGroup mdib_version_group);
   };
 } // namespace BICEPS::PM
