@@ -283,7 +283,7 @@ namespace SimpleWeb {
     class Connection : public std::enable_shared_from_this<Connection> {
     public:
       template <typename... Args>
-      Connection(std::shared_ptr<ScopeRunner> handler_runner_, Args &&... args) noexcept : handler_runner(std::move(handler_runner_)), socket(new socket_type(std::forward<Args>(args)...)) {}
+      Connection(std::shared_ptr<ScopeRunner> handler_runner_, Args &&...args) noexcept : handler_runner(std::move(handler_runner_)), socket(new socket_type(std::forward<Args>(args)...)) {}
 
       std::shared_ptr<ScopeRunner> handler_runner;
 
@@ -517,7 +517,7 @@ namespace SimpleWeb {
     virtual void accept() = 0;
 
     template <typename... Args>
-    std::shared_ptr<Connection> create_connection(Args &&... args) noexcept {
+    std::shared_ptr<Connection> create_connection(Args &&...args) noexcept {
       auto connections = this->connections;
       auto connection = std::shared_ptr<Connection>(new Connection(handler_runner, std::forward<Args>(args)...), [connections](Connection *connection) {
         {
