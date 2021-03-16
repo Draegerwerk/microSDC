@@ -1,5 +1,6 @@
 #pragma once
 
+#include "url.hpp"
 #include <memory>
 
 /// @brief ClientSessionInterface defines an interface to a client session
@@ -14,12 +15,12 @@ public:
   virtual ~ClientSessionInterface() = default;
   /// @brief sends a given data message string the this client
   /// @param message the message to send
-  virtual void send(const std::string& message) = 0;
+  virtual void send(const URL& url, const std::string& message) = 0;
 };
 
 
 class ClientSessionFactory
 {
 public:
-  static std::unique_ptr<ClientSessionInterface> produce(const std::string& address, bool use_tls);
+  static std::unique_ptr<ClientSessionInterface> produce(const URL& url, bool use_tls);
 };

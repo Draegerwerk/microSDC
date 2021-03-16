@@ -88,4 +88,6 @@ private:
 
   /// @brief prints all current subscriptions to DEBUG Log
   void print_subscriptions() const;
+
+  void unsubscribe(const WS::EVENTING::Identifier& identifier);
 };

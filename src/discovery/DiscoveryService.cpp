@@ -5,8 +5,10 @@
 #include "datamodel/ExpectedElement.hpp"
 #include "datamodel/MessageModel.hpp"
 #include "datamodel/MessageSerializer.hpp"
+#include "url.hpp"
 #include <array>
 #include <memory>
+#include <regex>
 #include <utility>
 
 static constexpr const char* TAG = "DPWS";
@@ -71,7 +73,7 @@ void DiscoveryService::configure_proxy(const NetworkConfig::DiscoveryProxyProtoc
   else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP ||
            discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
   {
-    discovery_proxy_http_endpoint_ = proxy_address;
+    discovery_proxy_http_endpoint_ = URL{proxy_address};
   }
   if (running())
   {
@@ -244,15 +246,18 @@ void DiscoveryService::send_hello()
     socket_.async_send_to(asio::buffer(*msg), discovery_proxy_udp_endpoint_.value(),
                           async_callback);
   }
-  else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
+  if (!discovery_proxy_http_endpoint_.url().empty())
   {
-    auto session = ClientSessionFactory::produce(discovery_proxy_http_endpoint_, false);
-    session->send(*msg);
-  }
-  else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
-  {
-    auto session = ClientSessionFactory::produce(discovery_proxy_http_endpoint_, true);
-    session->send(*msg);
+    if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
+    {
+      auto session = ClientSessionFactory::produce(discovery_proxy_http_endpoint_, false);
+      session->send(discovery_proxy_http_endpoint_, *msg);
+    }
+    else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
+    {
+      auto session = ClientSessionFactory::produce(discovery_proxy_http_endpoint_, true);
+      session->send(discovery_proxy_http_endpoint_, *msg);
+    }
   }
 }
 
@@ -313,12 +318,12 @@ void DiscoveryService::send_bye()
   else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTP)
   {
     auto session = ClientSessionFactory::produce(discovery_proxy_http_endpoint_, false);
-    session->send(*msg);
+    session->send(discovery_proxy_http_endpoint_, *msg);
   }
   else if (discovery_proxy_protocol_ == NetworkConfig::DiscoveryProxyProtocol::HTTPS)
   {
     auto session = ClientSessionFactory::produce(discovery_proxy_http_endpoint_, true);
-    session->send(*msg);
+    session->send(discovery_proxy_http_endpoint_, *msg);
   }
 }
 

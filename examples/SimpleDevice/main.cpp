@@ -246,10 +246,10 @@ int main()
     double i = 0.0;
     while (keep_running)
     {
-      // pressure_state_handler->set_value(i++);
+      pressure_state_handler->set_value(i++);
       // temperature_state_handler->set_value(2 * i);
       // humidity_state_handler->set_value(3 * i);
-      sdc->update_state(std::make_shared<BICEPS::PM::MdsState>(device_descriptor.handle));
+      // sdc->update_state(std::make_shared<BICEPS::PM::MdsState>(device_descriptor.handle));
       std::unique_lock<std::mutex> lock(running_mutex);
       cv_running.wait_for(lock, std::chrono::seconds(1));
     }

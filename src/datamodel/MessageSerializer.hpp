@@ -111,6 +111,8 @@ public:
   void serialize(rapidxml::xml_node<>* parent, const WS::EVENTING::RenewResponse& renew_response);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::AbstractSetResponse& set_response);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::InvocationInfo& invocation_info);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::AbstractReport& report);
+  void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::AbstractMetricReport& report);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::EpisodicMetricReport& report);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::MetricReportPart&);
   void serialize(rapidxml::xml_node<>* parent, const BICEPS::MM::EpisodicComponentReport& report);

@@ -85,11 +85,16 @@ void SubscriptionManager::dispatch(const WS::EVENTING::Unsubscribe& /*unsubscrib
                                    const WS::EVENTING::Identifier& identifier)
 {
   std::lock_guard<std::mutex> lock(subscription_mutex_);
+  unsubscribe(identifier);
+}
+
+void SubscriptionManager::unsubscribe(const WS::EVENTING::Identifier& identifier)
+{
   auto subscription_info = subscriptions_.find(identifier);
   if (subscription_info == subscriptions_.end())
   {
-    throw std::runtime_error("Could not find subscription corresponding to Renew Identifier " +
-                             identifier);
+    throw std::runtime_error(
+        "Could not find subscription corresponding to Unsubscribe Identifier " + identifier);
   }
   const auto& notify_to = subscription_info->second.notify_to.address;
   const auto num_same_client =
@@ -109,13 +114,14 @@ void SubscriptionManager::fire_event(const BICEPS::MM::EpisodicMetricReport& rep
 {
   LOG(LogLevel::DEBUG, "Fire Event: EpisodicMetricReport");
   std::lock_guard<std::mutex> lock(subscription_mutex_);
-  std::vector<const SubscriptionInformation*> subscriber;
+  std::vector<std::pair<const WS::EVENTING::Identifier*, const SubscriptionInformation*>>
+      subscriber;
   for (const auto& [id, info] : subscriptions_)
   {
     if (std::find(info.filter.begin(), info.filter.end(), SDC::ACTION_EPISODIC_METRIC_REPORT) !=
         info.filter.end())
     {
-      subscriber.emplace_back(&info);
+      subscriber.emplace_back(&id, &info);
     }
   }
   if (subscriber.empty())
@@ -133,14 +139,22 @@ void SubscriptionManager::fire_event(const BICEPS::MM::EpisodicMetricReport& rep
   notify_envelope.header = std::move(header);
   notify_envelope.body = std::move(body);
 
-  for (const auto* const info : subscriber)
+  for (const auto [id, info] : subscriber)
   {
     notify_envelope.header.to = WS::ADDRESSING::URIType{info->notify_to.address};
     MessageSerializer serializer;
     serializer.serialize(notify_envelope);
     const auto message_str = serializer.str();
     LOG(LogLevel::DEBUG, "SENDING: " << message_str);
-    session_manager_.send_to_session(info->notify_to.address, message_str);
+    try
+    {
+      session_manager_.send_to_session(info->notify_to.address, message_str);
+    }
+    catch (const std::system_error& err)
+    {
+      subscriptions_.erase(*id);
+      LOG(LogLevel::ERROR, "Error while sending metric report: " << err.what());
+    }
   }
 }
 

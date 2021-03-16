@@ -4,6 +4,7 @@
 #include "datamodel/MDPWSConstants.hpp"
 #include "datamodel/MessageModel.hpp"
 #include "networking/NetworkConfig.hpp"
+#include "url.hpp"
 #include <array>
 #include <asio.hpp>
 #include <atomic>
@@ -58,7 +59,7 @@ private:
   /// endpoint of the discovery proxy for udp, is empty, if no proxy is configured
   std::optional<asio::ip::udp::endpoint> discovery_proxy_udp_endpoint_;
   /// endpoint of the discovery proxy for protocol types HTTP and HTTPS
-  std::string discovery_proxy_http_endpoint_;
+  URL discovery_proxy_http_endpoint_;
   /// the protocol type of the discoveryProxy
   NetworkConfig::DiscoveryProxyProtocol discovery_proxy_protocol_{
       NetworkConfig::DiscoveryProxyProtocol::UDP};

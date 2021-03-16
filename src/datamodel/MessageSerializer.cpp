@@ -1433,19 +1433,27 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
 }
 
 void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::MM::AbstractReport& report)
+{
+  serialize(parent, report.mdib_version_group);
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
+                                  const BICEPS::MM::AbstractMetricReport& report)
+{
+  serialize(parent, static_cast<const BICEPS::MM::AbstractReport&>(report));
+  for (const auto& part : report.report_part)
+  {
+    serialize(parent, part);
+  }
+}
+
+void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
                                   const BICEPS::MM::EpisodicMetricReport& report)
 {
   auto* report_node =
       xml_document_->allocate_node(rapidxml::node_element, "mm:EpisodicMetricReport");
-  if (report.mdib_version_group.mdib_version.has_value())
-  {
-    append_to_string_attribute(report_node, "MdibVersion",
-                               report.mdib_version_group.mdib_version.value());
-  }
-  for (const auto& part : report.report_part)
-  {
-    serialize(report_node, part);
-  }
+  serialize(report_node, static_cast<const BICEPS::MM::AbstractMetricReport&>(report));
   parent->append_node(report_node);
 }
 
@@ -1472,7 +1480,7 @@ void MessageSerializer::serialize(rapidxml::xml_node<>* parent,
   auto* report_part_node = xml_document_->allocate_node(rapidxml::node_element, "mm:ReportPart");
   for (const auto& state : part.metric_state)
   {
-    auto* state_node = xml_document_->allocate_node(rapidxml::node_element, "pm:State");
+    auto* state_node = xml_document_->allocate_node(rapidxml::node_element, "mm:MetricState");
     if (const auto numeric_metric_state = dyn_cast<const BICEPS::PM::NumericMetricState>(state);
         numeric_metric_state != nullptr)
     {
