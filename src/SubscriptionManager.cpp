@@ -133,12 +133,13 @@ void SubscriptionManager::fire_event(const BICEPS::MM::EpisodicMetricReport& rep
   notify_envelope.header = std::move(header);
   notify_envelope.body = std::move(body);
 
-  MessageSerializer serializer;
-  serializer.serialize(notify_envelope);
-  const auto message_str = serializer.str();
-  LOG(LogLevel::DEBUG, "SENDING: " << message_str);
   for (const auto* const info : subscriber)
   {
+    notify_envelope.header.to = WS::ADDRESSING::URIType{info->notify_to.address};
+    MessageSerializer serializer;
+    serializer.serialize(notify_envelope);
+    const auto message_str = serializer.str();
+    LOG(LogLevel::DEBUG, "SENDING: " << message_str);
     session_manager_.send_to_session(info->notify_to.address, message_str);
   }
 }
@@ -171,12 +172,13 @@ void SubscriptionManager::fire_event(const BICEPS::MM::EpisodicComponentReport& 
   notify_envelope.header = std::move(header);
   notify_envelope.body = std::move(body);
 
-  MessageSerializer serializer;
-  serializer.serialize(notify_envelope);
-  const auto message_str = serializer.str();
-  LOG(LogLevel::DEBUG, "SENDING: " << message_str);
   for (const auto* const info : subscriber)
   {
+    notify_envelope.header.to = WS::ADDRESSING::URIType{info->notify_to.address};
+    MessageSerializer serializer;
+    serializer.serialize(notify_envelope);
+    const auto message_str = serializer.str();
+    LOG(LogLevel::DEBUG, "SENDING: " << message_str);
     session_manager_.send_to_session(info->notify_to.address, message_str);
   }
 }
