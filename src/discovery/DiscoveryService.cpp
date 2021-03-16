@@ -13,8 +13,7 @@ static constexpr const char* TAG = "DPWS";
 
 DiscoveryService::DiscoveryService(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
                                    WS::DISCOVERY::QNameListType types,
-                                   WS::DISCOVERY::UriListType x_addresses,
-                                   WS::DISCOVERY::HelloType::MetadataVersionType metadata_version)
+                                   WS::DISCOVERY::UriListType x_addresses)
   : socket_(io_context_,
             asio::ip::udp::endpoint(asio::ip::udp::v4(), MDPWS::UDP_MULTICAST_DISCOVERY_PORT))
   , multicast_endpoint_(address_from_string(MDPWS::UDP_MULTICAST_DISCOVERY_IP_V4),
@@ -23,7 +22,6 @@ DiscoveryService::DiscoveryService(WS::ADDRESSING::EndpointReferenceType::Addres
   , endpoint_reference_(std::move(epr))
   , types_(std::move(types))
   , x_addresses_(std::move(x_addresses))
-  , metadata_version_(metadata_version)
 {
   socket_.set_option(asio::ip::udp::socket::reuse_address(true));
   socket_.set_option(asio::ip::multicast::join_group(multicast_endpoint_.address()));

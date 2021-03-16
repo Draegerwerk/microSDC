@@ -16,8 +16,7 @@ class DiscoveryService
 public:
   /// @brief Constructs DiscoveryService
   DiscoveryService(WS::ADDRESSING::EndpointReferenceType::AddressType epr,
-                   WS::DISCOVERY::QNameListType types, WS::DISCOVERY::UriListType x_addresses,
-                   WS::DISCOVERY::HelloType::MetadataVersionType metadata_version = 1);
+                   WS::DISCOVERY::QNameListType types, WS::DISCOVERY::UriListType x_addresses);
   DiscoveryService(const DiscoveryService&) = delete;
   DiscoveryService(DiscoveryService&&) = delete;
   DiscoveryService& operator=(const DiscoveryService&) = delete;
@@ -79,7 +78,7 @@ private:
   /// addresses of the services exposed by this device
   WS::DISCOVERY::UriListType x_addresses_;
   /// the version of the metadata
-  const WS::DISCOVERY::HelloType::MetadataVersionType metadata_version_;
+  const WS::DISCOVERY::HelloType::MetadataVersionType metadata_version_{1};
 
 
   /// @brief creates an endpoint v4 address from string
