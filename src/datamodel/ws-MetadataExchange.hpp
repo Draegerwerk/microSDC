@@ -12,13 +12,13 @@ namespace WS::MEX
     // Dialect
     //
     using DialectType = WS::ADDRESSING::URIType;
-    using DialectOptional = std::optional<DialectType>;
+    using DialectOptional = boost::optional<DialectType>;
     DialectOptional dialect;
 
     // Identifier
     //
     using IdentifierType = WS::ADDRESSING::URIType;
-    using IdentifierOptional = std::optional<IdentifierType>;
+    using IdentifierOptional = boost::optional<IdentifierType>;
     IdentifierOptional identifier;
 
     explicit GetMetadata(const rapidxml::xml_node<>& node);
@@ -37,31 +37,31 @@ namespace WS::MEX
     // MetadataReference
     //
     using MetadataReferenceType = WS::MEX::MetadataReference;
-    using MetadataReferenceOptional = std::optional<MetadataReferenceType>;
+    using MetadataReferenceOptional = boost::optional<MetadataReferenceType>;
     MetadataReferenceOptional metadata_reference;
 
     // Location
     //
     using LocationType = WS::ADDRESSING::URIType;
-    using LocationOptional = std::optional<LocationType>;
+    using LocationOptional = boost::optional<LocationType>;
     LocationOptional location;
 
     // ThisModel
     //
     using ThisModelType = WS::DPWS::ThisModelType;
-    using ThisModelOptional = std::optional<ThisModelType>;
+    using ThisModelOptional = boost::optional<ThisModelType>;
     ThisModelOptional this_model;
 
     // ThisDevice
     //
     using ThisDeviceType = WS::DPWS::ThisDeviceType;
-    using ThisDeviceOptional = std::optional<ThisDeviceType>;
+    using ThisDeviceOptional = boost::optional<ThisDeviceType>;
     ThisDeviceOptional this_device;
 
     // Relationship
     //
     using RelationshipType = WS::DPWS::Relationship;
-    using RelationshipOptional = std::optional<RelationshipType>;
+    using RelationshipOptional = boost::optional<RelationshipType>;
     RelationshipOptional relationship;
 
     // Dialect
@@ -72,7 +72,7 @@ namespace WS::MEX
     // Identifier
     //
     using IdentifierType = WS::ADDRESSING::URIType;
-    using IdentifierOptional = std::optional<IdentifierType>;
+    using IdentifierOptional = boost::optional<IdentifierType>;
     IdentifierOptional identifier;
 
     explicit MetadataSection(DialectType dialect);

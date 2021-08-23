@@ -21,39 +21,39 @@ namespace MESSAGEMODEL
     ActionType action;
 
     using AppSequenceType = WS::DISCOVERY::AppSequenceType;
-    using AppSequenceOptional = std::optional<AppSequenceType>;
+    using AppSequenceOptional = boost::optional<AppSequenceType>;
     AppSequenceOptional app_sequence;
 
     using FaultToType = WS::ADDRESSING::EndpointReferenceType;
-    using FaultToOptional = std::optional<FaultToType>;
+    using FaultToOptional = boost::optional<FaultToType>;
     FaultToOptional fault_to;
 
     using FromType = WS::ADDRESSING::EndpointReferenceType;
-    using FromOptional = std::optional<FromType>;
+    using FromOptional = boost::optional<FromType>;
     FromOptional from;
 
     using MessageIDType = WS::ADDRESSING::URIType;
-    using MessageIDOptional = std::optional<MessageIDType>;
+    using MessageIDOptional = boost::optional<MessageIDType>;
     MessageIDOptional message_id;
 
     using ReferenceParametersType = WS::ADDRESSING::ReferenceParametersType;
-    using ReferenceParametersOptional = std::optional<ReferenceParametersType>;
+    using ReferenceParametersOptional = boost::optional<ReferenceParametersType>;
     ReferenceParametersOptional reference_parameters;
 
     using RelatesToType = WS::ADDRESSING::RelatesToType;
-    using RelatesToOptional = std::optional<RelatesToType>;
+    using RelatesToOptional = boost::optional<RelatesToType>;
     RelatesToOptional relates_to;
 
     using ReplyToType = WS::ADDRESSING::EndpointReferenceType;
-    using ReplyToOptional = std::optional<ReplyToType>;
+    using ReplyToOptional = boost::optional<ReplyToType>;
     ReplyToOptional reply_to;
 
     using ToType = WS::ADDRESSING::URIType;
-    using ToOptional = std::optional<ToType>;
+    using ToOptional = boost::optional<ToType>;
     ToOptional to;
 
     using IdentifierType = WS::EVENTING::Identifier;
-    using IdentifierOptional = std::optional<IdentifierType>;
+    using IdentifierOptional = boost::optional<IdentifierType>;
     IdentifierOptional identifier;
 
   private:
@@ -67,87 +67,87 @@ namespace MESSAGEMODEL
     explicit Body(const rapidxml::xml_node<>& node);
 
     using ByeType = WS::DISCOVERY::ByeType;
-    using ByeOptional = std::optional<ByeType>;
+    using ByeOptional = boost::optional<ByeType>;
     ByeOptional bye;
 
     using HelloType = WS::DISCOVERY::HelloType;
-    using HelloOptional = std::optional<HelloType>;
+    using HelloOptional = boost::optional<HelloType>;
     HelloOptional hello;
 
     using ProbeType = WS::DISCOVERY::ProbeType;
-    using ProbeOptional = std::optional<ProbeType>;
+    using ProbeOptional = boost::optional<ProbeType>;
     ProbeOptional probe;
 
     using ProbeMatchesType = WS::DISCOVERY::ProbeMatchesType;
-    using ProbeMatchesOptional = std::optional<ProbeMatchesType>;
+    using ProbeMatchesOptional = boost::optional<ProbeMatchesType>;
     ProbeMatchesOptional probe_matches;
 
     using ResolveType = WS::DISCOVERY::ResolveType;
-    using ResolveOptional = std::optional<ResolveType>;
+    using ResolveOptional = boost::optional<ResolveType>;
     ResolveOptional resolve;
 
     using ResolveMatchesType = WS::DISCOVERY::ResolveMatchesType;
-    using ResolveMatchesOptional = std::optional<ResolveMatchesType>;
+    using ResolveMatchesOptional = boost::optional<ResolveMatchesType>;
     ResolveMatchesOptional resolve_matches;
 
     using GetMetadataType = WS::MEX::GetMetadata;
-    using GetMetadataOptional = std::optional<GetMetadataType>;
+    using GetMetadataOptional = boost::optional<GetMetadataType>;
     GetMetadataOptional get_metadata;
 
     using MetadataType = WS::MEX::Metadata;
-    using MetadataOptional = std::optional<MetadataType>;
+    using MetadataOptional = boost::optional<MetadataType>;
     MetadataOptional metadata;
 
     using GetMdibType = BICEPS::MM::GetMdib;
-    using GetMdibOptional = std::optional<GetMdibType>;
+    using GetMdibOptional = boost::optional<GetMdibType>;
     GetMdibOptional get_mdib;
 
     using GetMdibResponseType = BICEPS::MM::GetMdibResponse;
-    using GetMdibResponseOptional = std::optional<GetMdibResponseType>;
+    using GetMdibResponseOptional = boost::optional<GetMdibResponseType>;
     GetMdibResponseOptional get_mdib_response;
 
     using SubscribeType = WS::EVENTING::Subscribe;
-    using SubscribeOptional = std::optional<SubscribeType>;
+    using SubscribeOptional = boost::optional<SubscribeType>;
     SubscribeOptional subscribe;
 
     using SubscribeResponseType = WS::EVENTING::SubscribeResponse;
-    using SubscribeResponseOptional = std::optional<SubscribeResponseType>;
+    using SubscribeResponseOptional = boost::optional<SubscribeResponseType>;
     SubscribeResponseOptional subscribe_response;
 
     using RenewType = WS::EVENTING::Renew;
-    using RenewOptional = std::optional<RenewType>;
+    using RenewOptional = boost::optional<RenewType>;
     RenewOptional renew;
 
     using RenewResponseType = WS::EVENTING::RenewResponse;
-    using RenewResponseOptional = std::optional<RenewResponseType>;
+    using RenewResponseOptional = boost::optional<RenewResponseType>;
     RenewResponseOptional renew_response;
 
     using UnsubscribeType = WS::EVENTING::Unsubscribe;
-    using UnsubscribeOptional = std::optional<UnsubscribeType>;
+    using UnsubscribeOptional = boost::optional<UnsubscribeType>;
     UnsubscribeOptional unsubscribe;
 
     using SetStringType = BICEPS::MM::SetString;
-    using SetStringOptional = std::optional<SetStringType>;
+    using SetStringOptional = boost::optional<SetStringType>;
     SetStringOptional set_string;
 
     using SetStringResponseType = BICEPS::MM::SetStringResponse;
-    using SetStringResponseOptional = std::optional<SetStringResponseType>;
+    using SetStringResponseOptional = boost::optional<SetStringResponseType>;
     SetStringResponseOptional set_string_response;
 
     using SetValueType = BICEPS::MM::SetValue;
-    using SetValueOptional = std::optional<SetValueType>;
+    using SetValueOptional = boost::optional<SetValueType>;
     SetValueOptional set_value;
 
     using SetValueResponseType = BICEPS::MM::SetValueResponse;
-    using SetValueResponseOptional = std::optional<SetValueResponseType>;
+    using SetValueResponseOptional = boost::optional<SetValueResponseType>;
     SetValueResponseOptional set_value_response;
 
     using EpisodicMetricReportType = BICEPS::MM::EpisodicMetricReport;
-    using EpisodicMetricReportOptional = std::optional<EpisodicMetricReportType>;
+    using EpisodicMetricReportOptional = boost::optional<EpisodicMetricReportType>;
     EpisodicMetricReportOptional episodic_metric_report;
 
     using EpisodicComponentReportType = BICEPS::MM::EpisodicComponentReport;
-    using EpisodicComponentReportOptional = std::optional<EpisodicComponentReportType>;
+    using EpisodicComponentReportOptional = boost::optional<EpisodicComponentReportType>;
     EpisodicComponentReportOptional episodic_component_report;
 
   private:

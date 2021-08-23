@@ -120,19 +120,19 @@ namespace BICEPS::PM
   struct LocalizedText
   {
     using RefType = LocalizedTextRef;
-    using RefOptional = std::optional<RefType>;
+    using RefOptional = boost::optional<RefType>;
     RefOptional ref;
 
     using LangType = std::string;
-    using LangOptional = std::optional<LangType>;
+    using LangOptional = boost::optional<LangType>;
     LangOptional lang;
 
     using VersionType = unsigned int;
-    using VersionOptional = std::optional<VersionType>;
+    using VersionOptional = boost::optional<VersionType>;
     VersionOptional version;
 
     using TextWidthType = LocalizedTextWidth;
-    using TextWidthOptional = std::optional<TextWidthType>;
+    using TextWidthOptional = boost::optional<TextWidthType>;
     TextWidthOptional text_width;
 
     using ContentType = std::string;
@@ -148,7 +148,7 @@ namespace BICEPS::PM
     CodeType code;
 
     using ConceptDescriptionType = LocalizedText;
-    using ConceptDescriptionOptional = std::optional<ConceptDescriptionType>;
+    using ConceptDescriptionOptional = boost::optional<ConceptDescriptionType>;
     ConceptDescriptionOptional concept_description;
 
     explicit CodedValue(CodeType code);
@@ -187,18 +187,18 @@ namespace BICEPS::PM
     DescriptorKind get_kind() const;
 
     using TypeType = CodedValue;
-    using TypeOptional = std::optional<TypeType>;
+    using TypeOptional = boost::optional<TypeType>;
     TypeOptional type;
 
     using HandleType = std::string;
     HandleType handle;
 
     using DescriptorVersionType = unsigned int;
-    using DescriptorVersionOptional = std::optional<DescriptorVersionType>;
+    using DescriptorVersionOptional = boost::optional<DescriptorVersionType>;
     DescriptorVersionOptional descriptor_version;
 
     using SafetyClassificationType = ::BICEPS::PM::SafetyClassification;
-    using SafetyClassificationOptional = std::optional<SafetyClassificationType>;
+    using SafetyClassificationOptional = boost::optional<SafetyClassificationType>;
     SafetyClassificationOptional safety_classification;
 
     virtual ~AbstractDescriptor() = default;
@@ -229,7 +229,7 @@ namespace BICEPS::PM
   struct SetStringOperationDescriptor : public AbstractOperationDescriptor
   {
     using MaxLengthType = std::uint64_t;
-    using MaxLengthOptional = std::optional<MaxLengthType>;
+    using MaxLengthOptional = boost::optional<MaxLengthType>;
     MaxLengthOptional max_length;
 
     static bool classof(const AbstractDescriptor* other);
@@ -270,7 +270,7 @@ namespace BICEPS::PM
     static bool classof(const AbstractDescriptor* other);
 
     using ScoType = ::BICEPS::PM::ScoDescriptor;
-    using ScoOptional = std::optional<ScoType>;
+    using ScoOptional = boost::optional<ScoType>;
     ScoOptional sco;
 
   protected:
@@ -289,7 +289,7 @@ namespace BICEPS::PM
     ModelNameSequence model_name;
 
     using ModelNumberType = std::string;
-    using ModelNumberOptional = std::optional<ModelNumberType>;
+    using ModelNumberOptional = boost::optional<ModelNumberType>;
     ModelNumberOptional model_number;
 
     using SerialNumberType = std::string;
@@ -322,11 +322,11 @@ namespace BICEPS::PM
   struct SystemContextDescriptor : public AbstractDeviceComponentDescriptor
   {
     using PatientContextType = PatientContextDescriptor;
-    using PatientContextOptional = std::optional<PatientContextType>;
+    using PatientContextOptional = boost::optional<PatientContextType>;
     PatientContextOptional patient_context;
 
     using LocationContextType = LocationContextDescriptor;
-    using LocationContextOptional = std::optional<LocationContextType>;
+    using LocationContextOptional = boost::optional<LocationContextType>;
     LocationContextOptional location_context;
 
     static bool classof(const AbstractDescriptor* other);
@@ -345,34 +345,34 @@ namespace BICEPS::PM
   struct Range
   {
     using LowerType = int;
-    using LowerOptional = std::optional<LowerType>;
+    using LowerOptional = boost::optional<LowerType>;
     LowerOptional lower;
 
     using UpperType = int;
-    using UpperOptional = std::optional<UpperType>;
+    using UpperOptional = boost::optional<UpperType>;
     UpperOptional upper;
 
     using StepWidthType = int;
-    using StepWidthOptional = std::optional<StepWidthType>;
+    using StepWidthOptional = boost::optional<StepWidthType>;
     StepWidthOptional step_width;
 
     using RelativeAccuracyType = int;
-    using RelativeAccuracyOptional = std::optional<RelativeAccuracyType>;
+    using RelativeAccuracyOptional = boost::optional<RelativeAccuracyType>;
     RelativeAccuracyOptional relative_accuracy;
 
     using AbsoluteAccuracyType = int;
-    using AbsoluteAccuracyOptional = std::optional<AbsoluteAccuracyType>;
+    using AbsoluteAccuracyOptional = boost::optional<AbsoluteAccuracyType>;
     AbsoluteAccuracyOptional absolute_accuracy;
   };
 
   struct InstanceIdentifier
   {
     using ExtensionType = std::string;
-    using ExtensionOptional = std::optional<ExtensionType>;
+    using ExtensionOptional = boost::optional<ExtensionType>;
     ExtensionOptional extension;
 
     using RootType = WS::ADDRESSING::URIType;
-    using RootOptional = std::optional<RootType>;
+    using RootOptional = boost::optional<RootType>;
     RootOptional root;
   };
 
@@ -404,7 +404,7 @@ namespace BICEPS::PM
     ResolutionType resolution;
 
     using AveragingPeriodType = std::string;
-    using AveragingPeriodOptional = std::optional<AveragingPeriodType>;
+    using AveragingPeriodOptional = boost::optional<AveragingPeriodType>;
     AveragingPeriodOptional averaging_period;
 
     static bool classof(const AbstractDescriptor* other);
@@ -439,15 +439,15 @@ namespace BICEPS::PM
     ValueType value;
 
     using TypeType = CodedValue;
-    using TypeOptional = std::optional<TypeType>;
+    using TypeOptional = boost::optional<TypeType>;
     TypeOptional type;
 
     using IdentificationType = InstanceIdentifier;
-    using IdentificationOptional = std::optional<IdentificationType>;
+    using IdentificationOptional = boost::optional<IdentificationType>;
     IdentificationOptional identification;
 
     using CharacteristicType = Measurement;
-    using CharacteristicOptional = std::optional<CharacteristicType>;
+    using CharacteristicOptional = boost::optional<CharacteristicType>;
     CharacteristicOptional characteristic;
 
     explicit AllowedValue(ValueType value);
@@ -492,15 +492,15 @@ namespace BICEPS::PM
   struct MdsDescriptor : public AbstractComplexDeviceComponentDescriptor
   {
     using MetaDataType = Metadata;
-    using MetaDataOptional = std::optional<MetaDataType>;
+    using MetaDataOptional = boost::optional<MetaDataType>;
     MetaDataOptional meta_data;
 
     using SystemContextType = SystemContextDescriptor;
-    using SystemContextOptional = std::optional<SystemContextType>;
+    using SystemContextOptional = boost::optional<SystemContextType>;
     SystemContextOptional system_context;
 
     using ClockType = ClockDescriptor;
-    using ClockOptional = std::optional<ClockType>;
+    using ClockOptional = boost::optional<ClockType>;
     ClockOptional clock;
 
     using BatteryType = BatteryDescriptor;
@@ -523,7 +523,7 @@ namespace BICEPS::PM
     MdsSequence mds;
 
     using DescriptionVersionType = unsigned int;
-    using DescriptionVersionOptional = std::optional<DescriptionVersionType>;
+    using DescriptionVersionOptional = boost::optional<DescriptionVersionType>;
     DescriptionVersionOptional description_version;
   };
 
@@ -561,14 +561,14 @@ namespace BICEPS::PM
     StateKind get_kind() const;
 
     using StateVersionType = unsigned int;
-    using StateVersionOptional = std::optional<StateVersionType>;
+    using StateVersionOptional = boost::optional<StateVersionType>;
     StateVersionOptional state_version;
 
     using DescriptorHandleType = std::string;
     DescriptorHandleType descriptor_handle;
 
     using DescriptorVersionType = unsigned int;
-    using DescriptorVersionOptional = std::optional<DescriptorVersionType>;
+    using DescriptorVersionOptional = boost::optional<DescriptorVersionType>;
     DescriptorVersionOptional descriptor_version;
 
     virtual ~AbstractState() = default;
@@ -587,7 +587,7 @@ namespace BICEPS::PM
   struct AbstractMultiState : public AbstractState
   {
     using CategoryType = CodedValue;
-    using CategoryOptional = std::optional<CategoryType>;
+    using CategoryOptional = boost::optional<CategoryType>;
     CategoryOptional category;
 
     using HandleType = std::string;
@@ -601,11 +601,11 @@ namespace BICEPS::PM
   struct AbstractContextState : public AbstractMultiState
   {
     using BindingMdibVersionType = unsigned int;
-    using BindingMdibVersionOptional = std::optional<BindingMdibVersionType>;
+    using BindingMdibVersionOptional = boost::optional<BindingMdibVersionType>;
     BindingMdibVersionOptional binding_mdib_version;
 
     using ContextAssociationType = ::BICEPS::PM::ContextAssociation;
-    using ContextAssociationOptional = std::optional<ContextAssociationType>;
+    using ContextAssociationOptional = boost::optional<ContextAssociationType>;
     ContextAssociationOptional context_association;
 
     using ValidatorType = InstanceIdentifier;
@@ -624,33 +624,33 @@ namespace BICEPS::PM
   struct LocationDetail
   {
     using PoCType = std::string;
-    using PoCOptional = std::optional<PoCType>;
+    using PoCOptional = boost::optional<PoCType>;
     PoCOptional poc;
 
     using RoomType = std::string;
-    using RoomOptional = std::optional<RoomType>;
+    using RoomOptional = boost::optional<RoomType>;
     RoomOptional room;
 
     using BedType = std::string;
-    using BedOptional = std::optional<PoCType>;
+    using BedOptional = boost::optional<PoCType>;
     BedOptional bed;
 
     using FacilityType = std::string;
-    using FacilityOptional = std::optional<FacilityType>;
+    using FacilityOptional = boost::optional<FacilityType>;
     FacilityOptional facility;
 
     using BuildingType = std::string;
-    using BuildingOptional = std::optional<PoCType>;
+    using BuildingOptional = boost::optional<PoCType>;
     BuildingOptional building;
 
     using FloorType = std::string;
-    using FloorOptional = std::optional<PoCType>;
+    using FloorOptional = boost::optional<PoCType>;
     FloorOptional floor;
   };
 
   struct LocationContextState : public AbstractContextState
   {
-    using LocationDetailOptional = std::optional<LocationDetail>;
+    using LocationDetailOptional = boost::optional<LocationDetail>;
     LocationDetailOptional location_detail;
 
     static bool classof(const AbstractState* other);
@@ -663,7 +663,7 @@ namespace BICEPS::PM
   struct PhysicalConnectorInfo
   {
     using NumberType = int;
-    using NumberOptional = std::optional<NumberType>;
+    using NumberOptional = boost::optional<NumberType>;
     NumberOptional number;
 
     using LabelSequence = std::vector<LocalizedText>;
@@ -673,57 +673,57 @@ namespace BICEPS::PM
   struct CalibrationDocumentation
   {
     using DocumentationType = LocalizedText;
-    using DocumentationOptional = std::optional<DocumentationType>;
+    using DocumentationOptional = boost::optional<DocumentationType>;
     DocumentationOptional documentation;
 
     using CalibrationResultType = CodedValue;
-    using CalibrationResultOptional = std::optional<CalibrationResultType>;
+    using CalibrationResultOptional = boost::optional<CalibrationResultType>;
     CalibrationResultOptional calibration_result;
   };
 
   struct CalibrationInfo
   {
     using ComponentCalibrationStateType = CalibrationState;
-    using ComponentCalibrationStateOptional = std::optional<ComponentCalibrationStateType>;
+    using ComponentCalibrationStateOptional = boost::optional<ComponentCalibrationStateType>;
     ComponentCalibrationStateOptional component_calibration_state;
 
     using TypeType = CalibrationType;
-    using TypeOptional = std::optional<TypeType>;
+    using TypeOptional = boost::optional<TypeType>;
     TypeOptional type;
 
     using TimeType = Timestamp;
-    using TimeOptional = std::optional<TimeType>;
+    using TimeOptional = boost::optional<TimeType>;
     TimeOptional time;
 
     using CalibrationDocumentationType = CalibrationDocumentation;
-    using CalibrationDocumentationOptional = std::optional<CalibrationDocumentationType>;
+    using CalibrationDocumentationOptional = boost::optional<CalibrationDocumentationType>;
     CalibrationDocumentationOptional calibration_documentation;
   };
 
   struct AbstractDeviceComponentState : public AbstractState
   {
     using ActivationStateType = ComponentActivation;
-    using ActivationStateOptional = std::optional<ActivationStateType>;
+    using ActivationStateOptional = boost::optional<ActivationStateType>;
     ActivationStateOptional activation_state;
 
     using OperatingHoursType = unsigned int;
-    using OperatingHoursOptional = std::optional<OperatingHoursType>;
+    using OperatingHoursOptional = boost::optional<OperatingHoursType>;
     OperatingHoursOptional operating_hours;
 
     using OperatingCyclesType = int;
-    using OperatingCyclesOptional = std::optional<OperatingCyclesType>;
+    using OperatingCyclesOptional = boost::optional<OperatingCyclesType>;
     OperatingCyclesOptional operating_cycles;
 
     using CalibrationInfoType = struct CalibrationInfo;
-    using CalibrationInfoOptional = std::optional<CalibrationInfoType>;
+    using CalibrationInfoOptional = boost::optional<CalibrationInfoType>;
     CalibrationInfoOptional calibration_info;
 
     using NextCalibrationType = struct CalibrationInfo;
-    using NextCalibrationOptional = std::optional<NextCalibrationType>;
+    using NextCalibrationOptional = boost::optional<NextCalibrationType>;
     NextCalibrationOptional next_calibration;
 
     using PhysicalConnectorType = PhysicalConnectorInfo;
-    using PhysicalConnectorOptional = std::optional<PhysicalConnectorType>;
+    using PhysicalConnectorOptional = boost::optional<PhysicalConnectorType>;
     PhysicalConnectorOptional physical_connector;
 
     static bool classof(const AbstractState* other);
@@ -751,11 +751,11 @@ namespace BICEPS::PM
   struct OperationGroup
   {
     using OperatingModeType = OperatingMode;
-    using OperatingModeOptional = std::optional<OperatingModeType>;
+    using OperatingModeOptional = boost::optional<OperatingModeType>;
     OperatingModeOptional operating_mode;
 
     using OperationsType = OperationRef;
-    using OperationsOptional = std::optional<OperationsType>;
+    using OperationsOptional = boost::optional<OperationsType>;
     OperationsOptional operations;
 
     using TypeType = CodedValue;
@@ -767,15 +767,15 @@ namespace BICEPS::PM
   struct ScoState : public AbstractDeviceComponentState
   {
     using InvocationRequestedType = OperationRef;
-    using InvocationRequestedOptional = std::optional<InvocationRequestedType>;
+    using InvocationRequestedOptional = boost::optional<InvocationRequestedType>;
     InvocationRequestedOptional invocation_requested;
 
     using InvocationRequiredType = OperationRef;
-    using InvocationRequiredOptional = std::optional<InvocationRequiredType>;
+    using InvocationRequiredOptional = boost::optional<InvocationRequiredType>;
     InvocationRequiredOptional invocation_required;
 
     using OperationGroupType = OperationGroup;
-    using OperationGroupOptional = std::optional<OperationGroupType>;
+    using OperationGroupOptional = boost::optional<OperationGroupType>;
     OperationGroupOptional operation_group;
 
     static bool classof(const AbstractState* other);
@@ -795,15 +795,15 @@ namespace BICEPS::PM
   struct MdsState : public AbstractComplexDeviceComponentState
   {
     using LangType = std::string;
-    using LangOptional = std::optional<LangType>;
+    using LangOptional = boost::optional<LangType>;
     LangOptional lang;
 
     using OperatingModeType = MdsOperatingMode;
-    using OperatingModeOptional = std::optional<OperatingModeType>;
+    using OperatingModeOptional = boost::optional<OperatingModeType>;
     OperatingModeOptional operating_mode;
 
     using OperatingJurisdictionType = OperatingJurisdiction;
-    using OperatingJurisdictionOptional = std::optional<OperatingJurisdictionType>;
+    using OperatingJurisdictionOptional = boost::optional<OperatingJurisdictionType>;
     OperatingJurisdictionOptional operating_jurisdiction;
 
     static bool classof(const AbstractState* other);
@@ -813,7 +813,7 @@ namespace BICEPS::PM
   struct VmdState : public AbstractComplexDeviceComponentState
   {
     using OperatingJurisdictionType = OperatingJurisdiction;
-    using OperatingJurisdictionOptional = std::optional<OperatingJurisdictionType>;
+    using OperatingJurisdictionOptional = boost::optional<OperatingJurisdictionType>;
     OperatingJurisdictionOptional operating_jurisdiction;
 
     static bool classof(const AbstractState* other);
@@ -858,11 +858,11 @@ namespace BICEPS::PM
     ValidityType validity;
 
     using ModeType = GenerationMode;
-    using ModeOptional = std::optional<ModeType>;
+    using ModeOptional = boost::optional<ModeType>;
     ModeOptional mode;
 
     using QiType = int;
-    using QiOptional = std::optional<QiType>;
+    using QiOptional = boost::optional<QiType>;
     QiOptional qi;
 
     explicit MetricQuality(const ValidityType& validity);
@@ -889,15 +889,15 @@ namespace BICEPS::PM
     AnnotationSequence annotation;
 
     using StartTimeType = Timestamp;
-    using StartTimeOptional = std::optional<StartTimeType>;
+    using StartTimeOptional = boost::optional<StartTimeType>;
     StartTimeOptional start_time;
 
     using StopTimeType = Timestamp;
-    using StopTimeOptional = std::optional<StopTimeType>;
+    using StopTimeOptional = boost::optional<StopTimeType>;
     StopTimeOptional stop_time;
 
     using DeterminationTimeType = Timestamp;
-    using DeterminationTimeOptional = std::optional<DeterminationTimeType>;
+    using DeterminationTimeOptional = boost::optional<DeterminationTimeType>;
     DeterminationTimeOptional determination_time;
 
     virtual ~AbstractMetricValue() = default;
@@ -916,7 +916,7 @@ namespace BICEPS::PM
   struct NumericMetricValue : public AbstractMetricValue
   {
     using ValueType = double;
-    using ValueOptional = std::optional<ValueType>;
+    using ValueOptional = boost::optional<ValueType>;
     ValueOptional value;
 
     static bool classof(const AbstractMetricValue* other);
@@ -927,7 +927,7 @@ namespace BICEPS::PM
   struct AbstractMetricState : public AbstractState
   {
     using ActivationStateType = ComponentActivation;
-    using ActivationStateOptional = std::optional<ActivationStateType>;
+    using ActivationStateOptional = boost::optional<ActivationStateType>;
     ActivationStateOptional activation_state;
 
     static bool classof(const AbstractState* other);
@@ -939,7 +939,7 @@ namespace BICEPS::PM
   struct NumericMetricState : public AbstractMetricState
   {
     using MetricValueType = NumericMetricValue;
-    using MetricValueOptional = std::optional<MetricValueType>;
+    using MetricValueOptional = boost::optional<MetricValueType>;
     MetricValueOptional metric_value;
 
     using PhysiologicalRangeType = Range;
@@ -947,7 +947,7 @@ namespace BICEPS::PM
     PhysiologicalRangeSequence physiological_range;
 
     using ActiveAveragingPeriodType = std::string;
-    using ActiveAveragingPeriodOptional = std::optional<ActiveAveragingPeriodType>;
+    using ActiveAveragingPeriodOptional = boost::optional<ActiveAveragingPeriodType>;
     ActiveAveragingPeriodOptional active_averaging_period;
 
     static bool classof(const AbstractState* other);
@@ -958,7 +958,7 @@ namespace BICEPS::PM
   struct StringMetricValue : public AbstractMetricValue
   {
     using ValueType = std::string;
-    using ValueOptional = std::optional<ValueType>;
+    using ValueOptional = boost::optional<ValueType>;
     ValueOptional value;
 
     static bool classof(const AbstractMetricValue* other);
@@ -969,7 +969,7 @@ namespace BICEPS::PM
   struct StringMetricState : public AbstractMetricState
   {
     using MetricValueType = StringMetricValue;
-    using MetricValueOptional = std::optional<MetricValueType>;
+    using MetricValueOptional = boost::optional<MetricValueType>;
     MetricValueOptional metric_value;
 
     static bool classof(const AbstractState* other);
@@ -991,21 +991,21 @@ namespace BICEPS::PM
     StateSequence state;
 
     using StateVersionType = unsigned int;
-    using StateVersionOptional = std::optional<StateVersionType>;
+    using StateVersionOptional = boost::optional<StateVersionType>;
     StateVersionOptional state_version;
   };
 
   struct MdibVersionGroup
   {
     using MdibVersionType = unsigned long;
-    using MdibVersionOptional = std::optional<MdibVersionType>;
+    using MdibVersionOptional = boost::optional<MdibVersionType>;
     MdibVersionOptional mdib_version;
 
     using SequenceIdType = WS::ADDRESSING::URIType;
     SequenceIdType sequence_id;
 
     using InstanceIdType = unsigned long;
-    using InstanceIdOptional = std::optional<InstanceIdType>;
+    using InstanceIdOptional = boost::optional<InstanceIdType>;
     InstanceIdOptional instance_id;
 
     explicit MdibVersionGroup(SequenceIdType sequence_id);
@@ -1014,11 +1014,11 @@ namespace BICEPS::PM
   struct Mdib
   {
     using MdDescriptionType = ::BICEPS::PM::MdDescription;
-    using MdDescriptionOptional = std::optional<MdDescriptionType>;
+    using MdDescriptionOptional = boost::optional<MdDescriptionType>;
     MdDescriptionOptional md_description;
 
     using MdStateType = ::BICEPS::PM::MdState;
-    using MdStateOptional = std::optional<MdStateType>;
+    using MdStateOptional = boost::optional<MdStateType>;
     MdStateOptional md_state;
 
     MdibVersionGroup mdib_version_group;

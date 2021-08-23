@@ -57,7 +57,7 @@ namespace BICEPS::MM
   struct AbstractReportPart
   {
     using SourceMdsType = std::string;
-    using SourceMdsOptional = std::optional<SourceMdsType>;
+    using SourceMdsOptional = boost::optional<SourceMdsType>;
     SourceMdsOptional source_mds;
 
   protected:
@@ -148,11 +148,11 @@ namespace BICEPS::MM
     InvocationStateType invocation_state;
 
     using InvocationErrorType = InvocationError;
-    using InvocationErrorOptional = std::optional<InvocationErrorType>;
+    using InvocationErrorOptional = boost::optional<InvocationErrorType>;
     InvocationErrorOptional invocation_error;
 
     using InvocationErrorMessageType = InvocationErrorMessage;
-    using InvocationErrorMessageOptional = std::optional<InvocationErrorMessageType>;
+    using InvocationErrorMessageOptional = boost::optional<InvocationErrorMessageType>;
     InvocationErrorMessageOptional invocation_error_message;
 
     InvocationInfo(TransactionIdType transaction_id, InvocationStateType invocation_state);
@@ -214,7 +214,7 @@ namespace BICEPS::MM
     OperationHandleRefType operation_handle_ref;
 
     using OperationTargetType = PM::HandleRef;
-    using OperationTargetOptional = std::optional<OperationTargetType>;
+    using OperationTargetOptional = boost::optional<OperationTargetType>;
     OperationTargetOptional operation_target;
 
     using InvocationInfoType = InvocationInfo;

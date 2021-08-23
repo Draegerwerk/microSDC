@@ -18,7 +18,7 @@ namespace WS::DPWS
     // ManufacturerUrl
     //
     using ManufacturerUrlType = WS::ADDRESSING::URIType;
-    using ManufacturerUrlOptional = std::optional<ManufacturerUrlType>;
+    using ManufacturerUrlOptional = boost::optional<ManufacturerUrlType>;
     ManufacturerUrlOptional manufacturer_url;
 
     // ModelName
@@ -30,19 +30,19 @@ namespace WS::DPWS
     // ModelNumber
     //
     using ModelNumberType = std::string;
-    using ModelNumberOptional = std::optional<ModelNumberType>;
+    using ModelNumberOptional = boost::optional<ModelNumberType>;
     ModelNumberOptional model_number;
 
     // ModelUrl
     //
     using ModelUrlType = WS::ADDRESSING::URIType;
-    using ModelUrlOptional = std::optional<ModelUrlType>;
+    using ModelUrlOptional = boost::optional<ModelUrlType>;
     ModelUrlOptional model_url;
 
     // PresentationUrl
     //
     using PresentationUrlType = WS::ADDRESSING::URIType;
-    using PresentationUrlOptional = std::optional<PresentationUrlType>;
+    using PresentationUrlOptional = boost::optional<PresentationUrlType>;
     PresentationUrlOptional presentation_url;
   };
 
@@ -57,13 +57,13 @@ namespace WS::DPWS
     // FirmwareVersion
     //
     using FirmwareVersionType = std::string;
-    using FirmwareVersionOptional = std::optional<FirmwareVersionType>;
+    using FirmwareVersionOptional = boost::optional<FirmwareVersionType>;
     FirmwareVersionOptional firmware_version;
 
     // SerialNumber
     //
     using SerialNumberType = std::string;
-    using SerialNumberOptional = std::optional<SerialNumberType>;
+    using SerialNumberOptional = boost::optional<SerialNumberType>;
     SerialNumberOptional serial_number;
   };
   struct HostServiceType
@@ -76,7 +76,7 @@ namespace WS::DPWS
     // Types
     //
     using TypesType = WS::DISCOVERY::QNameListType;
-    using TypesOptional = std::optional<TypesType>;
+    using TypesOptional = boost::optional<TypesType>;
     TypesOptional types;
 
     explicit HostServiceType(EndpointReferenceType epr);

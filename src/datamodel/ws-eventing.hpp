@@ -16,7 +16,7 @@ namespace WS::EVENTING
     NotifyToType notify_to;
 
     using ModeType = std::string;
-    using ModeOptional = std::optional<ModeType>;
+    using ModeOptional = boost::optional<ModeType>;
     ModeOptional mode;
 
     explicit DeliveryType(NotifyToType notify_to);
@@ -51,18 +51,18 @@ namespace WS::EVENTING
   {
   public:
     using EndToType = WS::ADDRESSING::EndpointReferenceType;
-    using EndToOptional = std::optional<EndToType>;
+    using EndToOptional = boost::optional<EndToType>;
     EndToOptional end_to;
 
     using DeliveryType = WS::EVENTING::DeliveryType;
     DeliveryType delivery;
 
     using ExpirationType = WS::EVENTING::ExpirationType;
-    using ExpiresOptional = std::optional<ExpirationType>;
+    using ExpiresOptional = boost::optional<ExpirationType>;
     ExpiresOptional expires;
 
     using FilterType = WS::EVENTING::FilterType;
-    using FilterOptional = std::optional<FilterType>;
+    using FilterOptional = boost::optional<FilterType>;
     FilterOptional filter;
 
     explicit Subscribe(DeliveryType delivery);
@@ -88,7 +88,7 @@ namespace WS::EVENTING
   {
   public:
     using ExpiresType = WS::EVENTING::ExpirationType;
-    using ExpiresOptional = std::optional<ExpiresType>;
+    using ExpiresOptional = boost::optional<ExpiresType>;
     ExpiresOptional expires;
 
     explicit Renew(const rapidxml::xml_node<>& node);
@@ -100,7 +100,7 @@ namespace WS::EVENTING
   struct RenewResponse
   {
     using ExpiresType = WS::EVENTING::ExpirationType;
-    using ExpiresOptional = std::optional<ExpiresType>;
+    using ExpiresOptional = boost::optional<ExpiresType>;
     ExpiresOptional expires;
   };
 

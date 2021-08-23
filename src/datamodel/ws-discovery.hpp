@@ -31,7 +31,7 @@ namespace WS::DISCOVERY
   {
   public:
     using MatchByType = WS::ADDRESSING::URIType;
-    using MatchByOptional = std::optional<MatchByType>;
+    using MatchByOptional = boost::optional<MatchByType>;
     MatchByOptional match_by;
   };
 
@@ -43,7 +43,7 @@ namespace WS::DISCOVERY
     InstanceIdType instance_id;
 
     using SequenceIdType = WS::ADDRESSING::URIType;
-    using SequenceIdOptional = std::optional<SequenceIdType>;
+    using SequenceIdOptional = boost::optional<SequenceIdType>;
     SequenceIdOptional sequence_id;
 
     using MessageNumberType = unsigned int;
@@ -56,19 +56,19 @@ namespace WS::DISCOVERY
     EndpointReferenceType endpoint_reference;
 
     using TypesType = WS::DISCOVERY::QNameListType;
-    using TypesOptional = std::optional<TypesType>;
+    using TypesOptional = boost::optional<TypesType>;
     TypesOptional types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
-    using ScopesOptional = std::optional<ScopesType>;
+    using ScopesOptional = boost::optional<ScopesType>;
     ScopesOptional scopes;
 
     using XAddrsType = WS::DISCOVERY::UriListType;
-    using XAddrsOptional = std::optional<XAddrsType>;
+    using XAddrsOptional = boost::optional<XAddrsType>;
     XAddrsOptional x_addrs;
 
     using MetadataVersionType = unsigned int;
-    using MetadataVersionOptional = std::optional<MetadataVersionType>;
+    using MetadataVersionOptional = boost::optional<MetadataVersionType>;
     MetadataVersionOptional metadata_version;
 
     explicit ByeType(EndpointReferenceType epr);
@@ -80,15 +80,15 @@ namespace WS::DISCOVERY
     EndpointReferenceType endpoint_reference;
 
     using TypesType = ::WS::DISCOVERY::QNameListType;
-    using TypesOptional = std::optional<TypesType>;
+    using TypesOptional = boost::optional<TypesType>;
     TypesOptional types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
-    using ScopesOptional = std::optional<ScopesType>;
+    using ScopesOptional = boost::optional<ScopesType>;
     ScopesOptional scopes;
 
     using XAddrsType = WS::DISCOVERY::UriListType;
-    using XAddrsOptional = std::optional<XAddrsType>;
+    using XAddrsOptional = boost::optional<XAddrsType>;
     XAddrsOptional x_addrs;
 
     using MetadataVersionType = unsigned int;
@@ -102,11 +102,11 @@ namespace WS::DISCOVERY
     explicit ProbeType(const rapidxml::xml_node<>& node);
 
     using TypesType = ::WS::DISCOVERY::QNameListType;
-    using TypesOptional = std::optional<TypesType>;
+    using TypesOptional = boost::optional<TypesType>;
     TypesOptional types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
-    using ScopesOptional = std::optional<ScopesType>;
+    using ScopesOptional = boost::optional<ScopesType>;
     ScopesOptional scopes;
 
   private:
@@ -119,15 +119,15 @@ namespace WS::DISCOVERY
     EndpointReferenceType endpoint_reference;
 
     using TypesType = ::WS::DISCOVERY::QNameListType;
-    using TypesOptional = std::optional<TypesType>;
+    using TypesOptional = boost::optional<TypesType>;
     TypesOptional types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
-    using ScopesOptional = std::optional<ScopesType>;
+    using ScopesOptional = boost::optional<ScopesType>;
     ScopesOptional scopes;
 
     using XAddrsType = WS::DISCOVERY::UriListType;
-    using XAddrsOptional = std::optional<XAddrsType>;
+    using XAddrsOptional = boost::optional<XAddrsType>;
     XAddrsOptional x_addrs;
 
     using MetadataVersionType = unsigned int;
@@ -163,15 +163,15 @@ namespace WS::DISCOVERY
     EndpointReferenceType endpoint_reference;
 
     using TypesType = ::WS::DISCOVERY::QNameListType;
-    using TypesOptional = std::optional<TypesType>;
+    using TypesOptional = boost::optional<TypesType>;
     TypesOptional types;
 
     using ScopesType = WS::DISCOVERY::ScopesType;
-    using ScopesOptional = std::optional<ScopesType>;
+    using ScopesOptional = boost::optional<ScopesType>;
     ScopesOptional scopes;
 
     using XAddrsType = WS::DISCOVERY::UriListType;
-    using XAddrsOptional = std::optional<XAddrsType>;
+    using XAddrsOptional = boost::optional<XAddrsType>;
     XAddrsOptional x_addrs;
 
     using MetadataVersionType = unsigned int;
