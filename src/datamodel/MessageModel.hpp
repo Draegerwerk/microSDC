@@ -6,7 +6,7 @@
 #include "ws-discovery.hpp"
 #include "ws-eventing.hpp"
 #include <memory>
-#include <optional>
+#include <boost/optional.hpp>
 #include <string>
 
 namespace MESSAGEMODEL

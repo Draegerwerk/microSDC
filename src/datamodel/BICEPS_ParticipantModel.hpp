@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ws-addressing.hpp"
-#include <optional>
+#include <boost/optional.hpp>
 #include <string>
 #include <vector>
 

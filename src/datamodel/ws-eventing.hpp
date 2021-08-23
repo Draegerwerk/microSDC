@@ -3,7 +3,7 @@
 #include "ws-addressing.hpp"
 #include "xs_duration.hpp"
 #include <memory>
-#include <optional>
+#include <boost/optional.hpp>
 #include <string>
 #include <vector>
 

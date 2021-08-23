@@ -1,6 +1,6 @@
 #pragma once
 
-#include <optional>
+#include <boost/optional.hpp>
 #include <string>
 
 /// @brief NetworkConfig holds configuration of Network settings relevant to configure MicroSDC
@@ -41,7 +41,7 @@ public:
 
   /// @brief gets the optional discoveryProxy for ws-discovery
   /// @return the configured discovery proxy ip address
-  const std::optional<std::string>& discovery_proxy() const;
+  const boost::optional<std::string>& discovery_proxy() const;
 
   /// @brief gets the configured discoveryProxyProtocol
   /// @return the protocol the discovery proxy is communicating
@@ -56,7 +56,7 @@ private:
   /// the configured port
   std::uint16_t port_;
   /// the ip address of the discovery proxy to use in ws-discovery
-  std::optional<std::string> discovery_proxy_;
+  boost::optional<std::string> discovery_proxy_;
   /// the communication protocol of the discovery proxy
   DiscoveryProxyProtocol discovery_proxy_protocol_{DiscoveryProxyProtocol::UDP};
 };

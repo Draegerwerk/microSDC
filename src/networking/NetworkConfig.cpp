@@ -33,7 +33,7 @@ std::uint16_t NetworkConfig::port() const
   return port_;
 }
 
-const std::optional<std::string>& NetworkConfig::discovery_proxy() const
+const boost::optional<std::string>& NetworkConfig::discovery_proxy() const
 {
   return discovery_proxy_;
 }
