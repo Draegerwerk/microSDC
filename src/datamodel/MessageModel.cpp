@@ -5,7 +5,7 @@
 #include "ws-eventing.hpp"
 #include <cstring>
 #include <memory>
-#include <optional>
+#include <boost/optional.hpp>
 
 namespace MESSAGEMODEL
 {
@@ -48,7 +48,7 @@ namespace MESSAGEMODEL
       else if (strncmp(entry->name(), "MessageID", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
-        message_id = std::make_optional<MessageIDType>(*entry);
+        message_id = boost::optional<MessageIDType>(*entry);
       }
       else if (strncmp(entry->name(), "ReferenceParameters", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
@@ -63,17 +63,17 @@ namespace MESSAGEMODEL
       else if (strncmp(entry->name(), "ReplyTo", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
-        reply_to = std::make_optional<ReplyToType>(*entry);
+        reply_to = boost::optional<ReplyToType>(*entry);
       }
       else if (strncmp(entry->name(), "To", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), MDPWS::WS_NS_ADDRESSING, entry->xmlns_size()) == 0)
       {
-        to = std::make_optional<ToType>(*entry);
+        to = boost::optional<ToType>(*entry);
       }
       else if (strncmp(entry->name(), "Identifier", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        identifier = std::make_optional<IdentifierType>(*entry);
+        identifier = boost::optional<IdentifierType>(*entry);
       }
     }
   }
@@ -97,46 +97,46 @@ namespace MESSAGEMODEL
     if (strncmp(body_content->name(), "Probe", body_content->name_size()) == 0 &&
         strncmp(body_content->xmlns(), MDPWS::WS_NS_DISCOVERY, body_content->xmlns_size()) == 0)
     {
-      probe = std::make_optional<ProbeType>(*body_content);
+      probe = boost::optional<ProbeType>(*body_content);
     }
     else if (strncmp(body_content->name(), "Resolve", body_content->name_size()) == 0 &&
              strncmp(body_content->xmlns(), MDPWS::WS_NS_DISCOVERY, body_content->xmlns_size()) ==
                  0)
     {
-      resolve = std::make_optional<ResolveType>(*body_content);
+      resolve = boost::optional<ResolveType>(*body_content);
     }
     else if (strncmp(body_content->name(), "GetMetadata", body_content->name_size()) == 0 &&
              strncmp(body_content->xmlns(), MDPWS::WS_NS_METADATA_EXCHANGE,
                      body_content->xmlns_size()) == 0)
     {
-      get_metadata = std::make_optional<GetMetadataType>(*body_content);
+      get_metadata = boost::optional<GetMetadataType>(*body_content);
     }
     else if (strncmp(body_content->name(), "Subscribe", body_content->name_size()) == 0 &&
              strncmp(body_content->xmlns(), MDPWS::WS_NS_EVENTING, body_content->xmlns_size()) == 0)
     {
-      subscribe = std::make_optional<SubscribeType>(*body_content);
+      subscribe = boost::optional<SubscribeType>(*body_content);
     }
     else if (strncmp(body_content->name(), "Renew", body_content->name_size()) == 0 &&
              strncmp(body_content->xmlns(), MDPWS::WS_NS_EVENTING, body_content->xmlns_size()) == 0)
     {
-      renew = std::make_optional<RenewType>(*body_content);
+      renew = boost::optional<RenewType>(*body_content);
     }
     else if (strncmp(body_content->name(), "Unsubscribe", body_content->name_size()) == 0 &&
              strncmp(body_content->xmlns(), MDPWS::WS_NS_EVENTING, body_content->xmlns_size()) == 0)
     {
-      unsubscribe = std::make_optional<UnsubscribeType>(*body_content);
+      unsubscribe = boost::optional<UnsubscribeType>(*body_content);
     }
     else if (strncmp(body_content->name(), "SetString", body_content->name_size()) == 0 &&
              strncmp(body_content->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL,
                      body_content->xmlns_size()) == 0)
     {
-      set_string = std::make_optional<SetStringType>(*body_content);
+      set_string = boost::optional<SetStringType>(*body_content);
     }
     else if (strncmp(body_content->name(), "SetValue", body_content->name_size()) == 0 &&
              strncmp(body_content->xmlns(), SDC::NS_BICEPS_MESSAGE_MODEL,
                      body_content->xmlns_size()) == 0)
     {
-      set_value = std::make_optional<SetValueType>(*body_content);
+      set_value = boost::optional<SetValueType>(*body_content);
     }
   }
 

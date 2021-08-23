@@ -18,12 +18,12 @@ namespace WS::MEX
       if (strncmp(entry->name(), "Dialect", entry->name_size()) == 0 &&
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE, entry->xmlns_size()) == 0)
       {
-        dialect = std::make_optional<DialectType>(entry->value(), entry->value_size());
+        dialect = boost::optional<DialectType>(entry->value(), entry->value_size());
       }
       else if (strncmp(entry->name(), "Identifier", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_METADATA_EXCHANGE, entry->xmlns_size()) == 0)
       {
-        identifier = std::make_optional<IdentifierType>(entry->value(), entry->value_size());
+        identifier = boost::optional<IdentifierType>(entry->value(), entry->value_size());
       }
     }
   }

@@ -19,7 +19,7 @@ public:
   std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override
   {
     auto state = std::make_shared<BICEPS::PM::NumericMetricState>(get_descriptor_handle());
-    state->metric_value = std::make_optional<BICEPS::PM::NumericMetricValue>(
+    state->metric_value = boost::optional<BICEPS::PM::NumericMetricValue>(
         BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::VLD});
     state->metric_value->value = 42;
     return state;
@@ -60,7 +60,7 @@ public:
   std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override
   {
     auto state = std::make_shared<BICEPS::PM::StringMetricState>(get_descriptor_handle());
-    state->metric_value = std::make_optional<BICEPS::PM::StringMetricValue>(
+    state->metric_value = boost::optional<BICEPS::PM::StringMetricValue>(
         BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::VLD});
     state->metric_value->value = "Hello Esp32!";
     return state;
@@ -101,7 +101,7 @@ public:
   std::shared_ptr<BICEPS::PM::AbstractState> get_initial_state() const override
   {
     auto state = std::make_shared<BICEPS::PM::EnumStringMetricState>(get_descriptor_handle());
-    state->metric_value = std::make_optional<BICEPS::PM::StringMetricValue>(
+    state->metric_value = boost::optional<BICEPS::PM::StringMetricValue>(
         BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::VLD});
     state->metric_value->value = "OFF";
     return state;

@@ -46,7 +46,7 @@ void GetService::handle_request(std::unique_ptr<Request> req)
     BICEPS::PM::MdibVersionGroup version_group{sequence_id};
     version_group.mdib_version = micro_sdc_.get_mdib().mdib_version_group.mdib_version.value_or(0);
     response_envelope.body.get_mdib_response =
-        std::make_optional<MESSAGEMODEL::Body::GetMdibResponseType>(version_group,
+        boost::optional<MESSAGEMODEL::Body::GetMdibResponseType>(version_group,
                                                                     micro_sdc_.get_mdib());
     req->respond(response_envelope);
   }

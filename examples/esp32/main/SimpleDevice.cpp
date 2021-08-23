@@ -10,7 +10,7 @@ std::shared_ptr<BICEPS::PM::AbstractState>
 SimpleDevice::NumericStateHandler::get_initial_state() const
 {
   auto state = std::make_shared<BICEPS::PM::NumericMetricState>(get_descriptor_handle());
-  state->metric_value = std::make_optional<BICEPS::PM::NumericMetricValue>(
+  state->metric_value = boost::optional<BICEPS::PM::NumericMetricValue>(
       BICEPS::PM::MetricQuality{BICEPS::PM::MeasurementValidity::VLD});
   state->metric_value->value = 0;
   return state;

@@ -99,7 +99,7 @@ namespace WS::EVENTING
       if (strncmp(entry->name(), "EndTo", entry->name_size()) == 0 &&
           strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        end_to = std::make_optional<EndToType>(*entry);
+        end_to = boost::optional<EndToType>(*entry);
       }
       else if (strncmp(entry->name(), "Delivery", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
@@ -110,12 +110,12 @@ namespace WS::EVENTING
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
         expires =
-            std::make_optional<ExpirationType>(std::string(entry->value(), entry->value_size()));
+            boost::optional<ExpirationType>(std::string(entry->value(), entry->value_size()));
       }
       else if (strncmp(entry->name(), "Filter", entry->name_size()) == 0 &&
                strncmp(entry->xmlns(), ::MDPWS::WS_NS_EVENTING, entry->xmlns_size()) == 0)
       {
-        filter = std::make_optional<FilterType>(*entry);
+        filter = boost::optional<FilterType>(*entry);
       }
     }
   }
